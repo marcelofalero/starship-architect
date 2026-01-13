@@ -54,10 +54,19 @@ const setup = () => {
     });
 
     const isSizeValid = (itemDef) => {
-        if (!itemDef.maxSize) return true;
-        const rankIndex = shipStore.db.SIZE_RANK.indexOf(itemDef.maxSize);
         const shipIndex = shipStore.db.SIZE_RANK.indexOf(shipStore.chassis.size);
-        return shipIndex <= rankIndex;
+
+        if (itemDef.maxSize) {
+            const rankIndex = shipStore.db.SIZE_RANK.indexOf(itemDef.maxSize);
+            if (shipIndex > rankIndex) return false;
+        }
+
+        if (itemDef.minShipSize) {
+            const minRankIndex = shipStore.db.SIZE_RANK.indexOf(itemDef.minShipSize);
+            if (shipIndex < minRankIndex) return false;
+        }
+
+        return true;
     };
 
     const previewCost = computed(() => {
