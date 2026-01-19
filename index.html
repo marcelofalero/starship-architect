@@ -122,7 +122,9 @@
                                         <q-badge v-if="scope.opt.availability === 'Military'" color="negative" label="Mil" />
                                     </q-item-label>
                                     <q-item-label caption class="text-grey-5" v-if="!isSizeValid(scope.opt)">
-                                        <q-icon name="block" color="negative" class="q-mr-xs"/> {{ $t('ui.max_size') }}: {{ scope.opt.maxSize }}
+                                        <q-icon name="block" color="negative" class="q-mr-xs"/>
+                                        <span v-if="scope.opt.maxSize">{{ $t('ui.max_size') }}: {{ scope.opt.maxSize }}</span>
+                                        <span v-if="scope.opt.minShipSize">{{ $t('ui.min_size') }}: {{ scope.opt.minShipSize }}</span>
                                     </q-item-label>
                                 </q-item-section>
                             </q-item>

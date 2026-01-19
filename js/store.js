@@ -9,7 +9,6 @@ export const useShipStore = defineStore('ship', () => {
         TEMPLATES: [],
         SIZE_COST_MULTIPLIERS: {},
         REFLEX_SIZE_MODS: {},
-        MAX_SR_BY_SIZE: {},
         LICENSE_FEES: {},
         AVAILABILITY_RANK: [],
         SIZE_RANK: []
@@ -137,8 +136,6 @@ export const useShipStore = defineStore('ship', () => {
         return db.AVAILABILITY_RANK[maxRank];
     });
 
-    const maxSrAllowed = computed(() => db.MAX_SR_BY_SIZE[chassis.value.size] || 999);
-    const isSrIllegal = computed(() => (currentStats.value.sr || 0) > maxSrAllowed.value);
     const reflexDefense = computed(() => {
         const dexMod = Math.floor(((currentStats.value.dex || 10) - 10) / 2);
         const armor = currentStats.value.armor || 0;
@@ -224,7 +221,7 @@ export const useShipStore = defineStore('ship', () => {
     return {
         db, initDb,
         meta, chassisId, activeTemplate, installedMods, engineering, showAddModDialog,
-        chassis, template, currentStats, currentCargo, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, modsCost, licensingCost, shipAvailability, maxSrAllowed, isSrIllegal, sizeMultVal,
+        chassis, template, currentStats, currentCargo, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, modsCost, licensingCost, shipAvailability, sizeMultVal,
         addMod, removeMod, reset, createNew, loadState, getModCost, getModEp
     };
 });
