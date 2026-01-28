@@ -803,7 +803,8 @@
                     "maxAdd": 16,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -824,7 +825,8 @@
                     "maxAdd": 32,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1097,7 +1099,8 @@
                     "maxAdd": 12,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1118,7 +1121,8 @@
                     "maxAdd": 24,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1161,7 +1165,8 @@
                     "maxAdd": 32,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1182,7 +1187,8 @@
                     "maxAdd": 64,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1227,7 +1233,8 @@
                     "maxAdd": 60,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {
@@ -1249,7 +1256,8 @@
                     "maxAdd": 120,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
-                }
+                },
+                "fireLinkOption": true
             }
         },
         {

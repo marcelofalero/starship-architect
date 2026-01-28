@@ -65,7 +65,7 @@ export const useShipStore = defineStore('ship', () => {
         let cost = def.baseCost;
         if (def.sizeMult) cost *= sizeMultVal.value;
 
-        // Modifications (Payload, Battery)
+        // Modifications (Payload, Battery, Fire-link)
         if (mod.modifications) {
              if (def.upgradeSpecs && def.upgradeSpecs.payload) {
                  if (def.upgradeSpecs.payload.type === 'capacity' && mod.modifications.payloadCount > 0) {
@@ -73,6 +73,9 @@ export const useShipStore = defineStore('ship', () => {
                  } else if (mod.modifications.payloadOption && def.upgradeSpecs.payload.type === 'toggle') {
                      cost += def.upgradeSpecs.payload.cost;
                  }
+             }
+             if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && mod.modifications.fireLinkOption) {
+                 cost += 1000;
              }
              if (mod.modifications.batteryCount > 1) {
                  cost *= mod.modifications.batteryCount;
@@ -210,7 +213,7 @@ export const useShipStore = defineStore('ship', () => {
             });
             if (existing) removeMod(existing.instanceId);
         }
-        installedMods.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1 } });
+        installedMods.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } });
     }
     function removeMod(instanceId) { installedMods.value = installedMods.value.filter(m => m.instanceId !== instanceId); }
     function reset() { activeTemplate.value = null; installedMods.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; }
@@ -220,7 +223,7 @@ export const useShipStore = defineStore('ship', () => {
         if(ship && ship.defaultMods) ship.defaultMods.forEach(defId => {
             const def = db.EQUIPMENT.find(e => e.id === defId);
             let loc = 'Installed'; if(def && def.type === 'engine') loc = 'Aft Section';
-            if(def) installedMods.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1 } });
+            if(def) installedMods.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } });
         });
     }
     function loadState(state) {
@@ -228,7 +231,7 @@ export const useShipStore = defineStore('ship', () => {
         if(Array.isArray(state.configuration.templates)) activeTemplate.value = state.configuration.templates[0] || null;
         else activeTemplate.value = state.configuration.template;
         engineering.hasStarshipDesigner = state.configuration.feats.starshipDesigner;
-        installedMods.value = state.manifest.map(m => ({ instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1 } }));
+        installedMods.value = state.manifest.map(m => ({ instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } }));
     }
     watch([meta, chassisId, activeTemplate, installedMods, engineering], () => {
         const saveObj = {
