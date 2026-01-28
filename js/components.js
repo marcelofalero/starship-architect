@@ -92,6 +92,9 @@ const SystemList = {
                         <div class="text-caption">Battery Size</div>
                         <q-input dark type="number" filled v-model.number="editingMod.modifications.batteryCount" label="Battery Count" min="1" max="6" />
                     </div>
+                    <div v-if="getUpgradeSpecs(editingMod.defId)?.fireLinkOption" class="q-mb-md">
+                        <q-checkbox dark v-model="editingMod.modifications.fireLinkOption" label="Selective Fire (+1,000 cr)" />
+                    </div>
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat label="Close" color="primary" v-close-popup />
