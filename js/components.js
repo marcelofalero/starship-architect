@@ -56,7 +56,8 @@ const SystemList = {
                         <span v-if="getEpDynamic(mod.defId)" class="text-positive">+{{ Math.abs(getEpDynamic(mod.defId)) }} EP</span><span v-else>{{ mod.location }}</span>
                     </q-item-label>
                     <q-item-label v-if="mod.modifications" caption class="text-info">
-                        <span v-if="mod.modifications.payloadOption" class="q-mr-xs">Extra Payload</span>
+                        <span v-if="getUpgradeSpecs(mod.defId)?.payload?.type === 'capacity' && mod.modifications.payloadCount > 0" class="q-mr-xs">Payload: {{ getUpgradeSpecs(mod.defId).payload.base }} + {{ mod.modifications.payloadCount }}</span>
+                        <span v-else-if="mod.modifications.payloadOption" class="q-mr-xs">Extra Payload</span>
                         <span v-if="mod.modifications.batteryCount > 1">Battery ({{ mod.modifications.batteryCount }})</span>
                     </q-item-label>
                 </q-item-section>
@@ -81,7 +82,11 @@ const SystemList = {
                 <q-card-section><div class="text-h6">Configure System</div></q-card-section>
                 <q-card-section v-if="editingMod">
                     <div v-if="getUpgradeSpecs(editingMod.defId)?.payload" class="q-mb-md">
-                        <q-checkbox dark v-model="editingMod.modifications.payloadOption" :label="getUpgradeSpecs(editingMod.defId).payload.label + ' (' + format(getUpgradeSpecs(editingMod.defId).payload.cost) + ')'" />
+                        <div v-if="getUpgradeSpecs(editingMod.defId).payload.type === 'capacity'">
+                            <div class="text-caption">Additional {{ getUpgradeSpecs(editingMod.defId).payload.unitLabel }} ({{ format(store.db.EQUIPMENT.find(e => e.id === editingMod.defId).baseCost * getUpgradeSpecs(editingMod.defId).payload.costFactor) }} each)</div>
+                            <q-input dark type="number" filled v-model.number="editingMod.modifications.payloadCount" label="Additional Capacity" min="0" :max="getUpgradeSpecs(editingMod.defId).payload.maxAdd" :hint="'Base: ' + getUpgradeSpecs(editingMod.defId).payload.base + ' | Max Add: ' + getUpgradeSpecs(editingMod.defId).payload.maxAdd" />
+                        </div>
+                        <q-checkbox v-else dark v-model="editingMod.modifications.payloadOption" :label="getUpgradeSpecs(editingMod.defId).payload.label + ' (' + format(getUpgradeSpecs(editingMod.defId).payload.cost) + ')'" />
                     </div>
                     <div v-if="getUpgradeSpecs(editingMod.defId)?.battery" class="q-mb-md">
                         <div class="text-caption">Battery Size</div>
