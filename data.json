@@ -518,7 +518,10 @@
             "baseCost": 3000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Licensed"
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_light_quad",
@@ -530,7 +533,10 @@
             "baseCost": 5000,
             "baseEp": 2,
             "sizeMult": false,
-            "availability": "Restricted"
+            "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_light_fl2",
@@ -587,7 +593,10 @@
             "baseCost": 7500,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Restricted"
+            "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_med_quad",
@@ -599,7 +608,10 @@
             "baseCost": 12500,
             "baseEp": 2,
             "sizeMult": false,
-            "availability": "Restricted"
+            "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_med_fl2",
@@ -656,7 +668,10 @@
             "baseCost": 12000,
             "baseEp": 2,
             "sizeMult": false,
-            "availability": "Military"
+            "availability": "Military",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_hvy_quad",
@@ -668,7 +683,10 @@
             "baseCost": 20000,
             "baseEp": 3,
             "sizeMult": false,
-            "availability": "Military"
+            "availability": "Military",
+            "upgradeSpecs": {
+                "battery": true
+            }
         },
         {
             "id": "laser_hvy_fl2",
@@ -812,14 +830,89 @@
             }
         },
         {
-            "id": "ion_cannon",
-            "name": "Ion Cannon",
-            "name_es": "Ca\u00f1\u00f3n de Iones",
+            "id": "ion_cannon_light",
+            "name": "Light Ion Cannon (3d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero (3d10x2)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
-            "baseCost": 5000,
+            "baseCost": 2000,
             "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_light_twin",
+            "name": "Twin Light Ion Cannon (3d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero Doble (3d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 6000,
+            "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_light_quad",
+            "name": "Quad Light Ion Cannon (3d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero Cu\u00e1druple (3d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 10000,
+            "baseEp": 2,
+            "sizeMult": false,
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_light_fl2",
+            "name": "Fire-linked (2) Light Ion Cannon (3d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero Enlazado (2) (3d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 4000,
+            "baseEp": 3,
+            "sizeMult": false,
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_light_fl4",
+            "name": "Fire-linked (4) Light Ion Cannon (3d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero Enlazado (4) (3d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 8000,
+            "baseEp": 6,
+            "sizeMult": false,
+            "availability": "Licensed",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon",
+            "name": "Medium Ion Cannon (5d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano (5d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 3000,
+            "baseEp": 2,
             "sizeMult": false,
             "availability": "Restricted",
             "upgradeSpecs": {
@@ -827,13 +920,28 @@
             }
         },
         {
-            "id": "ion_cannon_fl2",
-            "name": "Fire-linked (2) Ion Cannon",
-            "name_es": "Ca\u00f1\u00f3n de Iones Enlazado (2)",
+            "id": "ion_cannon_twin",
+            "name": "Twin Medium Ion Cannon (5d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano Doble (5d10x2)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
-            "baseCost": 10000,
+            "baseCost": 9000,
+            "baseEp": 2,
+            "sizeMult": false,
+            "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_quad",
+            "name": "Quad Medium Ion Cannon (5d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano Cu\u00e1druple (5d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 15000,
             "baseEp": 3,
             "sizeMult": false,
             "availability": "Restricted",
@@ -842,16 +950,111 @@
             }
         },
         {
-            "id": "ion_cannon_fl4",
-            "name": "Fire-linked (4) Ion Cannon",
-            "name_es": "Ca\u00f1\u00f3n de Iones Enlazado (4)",
+            "id": "ion_cannon_fl2",
+            "name": "Fire-linked (2) Medium Ion Cannon (5d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano Enlazado (2) (5d10x2)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
-            "baseCost": 20000,
-            "baseEp": 6,
+            "baseCost": 6000,
+            "baseEp": 5,
             "sizeMult": false,
             "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_fl4",
+            "name": "Fire-linked (4) Medium Ion Cannon (5d10x2)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano Enlazado (4) (5d10x2)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 12000,
+            "baseEp": 10,
+            "sizeMult": false,
+            "availability": "Restricted",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_hvy",
+            "name": "Heavy Ion Cannon (3d10x5)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado (3d10x5)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 6000,
+            "baseEp": 5,
+            "sizeMult": false,
+            "availability": "Military",
+            "minShipSize": "Colossal (frigate)",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_hvy_twin",
+            "name": "Twin Heavy Ion Cannon (3d10x5)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado Doble (3d10x5)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 18000,
+            "baseEp": 5,
+            "sizeMult": false,
+            "availability": "Military",
+            "minShipSize": "Colossal (frigate)",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_hvy_quad",
+            "name": "Quad Heavy Ion Cannon (3d10x5)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado Cu\u00e1druple (3d10x5)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 30000,
+            "baseEp": 6,
+            "sizeMult": false,
+            "availability": "Military",
+            "minShipSize": "Colossal (frigate)",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_hvy_fl2",
+            "name": "Fire-linked (2) Heavy Ion Cannon (3d10x5)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado Enlazado (2) (3d10x5)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 12000,
+            "baseEp": 11,
+            "sizeMult": false,
+            "availability": "Military",
+            "minShipSize": "Colossal (frigate)",
+            "upgradeSpecs": {
+                "battery": true
+            }
+        },
+        {
+            "id": "ion_cannon_hvy_fl4",
+            "name": "Fire-linked (4) Heavy Ion Cannon (3d10x5)",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado Enlazado (4) (3d10x5)",
+            "category": "Weapon Systems",
+            "group": "Ion Weapons",
+            "type": "weapon",
+            "baseCost": 24000,
+            "baseEp": 22,
+            "sizeMult": false,
+            "availability": "Military",
+            "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
             }
