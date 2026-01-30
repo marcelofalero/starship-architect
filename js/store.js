@@ -18,9 +18,9 @@ export const useShipStore = defineStore('ship', () => {
     const meta = reactive({ name: 'Untitled Ship', version: '1.0' });
     const chassisId = ref('light_fighter');
     const activeTemplate = ref(null);
-    const installedMods = ref([]);
+    const installedComponents = ref([]);
     const engineering = reactive({ hasStarshipDesigner: false });
-    const showAddModDialog = ref(false);
+    const showAddComponentDialog = ref(false);
 
     // Initialize DB Action
     function initDb(data) {
@@ -28,9 +28,14 @@ export const useShipStore = defineStore('ship', () => {
     }
 
     // Helper functions
-    function getModEp(mod) {
-        const def = db.EQUIPMENT.find(e => e.id === mod.defId);
-        if (!def || mod.isStock) return 0;
+    const chassis = computed(() => {
+        if (!db.STOCK_SHIPS.length) return { size: 'Huge', baseEp: 0, cost: 0, stats: {}, logistics: {} }; // Fallback
+        return db.STOCK_SHIPS.find(s => s.id === chassisId.value) || db.STOCK_SHIPS[0];
+    });
+
+    function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0) {
+        const def = db.EQUIPMENT.find(e => e.id === defId);
+        if (!def) return 0;
 
         let epCost = def.baseEp;
         // Dynamic EP (Gain)
@@ -39,64 +44,62 @@ export const useShipStore = defineStore('ship', () => {
         }
 
         // Modifications (Battery)
-        if (mod.modifications) {
-            if (mod.modifications.batteryCount > 1) {
-                epCost *= mod.modifications.batteryCount;
-            }
+        if (batteryCount > 1) {
+            epCost *= batteryCount;
         }
 
-        // Non-Standard Logic (New)
-        if (mod.isNonStandard && epCost > 0) {
+        // Non-Standard Logic
+        if (isNonStandard && epCost > 0) {
             epCost *= 2;
         }
 
         // Miniaturization
         if (epCost > 0) {
-            if (mod.miniaturization === 1) epCost = Math.max(1, epCost - 1);
-            else if (mod.miniaturization === 2) epCost = Math.ceil(epCost / 2);
+            if (miniaturization === 1) epCost = Math.max(1, epCost - 1);
+            else if (miniaturization === 2) epCost = Math.ceil(epCost / 2);
         }
         return epCost;
     }
 
-    function getModCost(mod) {
-        const def = db.EQUIPMENT.find(e => e.id === mod.defId);
-        if (!def || mod.isStock) return 0;
+    function getComponentEp(component) {
+        const batteryCount = component.modifications?.batteryCount || 1;
+        return calculateEp(component.defId, batteryCount, component.isNonStandard, component.miniaturization);
+    }
+
+    function getComponentCost(component) {
+        const def = db.EQUIPMENT.find(e => e.id === component.defId);
+        if (!def || component.isStock) return 0;
 
         let cost = def.baseCost;
         if (def.sizeMult) cost *= sizeMultVal.value;
 
         // Modifications (Payload, Battery, Fire-link)
-        if (mod.modifications) {
+        if (component.modifications) {
              if (def.upgradeSpecs && def.upgradeSpecs.payload) {
-                 if (def.upgradeSpecs.payload.type === 'capacity' && mod.modifications.payloadCount > 0) {
-                     cost += mod.modifications.payloadCount * (def.baseCost * def.upgradeSpecs.payload.costFactor);
-                 } else if (mod.modifications.payloadOption && def.upgradeSpecs.payload.type === 'toggle') {
+                 if (def.upgradeSpecs.payload.type === 'capacity' && component.modifications.payloadCount > 0) {
+                     cost += component.modifications.payloadCount * (def.baseCost * def.upgradeSpecs.payload.costFactor);
+                 } else if (component.modifications.payloadOption && def.upgradeSpecs.payload.type === 'toggle') {
                      cost += def.upgradeSpecs.payload.cost;
                  }
              }
-             if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && mod.modifications.fireLinkOption) {
+             if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && component.modifications.fireLinkOption) {
                  cost += 1000;
              }
-             if (mod.modifications.batteryCount > 1) {
-                 cost *= mod.modifications.batteryCount;
+             if (component.modifications.batteryCount > 1) {
+                 cost *= component.modifications.batteryCount;
              }
         }
 
-        if (mod.miniaturization === 1) cost *= 2;
-        else if (mod.miniaturization === 2) cost *= 5;
+        if (component.miniaturization === 1) cost *= 2;
+        else if (component.miniaturization === 2) cost *= 5;
 
         // Apply Non-Standard Multiplier
-        if (mod.isNonStandard) cost *= 5;
+        if (component.isNonStandard) cost *= 5;
 
         return cost;
     }
 
     // Computed Properties
-    const chassis = computed(() => {
-        if (!db.STOCK_SHIPS.length) return { size: 'Huge', baseEp: 0, cost: 0, stats: {}, logistics: {} }; // Fallback
-        return db.STOCK_SHIPS.find(s => s.id === chassisId.value) || db.STOCK_SHIPS[0];
-    });
-
     const template = computed(() => activeTemplate.value ? db.TEMPLATES.find(t => t.id === activeTemplate.value) : null);
     const templateCostMult = computed(() => template.value ? template.value.costMult : 1);
     const sizeMultVal = computed(() => db.SIZE_COST_MULTIPLIERS[chassis.value.size] || 1);
@@ -111,7 +114,7 @@ export const useShipStore = defineStore('ship', () => {
         let bonusDex = 0, bonusStr = 0, bonusPer = 0, speedFactor = 0, hyperdriveShift = 0;
         let hpBonusPct = 0;
 
-        installedMods.value.forEach(mod => {
+        installedComponents.value.forEach(mod => {
             const def = db.EQUIPMENT.find(e => e.id === mod.defId);
             if (def && def.stats) {
                 if (def.stats.sr !== undefined) modSR = def.stats.sr;
@@ -151,7 +154,7 @@ export const useShipStore = defineStore('ship', () => {
 
     const shipAvailability = computed(() => {
         let maxRank = 0;
-        installedMods.value.forEach(mod => {
+        installedComponents.value.forEach(mod => {
             const def = db.EQUIPMENT.find(e => e.id === mod.defId);
             if (def && def.availability) {
                 const rank = db.AVAILABILITY_RANK.indexOf(def.availability);
@@ -175,48 +178,64 @@ export const useShipStore = defineStore('ship', () => {
         let val = parseFloat(match[1].replace(/,/g, ''));
         const unit = match[2];
         let multiplier = 1.0;
-        installedMods.value.forEach(mod => {
+        installedComponents.value.forEach(mod => {
             const def = db.EQUIPMENT.find(e => e.id === mod.defId);
             if (def && def.stats && def.stats.cargo_factor) multiplier = def.stats.cargo_factor;
         });
         val = val * multiplier;
         return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(val) + ' ' + unit;
     });
+
+    const stockConfigurationEp = computed(() => {
+        if (!chassis.value.defaultMods) return 0;
+        return chassis.value.defaultMods.reduce((total, modConfig) => {
+             let defId = modConfig;
+             let batteryCount = 1;
+             if (typeof modConfig === 'object' && modConfig !== null) {
+                 defId = modConfig.id;
+                 if (modConfig.batteryCount) batteryCount = modConfig.batteryCount;
+             }
+             return total + calculateEp(defId, batteryCount);
+        }, 0);
+    });
+
     const totalEP = computed(() => {
-        let ep = chassis.value.baseEp;
+        let ep = chassis.value.baseEp + stockConfigurationEp.value;
         if(template.value) ep += (template.value.epMod || 0);
         return ep;
     });
-    const usedEP = computed(() => installedMods.value.reduce((total, mod) => total + getModEp(mod), 0));
+    const usedEP = computed(() => installedComponents.value.reduce((total, mod) => total + getComponentEp(mod), 0));
     const remainingEP = computed(() => totalEP.value - usedEP.value);
     const epUsagePct = computed(() => usedEP.value / totalEP.value);
 
     const hullCost = computed(() => Math.floor(chassis.value.cost * templateCostMult.value));
-    const modsCost = computed(() => installedMods.value.reduce((total, mod) => total + getModCost(mod), 0));
-    const licensingCost = computed(() => installedMods.value.reduce((total, mod) => {
+    const componentsCost = computed(() => installedComponents.value.reduce((total, mod) => total + getComponentCost(mod), 0));
+    const licensingCost = computed(() => installedComponents.value.reduce((total, mod) => {
         if (mod.isStock) return total;
         const def = db.EQUIPMENT.find(e => e.id === mod.defId);
         if (!def || !def.availability) return total;
         const feePct = db.LICENSE_FEES[def.availability] || 0;
-        return total + (getModCost(mod) * feePct);
+        return total + (getComponentCost(mod) * feePct);
     }, 0));
-    const totalCost = computed(() => hullCost.value + modsCost.value + licensingCost.value);
+    const totalCost = computed(() => hullCost.value + componentsCost.value + licensingCost.value);
 
     // Actions
-    function addMod(defId, location, isNonStandard = false) {
+    function addComponent(defId, location, isNonStandard = false) {
         const def = db.EQUIPMENT.find(e => e.id === defId);
         if (!def) return;
         if (def.exclusiveGroup) {
-            const existing = installedMods.value.find(m => {
+            const existing = installedComponents.value.find(m => {
                 const mDef = db.EQUIPMENT.find(e => e.id === m.defId);
                 return mDef && mDef.exclusiveGroup === def.exclusiveGroup;
             });
-            if (existing) removeMod(existing.instanceId);
+            if (existing) removeComponent(existing.instanceId);
         }
-        installedMods.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } });
+        const mods = { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false };
+        if (def.type === 'weapon') mods.weaponUser = 'Pilot';
+        installedComponents.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: mods });
     }
-    function removeMod(instanceId) { installedMods.value = installedMods.value.filter(m => m.instanceId !== instanceId); }
-    function reset() { activeTemplate.value = null; installedMods.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; }
+    function removeComponent(instanceId) { installedComponents.value = installedComponents.value.filter(m => m.instanceId !== instanceId); }
+    function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; }
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
         const ship = db.STOCK_SHIPS.find(s => s.id === newChassisId);
@@ -231,7 +250,11 @@ export const useShipStore = defineStore('ship', () => {
 
             const def = db.EQUIPMENT.find(e => e.id === defId);
             let loc = 'Installed'; if(def && def.type === 'engine') loc = 'Aft Section';
-            if(def) installedMods.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, fireLinkOption: false } });
+            if(def) {
+                const mods = { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, fireLinkOption: false };
+                if (def.type === 'weapon') mods.weaponUser = 'Pilot';
+                installedComponents.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: mods });
+            }
         });
     }
     function loadState(state) {
@@ -239,22 +262,27 @@ export const useShipStore = defineStore('ship', () => {
         if(Array.isArray(state.configuration.templates)) activeTemplate.value = state.configuration.templates[0] || null;
         else activeTemplate.value = state.configuration.template;
         engineering.hasStarshipDesigner = state.configuration.feats.starshipDesigner;
-        installedMods.value = state.manifest.map(m => ({ instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } }));
+        installedComponents.value = state.manifest.map(m => {
+            const mods = m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false };
+            const def = db.EQUIPMENT.find(e => e.id === m.defId);
+            if (def && def.type === 'weapon' && !mods.weaponUser) mods.weaponUser = 'Pilot';
+            return { instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: mods };
+        });
     }
-    watch([meta, chassisId, activeTemplate, installedMods, engineering], () => {
+    watch([meta, chassisId, activeTemplate, installedComponents, engineering], () => {
         const saveObj = {
             apiVersion: "1.9",
             meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
             configuration: { baseChassis: chassisId.value, template: activeTemplate.value, feats: { starshipDesigner: engineering.hasStarshipDesigner } },
-            manifest: installedMods.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: m.modifications }))
+            manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: m.modifications }))
         };
         localStorage.setItem('swse_architect_current_build', JSON.stringify(saveObj));
     }, { deep: true });
 
     return {
         db, initDb,
-        meta, chassisId, activeTemplate, installedMods, engineering, showAddModDialog,
-        chassis, template, currentStats, currentCargo, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, modsCost, licensingCost, shipAvailability, sizeMultVal,
-        addMod, removeMod, reset, createNew, loadState, getModCost, getModEp
+        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog,
+        chassis, template, currentStats, currentCargo, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
+        addComponent, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
     };
 });

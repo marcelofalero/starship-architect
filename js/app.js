@@ -18,10 +18,10 @@ const setup = () => {
     const hangarTab = ref('stock');
     const showHangarDialog = ref(false);
 
-    const newModCategory = ref(null);
-    const newModGroup = ref(null);
-    const newModSelection = ref(null);
-    const newModNonStandard = ref(false);
+    const newComponentCategory = ref(null);
+    const newComponentGroup = ref(null);
+    const newComponentSelection = ref(null);
+    const newComponentNonStandard = ref(false);
     const fileInput = ref(null);
     const showSheetDialog = ref(false);
 
@@ -31,26 +31,26 @@ const setup = () => {
 
     const categoryOptions = computed(() => {
         const cats = [...new Set(shipStore.db.EQUIPMENT.map(e => e.category))];
-        return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'mods' : 'accessories')), value: c }));
+        return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
     });
 
     const groupOptions = computed(() => {
-        if (!newModCategory.value) return [];
-        const groups = [...new Set(shipStore.db.EQUIPMENT.filter(e => e.category === newModCategory.value).map(e => e.group))];
+        if (!newComponentCategory.value) return [];
+        const groups = [...new Set(shipStore.db.EQUIPMENT.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
         return groups.map(g => ({ label: g, value: g }));
     });
 
     const itemOptions = computed(() => {
-        if (!newModGroup.value) return [];
-        return shipStore.db.EQUIPMENT.filter(e => e.group === newModGroup.value).map(e => ({
+        if (!newComponentGroup.value) return [];
+        return shipStore.db.EQUIPMENT.filter(e => e.group === newComponentGroup.value).map(e => ({
             ...e,
             label: getLocalizedName(e)
         }));
     });
 
     const selectedItemDef = computed(() => {
-        if (!newModSelection.value) return null;
-        return shipStore.db.EQUIPMENT.find(e => e.id === newModSelection.value);
+        if (!newComponentSelection.value) return null;
+        return shipStore.db.EQUIPMENT.find(e => e.id === newComponentSelection.value);
     });
 
     const isSizeValid = (itemDef) => {
@@ -71,15 +71,15 @@ const setup = () => {
 
     const previewCost = computed(() => {
         if (!selectedItemDef.value) return 0;
-        return shipStore.getModCost({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newModNonStandard.value });
+        return shipStore.getComponentCost({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
     });
 
     const previewEp = computed(() => {
         if (!selectedItemDef.value) return 0;
-        return shipStore.getModEp({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newModNonStandard.value });
+        return shipStore.getComponentEp({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
     });
 
-    const resetGroup = () => { newModGroup.value = null; newModSelection.value = null; };
+    const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
     const toggleLang = () => { locale.value = locale.value === 'en' ? 'es' : 'en'; };
 
     onMounted(() => {
@@ -92,16 +92,16 @@ const setup = () => {
         }
     });
 
-    const installMod = () => {
-        if(newModSelection.value) {
-            const def = shipStore.db.EQUIPMENT.find(e => e.id === newModSelection.value);
+    const installComponent = () => {
+        if(newComponentSelection.value) {
+            const def = shipStore.db.EQUIPMENT.find(e => e.id === newComponentSelection.value);
             let loc = 'Installed';
             if (def) {
                 if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
             }
-            shipStore.addMod(newModSelection.value, loc, newModNonStandard.value);
-            newModSelection.value = null;
-            newModNonStandard.value = false;
+            shipStore.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
+            newComponentSelection.value = null;
+            newComponentNonStandard.value = false;
         }
     };
 
@@ -153,10 +153,10 @@ const setup = () => {
 
     return {
         shipStore, centerTab, mobileTab, hangarTab, showHangarDialog, showSheetDialog,
-        newModCategory, newModGroup, newModSelection, newModNonStandard,
+        newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard,
         categoryOptions, groupOptions, itemOptions, selectedItemDef, previewCost, previewEp, resetGroup, isSizeValid,
         fileInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
-        installMod, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds
+        installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds
     };
 };
 

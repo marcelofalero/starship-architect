@@ -8,7 +8,7 @@ export const messages = {
             install_system: "Install System", install_caption: "Select category, type, and specific component.",
             category: "Category", sys_type: "System Type", component: "Component",
             non_standard: "Rare / Non-standard (Cost x5, EP x2)",
-            non_standard_tip: "Multiplies Cost by 5 and EP by 2 for ill-suited or rare modifications.",
+            non_standard_tip: "Multiplies Cost by 5 and EP by 2 for ill-suited or rare components.",
             ns_tag: "Non-Std", cost_variable: "Cost: Variable", base_cost: "Base Cost", base_ep: "Base EP",
             avail: "Availability", variable: "Variable", size_mult_msg: "Includes {size} size multiplier",
             cancel: "Cancel", install: "Install", new_stock: "New from Stock", import_file: "Import File",
@@ -16,7 +16,7 @@ export const messages = {
             engineering: "Engineering", designer: "Starship Designer", self_built: "Self-Built",
             ledger: "Ledger", hull_base: "Hull Base", lic_fees: "Licensing Fees", total: "Total",
             template: "Template", none: "None", chassis: "Chassis", market_avail: "Market Availability",
-            starship_designer_tip: "Waives Non-standard penalties. Enables custom modifications.",
+            starship_designer_tip: "Waives Non-standard penalties. Enables custom components.",
             installed_systems: "Installed Systems", print_btn: "Print to PDF / Paper"
         },
         stats: {
@@ -26,7 +26,7 @@ export const messages = {
         cat: {
             fighters: "Fighters", freighters: "Freighters", capitals: "Capital Ships",
             weapons: "Weapon Systems", movement: "Movement Systems", defense: "Defense Systems",
-            mods: "Modifications", accessories: "Starship Accessories"
+            components: "Components", accessories: "Starship Accessories"
         },
         avail: {
             Common: "Common", Licensed: "Licensed", Restricted: "Restricted",
@@ -40,7 +40,7 @@ export const messages = {
             install_system: "Instalar Sistema", install_caption: "Seleccione categoría, tipo y componente específico.",
             category: "Categoría", sys_type: "Tipo de Sistema", component: "Componente",
             non_standard: "Raro / No Estándar (Costo x5, PE x2)",
-            non_standard_tip: "Multiplica Costo por 5 y PE por 2 para modificaciones raras o inadecuadas.",
+            non_standard_tip: "Multiplica Costo por 5 y PE por 2 para componentes raros o inadecuados.",
             ns_tag: "No-Est", cost_variable: "Costo: Variable", base_cost: "Costo Base", base_ep: "PE Base",
             avail: "Disponibilidad", variable: "Variable", size_mult_msg: "Incluye multiplicador de tamaño {size}",
             cancel: "Cancelar", install: "Instalar", new_stock: "Nuevo de Stock", import_file: "Importar Archivo",
@@ -48,7 +48,7 @@ export const messages = {
             engineering: "Ingeniería", designer: "Diseñador de Naves", self_built: "Construcción Propia",
             ledger: "Libro Mayor", hull_base: "Base del Casco", lic_fees: "Tasas de Licencia", total: "Total",
             template: "Plantilla", none: "Ninguno", chassis: "Chasis", market_avail: "Disponibilidad de Mercado",
-            starship_designer_tip: "Anula penalizaciones No Estándar. Permite modificaciones personalizadas.",
+            starship_designer_tip: "Anula penalizaciones No Estándar. Permite componentes personalizados.",
             installed_systems: "Sistemas Instalados", print_btn: "Imprimir en PDF / Papel"
         },
         stats: {
@@ -58,7 +58,7 @@ export const messages = {
         cat: {
             fighters: "Cazas", freighters: "Cargueros", capitals: "Naves Capitales",
             weapons: "Sistemas de Armas", movement: "Sistemas de Movimiento", defense: "Sistemas Defensivos",
-            mods: "Modificaciones", accessories: "Accesorios"
+            components: "Componentes", accessories: "Accesorios"
         },
         avail: {
             Common: "Común", Licensed: "Licenciado", Restricted: "Restringido",

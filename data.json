@@ -31,7 +31,7 @@
     "SIZE_RANK": [
         "Huge",
         "Gargantuan",
-        "Colossal",
+        "Colossal(transport)",
         "Colossal (frigate)",
         "Colossal (cruiser)",
         "Colossal (station)"
@@ -151,7 +151,7 @@
             "id": "gunship",
             "name": "Gunship",
             "name_es": "Ca\u00f1onera",
-            "size": "Colossal",
+            "size": "Colossal(transport)",
             "cost": 200000,
             "baseEp": 20,
             "stats": {
@@ -178,7 +178,7 @@
             "id": "shuttle",
             "name": "Shuttle",
             "name_es": "Lanzadera",
-            "size": "Colossal",
+            "size": "Colossal(transport)",
             "cost": 50000,
             "baseEp": 5,
             "stats": {
@@ -207,7 +207,7 @@
             "id": "light_freighter",
             "name": "Light Freighter",
             "name_es": "Carguero Ligero",
-            "size": "Colossal",
+            "size": "Colossal(transport)",
             "cost": 20000,
             "baseEp": 5,
             "stats": {
@@ -381,7 +381,7 @@
             "id": "citadel",
             "name": "Citadel-class Cruiser",
             "name_es": "Crucero clase Ciudadela",
-            "size": "Colossal",
+            "size": "Colossal(transport)",
             "cost": 205000,
             "baseEp": 30,
             "stats": {
@@ -420,7 +420,7 @@
             "id": "gozanti",
             "name": "Gozanti-class Cruiser",
             "name_es": "Crucero clase Gozanti",
-            "size": "Colossal",
+            "size": "Colossal(transport)",
             "cost": 150000,
             "baseEp": 1,
             "stats": {
@@ -445,6 +445,8 @@
                 "nav_standard",
                 { "id": "laser_light_quad", "batteryCount": 2 },
                 { "id": "laser_med", "batteryCount": 4 },
+                "escape_pod",
+                "escape_pod",
                 "escape_pod",
                 "escape_pod",
                 "escape_pod",
@@ -1198,7 +1200,7 @@
             "baseEp": 20,
             "sizeMult": false,
             "availability": "Military",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
@@ -1221,7 +1223,7 @@
             "baseEp": 41,
             "sizeMult": false,
             "availability": "Military",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
@@ -1244,7 +1246,7 @@
             "baseEp": 82,
             "sizeMult": false,
             "availability": "Military",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
@@ -1278,7 +1280,7 @@
             "baseCost": 2000,
             "baseEp": 2,
             "sizeMult": false,
-            "maxSize": "Colossal",
+            "maxSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1304,7 +1306,7 @@
             "baseCost": 2000,
             "baseEp": 1,
             "sizeMult": false,
-            "maxSize": "Colossal",
+            "maxSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1335,7 +1337,7 @@
             "stats": {
                 "pilot_bonus": 4
             },
-            "maxSize": "Colossal",
+            "maxSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1606,7 +1608,7 @@
                 "speed": 5
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Colossal",
+            "maxSize": "Colossal(transport)",
             "availability": "Military"
         },
         {
@@ -1756,7 +1758,7 @@
                 "sr": 40
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1773,7 +1775,7 @@
                 "sr": 45
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1790,7 +1792,7 @@
                 "sr": 50
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "availability": "Common"
         },
         {
@@ -1807,7 +1809,7 @@
                 "sr": 55
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal(transport)",
             "availability": "Common"
         },
         {

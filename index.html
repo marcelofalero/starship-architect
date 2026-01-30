@@ -96,7 +96,7 @@
         </q-dialog>
 
         <!-- ADD MOD DIALOG -->
-        <q-dialog v-model="shipStore.showAddModDialog">
+        <q-dialog v-model="shipStore.showAddComponentDialog">
             <q-card class="bg-grey-9 text-white" style="min-width: 500px">
                 <q-card-section>
                     <div class="text-h6">{{ $t('ui.install_system') }}</div>
@@ -105,13 +105,13 @@
 
                 <q-card-section class="q-pt-none q-gutter-md">
                     <!-- Form Elements -->
-                    <q-select filled dark v-model="newModCategory" :options="categoryOptions" :label="$t('ui.category')" emit-value map-options @update:model-value="resetGroup">
+                    <q-select filled dark v-model="newComponentCategory" :options="categoryOptions" :label="$t('ui.category')" emit-value map-options @update:model-value="resetGroup">
                         <template v-slot:prepend><q-icon name="folder" /></template>
                     </q-select>
-                    <q-select filled dark v-model="newModGroup" :options="groupOptions" :label="$t('ui.sys_type')" emit-value map-options :disable="!newModCategory" @update:model-value="newModSelection = null">
+                    <q-select filled dark v-model="newComponentGroup" :options="groupOptions" :label="$t('ui.sys_type')" emit-value map-options :disable="!newComponentCategory" @update:model-value="newComponentSelection = null">
                         <template v-slot:prepend><q-icon name="category" /></template>
                     </q-select>
-                    <q-select filled dark v-model="newModSelection" :options="itemOptions" :label="$t('ui.component')" option-label="label" option-value="id" emit-value map-options :disable="!newModGroup">
+                    <q-select filled dark v-model="newComponentSelection" :options="itemOptions" :label="$t('ui.component')" option-label="label" option-value="id" emit-value map-options :disable="!newComponentGroup">
                         <template v-slot:option="scope">
                             <q-item v-bind="scope.itemProps" :disable="!isSizeValid(scope.opt)">
                                 <q-item-section>
@@ -130,15 +130,15 @@
                             </q-item>
                         </template>
                     </q-select>
-                    <div v-if="newModSelection">
-                        <q-checkbox dark v-model="newModNonStandard" :label="$t('ui.non_standard')" color="warning">
+                    <div v-if="newComponentSelection">
+                        <q-checkbox dark v-model="newComponentNonStandard" :label="$t('ui.non_standard')" color="warning">
                             <q-tooltip>{{ $t('ui.non_standard_tip') }}</q-tooltip>
                         </q-checkbox>
                     </div>
                     <q-card v-if="selectedItemDef" class="bg-grey-8 q-pa-sm q-mt-md" flat bordered>
                         <div class="row items-center justify-between">
                             <div>
-                                <div class="text-subtitle2">{{ getLocalizedName(selectedItemDef) }} <span v-if="newModNonStandard" class="text-warning text-caption">({{ $t('ui.ns_tag') }})</span></div>
+                                <div class="text-subtitle2">{{ getLocalizedName(selectedItemDef) }} <span v-if="newComponentNonStandard" class="text-warning text-caption">({{ $t('ui.ns_tag') }})</span></div>
                                 <div class="text-caption text-grey-4">
                                     <span v-if="selectedItemDef.variableCost">{{ $t('ui.cost_variable') }}</span>
                                     <span v-else>{{ $t('ui.base_cost') }}: {{ selectedItemDef.baseCost }} cr</span> | {{ $t('ui.base_ep') }}: {{ selectedItemDef.baseEp }}
@@ -159,7 +159,7 @@
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat :label="$t('ui.cancel')" color="grey" v-close-popup></q-btn>
-                    <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installMod" v-close-popup :disable="!newModSelection"></q-btn>
+                    <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installComponent" v-close-popup :disable="!newComponentSelection"></q-btn>
                 </q-card-actions>
             </q-card>
         </q-dialog>
