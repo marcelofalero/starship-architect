@@ -25,6 +25,8 @@
                     <q-btn flat icon="garage" :label="$t('ui.hangar')" @click="showHangarDialog = true" class="q-mr-sm"></q-btn>
                     <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
                     <q-btn flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
+                    <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
+                    <input type="file" ref="importInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
                     <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
                 </q-toolbar>
             </q-header>
@@ -42,7 +44,7 @@
                                 </q-tabs>
                                 <q-separator></q-separator>
                                 <q-tab-panels v-model="centerTab" animated class="bg-grey-9 col">
-                                    <q-tab-panel name="systems" class="q-pa-none"><system-list></system-list></q-tab-panel>
+                                    <q-tab-panel name="systems" class="q-pa-none fit"><system-list></system-list></q-tab-panel>
                                 </q-tab-panels>
                             </q-card>
                         </div>

@@ -120,6 +120,7 @@ const ConfigPanel = {
     template: `
     <q-card class="bg-grey-9 text-white full-height column">
         <q-card-section class="col-auto">
+            <q-input dark filled v-model="store.meta.name" :label="$t('ui.ship_name')" dense class="q-mb-md" />
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">
                 <q-toggle dark v-model="store.engineering.hasStarshipDesigner" :label="$t('ui.designer')" color="primary" />
@@ -180,7 +181,7 @@ const ConfigPanel = {
             </q-card-section>
 
             <q-card-actions align="right">
-                <q-btn flat :label="$t('ui.cancel')" color="primary" v-close-popup />
+                <q-btn flat :label="$t('ui.close')" color="primary" v-close-popup />
             </q-card-actions>
         </q-card>
     </q-dialog>
