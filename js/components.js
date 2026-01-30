@@ -46,7 +46,7 @@ const SystemList = {
                 <q-item-section>
                     <q-item-label>
                         {{ getName(component.defId) }}
-                        <q-badge v-if="getAvailability(component.defId) === 'Illegal'" color="deep-purple" label="Ill" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component.defId) === 'Illegal'" color="deep-purple" label="Illegal" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Military'" color="negative" label="Mil" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Restricted'" color="warning" text-color="black" label="Res" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Licensed'" color="info" label="Lic" class="q-ml-xs" />
