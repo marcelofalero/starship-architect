@@ -220,10 +220,18 @@ export const useShipStore = defineStore('ship', () => {
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
         const ship = db.STOCK_SHIPS.find(s => s.id === newChassisId);
-        if(ship && ship.defaultMods) ship.defaultMods.forEach(defId => {
+        if(ship && ship.defaultMods) ship.defaultMods.forEach(modConfig => {
+            let defId = modConfig;
+            let batteryCount = 1;
+
+            if (typeof modConfig === 'object' && modConfig !== null) {
+                defId = modConfig.id;
+                if (modConfig.batteryCount) batteryCount = modConfig.batteryCount;
+            }
+
             const def = db.EQUIPMENT.find(e => e.id === defId);
             let loc = 'Installed'; if(def && def.type === 'engine') loc = 'Aft Section';
-            if(def) installedMods.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1, fireLinkOption: false } });
+            if(def) installedMods.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, fireLinkOption: false } });
         });
     }
     function loadState(state) {
