@@ -194,14 +194,17 @@ const ShipSheet = {
     <div class="swse-block">
         <div class="swse-header"><span>{{ store.meta.name || 'Untitled Ship' }}</span><span>CL {{ calculateCL }}</span></div>
         <div class="swse-sub">{{ store.chassis.size }} Starfighter ({{ getLocalizedName(store.chassis) }})</div>
-        <div class="stat-grid">
+        <div class="sheet-body">
             <div><span class="bold">Init</span> +{{ getMod(store.currentStats.dex) }}; <span class="bold">Senses</span> Perception +{{ getMod(store.currentStats.int) }}</div>
+
             <div class="section-title">Defense</div>
             <div><span class="bold">Ref</span> {{ store.reflexDefense }} (Flat-footed {{ store.reflexDefense - getMod(store.currentStats.dex) }}), <span class="bold">Fort</span> {{ 10 + getMod(store.currentStats.str) }}; <span class="bold">+{{ store.currentStats.armor }} Armor</span></div>
             <div><span class="bold">HP</span> {{ store.currentStats.hp }}; <span class="bold">DR</span> {{ store.currentStats.dr }}; <span class="bold">SR</span> {{ store.currentStats.sr }}; <span class="bold">Threshold</span> {{ store.currentStats.str + 10 }}</div>
+
             <div class="section-title">Offense</div>
             <div><span class="bold">Speed</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
             <div v-for="w in weapons" :key="w.instanceId" class="weapon-line"><span class="bold">Ranged</span> {{ getName(w.defId) }} +5 ({{ getDmg(w.defId) }})</div>
+
             <div class="section-title">Statistics</div>
             <div class="stat-grid">
                 <div><span class="bold">Str</span> {{ store.currentStats.str }}</div>
@@ -209,8 +212,10 @@ const ShipSheet = {
                 <div><span class="bold">Int</span> {{ store.currentStats.int }}</div>
             </div>
             <div><span class="bold">Base Atk</span> +2; <span class="bold">Grapple</span> +{{ 2 + (getMod(store.currentStats.str)) + (store.sizeMultVal > 1 ? 10 : 0) }}</div>
+
             <div class="section-title">Systems</div>
             <div>{{ systemNames }}</div>
+
             <div class="section-title">Logistics</div>
             <div class="stat-grid">
                 <div><span class="bold">Crew</span> {{ store.chassis.logistics.crew }}</div>
@@ -218,7 +223,8 @@ const ShipSheet = {
                 <div><span class="bold">Cargo</span> {{ store.currentCargo }}</div>
                 <div><span class="bold">Consumables</span> {{ store.chassis.logistics.cons }}</div>
             </div>
-            <div style="margin-top: 10px; border-top: 1px solid #000; padding-top: 5px; text-align: right;">
+
+            <div class="cost-line">
                 <span class="bold">Total Cost:</span> {{ formatCreds(store.totalCost) }} <span style="font-size: 0.8em;">(Inc. {{ formatCreds(store.licensingCost) }} fees)</span>
             </div>
         </div>
