@@ -122,6 +122,8 @@
                                         <q-badge v-if="scope.opt.availability === 'Licensed'" color="info" label="Lic" />
                                         <q-badge v-if="scope.opt.availability === 'Restricted'" color="warning" text-color="black" label="Res" />
                                         <q-badge v-if="scope.opt.availability === 'Military'" color="negative" label="Mil" />
+                                        <q-badge v-if="scope.opt.availability === 'Illegal'" color="deep-purple" label="Ill" />
+                                        <q-badge v-if="scope.opt.availability === 'Rare'" color="purple-10" label="Rare" />
                                     </q-item-label>
                                     <q-item-label caption class="text-grey-5" v-if="!isSizeValid(scope.opt)">
                                         <q-icon name="block" color="negative" class="q-mr-xs"/>
