@@ -53,6 +53,7 @@ const SystemList = {
                         <q-badge v-if="getAvailability(component.defId) === 'Common'" color="positive" label="Com" class="q-ml-xs" />
                         <q-badge v-if="component.isStock" color="grey-7" label="Stock" class="q-ml-xs" />
                         <q-badge v-if="component.isNonStandard" color="warning" text-color="black" :label="$t('ui.ns_tag')" class="q-ml-xs" />
+                        <q-icon v-if="!checkValidity(component)" name="warning" color="negative" class="q-ml-sm"><q-tooltip>Invalid for Ship Size</q-tooltip></q-icon>
                     </q-item-label>
                     <q-item-label caption class="text-grey-5">
                         <span v-if="getEpDynamic(component.defId)" class="text-positive">+{{ Math.abs(getEpDynamic(component.defId)) }} EP</span><span v-else>{{ component.location }}</span>
@@ -290,7 +291,22 @@ export const SystemListWrapper = {
         const getUpgradeSpecs = (defId) => store.db.EQUIPMENT.find(e => e.id === defId)?.upgradeSpecs;
         const openConfig = (component) => { editingComponent.value = component; showConfigDialog.value = true; };
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, isVariableCost, isModification, isWeapon, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig };
+        const checkValidity = (component) => {
+            const def = store.db.EQUIPMENT.find(e => e.id === component.defId);
+            if (!def) return true;
+            const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
+            if (def.maxSize) {
+                const rankIndex = store.db.SIZE_RANK.indexOf(def.maxSize);
+                if (shipIndex > rankIndex) return false;
+            }
+            if (def.minShipSize) {
+                const minRankIndex = store.db.SIZE_RANK.indexOf(def.minShipSize);
+                if (shipIndex < minRankIndex) return false;
+            }
+            return true;
+        };
+
+        return { store, getName, getIcon, getEpDynamic, getAvailability, isVariableCost, isModification, isWeapon, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity };
     }
 };
 

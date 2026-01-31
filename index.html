@@ -115,7 +115,7 @@
                     </q-select>
                     <q-select filled dark v-model="newComponentSelection" :options="itemOptions" :label="$t('ui.component')" option-label="label" option-value="id" emit-value map-options :disable="!newComponentGroup">
                         <template v-slot:option="scope">
-                            <q-item v-bind="scope.itemProps" :disable="!isSizeValid(scope.opt)">
+                            <q-item v-bind="scope.itemProps">
                                 <q-item-section>
                                     <q-item-label>
                                         {{ scope.opt.label }}
@@ -125,8 +125,8 @@
                                         <q-badge v-if="scope.opt.availability === 'Illegal'" color="deep-purple" label="Ill" />
                                         <q-badge v-if="scope.opt.availability === 'Common'" color="positive" label="Com" />
                                     </q-item-label>
-                                    <q-item-label caption class="text-grey-5" v-if="!isSizeValid(scope.opt)">
-                                        <q-icon name="block" color="negative" class="q-mr-xs"/>
+                                    <q-item-label caption :class="isSizeValid(scope.opt) ? 'text-grey-5' : 'text-negative'" v-if="!isSizeValid(scope.opt)">
+                                        <q-icon name="warning" color="negative" class="q-mr-xs"/>
                                         <span v-if="scope.opt.maxSize">{{ $t('ui.max_size') }}: {{ scope.opt.maxSize }}</span>
                                         <span v-if="scope.opt.minShipSize">{{ $t('ui.min_size') }}: {{ scope.opt.minShipSize }}</span>
                                     </q-item-label>
