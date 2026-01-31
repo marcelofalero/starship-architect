@@ -95,13 +95,29 @@ const setup = () => {
     const installComponent = () => {
         if(newComponentSelection.value) {
             const def = shipStore.db.EQUIPMENT.find(e => e.id === newComponentSelection.value);
-            let loc = 'Installed';
-            if (def) {
-                if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
+
+            const doInstall = () => {
+                let loc = 'Installed';
+                if (def) {
+                    if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
+                }
+                shipStore.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
+                newComponentSelection.value = null;
+                newComponentNonStandard.value = false;
+            };
+
+            if (def && !isSizeValid(def)) {
+                $q.dialog({
+                    title: 'Warning',
+                    message: 'This component is not compatible with the ship\'s size class. Install anyway?',
+                    cancel: true,
+                    persistent: true
+                }).onOk(() => {
+                    doInstall();
+                });
+            } else {
+                doInstall();
             }
-            shipStore.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
-            newComponentSelection.value = null;
-            newComponentNonStandard.value = false;
         }
     };
 
