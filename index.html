@@ -217,27 +217,42 @@
                 <q-card-section>
                     <div class="text-h6">Create Custom Component</div>
                 </q-card-section>
-                <q-card-section class="q-pt-none q-gutter-md">
-                    <q-input filled dark v-model="newCustomComponent.name" label="Name" />
-                    <q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options />
-                    <q-input filled dark v-model="newCustomComponent.group" label="Group" />
-                    <q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" />
-                    <div class="row q-col-gutter-sm">
-                        <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number" /></div>
-                        <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number" /></div>
-                    </div>
-                    <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size" />
+                <q-card-section class="q-pt-none">
+                    <div>
+                        <div class="q-mb-md">
+                            <q-input filled dark v-model="newCustomComponent.name" label="Name" />
+                        </div>
+                        <div class="q-mb-md">
+                            <q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options />
+                        </div>
+                        <div class="q-mb-md">
+                            <q-input filled dark v-model="newCustomComponent.group" label="Group" />
+                        </div>
+                        <div class="q-mb-md">
+                            <q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" />
+                        </div>
+                        <div class="row q-col-gutter-sm q-mb-md">
+                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number" /></div>
+                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number" /></div>
+                        </div>
+                        <div class="q-mb-md">
+                            <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size" />
+                        </div>
 
-                    <div class="text-subtitle2 q-mt-md">Stats</div>
-                    <div class="row q-col-gutter-sm items-center">
-                        <div class="col"><q-select filled dark v-model="customStatToAdd.key" :options="statOptions" label="Stat" dense /></div>
-                        <div class="col"><q-input filled dark v-model="customStatToAdd.value" label="Value" type="number" dense /></div>
-                        <div class="col-auto"><q-btn round flat icon="add" color="primary" @click="addStatToCustomComponent" /></div>
+                        <div>
+                            <div class="text-subtitle2 q-mb-sm">Stats</div>
+                            <div class="row q-col-gutter-sm items-center">
+                                <div class="col"><q-select filled dark v-model="customStatToAdd.key" :options="statOptions" label="Stat" dense /></div>
+                                <div class="col"><q-input filled dark v-model="customStatToAdd.value" label="Value" type="number" dense /></div>
+                                <div class="col-auto"><q-btn round flat icon="add" color="primary" @click="addStatToCustomComponent" /></div>
+                            </div>
+                            <div class="q-mt-sm">
+                                <q-chip v-for="(val, key) in newCustomComponent.stats" :key="key" removable @remove="removeStatFromCustomComponent(key)" color="primary" text-color="white">
+                                    {{ key }}: {{ val }}
+                                </q-chip>
+                            </div>
+                        </div>
                     </div>
-                    <q-chip v-for="(val, key) in newCustomComponent.stats" :key="key" removable @remove="removeStatFromCustomComponent(key)" color="primary" text-color="white">
-                        {{ key }}: {{ val }}
-                    </q-chip>
-
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="grey" v-close-popup />
