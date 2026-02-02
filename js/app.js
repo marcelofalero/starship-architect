@@ -2,7 +2,7 @@ import { useShipStore } from './store.js';
 import { i18n, getLocalizedName } from './i18n.js';
 import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper } from './components.js';
 
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, reactive } = Vue;
 const { createPinia } = Pinia;
 const { useQuasar } = Quasar;
 const { useI18n } = VueI18n;
@@ -28,24 +28,39 @@ const setup = () => {
     const fileInput = ref(null);
     const showSheetDialog = ref(false);
 
+    // Custom Component State
+    const showCustomDialog = ref(false);
+    const newCustomComponent = reactive({
+        name: '',
+        category: 'Weapon Systems',
+        group: '',
+        type: 'weapon',
+        baseCost: 0,
+        baseEp: 0,
+        sizeMult: false,
+        stats: {}
+    });
+    const customStatToAdd = reactive({ key: 'sr', value: 0 });
+    const statOptions = ['sr', 'armor', 'hp', 'speed', 'hyperdrive', 'dex_bonus', 'str_bonus', 'perception_bonus', 'ep_dynamic_pct', 'cargo_factor'];
+
     const stockFighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
     const stockFreighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
     const stockCapitals = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
 
     const categoryOptions = computed(() => {
-        const cats = [...new Set(shipStore.db.EQUIPMENT.map(e => e.category))];
+        const cats = [...new Set(shipStore.allEquipment.map(e => e.category))];
         return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
     });
 
     const groupOptions = computed(() => {
         if (!newComponentCategory.value) return [];
-        const groups = [...new Set(shipStore.db.EQUIPMENT.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
+        const groups = [...new Set(shipStore.allEquipment.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
         return groups.map(g => ({ label: g, value: g }));
     });
 
     const itemOptions = computed(() => {
         if (!newComponentGroup.value) return [];
-        return shipStore.db.EQUIPMENT.filter(e => e.group === newComponentGroup.value).map(e => ({
+        return shipStore.allEquipment.filter(e => e.group === newComponentGroup.value).map(e => ({
             ...e,
             label: getLocalizedName(e)
         }));
@@ -53,7 +68,7 @@ const setup = () => {
 
     const selectedItemDef = computed(() => {
         if (!newComponentSelection.value) return null;
-        return shipStore.db.EQUIPMENT.find(e => e.id === newComponentSelection.value);
+        return shipStore.allEquipment.find(e => e.id === newComponentSelection.value);
     });
 
     const isSizeValid = (itemDef) => {
@@ -97,7 +112,7 @@ const setup = () => {
 
     const installComponent = () => {
         if(newComponentSelection.value) {
-            const def = shipStore.db.EQUIPMENT.find(e => e.id === newComponentSelection.value);
+            const def = shipStore.allEquipment.find(e => e.id === newComponentSelection.value);
 
             const doInstall = () => {
                 let loc = 'Installed';
@@ -172,13 +187,58 @@ const setup = () => {
 
     const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
+    const createCustomComponent = () => {
+        if (!newCustomComponent.name) return;
+        const id = 'custom_' + crypto.randomUUID();
+        const comp = {
+            id,
+            name: newCustomComponent.name,
+            name_es: newCustomComponent.name,
+            category: newCustomComponent.category,
+            group: newCustomComponent.group || 'Custom',
+            type: newCustomComponent.type,
+            baseCost: Number(newCustomComponent.baseCost),
+            baseEp: Number(newCustomComponent.baseEp),
+            sizeMult: newCustomComponent.sizeMult,
+            availability: 'Common',
+            stats: { ...newCustomComponent.stats }
+        };
+        shipStore.addCustomComponent(comp);
+
+        // Install it
+        let loc = 'Installed';
+        if (comp.type === 'weapon') loc = 'Hardpoint';
+        else if (comp.type === 'system') loc = 'Internal Bay';
+        else if (comp.type === 'cargo') loc = 'Cargo Hold';
+        else if (comp.type === 'modification') loc = 'Hull Config';
+        else if (comp.type === 'engine') loc = 'Aft Section';
+
+        shipStore.addComponent(id, loc, false);
+
+        // Reset and close
+        showCustomDialog.value = false;
+        shipStore.showAddComponentDialog = false;
+        Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+    };
+
+    const addStatToCustomComponent = () => {
+        if (customStatToAdd.key && customStatToAdd.value !== '') {
+            newCustomComponent.stats[customStatToAdd.key] = Number(customStatToAdd.value);
+            customStatToAdd.value = 0;
+        }
+    };
+    const removeStatFromCustomComponent = (key) => {
+        delete newCustomComponent.stats[key];
+    };
+
     return {
         shipStore, centerTab, mobileTab, hangarTab, showHangarDialog, showSheetDialog,
         leftDrawerOpen, rightDrawerOpen,
         newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard,
         categoryOptions, groupOptions, itemOptions, selectedItemDef, previewCost, previewEp, resetGroup, isSizeValid,
         fileInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
-        installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds
+        installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds,
+        showCustomDialog, newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent
     };
 };
 

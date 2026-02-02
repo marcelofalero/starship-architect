@@ -94,7 +94,7 @@ const SystemList = {
                     </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.payload" class="q-mb-md">
                         <div v-if="getUpgradeSpecs(editingComponent.defId).payload.type === 'capacity'">
-                            <div class="text-caption">Additional {{ getUpgradeSpecs(editingComponent.defId).payload.unitLabel }} ({{ format(store.db.EQUIPMENT.find(e => e.id === editingComponent.defId).baseCost * getUpgradeSpecs(editingComponent.defId).payload.costFactor) }} each)</div>
+                            <div class="text-caption">Additional {{ getUpgradeSpecs(editingComponent.defId).payload.unitLabel }} ({{ format(store.allEquipment.find(e => e.id === editingComponent.defId).baseCost * getUpgradeSpecs(editingComponent.defId).payload.costFactor) }} each)</div>
                             <q-input dark type="number" filled v-model.number="editingComponent.modifications.payloadCount" label="Additional Capacity" min="0" :max="getUpgradeSpecs(editingComponent.defId).payload.maxAdd" :hint="'Base: ' + getUpgradeSpecs(editingComponent.defId).payload.base + ' | Max Add: ' + getUpgradeSpecs(editingComponent.defId).payload.maxAdd" />
                         </div>
                         <q-checkbox v-else dark v-model="editingComponent.modifications.payloadOption" :label="getUpgradeSpecs(editingComponent.defId).payload.label + ' (' + format(getUpgradeSpecs(editingComponent.defId).payload.cost) + ')'" />
@@ -255,19 +255,19 @@ export const SystemListWrapper = {
         const editingComponent = ref(null);
 
         const getName = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return getLocalizedName(def);
         };
         const getAvailability = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def && def.availability ? def.availability : 'Common';
         }
         const getBaseEp = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def ? def.baseEp : 0;
         }
         const getIcon = (id) => {
-            const e = store.db.EQUIPMENT.find(e => e.id === id);
+            const e = store.allEquipment.find(e => e.id === id);
             if (e?.type === 'weapon') return 'gps_fixed';
             if (e?.type === 'engine') return 'speed';
             if (e?.type === 'upgrade') return 'upgrade';
@@ -275,30 +275,30 @@ export const SystemListWrapper = {
             return 'memory';
         }
         const getEpDynamic = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             if (def && def.stats && def.stats.ep_dynamic_pct) return Math.floor(store.chassis.baseEp * def.stats.ep_dynamic_pct);
             return null;
         }
         const isVariableCost = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def && def.variableCost;
         }
         const isModification = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def && def.category === 'Modifications';
         }
         const isWeapon = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def && def.type === 'weapon';
         }
         const format = (n) => n === 0 ? '-' : new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
-        const hasUpgrades = (defId) => isWeapon(defId) || !!store.db.EQUIPMENT.find(e => e.id === defId)?.upgradeSpecs;
-        const getUpgradeSpecs = (defId) => store.db.EQUIPMENT.find(e => e.id === defId)?.upgradeSpecs;
+        const hasUpgrades = (defId) => isWeapon(defId) || !!store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
+        const getUpgradeSpecs = (defId) => store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
         const openConfig = (component) => { editingComponent.value = component; showConfigDialog.value = true; };
 
         const checkValidity = (component) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === component.defId);
+            const def = store.allEquipment.find(e => e.id === component.defId);
             if (!def) return true;
             const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
             if (def.maxSize) {
@@ -339,17 +339,17 @@ export const ShipSheetWrapper = {
     setup() {
         const store = useShipStore();
         const getName = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return getLocalizedName(def);
         };
         const getMod = (score) => Math.floor((score - 10) / 2);
         const weapons = computed(() => store.installedComponents.filter(c => {
-            const def = store.db.EQUIPMENT.find(e => e.id === c.defId);
+            const def = store.allEquipment.find(e => e.id === c.defId);
             return def && def.type === 'weapon';
         }));
         const systemNames = computed(() => {
             const nonWeapons = store.installedComponents.filter(c => {
-                const def = store.db.EQUIPMENT.find(e => e.id === c.defId);
+                const def = store.allEquipment.find(e => e.id === c.defId);
                 return def && def.type !== 'weapon' && def.type !== 'engine';
             });
             if (nonWeapons.length === 0) return i18n.global.t('ui.installed_systems');
@@ -358,7 +358,7 @@ export const ShipSheetWrapper = {
 
         // Enhanced Damage Logic for Variants
         const getDmg = (id) => {
-            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            const def = store.allEquipment.find(e => e.id === id);
             return def && def.damage ? def.damage : '-';
         }
         const calculateCL = computed(() => { let cl = 10; if(store.chassis.size.includes('Colossal')) cl += 5; cl += Math.floor(store.installedComponents.length / 2); if(store.template) cl += 2; return cl; });

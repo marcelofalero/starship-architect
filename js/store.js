@@ -22,11 +22,16 @@ export const useShipStore = defineStore('ship', () => {
     const engineering = reactive({ hasStarshipDesigner: false });
     const showAddComponentDialog = ref(false);
     const cargoToEpAmount = ref(0);
+    const customComponents = ref([]);
 
     // Initialize DB Action
     function initDb(data) {
         Object.assign(db, data);
     }
+
+    const allEquipment = computed(() => {
+        return [...db.EQUIPMENT, ...customComponents.value];
+    });
 
     // Helper functions
     const chassis = computed(() => {
@@ -35,7 +40,7 @@ export const useShipStore = defineStore('ship', () => {
     });
 
     function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1) {
-        const def = db.EQUIPMENT.find(e => e.id === defId);
+        const def = allEquipment.value.find(e => e.id === defId);
         if (!def) return 0;
 
         let epCost = def.baseEp;
@@ -74,7 +79,7 @@ export const useShipStore = defineStore('ship', () => {
     }
 
     function getComponentCost(component) {
-        const def = db.EQUIPMENT.find(e => e.id === component.defId);
+        const def = allEquipment.value.find(e => e.id === component.defId);
         if (!def || component.isStock) return 0;
 
         let cost = def.baseCost;
@@ -125,7 +130,7 @@ export const useShipStore = defineStore('ship', () => {
         let hpBonusPct = 0;
 
         installedComponents.value.forEach(mod => {
-            const def = db.EQUIPMENT.find(e => e.id === mod.defId);
+            const def = allEquipment.value.find(e => e.id === mod.defId);
             if (def && def.stats) {
                 if (def.stats.sr !== undefined) modSR = def.stats.sr;
                 if (def.stats.hyperdrive !== undefined) {
@@ -165,7 +170,7 @@ export const useShipStore = defineStore('ship', () => {
     const shipAvailability = computed(() => {
         let maxRank = 0;
         installedComponents.value.forEach(mod => {
-            const def = db.EQUIPMENT.find(e => e.id === mod.defId);
+            const def = allEquipment.value.find(e => e.id === mod.defId);
             if (def && def.availability) {
                 const rank = db.AVAILABILITY_RANK.indexOf(def.availability);
                 if (rank > maxRank) maxRank = rank;
@@ -191,7 +196,7 @@ export const useShipStore = defineStore('ship', () => {
 
         let multiplier = 1.0;
         installedComponents.value.forEach(mod => {
-            const def = db.EQUIPMENT.find(e => e.id === mod.defId);
+            const def = allEquipment.value.find(e => e.id === mod.defId);
             if (def && def.stats && def.stats.cargo_factor) multiplier = def.stats.cargo_factor;
         });
         return val * multiplier;
@@ -238,7 +243,7 @@ export const useShipStore = defineStore('ship', () => {
     const componentsCost = computed(() => installedComponents.value.reduce((total, mod) => total + getComponentCost(mod), 0));
     const licensingCost = computed(() => installedComponents.value.reduce((total, mod) => {
         if (mod.isStock) return total;
-        const def = db.EQUIPMENT.find(e => e.id === mod.defId);
+        const def = allEquipment.value.find(e => e.id === mod.defId);
         if (!def || !def.availability) return total;
         const feePct = db.LICENSE_FEES[def.availability] || 0;
         return total + (getComponentCost(mod) * feePct);
@@ -247,11 +252,11 @@ export const useShipStore = defineStore('ship', () => {
 
     // Actions
     function addComponent(defId, location, isNonStandard = false) {
-        const def = db.EQUIPMENT.find(e => e.id === defId);
+        const def = allEquipment.value.find(e => e.id === defId);
         if (!def) return;
         if (def.exclusiveGroup) {
             const existing = installedComponents.value.find(m => {
-                const mDef = db.EQUIPMENT.find(e => e.id === m.defId);
+                const mDef = allEquipment.value.find(e => e.id === m.defId);
                 return mDef && mDef.exclusiveGroup === def.exclusiveGroup;
             });
             if (existing) removeComponent(existing.instanceId);
@@ -259,6 +264,9 @@ export const useShipStore = defineStore('ship', () => {
         const mods = { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
         if (def.type === 'weapon') mods.weaponUser = 'Pilot';
         installedComponents.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: mods });
+    }
+    function addCustomComponent(component) {
+        customComponents.value.push(component);
     }
     function removeComponent(instanceId) { installedComponents.value = installedComponents.value.filter(m => m.instanceId !== instanceId); }
     function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
@@ -276,7 +284,7 @@ export const useShipStore = defineStore('ship', () => {
                 if (modConfig.quantity) quantity = modConfig.quantity;
             }
 
-            const def = db.EQUIPMENT.find(e => e.id === defId);
+            const def = allEquipment.value.find(e => e.id === defId);
             let loc = 'Installed'; if(def && def.type === 'engine') loc = 'Aft Section';
             if(def) {
                 const mods = { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, quantity: quantity, fireLinkOption: false };
@@ -291,19 +299,22 @@ export const useShipStore = defineStore('ship', () => {
         else activeTemplate.value = state.configuration.template;
         engineering.hasStarshipDesigner = state.configuration.feats.starshipDesigner;
         cargoToEpAmount.value = state.configuration.cargoToEpAmount || 0;
+        if (state.customComponents) customComponents.value = state.customComponents;
+        else customComponents.value = [];
         installedComponents.value = state.manifest.map(m => {
             const mods = m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
             if (!mods.quantity) mods.quantity = 1;
-            const def = db.EQUIPMENT.find(e => e.id === m.defId);
+            const def = allEquipment.value.find(e => e.id === m.defId);
             if (def && def.type === 'weapon' && !mods.weaponUser) mods.weaponUser = 'Pilot';
             return { instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: mods };
         });
     }
-    watch([meta, chassisId, activeTemplate, installedComponents, engineering, cargoToEpAmount], () => {
+    watch([meta, chassisId, activeTemplate, installedComponents, engineering, cargoToEpAmount, customComponents], () => {
         const saveObj = {
             apiVersion: "1.9",
             meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
             configuration: { baseChassis: chassisId.value, template: activeTemplate.value, feats: { starshipDesigner: engineering.hasStarshipDesigner }, cargoToEpAmount: cargoToEpAmount.value },
+            customComponents: customComponents.value,
             manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: m.modifications }))
         };
         localStorage.setItem('swse_architect_current_build', JSON.stringify(saveObj));
@@ -311,8 +322,8 @@ export const useShipStore = defineStore('ship', () => {
 
     return {
         db, initDb,
-        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount,
+        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
+        addComponent, addCustomComponent, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
     };
 });
