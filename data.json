@@ -508,7 +508,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "3d10x2"
         },
         {
             "id": "laser_light_twin",
@@ -523,7 +524,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "laser_light_quad",
@@ -538,7 +540,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "laser_light_fl2",
@@ -553,7 +556,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "laser_light_fl4",
@@ -568,7 +572,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "laser_med",
@@ -583,7 +588,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "laser_med_twin",
@@ -598,7 +604,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "laser_med_quad",
@@ -613,7 +620,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "laser_med_fl2",
@@ -628,7 +636,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "laser_med_fl4",
@@ -643,7 +652,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "laser_hvy",
@@ -658,7 +668,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "laser_hvy_twin",
@@ -673,7 +684,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "laser_hvy_quad",
@@ -688,7 +700,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "laser_hvy_fl2",
@@ -703,7 +716,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "laser_hvy_fl4",
@@ -718,7 +732,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "proton_torp",
@@ -740,7 +755,8 @@
                     "unitLabel": "torpedoes"
                 },
                 "battery": true
-            }
+            },
+            "damage": "9d10x2"
         },
         {
             "id": "proton_torp_fl2",
@@ -761,8 +777,11 @@
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "9d10x2"
         },
         {
             "id": "proton_torp_fl4",
@@ -783,8 +802,11 @@
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "9d10x2"
         },
         {
             "id": "ion_cannon_light",
@@ -799,7 +821,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "3d10x2"
         },
         {
             "id": "ion_cannon_light_twin",
@@ -814,7 +837,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "ion_cannon_light_quad",
@@ -829,7 +853,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "ion_cannon_light_fl2",
@@ -844,7 +869,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "ion_cannon_light_fl4",
@@ -859,7 +885,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "ion_cannon",
@@ -874,7 +901,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "ion_cannon_twin",
@@ -889,7 +917,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "ion_cannon_quad",
@@ -904,7 +933,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "ion_cannon_fl2",
@@ -919,7 +949,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "ion_cannon_fl4",
@@ -934,7 +965,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "ion_cannon_hvy",
@@ -950,7 +982,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "3d10x5"
         },
         {
             "id": "ion_cannon_hvy_twin",
@@ -966,7 +999,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x5"
         },
         {
             "id": "ion_cannon_hvy_quad",
@@ -982,7 +1016,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x5"
         },
         {
             "id": "ion_cannon_hvy_fl2",
@@ -998,7 +1033,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x5"
         },
         {
             "id": "ion_cannon_hvy_fl4",
@@ -1014,7 +1050,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x5"
         },
         {
             "id": "ion_cannon_hapan",
@@ -1030,7 +1067,8 @@
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x5"
         },
         {
             "id": "concussion_missile_light",
@@ -1052,7 +1090,8 @@
                     "unitLabel": "missiles"
                 },
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "concussion_missile_light_fl2",
@@ -1073,8 +1112,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "8d10x2"
         },
         {
             "id": "concussion_missile_light_fl4",
@@ -1095,8 +1137,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "9d10x2"
         },
         {
             "id": "concussion_missile",
@@ -1118,7 +1163,8 @@
                     "unitLabel": "missiles"
                 },
                 "battery": true
-            }
+            },
+            "damage": "9d10x2"
         },
         {
             "id": "concussion_missile_fl2",
@@ -1139,8 +1185,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "10d10x2"
         },
         {
             "id": "concussion_missile_fl4",
@@ -1161,8 +1210,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "11d10x2"
         },
         {
             "id": "concussion_missile_hvy",
@@ -1185,7 +1237,8 @@
                     "unitLabel": "missiles"
                 },
                 "battery": true
-            }
+            },
+            "damage": "9d10x5"
         },
         {
             "id": "concussion_missile_hvy_fl2",
@@ -1207,8 +1260,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "10d10x5"
         },
         {
             "id": "concussion_missile_hvy_fl4",
@@ -1230,8 +1286,11 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "11d10x5"
         },
         {
             "id": "tractor_beam",
@@ -2644,7 +2703,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "3d10x5"
         },
         {
             "id": "turbolaser_light_twin",
@@ -2660,7 +2720,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "4d10x5"
         },
         {
             "id": "turbolaser_light_quad",
@@ -2676,7 +2737,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "5d10x5"
         },
         {
             "id": "turbolaser_light_fl2",
@@ -2691,9 +2753,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "4d10x5"
         },
         {
             "id": "turbolaser_light_fl4",
@@ -2708,9 +2773,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "5d10x5"
         },
         {
             "id": "turbolaser_med",
@@ -2726,7 +2794,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "5d10x5"
         },
         {
             "id": "turbolaser_med_twin",
@@ -2742,7 +2811,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "6d10x5"
         },
         {
             "id": "turbolaser_med_quad",
@@ -2758,7 +2828,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "7d10x5"
         },
         {
             "id": "turbolaser_med_fl2",
@@ -2773,9 +2844,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "6d10x5"
         },
         {
             "id": "turbolaser_med_fl4",
@@ -2790,9 +2864,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "7d10x5"
         },
         {
             "id": "turbolaser_hvy",
@@ -2808,7 +2885,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "7d10x5"
         },
         {
             "id": "turbolaser_hvy_twin",
@@ -2824,7 +2902,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "8d10x5"
         },
         {
             "id": "turbolaser_hvy_quad",
@@ -2840,7 +2919,8 @@
             "upgradeSpecs": {
                 "battery": true
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "9d10x5"
         },
         {
             "id": "turbolaser_hvy_fl2",
@@ -2855,9 +2935,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "8d10x5"
         },
         {
             "id": "turbolaser_hvy_fl4",
@@ -2872,9 +2955,12 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
-            "minShipSize": "Colossal (frigate)"
+            "minShipSize": "Colossal (frigate)",
+            "damage": "9d10x5"
         },
         {
             "id": "blaster_cannon_light",
@@ -2889,7 +2975,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "3d10x2"
         },
         {
             "id": "blaster_cannon_light_twin",
@@ -2904,7 +2991,8 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "blaster_cannon_light_quad",
@@ -2919,7 +3007,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "blaster_cannon_light_fl2",
@@ -2934,8 +3023,11 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "blaster_cannon_light_fl4",
@@ -2950,8 +3042,11 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "blaster_cannon_med",
@@ -2966,7 +3061,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "4d10x2"
         },
         {
             "id": "blaster_cannon_med_twin",
@@ -2981,7 +3077,8 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "blaster_cannon_med_quad",
@@ -2996,7 +3093,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "blaster_cannon_med_fl2",
@@ -3011,8 +3109,11 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "blaster_cannon_med_fl4",
@@ -3027,8 +3128,11 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "blaster_cannon_hvy",
@@ -3043,7 +3147,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "5d10x2"
         },
         {
             "id": "blaster_cannon_hvy_twin",
@@ -3058,7 +3163,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "blaster_cannon_hvy_quad",
@@ -3073,7 +3179,8 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true
-            }
+            },
+            "damage": "7d10x2"
         },
         {
             "id": "blaster_cannon_hvy_fl2",
@@ -3088,8 +3195,11 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "6d10x2"
         },
         {
             "id": "blaster_cannon_hvy_fl4",
@@ -3104,8 +3214,11 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "fireLinkOption": true
-            }
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            },
+            "damage": "7d10x2"
         }
     ]
 }

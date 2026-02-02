@@ -108,7 +108,7 @@ const SystemList = {
                         <q-input dark type="number" filled v-model.number="editingComponent.modifications.quantity" label="Quantity" min="1" />
                     </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.fireLinkOption" class="q-mb-md">
-                        <q-checkbox dark v-model="editingComponent.modifications.fireLinkOption" label="Selective Fire (+1,000 cr)" />
+                        <q-checkbox dark v-model="editingComponent.modifications.fireLinkOption" :label="'Selective Fire (+' + format(getUpgradeSpecs(editingComponent.defId).fireLinkOption.cost) + ')'" />
                     </div>
                 </q-card-section>
                 <q-card-actions align="right">
@@ -358,38 +358,8 @@ export const ShipSheetWrapper = {
 
         // Enhanced Damage Logic for Variants
         const getDmg = (id) => {
-            let dice = 0;
-            let mult = 0;
-
-            if (id.includes('turbolaser_light')) { dice = 3; mult = 5; }
-            else if (id.includes('turbolaser_med')) { dice = 5; mult = 5; }
-            else if (id.includes('turbolaser_hvy')) { dice = 7; mult = 5; }
-
-            else if (id.includes('laser_light')) { dice = 3; mult = 2; }
-            else if (id.includes('laser_med')) { dice = 4; mult = 2; }
-            else if (id.includes('laser_hvy')) { dice = 5; mult = 2; }
-
-            else if (id.includes('blaster_cannon_light')) { dice = 3; mult = 2; }
-            else if (id.includes('blaster_cannon_med')) { dice = 4; mult = 2; }
-            else if (id.includes('blaster_cannon_hvy')) { dice = 5; mult = 2; }
-
-            else if (id.includes('ion_cannon_light')) { dice = 3; mult = 2; }
-            else if (id.includes('ion_cannon_hvy')) { dice = 3; mult = 5; }
-            else if (id.includes('ion_cannon')) { dice = 5; mult = 2; }
-
-            else if (id.includes('concussion_missile_light')) { dice = 7; mult = 2; }
-            else if (id.includes('concussion_missile_hvy')) { dice = 9; mult = 5; }
-            else if (id.includes('concussion_missile')) { dice = 9; mult = 2; }
-
-            else if (id.includes('proton')) return '9d10x2';
-            else if (id.includes('hapan')) return '5d10x5';
-            else if (id.includes('tractor')) return '-';
-            else return '-';
-
-            if (id.includes('quad') || id.includes('fl4')) dice += 2;
-            else if (id.includes('twin') || id.includes('fl2')) dice += 1;
-
-            return `${dice}d10x${mult}`;
+            const def = store.db.EQUIPMENT.find(e => e.id === id);
+            return def && def.damage ? def.damage : '-';
         }
         const calculateCL = computed(() => { let cl = 10; if(store.chassis.size.includes('Colossal')) cl += 5; cl += Math.floor(store.installedComponents.length / 2); if(store.template) cl += 2; return cl; });
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';

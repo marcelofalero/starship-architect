@@ -90,7 +90,7 @@ export const useShipStore = defineStore('ship', () => {
                  }
              }
              if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && component.modifications.fireLinkOption) {
-                 cost += 1000;
+                 cost += (def.upgradeSpecs.fireLinkOption.cost || 0);
              }
              if (component.modifications.batteryCount > 1) {
                  cost *= component.modifications.batteryCount;
