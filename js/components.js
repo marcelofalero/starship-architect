@@ -222,6 +222,13 @@ const ShipSheet = {
             <div class="section-title">Systems</div>
             <div>{{ systemNames }}</div>
 
+            <div v-if="componentsWithDescriptions.length > 0">
+                <div class="section-title">Special Equipment Rules</div>
+                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" class="q-mb-sm">
+                    <span class="bold">{{ getName(c.defId) }}:</span> {{ getDescription(c.defId) }}
+                </div>
+            </div>
+
             <div class="section-title">Logistics</div>
             <div class="stat-grid">
                 <div><span class="bold">Crew</span> {{ store.chassis.logistics.crew }}</div>
@@ -367,6 +374,24 @@ export const ShipSheetWrapper = {
         }
         const calculateCL = computed(() => { let cl = 10; if(store.chassis.size.includes('Colossal')) cl += 5; cl += Math.floor(store.installedComponents.length / 2); if(store.template) cl += 2; return cl; });
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
-        return { store, getName, getMod, weapons, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName };
+
+        const componentsWithDescriptions = computed(() => {
+            const seen = new Set();
+            const unique = [];
+            store.installedComponents.forEach(c => {
+                const def = store.allEquipment.find(e => e.id === c.defId);
+                if (def && def.description && !seen.has(c.defId)) {
+                    unique.push(c);
+                    seen.add(c.defId);
+                }
+            });
+            return unique;
+        });
+        const getDescription = (id) => {
+             const def = store.allEquipment.find(e => e.id === id);
+             return def ? def.description : '';
+        };
+
+        return { store, getName, getMod, weapons, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName, componentsWithDescriptions, getDescription };
     }
 };
