@@ -26,10 +26,10 @@ const setup = () => {
     const newComponentSelection = ref(null);
     const newComponentNonStandard = ref(false);
     const fileInput = ref(null);
+    const libraryInput = ref(null);
     const showSheetDialog = ref(false);
 
     // Custom Component State
-    const showCustomDialog = ref(false);
     const newCustomComponent = reactive({
         name: '',
         category: 'Weapon Systems',
@@ -99,6 +99,29 @@ const setup = () => {
 
     const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
     const toggleLang = () => { locale.value = locale.value === 'en' ? 'es' : 'en'; };
+
+    // Watch for Custom Dialog Open/Edit
+    watch(() => shipStore.customDialogState.visible, (visible) => {
+        if (visible && shipStore.customDialogState.componentId) {
+             const existing = shipStore.customComponents.find(c => c.id === shipStore.customDialogState.componentId);
+             if (existing) {
+                 Object.assign(newCustomComponent, {
+                     name: existing.name,
+                     category: existing.category,
+                     group: existing.group,
+                     type: existing.type,
+                     baseCost: existing.baseCost,
+                     baseEp: existing.baseEp,
+                     sizeMult: existing.sizeMult,
+                     stats: { ...existing.stats }
+                 });
+             }
+        } else if (!visible) {
+             // Reset on close
+             Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+             shipStore.customDialogState.componentId = null;
+        }
+    });
 
     onMounted(() => {
         const saved = localStorage.getItem('swse_architect_current_build');
@@ -189,7 +212,10 @@ const setup = () => {
 
     const createCustomComponent = () => {
         if (!newCustomComponent.name) return;
-        const id = 'custom_' + crypto.randomUUID();
+
+        const isEdit = !!shipStore.customDialogState.componentId;
+        const id = isEdit ? shipStore.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+
         const comp = {
             id,
             name: newCustomComponent.name,
@@ -203,22 +229,55 @@ const setup = () => {
             availability: 'Common',
             stats: { ...newCustomComponent.stats }
         };
-        shipStore.addCustomComponent(comp);
 
-        // Install it
-        let loc = 'Installed';
-        if (comp.type === 'weapon') loc = 'Hardpoint';
-        else if (comp.type === 'system') loc = 'Internal Bay';
-        else if (comp.type === 'cargo') loc = 'Cargo Hold';
-        else if (comp.type === 'modification') loc = 'Hull Config';
-        else if (comp.type === 'engine') loc = 'Aft Section';
+        if (isEdit) {
+            shipStore.updateCustomComponent(comp);
+            shipStore.customDialogState.visible = false;
+        } else {
+            shipStore.addCustomComponent(comp);
+            // Install it
+            let loc = 'Installed';
+            if (comp.type === 'weapon') loc = 'Hardpoint';
+            else if (comp.type === 'system') loc = 'Internal Bay';
+            else if (comp.type === 'cargo') loc = 'Cargo Hold';
+            else if (comp.type === 'modification') loc = 'Hull Config';
+            else if (comp.type === 'engine') loc = 'Aft Section';
 
-        shipStore.addComponent(id, loc, false);
+            shipStore.addComponent(id, loc, false);
+            shipStore.customDialogState.visible = false;
+            shipStore.showAddComponentDialog = false;
+        }
+    };
 
-        // Reset and close
-        showCustomDialog.value = false;
-        shipStore.showAddComponentDialog = false;
-        Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+    const handleLibraryImport = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (Array.isArray(data)) {
+                    let count = 0;
+                    data.forEach(item => {
+                        // Basic Validation
+                        if (item.name && item.type) {
+                            // Assign new ID to avoid collisions
+                            const newId = 'custom_' + crypto.randomUUID();
+                            const comp = { ...item, id: newId };
+                            shipStore.addCustomComponent(comp);
+                            count++;
+                        }
+                    });
+                    $q.notify({ type: 'positive', message: `Imported ${count} components.` });
+                } else {
+                    $q.notify({ type: 'negative', message: 'Invalid file format. Expected JSON array.' });
+                }
+            } catch (error) {
+                console.error(error);
+                $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
+            }
+        };
+        reader.readAsText(file);
     };
 
     const addStatToCustomComponent = () => {
@@ -236,9 +295,9 @@ const setup = () => {
         leftDrawerOpen, rightDrawerOpen,
         newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard,
         categoryOptions, groupOptions, itemOptions, selectedItemDef, previewCost, previewEp, resetGroup, isSizeValid,
-        fileInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
+        fileInput, libraryInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
         installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds,
-        showCustomDialog, newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent
+        newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent, handleLibraryImport
     };
 };
 

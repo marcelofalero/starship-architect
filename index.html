@@ -203,7 +203,9 @@
                     </q-card>
                 </q-card-section>
                 <q-card-actions align="right">
-                    <q-btn flat label="Create Custom" color="primary" @click="showCustomDialog = true"></q-btn>
+                    <q-btn flat label="Create Custom" color="primary" @click="shipStore.openCustomDialog()"></q-btn>
+                    <q-btn flat icon="upload" label="Import Lib" color="accent" @click="$refs.libraryInput.click()"></q-btn>
+                    <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
                     <q-space></q-space>
                     <q-btn flat :label="$t('ui.cancel')" color="grey" v-close-popup></q-btn>
                     <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installComponent" v-close-popup :disable="!newComponentSelection"></q-btn>
@@ -212,30 +214,22 @@
         </q-dialog>
 
         <!-- CREATE CUSTOM COMPONENT DIALOG -->
-        <q-dialog v-model="showCustomDialog">
+        <q-dialog v-model="shipStore.customDialogState.visible">
             <q-card class="bg-grey-9 text-white" style="min-width: 500px">
                 <q-card-section>
-                    <div class="text-h6">Create Custom Component</div>
+                    <div class="text-h6">{{ shipStore.customDialogState.componentId ? 'Edit Custom Component' : 'Create Custom Component' }}</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none">
-                    <div>
-                        <div class="q-mb-md">
-                            <q-input filled dark v-model="newCustomComponent.name" label="Name" />
-                        </div>
-                        <div class="q-mb-md">
-                            <q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options />
-                        </div>
-                        <div class="q-mb-md">
-                            <q-input filled dark v-model="newCustomComponent.group" label="Group" />
-                        </div>
-                        <div class="q-mb-md">
-                            <q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" />
-                        </div>
-                        <div class="row q-col-gutter-sm q-mb-md">
+                    <div class="column q-gutter-md">
+                        <div><q-input filled dark v-model="newCustomComponent.name" label="Name" /></div>
+                        <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options /></div>
+                        <div><q-input filled dark v-model="newCustomComponent.group" label="Group" /></div>
+                        <div><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" /></div>
+                        <div class="row q-col-gutter-sm">
                             <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number" /></div>
                             <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number" /></div>
                         </div>
-                        <div class="q-mb-md">
+                        <div>
                             <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size" />
                         </div>
 
@@ -256,7 +250,7 @@
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="grey" v-close-popup />
-                    <q-btn unelevated label="Create & Install" color="positive" @click="createCustomComponent" :disable="!newCustomComponent.name" />
+                    <q-btn unelevated :label="shipStore.customDialogState.componentId ? 'Save Changes' : 'Create & Install'" color="positive" @click="createCustomComponent" :disable="!newCustomComponent.name" />
                 </q-card-actions>
             </q-card>
         </q-dialog>

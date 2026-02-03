@@ -23,6 +23,7 @@ export const useShipStore = defineStore('ship', () => {
     const showAddComponentDialog = ref(false);
     const cargoToEpAmount = ref(0);
     const customComponents = ref([]);
+    const customDialogState = reactive({ visible: false, componentId: null });
 
     // Initialize DB Action
     function initDb(data) {
@@ -268,6 +269,16 @@ export const useShipStore = defineStore('ship', () => {
     function addCustomComponent(component) {
         customComponents.value.push(component);
     }
+    function updateCustomComponent(component) {
+        const idx = customComponents.value.findIndex(c => c.id === component.id);
+        if (idx !== -1) {
+            customComponents.value[idx] = component;
+        }
+    }
+    function openCustomDialog(componentId = null) {
+        customDialogState.componentId = componentId;
+        customDialogState.visible = true;
+    }
     function removeComponent(instanceId) { installedComponents.value = installedComponents.value.filter(m => m.instanceId !== instanceId); }
     function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
     function createNew(newChassisId) {
@@ -322,8 +333,8 @@ export const useShipStore = defineStore('ship', () => {
 
     return {
         db, initDb,
-        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment,
+        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, addCustomComponent, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
+        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
     };
 });

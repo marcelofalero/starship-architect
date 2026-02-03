@@ -46,11 +46,12 @@ const SystemList = {
                 <q-item-section>
                     <q-item-label>
                         {{ getName(component.defId) }}
+                        <q-badge v-if="isCustom(component.defId)" color="purple" label="Custom" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Illegal'" color="deep-purple" label="Ill" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Military'" color="negative" label="Mil" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Restricted'" color="warning" text-color="black" label="Res" class="q-ml-xs" />
                         <q-badge v-if="getAvailability(component.defId) === 'Licensed'" color="info" label="Lic" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Common'" color="positive" label="Com" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component.defId) === 'Common' && !isCustom(component.defId)" color="positive" label="Com" class="q-ml-xs" />
                         <q-badge v-if="component.isStock" color="grey-7" label="Stock" class="q-ml-xs" />
                         <q-badge v-if="component.isNonStandard" color="warning" text-color="black" :label="$t('ui.ns_tag')" class="q-ml-xs" />
                         <q-icon v-if="!checkValidity(component)" name="warning" color="negative" class="q-ml-sm"><q-tooltip>Invalid for Ship Size</q-tooltip></q-icon>
@@ -77,6 +78,7 @@ const SystemList = {
                     </div>
                     <div class="row items-center">
                         <q-badge v-if="component.miniaturization > 0" color="orange" label="Mini" class="q-mr-xs" />
+                        <q-btn v-if="isCustom(component.defId)" flat round icon="edit" color="info" size="sm" @click="store.openCustomDialog(component.defId)" />
                         <q-btn v-if="hasUpgrades(component.defId)" flat round icon="settings" color="accent" size="sm" @click="openConfig(component)" />
                         <q-btn flat round icon="delete" color="negative" size="sm" @click="store.removeComponent(component.instanceId)" />
                     </div>
@@ -291,6 +293,9 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === id);
             return def && def.type === 'weapon';
         }
+        const isCustom = (id) => {
+            return store.customComponents.some(c => c.id === id);
+        }
         const format = (n) => n === 0 ? '-' : new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
         const hasUpgrades = (defId) => isWeapon(defId) || !!store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
@@ -312,7 +317,7 @@ export const SystemListWrapper = {
             return true;
         };
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity };
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isCustom, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity };
     }
 };
 
