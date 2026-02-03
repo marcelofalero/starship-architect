@@ -78,7 +78,6 @@ const SystemList = {
                     </div>
                     <div class="row items-center">
                         <q-badge v-if="component.miniaturization > 0" color="orange" label="Mini" class="q-mr-xs" />
-                        <q-btn v-if="isCustom(component.defId)" flat round icon="edit" color="info" size="sm" @click="store.openCustomDialog(component.defId)" />
                         <q-btn v-if="hasUpgrades(component.defId)" flat round icon="settings" color="accent" size="sm" @click="openConfig(component)" />
                         <q-btn flat round icon="delete" color="negative" size="sm" @click="store.removeComponent(component.instanceId)" />
                     </div>

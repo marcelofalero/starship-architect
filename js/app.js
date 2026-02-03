@@ -44,6 +44,33 @@ const setup = () => {
     const customStatToAdd = reactive({ key: 'sr', value: 0 });
     const statOptions = ['sr', 'sr_bonus', 'armor_bonus', 'hp', 'speed', 'hyperdrive', 'dex_bonus', 'str_bonus', 'perception_bonus', 'ep_dynamic_pct', 'cargo_factor'];
 
+    const groupOptionsFiltered = ref([]);
+    const exclusiveOptionsFiltered = ref([]);
+
+    const filterGroupFn = (val, update) => {
+        update(() => {
+            const groups = [...new Set(shipStore.allEquipment.map(e => e.group))];
+            if (val === '') {
+                groupOptionsFiltered.value = groups;
+            } else {
+                const needle = val.toLowerCase();
+                groupOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(needle) > -1);
+            }
+        });
+    };
+
+    const filterExclusiveFn = (val, update) => {
+        update(() => {
+            const groups = [...new Set(shipStore.allEquipment.map(e => e.exclusiveGroup).filter(g => g))];
+            if (val === '') {
+                exclusiveOptionsFiltered.value = groups;
+            } else {
+                const needle = val.toLowerCase();
+                exclusiveOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(needle) > -1);
+            }
+        });
+    };
+
     const stockFighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
     const stockFreighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
     const stockCapitals = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
@@ -299,10 +326,14 @@ const setup = () => {
     };
 
     const deleteCustomComponent = (id) => {
+        if (shipStore.isCustomComponentInstalled(id)) {
+            $q.notify({ type: 'warning', message: 'Cannot delete: Component is currently installed on the ship. Uninstall it first.' });
+            return;
+        }
         $q.dialog({
             dark: true,
             title: 'Confirm Deletion',
-            message: 'Are you sure you want to delete this custom component? It will be removed from any ships using it.',
+            message: 'Are you sure you want to delete this custom component?',
             cancel: true,
             persistent: true,
             color: 'negative'
@@ -329,7 +360,8 @@ const setup = () => {
         fileInput, libraryInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
         installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds,
         newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent,
-        handleLibraryImport, exportCustomLibrary, deleteCustomComponent
+        handleLibraryImport, exportCustomLibrary, deleteCustomComponent,
+        groupOptionsFiltered, exclusiveOptionsFiltered, filterGroupFn, filterExclusiveFn
     };
 };
 
