@@ -163,6 +163,8 @@ export const useShipStore = defineStore('ship', () => {
         s.str = (s.str || 0) + bonusStr;
         s.perception_bonus = bonusPer;
 
+        if (s.dex < 0) s.dex = 0; // Prevent negative Dex
+
         if (hpBonusPct > 0) s.hp += Math.floor(s.hp * hpBonusPct);
         if (s.speed > 0 && speedFactor > 0) s.speed += Math.max(1, Math.floor(s.speed * speedFactor));
         if (s.hyperdrive) s.hyperdrive += hyperdriveShift;
@@ -197,11 +199,15 @@ export const useShipStore = defineStore('ship', () => {
         if (unit === 'kg') val /= 1000;
 
         let multiplier = 1.0;
+        let adder = 0;
         installedComponents.value.forEach(mod => {
             const def = allEquipment.value.find(e => e.id === mod.defId);
-            if (def && def.stats && def.stats.cargo_factor) multiplier = def.stats.cargo_factor;
+            if (def && def.stats) {
+                if (def.stats.cargo_factor) multiplier = def.stats.cargo_factor;
+                if (def.stats.cargo_bonus_size_mult) adder += (def.stats.cargo_bonus_size_mult * sizeMultVal.value);
+            }
         });
-        return val * multiplier;
+        return (val * multiplier) + adder;
     });
 
     const currentCargo = computed(() => {

@@ -1355,26 +1355,24 @@
             "category": "Movement Systems",
             "group": "Thrusters",
             "type": "system",
-            "baseCost": 2000,
-            "baseEp": 2,
-            "sizeMult": false,
-            "maxSize": "Colossal(transport)",
+            "baseCost": 200,
+            "baseEp": 0,
+            "sizeMult": true,
             "availability": "Common",
-            "description": "Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
+            "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
         },
         {
             "id": "atmos_thrusters_adv",
-            "name": "Atmospheric Thrusters, Adv",
-            "name_es": "Propulsores Atmosf\u00e9ricos, Avz",
+            "name": "Atmospheric Thrusters (Advanced)",
+            "name_es": "Propulsores Atmosf\u00e9ricos (Avanzados)",
             "category": "Movement Systems",
             "group": "Thrusters",
             "type": "system",
-            "baseCost": 5000,
-            "baseEp": 5,
-            "sizeMult": false,
-            "maxSize": "Gargantuan",
-            "availability": "Common",
-            "description": "Advanced Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
+            "baseCost": 500,
+            "baseEp": 0,
+            "sizeMult": true,
+            "availability": "Licensed",
+            "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
         },
         {
             "id": "combat_thrusters",
@@ -1382,63 +1380,60 @@
             "name_es": "Propulsores de Combate",
             "category": "Movement Systems",
             "group": "Thrusters",
-            "type": "system",
-            "baseCost": 2000,
-            "baseEp": 1,
-            "sizeMult": false,
-            "maxSize": "Colossal(transport)",
-            "availability": "Common",
-            "description": "A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense."
+            "type": "modification",
+            "baseCost": 1000,
+            "baseEp": 0,
+            "sizeMult": true,
+            "availability": "Military",
+            "description": "Often used by smugglers, bounty hunters, and blockade runners. A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense."
         },
         {
-            "id": "maneuver_2",
+            "id": "maneuvering_jets",
             "name": "Maneuvering Jets (+2)",
             "name_es": "Jets de Maniobra (+2)",
             "category": "Movement Systems",
             "group": "Thrusters",
-            "type": "system",
+            "type": "modification",
             "baseCost": 2000,
-            "baseEp": 2,
-            "sizeMult": false,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Maneuvering Jets give a Starship a +2 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 2
-            },
-            "availability": "Common",
-            "description": "Maneuvering Jets give a Starship a +2 Equipment bonus to its Dexterity score."
+            }
         },
         {
-            "id": "maneuver_4",
+            "id": "maneuvering_jets_4",
             "name": "Maneuvering Jets (+4)",
             "name_es": "Jets de Maniobra (+4)",
             "category": "Movement Systems",
             "group": "Thrusters",
-            "type": "system",
+            "type": "modification",
             "baseCost": 5000,
             "baseEp": 3,
-            "sizeMult": false,
+            "sizeMult": true,
+            "availability": "Licensed",
+            "description": "Maneuvering Jets give a Starship a +4 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 4
-            },
-            "maxSize": "Colossal(transport)",
-            "availability": "Common",
-            "description": "Maneuvering Jets give a Starship a +4 Equipment bonus to its Dexterity score."
+            }
         },
         {
-            "id": "maneuver_6",
+            "id": "maneuvering_jets_6",
             "name": "Maneuvering Jets (+6)",
             "name_es": "Jets de Maniobra (+6)",
             "category": "Movement Systems",
             "group": "Thrusters",
-            "type": "system",
+            "type": "modification",
             "baseCost": 10000,
             "baseEp": 4,
-            "sizeMult": false,
+            "sizeMult": true,
+            "availability": "Military",
+            "description": "Maneuvering Jets give a Starship a +6 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 6
-            },
-            "maxSize": "Gargantuan",
-            "availability": "Licensed",
-            "description": "Maneuvering Jets give a Starship a +6 Equipment bonus to its Dexterity score."
+            }
         },
         {
             "id": "hyperdrive_075",
@@ -1455,7 +1450,7 @@
             },
             "maxSize": "Colossal (cruiser)",
             "availability": "Military",
-            "description": "A highly advanced hyperdrive."
+            "description": "The best Hyperdrive ever created is the Class .5 (which can be created by modifying a Class .75 Hyperdrive using the Starship Designer Feat). Class .5 drives are Illegal, require heavy maintenance (8h/month, DC 20 Mechanics), and impose penalties if neglected."
         },
         {
             "id": "hyperdrive_1",
@@ -1472,7 +1467,7 @@
             },
             "maxSize": "Colossal (cruiser)",
             "availability": "Licensed",
-            "description": "The Class 1 Hyperdrive is considered the pinnacle of stable Hyperdrive technology from the Clone Wars forward. It is the favored technology of military vessels."
+            "description": "The Class 1 Hyperdrive is considered the pinnacle of stable Hyperdrive technology from the Clone Wars forward. It is the favored technology of military vessels, but its high cost often results in designers settling for a Class 2 or Class 3 drive."
         },
         {
             "id": "hyperdrive_15",
@@ -1537,7 +1532,7 @@
                 "hyperdrive": 4
             },
             "availability": "Common",
-            "description": "A Hyperdrive of Class 4 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive."
+            "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive."
         },
         {
             "id": "hyperdrive_6",
@@ -1553,7 +1548,7 @@
                 "hyperdrive": 6
             },
             "availability": "Common",
-            "description": "A Hyperdrive of Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive."
+            "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive."
         },
         {
             "id": "hyperdrive_15_slow",
@@ -1569,7 +1564,7 @@
                 "hyperdrive": 15
             },
             "availability": "Common",
-            "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Often the alternative is to drift aimlessly in space for centuries."
+            "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries."
         },
         {
             "id": "nav_standard",
@@ -1582,7 +1577,7 @@
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Licensed",
-            "description": "Most Starships have Navicomputers. A Navicomputer is an astrogation calculator designed to make all the calculations necessary to travel through Hyperspace. It grants a +5 Equipment bonus to Use Computer checks made for Astrogation, and allows untrained checks."
+            "description": "A Navicomputer is an astrogation calculator designed to make all the calculations necessary to travel through Hyperspace. Most Starships have Navicomputers, but those that lack Hyperdrives and some fighters that depend on Astromech Droids do not."
         },
         {
             "id": "nav_limited",
@@ -1595,7 +1590,7 @@
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Common",
-            "description": "Limited Navicomputers store only two jumps' worth of information, enough to get to a destination and return."
+            "description": "Most Navicomputers are Nonstandard Modifications for Starfighters - these ships simply don't have the room for the memory core. Starfighters often have Limited Navicomputers that store only two jumps' worth of information, enough to get to a destination and return."
         },
         {
             "id": "nav_advanced",
@@ -1986,16 +1981,30 @@
             "availability": "Military"
         },
         {
-            "id": "cloaking",
-            "name": "Cloaking Device",
-            "name_es": "Dispositivo de Camuflaje",
+            "id": "cloaking_hibridium",
+            "name": "Cloaking Device (Hibridium)",
+            "name_es": "Dispositivo de Camuflaje (Hibridio)",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
             "baseCost": 100000,
             "baseEp": 5,
             "sizeMult": true,
-            "availability": "Illegal"
+            "availability": "Illegal",
+            "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment."
+        },
+        {
+            "id": "cloaking_stygium",
+            "name": "Cloaking Device (Stygium)",
+            "name_es": "Dispositivo de Camuflaje (Stygium)",
+            "category": "Defense Systems",
+            "group": "Electronic Warfare",
+            "type": "system",
+            "baseCost": 200000,
+            "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Illegal",
+            "description": "Ancient and rare technology using Stygium crystals. Grants Total Concealment without the 'Double-Blind' penalty. Extremely expensive and hard to find."
         },
         {
             "id": "anti_concussion",
@@ -2325,10 +2334,24 @@
             "category": "Starship Accessories",
             "group": "Communications",
             "type": "system",
-            "baseCost": 10000,
+            "baseCost": 30000,
+            "baseEp": 5,
+            "sizeMult": false,
+            "availability": "Military",
+            "description": "Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare)."
+        },
+        {
+            "id": "hypertransceiver",
+            "name": "Hypertransceiver",
+            "name_es": "Hipertransceptor",
+            "category": "Starship Accessories",
+            "group": "Communications",
+            "type": "system",
+            "baseCost": 1000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common"
+            "availability": "Common",
+            "description": "Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet."
         },
         {
             "id": "escape_pod",
@@ -2343,7 +2366,49 @@
             "availability": "Common",
             "upgradeSpecs": {
                 "quantity": true
-            }
+            },
+            "description": "Typical Escape Pods are small, single-use Vehicles providing 1 day of life support for eight Medium creatures. Required by law on all Starships (Military exempt)."
+        },
+        {
+            "id": "lifeboat_small",
+            "name": "Lifeboat, Small",
+            "name_es": "Bote Salvavidas, Peque\u00f1o",
+            "category": "Starship Accessories",
+            "group": "Safety",
+            "type": "system",
+            "baseCost": 500,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "minShipSize": "Colossal",
+            "description": "Provide life support for up to 15 Medium creatures for 1 week. Includes survival gear. Can be installed on ships of Colossal size or larger. 1 Bay includes (Cost Mod)/50 Lifeboats."
+        },
+        {
+            "id": "lifeboat_large",
+            "name": "Lifeboat, Large",
+            "name_es": "Bote Salvavidas, Grande",
+            "category": "Starship Accessories",
+            "group": "Safety",
+            "type": "system",
+            "baseCost": 2500,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "minShipSize": "Colossal (frigate)",
+            "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger. 1 Bay includes (Cost Mod)/100 Lifeboats."
+        },
+        {
+            "id": "droid_repair_team",
+            "name": "Droid Repair Team",
+            "name_es": "Equipo de Reparaci\u00f3n Droide",
+            "category": "Defense Systems",
+            "group": "Damage Control",
+            "type": "system",
+            "baseCost": 2000,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active."
         },
         {
             "id": "medical_bed",
@@ -2406,16 +2471,109 @@
             "availability": "Illegal"
         },
         {
-            "id": "cargo_pod",
-            "name": "Cargo Pod (10 tons)",
-            "name_es": "M\u00f3dulo de Carga (10 tons)",
+            "id": "cargo_pod_small",
+            "name": "Cargo Pod (Small)",
+            "name_es": "M\u00f3dulo de Carga (Peque\u00f1o)",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "cargo",
+            "baseCost": 200,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Additional storage space. Adds (Size Mod) x 1 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
+            "stats": {
+                "dex_bonus": -2,
+                "cargo_bonus_size_mult": 1
+            }
+        },
+        {
+            "id": "cargo_pod_med",
+            "name": "Cargo Pod (Medium)",
+            "name_es": "M\u00f3dulo de Carga (Mediano)",
             "category": "Starship Accessories",
             "group": "Storage",
             "type": "cargo",
             "baseCost": 1000,
+            "baseEp": 2,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Additional storage space. Adds (Size Mod) x 5 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
+            "stats": {
+                "dex_bonus": -2,
+                "cargo_bonus_size_mult": 5
+            }
+        },
+        {
+            "id": "cargo_pod_large",
+            "name": "Cargo Pod (Large)",
+            "name_es": "M\u00f3dulo de Carga (Grande)",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "cargo",
+            "baseCost": 2000,
+            "baseEp": 3,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Additional storage space. Adds (Size Mod) x 10 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
+            "stats": {
+                "dex_bonus": -2,
+                "cargo_bonus_size_mult": 10
+            }
+        },
+        {
+            "id": "cargo_jettison",
+            "name": "Cargo Jettison System",
+            "name_es": "Sistema de Expulsi\u00f3n de Carga",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "system",
+            "baseCost": 1500,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common"
+            "availability": "Common",
+            "description": "Allows a ship to dump part or all of its cargo into space without docking or slowing down as a Swift Action."
+        },
+        {
+            "id": "extended_range",
+            "name": "Extended Range",
+            "name_es": "Alcance Extendido",
+            "category": "Starship Accessories",
+            "group": "Logistics",
+            "type": "modification",
+            "baseCost": 100,
+            "baseEp": 0,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Improves a Starship's consumables by 10% of its original value (rounded down, minimum 1 day) x the number of times installed."
+        },
+        {
+            "id": "hangar_bay",
+            "name": "Hangar Bay",
+            "name_es": "Bah\u00eda de Hangar",
+            "category": "Starship Accessories",
+            "group": "Hangar",
+            "type": "system",
+            "baseCost": 5000,
+            "baseEp": 50,
+            "sizeMult": true,
+            "minShipSize": "Colossal (frigate)",
+            "availability": "Common",
+            "description": "Holds secondary craft. Each bay has (Cost Modifier)/50 units of hangar space (Huge=1, Gargantuan=5, Colossal=20). Can be combined."
+        },
+        {
+            "id": "hangar_bay_concealed",
+            "name": "Hangar Bay, Concealed",
+            "name_es": "Bah\u00eda de Hangar, Oculta",
+            "category": "Starship Accessories",
+            "group": "Hangar",
+            "type": "system",
+            "baseCost": 25000,
+            "baseEp": 50,
+            "sizeMult": true,
+            "minShipSize": "Colossal (frigate)",
+            "availability": "Restricted",
+            "description": "Functions as Hangar Bay but requires DC 30 Perception to notice externally. Launch/Land takes 2 Full-Round Actions."
         },
         {
             "id": "cryo_chambers",
@@ -2427,7 +2585,8 @@
             "baseCost": 5000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common"
+            "availability": "Common",
+            "description": "Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x."
         },
         {
             "id": "docking_clamp",
@@ -2436,10 +2595,11 @@
             "category": "Starship Accessories",
             "group": "Docking",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 1000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common"
+            "availability": "Common",
+            "description": "Used to carry smaller ships (e.g. TIE Fighters on a Gozanti). A Starship can maneuver and Hyperspace with ships attached. If ship takes damage > Threshold, clamped ships are shaken off."
         },
         {
             "id": "armor_1",
