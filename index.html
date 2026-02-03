@@ -267,7 +267,7 @@
                         <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
                         <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options></q-select></div>
                         <div>
-                            <q-select filled dark v-model="newCustomComponent.group" use-input hide-selected fill-input input-debounce="0" :options="groupOptionsFiltered" @filter="filterGroupFn" label="Group" hint="Select existing or type new" >
+                            <q-select filled dark v-model="newCustomComponent.group" use-input hide-selected fill-input input-debounce="0" new-value-mode="add-unique" :options="groupOptionsFiltered" @filter="filterGroupFn" label="Group" hint="Select existing or type new" >
                                 <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new group</q-item-section></q-item></template>
                             </q-select>
                         </div>
@@ -300,7 +300,7 @@
                                         <q-input v-else-if="prop.def.type === 'number'" filled dark v-model="prop.value" :label="prop.def.label" type="number" dense></q-input>
 
                                         <!-- Exclusive Group Select -->
-                                        <q-select v-else-if="prop.def.type === 'exclusive_select'" filled dark v-model="prop.value" use-input hide-selected fill-input input-debounce="0" :options="exclusiveOptionsFiltered" @filter="filterExclusiveFn" :label="prop.def.label" dense>
+                                        <q-select v-else-if="prop.def.type === 'exclusive_select'" filled dark v-model="prop.value" use-input hide-selected fill-input input-debounce="0" new-value-mode="add-unique" :options="exclusiveOptionsFiltered" @filter="filterExclusiveFn" :label="prop.def.label" dense>
                                             <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new exclusive group</q-item-section></q-item></template>
                                         </q-select>
 
