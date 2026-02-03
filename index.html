@@ -266,6 +266,7 @@
                         <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options /></div>
                         <div><q-input filled dark v-model="newCustomComponent.group" label="Group" /></div>
                         <div><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" /></div>
+                        <div><q-input filled dark v-model="newCustomComponent.exclusiveGroup" label="Exclusive Group (e.g. shield, armor)" hint="Items in the same group replace each other" /></div>
                         <div class="row q-col-gutter-sm">
                             <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number" /></div>
                             <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number" /></div>

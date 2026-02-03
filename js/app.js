@@ -38,10 +38,11 @@ const setup = () => {
         baseCost: 0,
         baseEp: 0,
         sizeMult: false,
+        exclusiveGroup: '',
         stats: {}
     });
     const customStatToAdd = reactive({ key: 'sr', value: 0 });
-    const statOptions = ['sr', 'armor', 'hp', 'speed', 'hyperdrive', 'dex_bonus', 'str_bonus', 'perception_bonus', 'ep_dynamic_pct', 'cargo_factor'];
+    const statOptions = ['sr', 'sr_bonus', 'armor_bonus', 'hp', 'speed', 'hyperdrive', 'dex_bonus', 'str_bonus', 'perception_bonus', 'ep_dynamic_pct', 'cargo_factor'];
 
     const stockFighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
     const stockFreighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
@@ -113,12 +114,13 @@ const setup = () => {
                      baseCost: existing.baseCost,
                      baseEp: existing.baseEp,
                      sizeMult: existing.sizeMult,
+                     exclusiveGroup: existing.exclusiveGroup || '',
                      stats: { ...existing.stats }
                  });
              }
         } else if (!visible) {
              // Reset on close
-             Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+             Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, exclusiveGroup: '', stats: {} });
              shipStore.customDialogState.componentId = null;
         }
     });
@@ -226,6 +228,7 @@ const setup = () => {
             baseCost: Number(newCustomComponent.baseCost),
             baseEp: Number(newCustomComponent.baseEp),
             sizeMult: newCustomComponent.sizeMult,
+            exclusiveGroup: newCustomComponent.exclusiveGroup,
             availability: 'Common',
             stats: { ...newCustomComponent.stats }
         };
