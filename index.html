@@ -43,6 +43,8 @@
                     <q-btn flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
                     <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
                     <input type="file" ref="importInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
+                    <q-separator vertical spaced dark></q-separator>
+                    <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
                     <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
                     <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen" v-if="$q.screen.gt.sm"></q-btn>
                 </q-toolbar>
@@ -203,13 +205,52 @@
                     </q-card>
                 </q-card-section>
                 <q-card-actions align="right">
-                    <q-btn flat label="Create Custom" color="primary" @click="shipStore.openCustomDialog()"></q-btn>
-                    <q-btn flat icon="upload" label="Import Lib" color="accent" @click="$refs.libraryInput.click()"></q-btn>
-                    <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
                     <q-space></q-space>
                     <q-btn flat :label="$t('ui.cancel')" color="grey" v-close-popup></q-btn>
                     <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installComponent" v-close-popup :disable="!newComponentSelection"></q-btn>
                 </q-card-actions>
+            </q-card>
+        </q-dialog>
+
+        <!-- CUSTOM MANAGER DIALOG -->
+        <q-dialog v-model="shipStore.showCustomManager">
+            <q-card class="bg-grey-9 text-white" style="min-width: 600px; max-height: 80vh; display: flex; flex-direction: column;">
+                <q-card-section class="row items-center q-pb-none">
+                    <div class="text-h6">Custom Components Library</div>
+                    <q-space></q-space>
+                    <q-btn icon="close" flat round dense v-close-popup></q-btn>
+                </q-card-section>
+
+                <q-card-section class="q-py-sm">
+                    <div class="row q-gutter-sm">
+                        <q-btn color="primary" icon="add" label="Create New" @click="shipStore.openCustomDialog()"></q-btn>
+                        <q-btn color="secondary" icon="upload" label="Import JSON" @click="$refs.libraryInput.click()"></q-btn>
+                        <q-btn color="accent" icon="download" label="Export JSON" @click="exportCustomLibrary" :disable="shipStore.customComponents.length === 0"></q-btn>
+                        <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
+                    </div>
+                </q-card-section>
+
+                <q-card-section class="col q-pa-none">
+                    <q-scroll-area class="fit">
+                        <q-list separator dark class="q-pa-md">
+                            <q-item v-for="comp in shipStore.customComponents" :key="comp.id">
+                                <q-item-section>
+                                    <q-item-label>{{ comp.name }}</q-item-label>
+                                    <q-item-label caption class="text-grey-5">{{ comp.type }} | {{ comp.baseCost }} cr | {{ comp.baseEp }} EP</q-item-label>
+                                </q-item-section>
+                                <q-item-section side>
+                                    <div class="row q-gutter-xs">
+                                        <q-btn flat round icon="edit" color="info" size="sm" @click="shipStore.openCustomDialog(comp.id)"></q-btn>
+                                        <q-btn flat round icon="delete" color="negative" size="sm" @click="deleteCustomComponent(comp.id)"></q-btn>
+                                    </div>
+                                </q-item-section>
+                            </q-item>
+                            <div v-if="shipStore.customComponents.length === 0" class="text-center text-grey q-pa-lg">
+                                No custom components found. Create or Import one.
+                            </div>
+                        </q-list>
+                    </q-scroll-area>
+                </q-card-section>
             </q-card>
         </q-dialog>
 
@@ -250,7 +291,7 @@
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="grey" v-close-popup />
-                    <q-btn unelevated :label="shipStore.customDialogState.componentId ? 'Save Changes' : 'Create & Install'" color="positive" @click="createCustomComponent" :disable="!newCustomComponent.name" />
+                    <q-btn unelevated :label="shipStore.customDialogState.componentId ? 'Save Changes' : 'Create'" color="positive" @click="createCustomComponent" :disable="!newCustomComponent.name" />
                 </q-card-actions>
             </q-card>
         </q-dialog>

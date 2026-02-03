@@ -24,6 +24,7 @@ export const useShipStore = defineStore('ship', () => {
     const cargoToEpAmount = ref(0);
     const customComponents = ref([]);
     const customDialogState = reactive({ visible: false, componentId: null });
+    const showCustomManager = ref(false);
 
     // Initialize DB Action
     function initDb(data) {
@@ -280,6 +281,10 @@ export const useShipStore = defineStore('ship', () => {
         customDialogState.visible = true;
     }
     function removeComponent(instanceId) { installedComponents.value = installedComponents.value.filter(m => m.instanceId !== instanceId); }
+    function removeCustomComponent(componentId) {
+        customComponents.value = customComponents.value.filter(c => c.id !== componentId);
+        installedComponents.value = installedComponents.value.filter(m => m.defId !== componentId);
+    }
     function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
@@ -333,8 +338,8 @@ export const useShipStore = defineStore('ship', () => {
 
     return {
         db, initDb,
-        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState,
+        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, reset, createNew, loadState, getComponentCost, getComponentEp
+        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, reset, createNew, loadState, getComponentCost, getComponentEp
     };
 });

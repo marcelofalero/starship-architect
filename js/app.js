@@ -235,17 +235,16 @@ const setup = () => {
             shipStore.customDialogState.visible = false;
         } else {
             shipStore.addCustomComponent(comp);
-            // Install it
-            let loc = 'Installed';
-            if (comp.type === 'weapon') loc = 'Hardpoint';
-            else if (comp.type === 'system') loc = 'Internal Bay';
-            else if (comp.type === 'cargo') loc = 'Cargo Hold';
-            else if (comp.type === 'modification') loc = 'Hull Config';
-            else if (comp.type === 'engine') loc = 'Aft Section';
 
-            shipStore.addComponent(id, loc, false);
+            // Only auto-install if we are NOT in the manager view (i.e. we came from "Install System" dialog via some path, though that path is removed now, but good for future proofing)
+            // Actually, per the plan, the entry point is now the Manager. So we just add it to the library.
+            // If the user wants to install it, they go to "Install System" -> Select Custom category -> Install.
+
+            // However, for better UX, if the manager is NOT open (e.g. we might add a shortcut later), we might want to install.
+            // But currently the only way to open this dialog is via Manager or Edit button.
+
             shipStore.customDialogState.visible = false;
-            shipStore.showAddComponentDialog = false;
+            // shipStore.showAddComponentDialog = false; // Do not close the add dialog if it was open behind? Actually it's distinct now.
         }
     };
 
@@ -261,7 +260,7 @@ const setup = () => {
                     data.forEach(item => {
                         // Basic Validation
                         if (item.name && item.type) {
-                            // Assign new ID to avoid collisions
+                            // Check for duplicates (by name/stats?) For now, always new ID
                             const newId = 'custom_' + crypto.randomUUID();
                             const comp = { ...item, id: newId };
                             shipStore.addCustomComponent(comp);
@@ -276,8 +275,37 @@ const setup = () => {
                 console.error(error);
                 $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
             }
+            // Clear input
+            if (libraryInput.value) libraryInput.value.value = '';
         };
         reader.readAsText(file);
+    };
+
+    const exportCustomLibrary = () => {
+        if (shipStore.customComponents.length === 0) {
+            $q.notify({ type: 'warning', message: 'No custom components to export.' });
+            return;
+        }
+        const jsonStr = JSON.stringify(shipStore.customComponents, null, 2);
+        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `swse_custom_components.json`;
+        a.click();
+    };
+
+    const deleteCustomComponent = (id) => {
+        $q.dialog({
+            dark: true,
+            title: 'Confirm Deletion',
+            message: 'Are you sure you want to delete this custom component? It will be removed from any ships using it.',
+            cancel: true,
+            persistent: true,
+            color: 'negative'
+        }).onOk(() => {
+            shipStore.removeCustomComponent(id);
+        });
     };
 
     const addStatToCustomComponent = () => {
@@ -297,7 +325,8 @@ const setup = () => {
         categoryOptions, groupOptions, itemOptions, selectedItemDef, previewCost, previewEp, resetGroup, isSizeValid,
         fileInput, libraryInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
         installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds,
-        newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent, handleLibraryImport
+        newCustomComponent, customStatToAdd, statOptions, createCustomComponent, addStatToCustomComponent, removeStatFromCustomComponent,
+        handleLibraryImport, exportCustomLibrary, deleteCustomComponent
     };
 };
 
