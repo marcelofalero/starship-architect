@@ -2,7 +2,7 @@ import { useShipStore } from './store.js';
 import { i18n, getLocalizedName } from './i18n.js';
 import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper } from './components.js';
 
-const { createApp, ref, computed, onMounted, reactive } = Vue;
+const { createApp, ref, computed, onMounted, reactive, watch } = Vue;
 const { createPinia } = Pinia;
 const { useQuasar } = Quasar;
 const { useI18n } = VueI18n;
