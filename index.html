@@ -264,30 +264,30 @@
                 </q-card-section>
                 <q-card-section class="q-pt-none">
                     <div class="column q-gutter-md">
-                        <div><q-input filled dark v-model="newCustomComponent.name" label="Name" /></div>
-                        <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options /></div>
+                        <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
+                        <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options></q-select></div>
                         <div>
                             <q-select filled dark v-model="newCustomComponent.group" use-input hide-selected fill-input input-debounce="0" :options="groupOptionsFiltered" @filter="filterGroupFn" label="Group" hint="Select existing or type new" >
                                 <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new group</q-item-section></q-item></template>
                             </q-select>
                         </div>
-                        <div><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type" /></div>
+                        <div><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type"></q-select></div>
                         <div class="row q-col-gutter-sm">
-                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number" /></div>
-                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number" /></div>
+                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number"></q-input></div>
+                            <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number"></q-input></div>
                         </div>
                         <div>
-                            <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size" />
+                            <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size"></q-checkbox>
                         </div>
 
                         <div>
                             <div class="text-subtitle2 q-mb-sm">Properties & Modifiers</div>
                             <div class="row q-col-gutter-sm items-center q-mb-md">
                                 <div class="col">
-                                    <q-select filled dark v-model="propertyToAdd" :options="propertyDefinitions" label="Select Property" dense option-label="label" />
+                                    <q-select filled dark v-model="propertyToAdd" :options="propertyDefinitions" label="Select Property" dense option-label="label"></q-select>
                                 </div>
                                 <div class="col-auto">
-                                    <q-btn icon="add" label="Add" color="primary" @click="addPropertyToCustomComponent" :disable="!propertyToAdd" />
+                                    <q-btn icon="add" label="Add" color="primary" @click="addPropertyToCustomComponent" :disable="!propertyToAdd"></q-btn>
                                 </div>
                             </div>
 
@@ -295,9 +295,9 @@
                                 <div v-for="prop in activeProperties" :key="prop.key" class="row q-col-gutter-sm items-center">
                                     <div class="col">
                                         <!-- String/Text Inputs -->
-                                        <q-input v-if="prop.def.type === 'string'" filled dark v-model="prop.value" :label="prop.def.label" dense />
-                                        <q-input v-else-if="prop.def.type === 'text'" filled dark v-model="prop.value" :label="prop.def.label" type="textarea" autogrow dense />
-                                        <q-input v-else-if="prop.def.type === 'number'" filled dark v-model="prop.value" :label="prop.def.label" type="number" dense />
+                                        <q-input v-if="prop.def.type === 'string'" filled dark v-model="prop.value" :label="prop.def.label" dense></q-input>
+                                        <q-input v-else-if="prop.def.type === 'text'" filled dark v-model="prop.value" :label="prop.def.label" type="textarea" autogrow dense></q-input>
+                                        <q-input v-else-if="prop.def.type === 'number'" filled dark v-model="prop.value" :label="prop.def.label" type="number" dense></q-input>
 
                                         <!-- Exclusive Group Select -->
                                         <q-select v-else-if="prop.def.type === 'exclusive_select'" filled dark v-model="prop.value" use-input hide-selected fill-input input-debounce="0" :options="exclusiveOptionsFiltered" @filter="filterExclusiveFn" :label="prop.def.label" dense>
@@ -305,10 +305,10 @@
                                         </q-select>
 
                                         <!-- Size Select -->
-                                        <q-select v-else-if="prop.def.type === 'size_select'" filled dark v-model="prop.value" :options="shipStore.db.SIZE_RANK" :label="prop.def.label" dense />
+                                        <q-select v-else-if="prop.def.type === 'size_select'" filled dark v-model="prop.value" :options="shipStore.db.SIZE_RANK" :label="prop.def.label" dense></q-select>
                                     </div>
                                     <div class="col-auto">
-                                        <q-btn flat round icon="delete" color="negative" size="sm" @click="removePropertyFromCustomComponent(prop.key)" />
+                                        <q-btn flat round icon="delete" color="negative" size="sm" @click="removePropertyFromCustomComponent(prop.key)"></q-btn>
                                     </div>
                                 </div>
                             </div>
