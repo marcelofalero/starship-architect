@@ -39,12 +39,12 @@
                     </q-toolbar-title>
                     
                     <q-btn flat icon="garage" :label="$t('ui.hangar')" @click="showHangarDialog = true" class="q-mr-sm"></q-btn>
-                    <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
                     <q-btn flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
                     <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
                     <input type="file" ref="importInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
                     <q-separator vertical spaced dark></q-separator>
                     <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
+                    <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
                     <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
                     <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen" v-if="$q.screen.gt.sm"></q-btn>
                 </q-toolbar>
