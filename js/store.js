@@ -285,6 +285,9 @@ export const useShipStore = defineStore('ship', () => {
         customComponents.value = customComponents.value.filter(c => c.id !== componentId);
         installedComponents.value = installedComponents.value.filter(m => m.defId !== componentId);
     }
+    function isCustomComponentInstalled(componentId) {
+        return installedComponents.value.some(m => m.defId === componentId);
+    }
     function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
@@ -340,6 +343,6 @@ export const useShipStore = defineStore('ship', () => {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, reset, createNew, loadState, getComponentCost, getComponentEp
+        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, reset, createNew, loadState, getComponentCost, getComponentEp
     };
 });
