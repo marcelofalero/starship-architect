@@ -3,7 +3,7 @@ const { createI18n, useI18n } = VueI18n;
 export const messages = {
     en: {
         ui: {
-            hangar: "Hangar", sheet: "Sheet", export: "Export", manifest: "Systems Manifest",
+            hangar: "New Ship", sheet: "Sheet", export: "Save Ship", manifest: "Systems Manifest",
             overview: "Overview", systems: "Systems", config: "Config", free_ep: "Free EP",
             install_system: "Install System", install_caption: "Select category, type, and specific component.",
             category: "Category", sys_type: "System Type", component: "Component",
@@ -20,7 +20,7 @@ export const messages = {
             installed_systems: "Installed Systems", print_btn: "Print to PDF / Paper",
             convert_cargo_ep: "Convert Cargo to EP", cargo_to_ep_hint: "{sizeMult} tons = 1 EP",
             max_cargo: "Max Cargo", cargo_converted: "Cargo Converted", close: "Close",
-            ship_name: "Ship Name", import: "Import"
+            ship_name: "Ship Name", import: "Load Ship"
         },
         stats: {
             str: "STR", dex: "DEX", int: "INT", ref: "Reflex Defense", armor: "Armor",
