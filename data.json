@@ -765,7 +765,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 3,
-                    "maxAdd": 16,
+                    "maxAdd": 13,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
@@ -788,8 +788,8 @@
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
-                    "base": 16,
-                    "maxAdd": 16,
+                    "base": 6,
+                    "maxAdd": 26,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
@@ -814,8 +814,8 @@
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
-                    "base": 32,
-                    "maxAdd": 32,
+                    "base": 12,
+                    "maxAdd": 52,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
