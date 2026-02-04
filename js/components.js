@@ -96,7 +96,7 @@ const SystemList = {
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.payload" class="q-mb-md">
                         <div v-if="getUpgradeSpecs(editingComponent.defId).payload.type === 'capacity'">
                             <div class="text-caption">Additional {{ getUpgradeSpecs(editingComponent.defId).payload.unitLabel }} ({{ format(store.allEquipment.find(e => e.id === editingComponent.defId).baseCost * getUpgradeSpecs(editingComponent.defId).payload.costFactor) }} each)</div>
-                            <q-input dark type="number" filled v-model.number="editingComponent.modifications.payloadCount" label="Additional Capacity" min="0" :max="getUpgradeSpecs(editingComponent.defId).payload.maxAdd" :hint="'Base: ' + getUpgradeSpecs(editingComponent.defId).payload.base + ' | Max Add: ' + getUpgradeSpecs(editingComponent.defId).payload.maxAdd" />
+                            <q-input dark type="number" filled v-model.number="editingComponent.modifications.payloadCount" label="Additional Capacity" min="0" :max="getUpgradeSpecs(editingComponent.defId).payload.max - getUpgradeSpecs(editingComponent.defId).payload.base" :hint="'Base: ' + getUpgradeSpecs(editingComponent.defId).payload.base + ' | Max Total: ' + getUpgradeSpecs(editingComponent.defId).payload.max" />
                         </div>
                         <q-checkbox v-else dark v-model="editingComponent.modifications.payloadOption" :label="getUpgradeSpecs(editingComponent.defId).payload.label + ' (' + format(getUpgradeSpecs(editingComponent.defId).payload.cost) + ')'" />
                     </div>

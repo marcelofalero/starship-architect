@@ -765,7 +765,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 3,
-                    "maxAdd": 13,
+                    "max": 16,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
@@ -789,7 +789,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 6,
-                    "maxAdd": 26,
+                    "max": 32,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
@@ -815,7 +815,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 12,
-                    "maxAdd": 52,
+                    "max": 64,
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
@@ -1119,7 +1119,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 6,
-                    "maxAdd": 6,
+                    "max": 12,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1143,7 +1143,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 12,
-                    "maxAdd": 12,
+                    "max": 24,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1169,7 +1169,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 24,
-                    "maxAdd": 24,
+                    "max": 48,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1195,7 +1195,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 16,
-                    "maxAdd": 16,
+                    "max": 32,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1219,7 +1219,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 32,
-                    "maxAdd": 32,
+                    "max": 64,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1245,7 +1245,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 64,
-                    "maxAdd": 64,
+                    "max": 128,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1272,7 +1272,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 30,
-                    "maxAdd": 30,
+                    "max": 60,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1297,7 +1297,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 60,
-                    "maxAdd": 60,
+                    "max": 120,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
@@ -1324,7 +1324,7 @@
                 "payload": {
                     "type": "capacity",
                     "base": 120,
-                    "maxAdd": 120,
+                    "max": 240,
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
