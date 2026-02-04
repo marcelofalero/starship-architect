@@ -2021,29 +2021,13 @@
             "availability": "Military"
         },
         {
-            "id": "aux_gen",
-            "name": "Auxiliary Generator",
-            "name_es": "Generador Auxiliar",
-            "category": "Defense Systems",
-            "group": "Generators",
-            "type": "system",
-            "baseCost": 0,
-            "baseEp": 1,
-            "sizeMult": false,
-            "stats": {
-                "cost_dynamic_pct": 0.1
-            },
-            "availability": "Common",
-            "description": "Supplies power to specific systems. Gives a +2/+4/+6 equipment bonus to Strength. Allows systems to continue when engines are shut down."
-        },
-        {
             "id": "backup_battery",
             "name": "Backup Battery",
             "name_es": "Bater\u00eda de Respaldo",
             "category": "Starship Accessories",
             "group": "Power",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 10000,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Common",
@@ -2510,7 +2494,7 @@
             "category": "Movement Systems",
             "group": "Sublight Drives",
             "type": "modification",
-            "baseCost": 3000,
+            "baseCost": 100000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Illegal",
@@ -2536,7 +2520,7 @@
             "category": "Starship Accessories",
             "group": "Safety",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 8000,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Licensed",
@@ -2549,7 +2533,7 @@
             "category": "Starship Accessories",
             "group": "Docking",
             "type": "system",
-            "baseCost": 5000,
+            "baseCost": 3000,
             "baseEp": 1,
             "sizeMult": false,
             "minShipSize": "Colossal",
@@ -2563,7 +2547,7 @@
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "system",
-            "baseCost": 500,
+            "baseCost": 2000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
@@ -2576,7 +2560,7 @@
             "category": "Starship Accessories",
             "group": "Logistics",
             "type": "system",
-            "baseCost": 1000,
+            "baseCost": 2400,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
@@ -2609,26 +2593,13 @@
             "description": "External mounts for missiles/bombs. 1 Array = 4 Hardpoints. 1 Missile/Bomb = 1 HP (2 for Colossal weapons). Can also carry Drop Tanks. Half payload lost if Condition Track drops."
         },
         {
-            "id": "hidden_cargo_hold",
-            "name": "Hidden Cargo Hold",
-            "name_es": "Bodega de Carga Oculta",
-            "category": "Starship Accessories",
-            "group": "Storage",
-            "type": "system",
-            "baseCost": 2000,
-            "baseEp": 1,
-            "sizeMult": true,
-            "availability": "Illegal",
-            "description": "Up to half cargo capacity can be hidden. DC 15 Perception (Routine) or DC 25 (Detailed) to find access."
-        },
-        {
             "id": "interrogation_chamber",
             "name": "Interrogation Chamber",
             "name_es": "C\u00e1mara de Interrogatorio",
             "category": "Starship Accessories",
             "group": "Security",
             "type": "system",
-            "baseCost": 5000,
+            "baseCost": 10000,
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Restricted",
@@ -2641,7 +2612,7 @@
             "category": "Starship Accessories",
             "group": "Control",
             "type": "modification",
-            "baseCost": 500,
+            "baseCost": 1000,
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Licensed",
@@ -2654,7 +2625,7 @@
             "category": "Weapon Systems",
             "group": "Tactical",
             "type": "weapon",
-            "baseCost": 5000,
+            "baseCost": 25000,
             "baseEp": 2,
             "sizeMult": false,
             "availability": "Military",
@@ -2667,7 +2638,7 @@
             "category": "Weapon Systems",
             "group": "Tactical",
             "type": "weapon",
-            "baseCost": 1000,
+            "baseCost": 6000,
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Military",
@@ -2680,7 +2651,7 @@
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
-            "baseCost": 5000,
+            "baseCost": 20000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Restricted",
@@ -2693,7 +2664,7 @@
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "weapon",
-            "baseCost": 1500,
+            "baseCost": 2000,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Common",
@@ -2706,7 +2677,7 @@
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
-            "baseCost": 100000,
+            "baseCost": 150000,
             "baseEp": 2,
             "sizeMult": true,
             "availability": "Illegal",
@@ -2719,8 +2690,8 @@
             "category": "Weapon Systems",
             "group": "Tactical",
             "type": "weapon",
-            "baseCost": 5000,
-            "baseEp": 2,
+            "baseCost": 15000,
+            "baseEp": 12,
             "sizeMult": false,
             "availability": "Common",
             "description": "Secures enemy ships for boarding. +5 Grapple bonus to maintain hold. Includes boarding tube. Can equip Plasma Torch."
@@ -2771,7 +2742,7 @@
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "system",
-            "baseCost": 5000,
+            "baseCost": 3000,
             "baseEp": 5,
             "sizeMult": false,
             "availability": "Common",
@@ -3968,7 +3939,7 @@
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Restricted",
-            "description": "Boosts damage output of Blaster, Laser, or Ion Cannons via multistage modifications (enhanced power cyclers, etc.)."
+            "description": "Standard Cannon Enhancements increase damage by +1 die. Costs 2x base weapon cost."
         },
         {
             "id": "cannon_enhancements_adv",
@@ -3981,7 +3952,7 @@
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Restricted",
-            "description": "Advanced modifications to boost damage output. Substantially more expensive than standard enhancements."
+            "description": "Advanced Cannon Enhancements increase damage by +2 dice. Costs 5x base weapon cost. Military availability."
         },
         {
             "id": "gravity_well",
@@ -4021,7 +3992,7 @@
             "damage": "4d10x2",
             "damageType": "Energy",
             "availability": "Military",
-            "description": "Shieldbuster Torpedoes deal 4d10x2 Energy damage. If the target has active shields (SR > 0), the torpedo deals double damage to SR (ignoring DR) and reduces the target's SR by 5 for the remainder of the encounter on a hit."
+            "description": "A specialized torpedo designed to overload shielding systems. On a hit, it reduces the target's Shield Rating by -10 (instead of the usual -5). Shields damaged in this way can be recharged normally."
         },
         {
             "id": "space_mine_launcher",
@@ -4063,7 +4034,7 @@
             "damage": "5d10x2",
             "damageType": "Energy",
             "availability": "Military",
-            "description": "Fires a concentrated beam of energy. Deals 5d10x2 Energy damage. Ignores 10 points of the target's DR."
+            "description": "A laser weapon that ignores 5 points of the target's Shield Rating (treat SR as 5 lower against this attack)."
         },
         {
             "id": "bomblet_generator",
@@ -4099,10 +4070,10 @@
             "baseCost": 4000,
             "sizeMult": true,
             "baseEp": 1,
-            "damage": "3d10x2",
+            "damage": "9d10x10",
             "damageType": "Ion",
             "availability": "Military",
-            "description": "Deals 3d10x2 Ion damage. On a critical hit, the target is disabled for 1 round in addition to normal critical effects."
+            "description": "A massive ion weapon used on ships like the Subjugator. It fires a massive ion pulse that affects all ships in a large area, disabling electronics and shields. Requires a massive recharge time."
         },
         {
             "id": "mass_driver",
@@ -4113,10 +4084,10 @@
             "baseCost": 3500,
             "sizeMult": true,
             "baseEp": 1,
-            "damage": "4d10x2",
+            "damage": "6d10x2",
             "damageType": "Physical",
             "availability": "Military",
-            "description": "Fires a physical projectile accelerated to high speeds. Deals 4d10x2 Physical damage. Ignores Shields (SR) but is subject to DR."
+            "description": "A projectile weapon. Damage 6d10x2."
         },
         {
             "id": "pressor_beam",
@@ -4139,7 +4110,7 @@
             "baseCost": 800,
             "sizeMult": true,
             "baseEp": 1,
-            "damage": "3d10x2",
+            "damage": "8d6",
             "damageType": "Energy",
             "availability": "Restricted",
             "description": "Fires a cluster of proton grenades. Deals 3d10x2 Energy damage in a 1-square burst. Short range only."
@@ -4153,7 +4124,7 @@
             "baseCost": 4500,
             "sizeMult": true,
             "baseEp": 2,
-            "damage": "5d10x2",
+            "damage": "5d10x5",
             "damageType": "Physical",
             "availability": "Military",
             "description": "Similar to Mass-Drivers but more powerful. Deals 5d10x2 Physical damage. Ignores SR."
@@ -4196,7 +4167,7 @@
             "sizeMult": true,
             "baseEp": 1,
             "availability": "Restricted",
-            "description": "Creates a cloud of interference. Grants total concealment to the ship against sensor checks and missile guidance systems for 1 round."
+            "description": "Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship."
         },
         {
             "id": "defoliator",
@@ -4215,11 +4186,152 @@
             "name": "Point Defense System",
             "type": "upgrade",
             "category": "Modifications",
-            "baseCost": 2000,
+            "baseCost": 4000,
             "sizeMult": true,
             "baseEp": 0,
             "availability": "Military",
             "description": "Automated laser system that shoots down incoming missiles. Provides a +5 bonus to Reflex Defense against missile attacks."
+        },
+        {
+            "id": "aux_gen_2",
+            "name": "Auxiliary Generator (+2)",
+            "name_es": "Generador Auxiliar (+2)",
+            "category": "Defense Systems",
+            "group": "Generators",
+            "type": "system",
+            "baseCost": 2000,
+            "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Common",
+            "description": "Supplies power to specific systems. Gives a +2 equipment bonus to Strength. Allows systems to continue when engines are shut down.",
+            "stats": {
+                "str_bonus": 2
+            }
+        },
+        {
+            "id": "aux_gen_4",
+            "name": "Auxiliary Generator (+4)",
+            "name_es": "Generador Auxiliar (+4)",
+            "category": "Defense Systems",
+            "group": "Generators",
+            "type": "system",
+            "baseCost": 5000,
+            "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Common",
+            "description": "Supplies power to specific systems. Gives a +4 equipment bonus to Strength.",
+            "stats": {
+                "str_bonus": 4
+            }
+        },
+        {
+            "id": "aux_gen_6",
+            "name": "Auxiliary Generator (+6)",
+            "name_es": "Generador Auxiliar (+6)",
+            "category": "Defense Systems",
+            "group": "Generators",
+            "type": "system",
+            "baseCost": 10000,
+            "baseEp": 1,
+            "sizeMult": false,
+            "availability": "Common",
+            "description": "Supplies power to specific systems. Gives a +6 equipment bonus to Strength.",
+            "stats": {
+                "str_bonus": 6
+            }
+        },
+        {
+            "id": "hidden_cargo_25",
+            "name": "Hidden Cargo Hold (25%)",
+            "name_es": "Bodega de Carga Oculta (25%)",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "system",
+            "baseCost": 2000,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Illegal",
+            "description": "Converts 25% of cargo space into hidden compartments (-5 to Perception checks to find).",
+            "stats": {
+                "hidden_cargo_pct": 0.25
+            }
+        },
+        {
+            "id": "hidden_cargo_50",
+            "name": "Hidden Cargo Hold (50%)",
+            "name_es": "Bodega de Carga Oculta (50%)",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "system",
+            "baseCost": 5000,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Illegal",
+            "description": "Converts 50% of cargo space into hidden compartments.",
+            "stats": {
+                "hidden_cargo_pct": 0.5
+            }
+        },
+        {
+            "id": "hidden_cargo_75",
+            "name": "Hidden Cargo Hold (75%)",
+            "name_es": "Bodega de Carga Oculta (75%)",
+            "category": "Starship Accessories",
+            "group": "Storage",
+            "type": "system",
+            "baseCost": 10000,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Illegal",
+            "description": "Converts 75% of cargo space into hidden compartments.",
+            "stats": {
+                "hidden_cargo_pct": 0.75
+            }
+        },
+        {
+            "id": "mass_driver_hvy",
+            "name": "Heavy Mass-Driver Cannon",
+            "name_es": "Ca\u00f1\u00f3n Mass-Driver Pesado",
+            "category": "Weapon Systems",
+            "group": "Exotic Weapons",
+            "type": "weapon",
+            "baseCost": 15000,
+            "baseEp": 2,
+            "sizeMult": true,
+            "damage": "7d10x2",
+            "damageType": "Physical",
+            "availability": "Military",
+            "description": "A heavy projectile weapon. Damage 7d10x2.",
+            "minShipSize": "Huge"
+        },
+        {
+            "id": "autoblaster_upgrade",
+            "name": "Autoblaster Modification",
+            "name_es": "Modificaci\u00f3n Autobl\u00e1ster",
+            "category": "Modifications",
+            "group": "Weapon Upgrades",
+            "type": "upgrade",
+            "baseCost": 2000,
+            "costMultiplier": "weapon_cost",
+            "baseEp": 0,
+            "sizeMult": false,
+            "description": "Modifies a single-mount weapon to be an Autoblaster. Increases cyclic rate, allowing Autofire but at -2 attack penalty. Cost is 2x the base cost of the weapon.",
+            "availability": "Restricted"
+        },
+        {
+            "id": "heavy_ordnance_launcher",
+            "name": "Heavy Ordnance Launcher",
+            "name_es": "Lanzador de Artiller\u00eda Pesada",
+            "category": "Weapon Systems",
+            "group": "Launchers",
+            "type": "weapon",
+            "baseCost": 10000,
+            "baseEp": 2,
+            "sizeMult": true,
+            "damage": "5d10x5",
+            "availability": "Military",
+            "description": "Launches heavy ordnance payloads.",
+            "minShipSize": "Colossal"
         }
     ]
 }
