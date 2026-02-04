@@ -507,7 +507,8 @@
             "sizeMult": false,
             "availability": "Licensed",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "3d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive."
@@ -592,7 +593,8 @@
             "sizeMult": false,
             "availability": "Restricted",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "4d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive."
@@ -677,7 +679,8 @@
             "sizeMult": false,
             "availability": "Military",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "5d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive."
@@ -838,7 +841,8 @@
             "sizeMult": false,
             "availability": "Licensed",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "3d10x2",
             "description": "Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament."
@@ -923,7 +927,8 @@
             "sizeMult": false,
             "availability": "Restricted",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "5d10x2",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire."
@@ -1009,7 +1014,8 @@
             "availability": "Military",
             "minShipSize": "Colossal (frigate)",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "3d10x5",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire."
@@ -3340,7 +3346,8 @@
             "sizeMult": false,
             "availability": "Military",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "minShipSize": "Colossal (frigate)",
             "damage": "3d10x5",
@@ -3376,7 +3383,8 @@
             "sizeMult": false,
             "availability": "Military",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "minShipSize": "Colossal (frigate)",
             "damage": "5d10x5",
@@ -3472,7 +3480,8 @@
             "sizeMult": false,
             "availability": "Military",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "minShipSize": "Colossal (frigate)",
             "damage": "7d10x5",
@@ -3628,7 +3637,8 @@
             "sizeMult": false,
             "availability": "Licensed",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "3d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range."
@@ -3719,7 +3729,8 @@
             "sizeMult": false,
             "availability": "Restricted",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "4d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range."
@@ -3810,7 +3821,8 @@
             "sizeMult": false,
             "availability": "Military",
             "upgradeSpecs": {
-                "battery": true
+                "battery": true,
+                "weaponVariants": true
             },
             "damage": "5d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range."

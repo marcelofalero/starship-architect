@@ -41,7 +41,7 @@ export const useShipStore = defineStore('ship', () => {
         return db.STOCK_SHIPS.find(s => s.id === chassisId.value) || db.STOCK_SHIPS[0];
     });
 
-    function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1) {
+    function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1, mount = 'single', fireLink = 1) {
         const def = allEquipment.value.find(e => e.id === defId);
         if (!def) return 0;
 
@@ -49,6 +49,15 @@ export const useShipStore = defineStore('ship', () => {
         // Dynamic EP (Gain)
         if (def.stats && def.stats.ep_dynamic_pct) {
             epCost = Math.floor(chassis.value.baseEp * def.stats.ep_dynamic_pct);
+        }
+
+        // Mount Logic
+        if (mount === 'quad') epCost += 1;
+
+        // Fire-Link Logic
+        if (fireLink > 1) {
+             const linkageCost = fireLink === 2 ? 1 : (fireLink === 4 ? 2 : 0);
+             epCost = (epCost * fireLink) + linkageCost;
         }
 
         // Modifications (Battery)
@@ -77,7 +86,9 @@ export const useShipStore = defineStore('ship', () => {
     function getComponentEp(component) {
         const batteryCount = component.modifications?.batteryCount || 1;
         const quantity = component.modifications?.quantity || 1;
-        return calculateEp(component.defId, batteryCount, component.isNonStandard, component.miniaturization, quantity);
+        const mount = component.modifications?.mount || 'single';
+        const fireLink = component.modifications?.fireLink || 1;
+        return calculateEp(component.defId, batteryCount, component.isNonStandard, component.miniaturization, quantity, mount, fireLink);
     }
 
     function getComponentCost(component) {
@@ -94,6 +105,21 @@ export const useShipStore = defineStore('ship', () => {
 
         // Modifications (Payload, Battery, Fire-link, Quantity)
         if (component.modifications) {
+             const mount = component.modifications.mount || 'single';
+             const fireLink = component.modifications.fireLink || 1;
+             const enhancement = component.modifications.enhancement || 'normal';
+
+             let mountMult = 1;
+             if (mount === 'twin') mountMult = 3;
+             if (mount === 'quad') mountMult = 5;
+             cost *= mountMult;
+
+             if (fireLink > 1) cost *= fireLink;
+
+             // Enhancement Cost (applied to the full weapon cost so far)
+             if (enhancement === 'enhanced') cost *= 3;
+             if (enhancement === 'advanced') cost *= 6;
+
              if (def.upgradeSpecs && def.upgradeSpecs.payload) {
                  if (def.upgradeSpecs.payload.type === 'capacity' && component.modifications.payloadCount > 0) {
                      cost += component.modifications.payloadCount * (def.baseCost * def.upgradeSpecs.payload.costFactor);
@@ -101,6 +127,7 @@ export const useShipStore = defineStore('ship', () => {
                      cost += def.upgradeSpecs.payload.cost;
                  }
              }
+             // Selective Fire cost (distinct from Fire-Link multipliers)
              if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && component.modifications.fireLinkOption) {
                  cost += (def.upgradeSpecs.fireLinkOption.cost || 0);
              }

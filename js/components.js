@@ -62,6 +62,9 @@ const SystemList = {
                         <span v-else>{{ component.location }}</span>
                     </q-item-label>
                     <q-item-label v-if="component.modifications" caption class="text-info">
+                        <span v-if="component.modifications.mount && component.modifications.mount !== 'single'" class="q-mr-xs text-uppercase">{{ component.modifications.mount }}</span>
+                        <span v-if="component.modifications.fireLink > 1" class="q-mr-xs">Fire-Linked ({{ component.modifications.fireLink }})</span>
+                        <span v-if="component.modifications.enhancement && component.modifications.enhancement !== 'normal'" class="q-mr-xs text-capitalize">{{ component.modifications.enhancement }}</span>
                         <span v-if="getUpgradeSpecs(component.defId)?.payload?.type === 'capacity' && component.modifications.payloadCount > 0" class="q-mr-xs">Payload: {{ getUpgradeSpecs(component.defId).payload.base }} + {{ component.modifications.payloadCount }}</span>
                         <span v-else-if="component.modifications.payloadOption" class="q-mr-xs">Extra Payload</span>
                         <span v-if="component.modifications.batteryCount > 1">Battery ({{ component.modifications.batteryCount }})</span>
@@ -93,6 +96,22 @@ const SystemList = {
                         <div class="text-caption">Weapon User</div>
                         <q-btn-toggle spread dark v-model="editingComponent.modifications.weaponUser" toggle-color="primary" :options="[{label: 'Pilot', value: 'Pilot'}, {label: 'Copilot', value: 'Copilot'}, {label: 'Gunner', value: 'Gunner'}]" />
                     </div>
+                    <div v-if="getUpgradeSpecs(editingComponent.defId)?.weaponVariants" class="q-mb-md">
+                        <div class="q-gutter-y-md">
+                            <div>
+                                <div class="text-caption q-mb-xs">Mount: <span class="text-white">{{ configModel.mountLabel }}</span></div>
+                                <q-slider dark v-model="configModel.mountIndex" :min="0" :max="2" :step="1" snap markers label />
+                            </div>
+                            <div>
+                                <div class="text-caption q-mb-xs">Fire Link: <span class="text-white">{{ configModel.fireLinkLabel }}</span></div>
+                                <q-slider dark v-model="configModel.fireLinkIndex" :min="0" :max="2" :step="1" snap markers label />
+                            </div>
+                            <div>
+                                <div class="text-caption q-mb-xs">Enhancement: <span class="text-white">{{ configModel.enhancementLabel }}</span></div>
+                                <q-slider dark v-model="configModel.enhancementIndex" :min="0" :max="2" :step="1" snap markers label />
+                            </div>
+                        </div>
+                    </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.payload" class="q-mb-md">
                         <div v-if="getUpgradeSpecs(editingComponent.defId).payload.type === 'capacity'">
                             <div class="text-caption">Additional {{ getUpgradeSpecs(editingComponent.defId).payload.unitLabel }} ({{ format(store.allEquipment.find(e => e.id === editingComponent.defId).baseCost * getUpgradeSpecs(editingComponent.defId).payload.costFactor) }} each)</div>
@@ -100,7 +119,7 @@ const SystemList = {
                         </div>
                         <q-checkbox v-else dark v-model="editingComponent.modifications.payloadOption" :label="getUpgradeSpecs(editingComponent.defId).payload.label + ' (' + format(getUpgradeSpecs(editingComponent.defId).payload.cost) + ')'" />
                     </div>
-                    <div v-if="getUpgradeSpecs(editingComponent.defId)?.battery" class="q-mb-md">
+                    <div v-if="getUpgradeSpecs(editingComponent.defId)?.battery && (!editingComponent.modifications.fireLink || editingComponent.modifications.fireLink === 1)" class="q-mb-md">
                         <div class="text-caption">Battery Size</div>
                         <q-input dark type="number" filled v-model.number="editingComponent.modifications.batteryCount" label="Battery Count" min="1" max="6" />
                     </div>
@@ -209,7 +228,7 @@ const ShipSheet = {
 
             <div class="section-title">Offense</div>
             <div><span class="bold">Speed</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
-            <div v-for="w in weapons" :key="w.instanceId" class="weapon-line"><span class="bold">Ranged</span> {{ getName(w.defId) }} +5 ({{ getDmg(w.defId) }})</div>
+            <div v-for="w in weapons" :key="w.instanceId" class="weapon-line"><span class="bold">Ranged</span> {{ getName(w) }} +5 ({{ getDmg(w) }})</div>
 
             <div class="section-title">Statistics</div>
             <div class="stat-grid">
@@ -323,7 +342,38 @@ export const SystemListWrapper = {
             return true;
         };
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isCustom, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity };
+        const configModel = computed(() => {
+            if (!editingComponent.value || !editingComponent.value.modifications) return {};
+            const mods = editingComponent.value.modifications;
+
+            const mountMap = ['single', 'twin', 'quad'];
+            const fireLinkMap = [1, 2, 4];
+            const enhancementMap = ['normal', 'enhanced', 'advanced'];
+
+            const mountLabels = ['Single', 'Twin', 'Quad'];
+            const fireLinkLabels = ['None', 'Fire-Link (2)', 'Fire-Link (4)'];
+            const enhancementLabels = ['Standard', 'Enhanced', 'Advanced'];
+
+            return {
+                get mountIndex() { return mountMap.indexOf(mods.mount || 'single'); },
+                set mountIndex(idx) { mods.mount = mountMap[idx]; },
+                get mountLabel() { return mountLabels[this.mountIndex]; },
+
+                get fireLinkIndex() { return fireLinkMap.indexOf(mods.fireLink || 1); },
+                set fireLinkIndex(idx) {
+                    const val = fireLinkMap[idx];
+                    mods.fireLink = val;
+                    if (val > 1) mods.batteryCount = 1;
+                },
+                get fireLinkLabel() { return fireLinkLabels[this.fireLinkIndex]; },
+
+                get enhancementIndex() { return enhancementMap.indexOf(mods.enhancement || 'normal'); },
+                set enhancementIndex(idx) { mods.enhancement = enhancementMap[idx]; },
+                get enhancementLabel() { return enhancementLabels[this.enhancementIndex]; }
+            };
+        });
+
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isCustom, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity, configModel };
     }
 };
 
@@ -349,9 +399,19 @@ export const ShipSheetWrapper = {
     ...ShipSheet,
     setup() {
         const store = useShipStore();
-        const getName = (id) => {
+        const getName = (component) => {
+            const id = component.defId || component;
             const def = store.allEquipment.find(e => e.id === id);
-            return getLocalizedName(def);
+            let name = getLocalizedName(def);
+
+            if (component.modifications) {
+                const parts = [];
+                if (component.modifications.fireLink > 1) parts.push(`Fire-Linked (${component.modifications.fireLink})`);
+                if (component.modifications.enhancement && component.modifications.enhancement !== 'normal') parts.push(component.modifications.enhancement.charAt(0).toUpperCase() + component.modifications.enhancement.slice(1));
+                if (component.modifications.mount && component.modifications.mount !== 'single') parts.push(component.modifications.mount.charAt(0).toUpperCase() + component.modifications.mount.slice(1));
+                if (parts.length > 0) name = `${parts.join(' ')} ${name}`;
+            }
+            return name;
         };
         const getMod = (score) => Math.floor((score - 10) / 2);
         const weapons = computed(() => store.installedComponents.filter(c => {
@@ -368,9 +428,34 @@ export const ShipSheetWrapper = {
         });
 
         // Enhanced Damage Logic for Variants
-        const getDmg = (id) => {
+        const getDmg = (component) => {
+            const id = component.defId || component;
             const def = store.allEquipment.find(e => e.id === id);
-            return def && def.damage ? def.damage : '-';
+            if (!def || !def.damage) return '-';
+
+            const match = def.damage.match(/(\d+)d(\d+)(x\d+)?/);
+            if (!match) return def.damage;
+
+            let diceCount = parseInt(match[1]);
+            const dieType = parseInt(match[2]);
+            const multiplier = match[3] || '';
+
+            if (component.modifications) {
+                const mount = component.modifications.mount || 'single';
+                const fireLink = component.modifications.fireLink || 1;
+                const enhancement = component.modifications.enhancement || 'normal';
+
+                if (mount === 'twin') diceCount += 1;
+                if (mount === 'quad') diceCount += 2;
+
+                if (fireLink === 2) diceCount += 1;
+                if (fireLink === 4) diceCount += 2;
+
+                if (enhancement === 'enhanced') diceCount += 1;
+                if (enhancement === 'advanced') diceCount += 2;
+            }
+
+            return `${diceCount}d${dieType}${multiplier}`;
         }
         const calculateCL = computed(() => { let cl = 10; if(store.chassis.size.includes('Colossal')) cl += 5; cl += Math.floor(store.installedComponents.length / 2); if(store.template) cl += 2; return cl; });
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
