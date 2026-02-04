@@ -469,7 +469,8 @@
             "stats": {
                 "dex": 4,
                 "hp": 20,
-                "sr": 10
+                "sr": 10,
+                "weapon_damage_dice": 1
             }
         },
         {

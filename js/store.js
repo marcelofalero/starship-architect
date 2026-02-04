@@ -51,13 +51,16 @@ export const useShipStore = defineStore('ship', () => {
             epCost = Math.floor(chassis.value.baseEp * def.stats.ep_dynamic_pct);
         }
 
-        // Mount Logic
-        if (mount === 'quad') epCost += 1;
+        // 1. Enhancement EP (Assumption: x1)
 
-        // Fire-Link Logic
+        // 2. Mount EP Multiplier
+        let mountEpMult = 1;
+        if (mount === 'quad') mountEpMult = 2; // Quad doubles base EP roughly
+        epCost *= mountEpMult;
+
+        // 3. Fire-Link EP Multiplier
         if (fireLink > 1) {
-             const linkageCost = fireLink === 2 ? 1 : (fireLink === 4 ? 2 : 0);
-             epCost = (epCost * fireLink) + linkageCost;
+             epCost *= fireLink;
         }
 
         // Modifications (Battery)
@@ -109,16 +112,18 @@ export const useShipStore = defineStore('ship', () => {
              const fireLink = component.modifications.fireLink || 1;
              const enhancement = component.modifications.enhancement || 'normal';
 
+             // 1. Enhancement (Multiplier)
+             if (enhancement === 'enhanced') cost *= 2;
+             if (enhancement === 'advanced') cost *= 5;
+
+             // 2. Mount (Multiplier)
              let mountMult = 1;
              if (mount === 'twin') mountMult = 3;
              if (mount === 'quad') mountMult = 5;
              cost *= mountMult;
 
+             // 3. Fire-Link (Multiplier)
              if (fireLink > 1) cost *= fireLink;
-
-             // Enhancement Cost (applied to the full weapon cost so far)
-             if (enhancement === 'enhanced') cost *= 3;
-             if (enhancement === 'advanced') cost *= 6;
 
              if (def.upgradeSpecs && def.upgradeSpecs.payload) {
                  if (def.upgradeSpecs.payload.type === 'capacity' && component.modifications.payloadCount > 0) {
@@ -156,12 +161,15 @@ export const useShipStore = defineStore('ship', () => {
     const currentStats = computed(() => {
         const s = { ...chassis.value.stats, speed: 0 };
         if (template.value && template.value.stats) {
-            for (const [key, val] of Object.entries(template.value.stats)) if (s[key] !== undefined) s[key] += val;
+            for (const [key, val] of Object.entries(template.value.stats)) {
+                if (s[key] !== undefined) s[key] += val;
+                else s[key] = val;
+            }
         }
         let modSR = null, bestHyperdrive = null;
         let bonusSR = 0, bonusArmor = 0, bonusHP = 0;
         let bonusDex = 0, bonusStr = 0, bonusPer = 0, speedFactor = 0, hyperdriveShift = 0;
-        let hpBonusPct = 0;
+        let hpBonusPct = 0, weaponDice = 0;
 
         installedComponents.value.forEach(mod => {
             const def = allEquipment.value.find(e => e.id === mod.defId);
@@ -184,6 +192,7 @@ export const useShipStore = defineStore('ship', () => {
                 if (def.stats.hyperdrive_bonus) hyperdriveShift += def.stats.hyperdrive_bonus;
                 if (def.stats.hp_dynamic_str) bonusHP += Math.floor(Math.floor((s.str || 0) / 2) / 10) * 10;
                 if (def.stats.hp_bonus_pct) hpBonusPct += def.stats.hp_bonus_pct;
+                if (def.stats.weapon_damage_dice) weaponDice += def.stats.weapon_damage_dice;
             }
         });
         if (modSR !== null) s.sr = modSR;
@@ -201,6 +210,7 @@ export const useShipStore = defineStore('ship', () => {
         if (hpBonusPct > 0) s.hp += Math.floor(s.hp * hpBonusPct);
         if (s.speed > 0 && speedFactor > 0) s.speed += Math.max(1, Math.floor(s.speed * speedFactor));
         if (s.hyperdrive) s.hyperdrive += hyperdriveShift;
+        s.weapon_damage_dice = (s.weapon_damage_dice || 0) + weaponDice;
         return s;
     });
 
