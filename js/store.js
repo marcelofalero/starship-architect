@@ -41,7 +41,7 @@ export const useShipStore = defineStore('ship', () => {
         return db.STOCK_SHIPS.find(s => s.id === chassisId.value) || db.STOCK_SHIPS[0];
     });
 
-    function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1, mount = 'single', fireLink = 1) {
+    function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1, mount = 'single', fireLink = 1, enhancement = 'normal') {
         const def = allEquipment.value.find(e => e.id === defId);
         if (!def) return 0;
 
@@ -51,12 +51,12 @@ export const useShipStore = defineStore('ship', () => {
             epCost = Math.floor(chassis.value.baseEp * def.stats.ep_dynamic_pct);
         }
 
-        // 1. Enhancement EP (Assumption: x1)
+        // 1. Enhancement EP
+        if (enhancement === 'enhanced') epCost += 1;
+        if (enhancement === 'advanced') epCost += 2;
 
-        // 2. Mount EP Multiplier
-        let mountEpMult = 1;
-        if (mount === 'quad') mountEpMult = 2; // Quad doubles base EP roughly
-        epCost *= mountEpMult;
+        // 2. Mount EP
+        if (mount === 'quad') epCost += 1;
 
         // 3. Fire-Link EP Multiplier
         if (fireLink > 1) {
@@ -91,7 +91,8 @@ export const useShipStore = defineStore('ship', () => {
         const quantity = component.modifications?.quantity || 1;
         const mount = component.modifications?.mount || 'single';
         const fireLink = component.modifications?.fireLink || 1;
-        return calculateEp(component.defId, batteryCount, component.isNonStandard, component.miniaturization, quantity, mount, fireLink);
+        const enhancement = component.modifications?.enhancement || 'normal';
+        return calculateEp(component.defId, batteryCount, component.isNonStandard, component.miniaturization, quantity, mount, fireLink, enhancement);
     }
 
     function getComponentCost(component) {
