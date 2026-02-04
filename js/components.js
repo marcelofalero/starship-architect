@@ -47,11 +47,11 @@ const SystemList = {
                     <q-item-label>
                         {{ getName(component.defId) }}
                         <q-badge v-if="isCustom(component.defId)" color="purple" label="Custom" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Illegal'" color="deep-purple" label="Ill" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Military'" color="negative" label="Mil" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Restricted'" color="warning" text-color="black" label="Res" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Licensed'" color="info" label="Lic" class="q-ml-xs" />
-                        <q-badge v-if="getAvailability(component.defId) === 'Common' && !isCustom(component.defId)" color="positive" label="Com" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component) === 'Illegal'" color="deep-purple" label="Ill" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component) === 'Military'" color="negative" label="Mil" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component) === 'Restricted'" color="warning" text-color="black" label="Res" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component) === 'Licensed'" color="info" label="Lic" class="q-ml-xs" />
+                        <q-badge v-if="getAvailability(component) === 'Common' && !isCustom(component.defId)" color="positive" label="Com" class="q-ml-xs" />
                         <q-badge v-if="component.isStock" color="grey-7" label="Stock" class="q-ml-xs" />
                         <q-badge v-if="component.isNonStandard" color="warning" text-color="black" :label="$t('ui.ns_tag')" class="q-ml-xs" />
                         <q-icon v-if="!checkValidity(component)" name="warning" color="negative" class="q-ml-sm"><q-tooltip>Invalid for Ship Size</q-tooltip></q-icon>
@@ -285,9 +285,27 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === id);
             return getLocalizedName(def);
         };
-        const getAvailability = (id) => {
+        const getAvailability = (idOrComp) => {
+            const id = idOrComp.defId || idOrComp;
             const def = store.allEquipment.find(e => e.id === id);
-            return def && def.availability ? def.availability : 'Common';
+            let avail = def && def.availability ? def.availability : 'Common';
+
+            // If a full component object is passed, check modifications
+            if (idOrComp.modifications) {
+                 const levels = { 'Common': 0, 'Licensed': 1, 'Restricted': 2, 'Military': 3, 'Illegal': 4 };
+                 const reverse = ['Common', 'Licensed', 'Restricted', 'Military', 'Illegal'];
+                 let currentLevel = levels[avail] || 0;
+                 const mods = idOrComp.modifications;
+
+                 // Mod Availabilities (Best Effort based on context)
+                 if (mods.mount === 'quad') currentLevel = Math.max(currentLevel, 2); // Restricted
+                 if (mods.fireLink > 1) currentLevel = Math.max(currentLevel, 2); // Restricted
+                 if (mods.enhancement === 'enhanced') currentLevel = Math.max(currentLevel, 2); // Restricted
+                 if (mods.enhancement === 'advanced') currentLevel = Math.max(currentLevel, 3); // Military
+
+                 return reverse[currentLevel];
+            }
+            return avail;
         }
         const getBaseEp = (id) => {
             const def = store.allEquipment.find(e => e.id === id);
