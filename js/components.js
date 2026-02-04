@@ -58,7 +58,7 @@ const SystemList = {
                     </q-item-label>
                     <q-item-label caption class="text-grey-5">
                         <span v-if="getEpDynamic(component.defId)" class="text-positive">+{{ Math.abs(getEpDynamic(component.defId)) }} EP</span>
-                        <span v-else-if="getBaseEp(component.defId) !== 0">{{ getBaseEp(component.defId) }} EP</span>
+                        <span v-else-if="store.getComponentEp(component) !== 0">{{ store.getComponentEp(component) }} EP</span>
                         <span v-else>{{ component.location }}</span>
                     </q-item-label>
                     <q-item-label v-if="component.modifications" caption class="text-info">
