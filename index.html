@@ -306,6 +306,9 @@
 
                                         <!-- Size Select -->
                                         <q-select v-else-if="prop.def.type === 'size_select'" filled dark v-model="prop.value" :options="shipStore.db.SIZE_RANK" :label="prop.def.label" dense></q-select>
+
+                                        <!-- Boolean Checkbox -->
+                                        <q-checkbox v-else-if="prop.def.type === 'boolean'" dark v-model="prop.value" :label="prop.def.label" dense></q-checkbox>
                                     </div>
                                     <div class="col-auto">
                                         <q-btn flat round icon="delete" color="negative" size="sm" @click="removePropertyFromCustomComponent(prop.key)"></q-btn>

@@ -52,6 +52,10 @@ const setup = () => {
         { label: 'Min Ship Size', key: 'minShipSize', type: 'size_select', location: 'root' },
         { label: 'Max Ship Size', key: 'maxSize', type: 'size_select', location: 'root' },
 
+        // Upgrade Specs (Weapons/Systems)
+        { label: 'Enable Weapon Upgrades (Twin/Quad/Link/Enh)', key: 'weaponVariants', type: 'boolean', location: 'upgradeSpecs' },
+        { label: 'Enable Battery Configuration', key: 'battery', type: 'boolean', location: 'upgradeSpecs' },
+
         // Stats
         { label: 'Shield Rating (Set)', key: 'sr', type: 'number', location: 'stats' },
         { label: 'Shield Bonus (Add)', key: 'sr_bonus', type: 'number', location: 'stats' },
@@ -179,6 +183,8 @@ const setup = () => {
                             val = existing[def.key];
                         } else if (def.location === 'stats' && existing.stats && existing.stats[def.key] !== undefined) {
                             val = existing.stats[def.key];
+                        } else if (def.location === 'upgradeSpecs' && existing.upgradeSpecs && existing.upgradeSpecs[def.key] !== undefined) {
+                            val = existing.upgradeSpecs[def.key];
                         }
 
                         if (val !== undefined) {
@@ -313,6 +319,9 @@ const setup = () => {
                 comp[prop.key] = prop.value;
             } else if (prop.def.location === 'stats') {
                 comp.stats[prop.key] = Number(prop.value);
+            } else if (prop.def.location === 'upgradeSpecs') {
+                if (!comp.upgradeSpecs) comp.upgradeSpecs = {};
+                comp.upgradeSpecs[prop.key] = prop.value;
             }
         });
 
@@ -398,6 +407,7 @@ const setup = () => {
         // Default value based on type
         let defaultVal = '';
         if (propertyToAdd.value.type === 'number') defaultVal = 0;
+        if (propertyToAdd.value.type === 'boolean') defaultVal = true;
 
         activeProperties.value.push({
             key: propertyToAdd.value.key,
