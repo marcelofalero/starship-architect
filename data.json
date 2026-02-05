@@ -1817,14 +1817,16 @@
             "id": "droid_repair_team",
             "name": "Droid Repair Team",
             "name_es": "Equipo de Reparaci\u00f3n Droide",
-            "category": "Defense Systems",
+            "category": "Starship Accessories",
             "group": "Damage Control",
             "type": "system",
             "baseCost": 2000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
-            "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active."
+            "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active.",
+            "minShipSize": "Colossal(transport)",
+            "maxSize": "Colossal (station)"
         },
         {
             "id": "medical_bed",
