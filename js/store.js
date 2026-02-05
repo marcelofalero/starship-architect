@@ -174,6 +174,16 @@ export const useShipStore = defineStore('ship', () => {
              if (def.upgradeSpecs && def.upgradeSpecs.fireLinkOption && component.modifications.fireLinkOption) {
                  cost += (def.upgradeSpecs.fireLinkOption.cost || 0);
              }
+
+             // Generic Option Costs
+             if (def.upgradeSpecs && def.upgradeSpecs.optionCosts) {
+                 for (const [key, val] of Object.entries(component.modifications)) {
+                     if (val === true && def.upgradeSpecs.optionCosts[key]) {
+                         cost += def.upgradeSpecs.optionCosts[key];
+                     }
+                 }
+             }
+
              if (component.modifications.batteryCount > 1) {
                  cost *= component.modifications.batteryCount;
              }

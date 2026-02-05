@@ -2211,7 +2211,15 @@
             "sizeMult": true,
             "availability": "Military",
             "exclusiveGroup": "slave_circuits",
-            "description": "Reduces crew requirements by 2/3 (minimum 1)."
+            "description": "Reduces crew requirements by 2/3 (minimum 1).",
+            "upgradeSpecs": {
+                "componentOptions": [
+                    "slaveCircuits.recall"
+                ],
+                "optionCosts": {
+                    "slaveCircuits.recall": 6000
+                }
+            }
         },
         {
             "id": "slave_circuits_recall",
