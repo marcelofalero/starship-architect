@@ -53,7 +53,9 @@ const setup = () => {
         { label: 'Max Ship Size', key: 'maxSize', type: 'size_select', location: 'root' },
 
         // Upgrade Specs (Weapons/Systems)
-        { label: 'Enable Weapon Upgrades (Twin/Quad/Link/Enh)', key: 'weaponVariants', type: 'boolean', location: 'upgradeSpecs' },
+        { label: 'Enable Multi-Barrel (Twin/Quad)', key: 'mounts', type: 'boolean', location: 'upgradeSpecs' },
+        { label: 'Enable Fire-Link', key: 'fireLink', type: 'boolean', location: 'upgradeSpecs' },
+        { label: 'Enable Enhancement', key: 'enhancement', type: 'boolean', location: 'upgradeSpecs' },
         { label: 'Enable Battery Configuration', key: 'battery', type: 'boolean', location: 'upgradeSpecs' },
 
         // Stats
