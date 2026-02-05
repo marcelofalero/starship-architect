@@ -1413,29 +1413,20 @@
             "description": "A Jamming Suite targets a single enemy within 6 squares. The target takes penalties on Use Computer checks (-4 for Starfighters, -2 for Space Transports) and enemy fire control systems."
         },
         {
-            "id": "ecm_suite",
-            "name": "Electronic Countermeasures (ECM)",
-            "name_es": "Contramedidas Electr\u00f3nicas (ECM)",
-            "category": "Defense Systems",
-            "group": "Electronic Warfare",
-            "type": "system",
-            "baseCost": 2000,
-            "baseEp": 1,
-            "sizeMult": true,
-            "availability": "Military"
-        },
-        {
             "id": "cloaking_hibridium",
             "name": "Cloaking Device (Hibridium)",
             "name_es": "Dispositivo de Camuflaje (Hibridio)",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
-            "baseCost": 100000,
-            "baseEp": 5,
+            "baseCost": 50000,
+            "baseEp": 3,
             "sizeMult": true,
-            "availability": "Illegal",
-            "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment."
+            "availability": "Military",
+            "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment.",
+            "minShipSize": "Colossal(transport)",
+            "maxSize": "Colossal (station)",
+            "exclusiveGroup": "cloaking_device"
         },
         {
             "id": "cloaking_stygium",
@@ -1444,11 +1435,13 @@
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
-            "baseCost": 200000,
+            "baseCost": 100000000,
             "baseEp": 1,
-            "sizeMult": false,
-            "availability": "Illegal",
-            "description": "Ancient and rare technology using Stygium crystals. Grants Total Concealment without the 'Double-Blind' penalty. Extremely expensive and hard to find."
+            "sizeMult": true,
+            "availability": "Military",
+            "description": "Ancient and rare technology using Stygium crystals. Grants Total Concealment without the 'Double-Blind' penalty. Extremely expensive and hard to find.",
+            "minShipSize": "Huge",
+            "exclusiveGroup": "cloaking_device"
         },
         {
             "id": "anti_concussion",
