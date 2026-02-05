@@ -98,7 +98,7 @@ const SystemList = {
                     </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.weaponVariants" class="q-mb-md">
                         <div class="q-gutter-y-md">
-                            <div>
+                            <div v-if="!isLauncher(editingComponent.defId)">
                                 <div class="text-caption q-mb-xs">Mount: <span class="text-white">{{ configModel.mountLabel }}</span></div>
                                 <q-slider dark v-model="configModel.mountIndex" :min="0" :max="2" :step="1" snap markers label />
                             </div>
@@ -106,7 +106,7 @@ const SystemList = {
                                 <div class="text-caption q-mb-xs">Fire Link: <span class="text-white">{{ configModel.fireLinkLabel }}</span></div>
                                 <q-slider dark v-model="configModel.fireLinkIndex" :min="0" :max="2" :step="1" snap markers label />
                             </div>
-                            <div>
+                            <div v-if="!isLauncher(editingComponent.defId)">
                                 <div class="text-caption q-mb-xs">Enhancement: <span class="text-white">{{ configModel.enhancementLabel }}</span></div>
                                 <q-slider dark v-model="configModel.enhancementIndex" :min="0" :max="2" :step="1" snap markers label />
                             </div>
@@ -115,19 +115,19 @@ const SystemList = {
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.payload" class="q-mb-md">
                         <div v-if="getUpgradeSpecs(editingComponent.defId).payload.type === 'capacity'">
                             <div class="text-caption">Additional {{ getUpgradeSpecs(editingComponent.defId).payload.unitLabel }} ({{ format(store.allEquipment.find(e => e.id === editingComponent.defId).baseCost * getUpgradeSpecs(editingComponent.defId).payload.costFactor) }} each)</div>
-                            <q-input dark type="number" filled v-model.number="editingComponent.modifications.payloadCount" label="Additional Capacity" min="0" :max="getUpgradeSpecs(editingComponent.defId).payload.max - getUpgradeSpecs(editingComponent.defId).payload.base" :hint="'Base: ' + getUpgradeSpecs(editingComponent.defId).payload.base + ' | Max Total: ' + getUpgradeSpecs(editingComponent.defId).payload.max" />
+                            <q-input dark type="number" filled v-model.number="editingComponent.modifications.payloadCount" label="Additional Capacity" min="0" :max="(getUpgradeSpecs(editingComponent.defId).payload.max * (editingComponent.modifications.fireLink || 1)) - (getUpgradeSpecs(editingComponent.defId).payload.base * (editingComponent.modifications.fireLink || 1))" :hint="'Base: ' + (getUpgradeSpecs(editingComponent.defId).payload.base * (editingComponent.modifications.fireLink || 1)) + ' | Max Total: ' + (getUpgradeSpecs(editingComponent.defId).payload.max * (editingComponent.modifications.fireLink || 1))" />
                         </div>
                         <q-checkbox v-else dark v-model="editingComponent.modifications.payloadOption" :label="getUpgradeSpecs(editingComponent.defId).payload.label + ' (' + format(getUpgradeSpecs(editingComponent.defId).payload.cost) + ')'" />
                     </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.battery && (!editingComponent.modifications.fireLink || editingComponent.modifications.fireLink === 1)" class="q-mb-md">
-                        <div class="text-caption">Battery Size</div>
-                        <q-input dark type="number" filled v-model.number="editingComponent.modifications.batteryCount" label="Battery Count" min="1" max="6" />
+                        <div class="text-caption">Battery Size ({{ editingComponent.modifications.batteryCount }})</div>
+                        <q-slider dark v-model="editingComponent.modifications.batteryCount" :min="1" :max="6" :step="1" snap markers label />
                     </div>
                     <div v-if="getUpgradeSpecs(editingComponent.defId)?.quantity" class="q-mb-md">
                         <div class="text-caption">Quantity</div>
                         <q-input dark type="number" filled v-model.number="editingComponent.modifications.quantity" label="Quantity" min="1" />
                     </div>
-                    <div v-if="getUpgradeSpecs(editingComponent.defId)?.fireLinkOption" class="q-mb-md">
+                    <div v-if="getUpgradeSpecs(editingComponent.defId)?.fireLinkOption && (editingComponent.modifications.fireLink || 1) > 1" class="q-mb-md">
                         <q-checkbox dark v-model="editingComponent.modifications.fireLinkOption" :label="'Selective Fire (+' + format(getUpgradeSpecs(editingComponent.defId).fireLinkOption.cost) + ')'" />
                     </div>
                 </q-card-section>
@@ -336,6 +336,10 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === id);
             return def && def.type === 'weapon';
         }
+        const isLauncher = (id) => {
+            const def = store.allEquipment.find(e => e.id === id);
+            return def && def.group === 'Launchers';
+        }
         const isCustom = (id) => {
             return store.customComponents.some(c => c.id === id);
         }
@@ -381,7 +385,13 @@ export const SystemListWrapper = {
                 set fireLinkIndex(idx) {
                     const val = fireLinkMap[idx];
                     mods.fireLink = val;
-                    if (val > 1) mods.batteryCount = 1;
+                    if (val > 1) {
+                         mods.batteryCount = 1;
+                         const def = store.allEquipment.find(e => e.id === editingComponent.value.defId);
+                         if (def && def.upgradeSpecs && def.upgradeSpecs.payload && def.upgradeSpecs.payload.type === 'capacity') {
+                             mods.fireLinkOption = true;
+                         }
+                    }
                 },
                 get fireLinkLabel() { return fireLinkLabels[this.fireLinkIndex]; },
 
@@ -391,7 +401,7 @@ export const SystemListWrapper = {
             };
         });
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isCustom, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity, configModel };
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingComponent, hasUpgrades, getUpgradeSpecs, openConfig, checkValidity, configModel };
     }
 };
 

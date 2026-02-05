@@ -569,62 +569,14 @@
                     "costFactor": 0.25,
                     "unitLabel": "torpedoes"
                 },
-                "battery": true
+                "battery": true,
+                "weaponVariants": true,
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
             "damage": "9d10x2",
             "description": "Base Capacity: 3 torpedoes. Additional capacity costs +25% per torpedo (max 16)."
-        },
-        {
-            "id": "proton_torp_fl2",
-            "name": "Fire-linked (2) Proton Torpedo Launcher",
-            "name_es": "Lanzador de Torpedos de Protones Enlazado (2)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 6000,
-            "baseEp": 3,
-            "sizeMult": false,
-            "availability": "Restricted",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 6,
-                    "max": 32,
-                    "costFactor": 0.25,
-                    "unitLabel": "torpedoes"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "9d10x2",
-            "description": "Fire-Linked Proton Torpedoes consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
-        },
-        {
-            "id": "proton_torp_fl4",
-            "name": "Fire-linked (4) Proton Torpedo Launcher",
-            "name_es": "Lanzador de Torpedos de Protones Enlazado (4)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 12000,
-            "baseEp": 6,
-            "sizeMult": false,
-            "availability": "Restricted",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 12,
-                    "max": 64,
-                    "costFactor": 0.25,
-                    "unitLabel": "torpedoes"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "9d10x2",
-            "description": "Fire-Linked Proton Torpedoes consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
         },
         {
             "id": "ion_cannon_light",
@@ -718,62 +670,14 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "battery": true
+                "battery": true,
+                "weaponVariants": true,
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
             "damage": "7d10x2",
             "description": "Base Capacity: 6 missiles. Additional capacity costs +20% per missile (max double capacity)."
-        },
-        {
-            "id": "concussion_missile_light_fl2",
-            "name": "Fire-linked (2) Light Concussion Missile Launcher (8d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Ligero Enlazado (2) (8d10x2)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 4000,
-            "baseEp": 5,
-            "sizeMult": false,
-            "availability": "Military",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 12,
-                    "max": 24,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "8d10x2",
-            "description": "Base Capacity: 12 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
-        },
-        {
-            "id": "concussion_missile_light_fl4",
-            "name": "Fire-linked (4) Light Concussion Missile Launcher (9d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Ligero Enlazado (4) (9d10x2)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 8000,
-            "baseEp": 10,
-            "sizeMult": false,
-            "availability": "Military",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 24,
-                    "max": 48,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "9d10x2",
-            "description": "Base Capacity: 24 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
         },
         {
             "id": "concussion_missile",
@@ -794,62 +698,14 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "battery": true
+                "battery": true,
+                "weaponVariants": true,
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
             "damage": "9d10x2",
             "description": "Base Capacity: 16 missiles. Additional capacity costs +20% per missile (max double capacity)."
-        },
-        {
-            "id": "concussion_missile_fl2",
-            "name": "Fire-linked (2) Medium Concussion Missile Launcher (10d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Mediano Enlazado (2) (10d10x2)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 7000,
-            "baseEp": 11,
-            "sizeMult": false,
-            "availability": "Military",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 32,
-                    "max": 64,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "10d10x2",
-            "description": "Base Capacity: 32 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
-        },
-        {
-            "id": "concussion_missile_fl4",
-            "name": "Fire-linked (4) Medium Concussion Missile Launcher (11d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Mediano Enlazado (4) (11d10x2)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 14000,
-            "baseEp": 22,
-            "sizeMult": false,
-            "availability": "Military",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 64,
-                    "max": 128,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "11d10x2",
-            "description": "Base Capacity: 64 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
         },
         {
             "id": "concussion_missile_hvy",
@@ -871,64 +727,14 @@
                     "costFactor": 0.2,
                     "unitLabel": "missiles"
                 },
-                "battery": true
+                "battery": true,
+                "weaponVariants": true,
+                "fireLinkOption": {
+                    "cost": 1000
+                }
             },
             "damage": "9d10x5",
             "description": "Base Capacity: 30 missiles. Additional capacity costs +20% per missile (max double capacity)."
-        },
-        {
-            "id": "concussion_missile_hvy_fl2",
-            "name": "Fire-linked (2) Heavy Concussion Missile Launcher (10d10x5)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Pesado Enlazado (2) (10d10x5)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 60000,
-            "baseEp": 41,
-            "sizeMult": false,
-            "availability": "Military",
-            "minShipSize": "Colossal(transport)",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 60,
-                    "max": 120,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "10d10x5",
-            "description": "Base Capacity: 60 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
-        },
-        {
-            "id": "concussion_missile_hvy_fl4",
-            "name": "Fire-linked (4) Heavy Concussion Missile Launcher (11d10x5)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Pesado Enlazado (4) (11d10x5)",
-            "category": "Weapon Systems",
-            "group": "Launchers",
-            "type": "weapon",
-            "baseCost": 120000,
-            "baseEp": 82,
-            "sizeMult": false,
-            "availability": "Military",
-            "minShipSize": "Colossal(transport)",
-            "upgradeSpecs": {
-                "payload": {
-                    "type": "capacity",
-                    "base": 120,
-                    "max": 240,
-                    "costFactor": 0.2,
-                    "unitLabel": "missiles"
-                },
-                "fireLinkOption": {
-                    "cost": 1000
-                }
-            },
-            "damage": "11d10x5",
-            "description": "Base Capacity: 120 missiles. Fire-Linked missiles consume ammunition equal to the number of weapons. Requires the Selective Fire upgrade to deactivate the Fire-Link and conserve ammo."
         },
         {
             "id": "tractor_beam",
@@ -3476,7 +3282,13 @@
             "damage": "5d10x5",
             "availability": "Military",
             "description": "Launches heavy ordnance payloads.",
-            "minShipSize": "Colossal"
+            "minShipSize": "Colossal",
+            "upgradeSpecs": {
+                "weaponVariants": true,
+                "fireLinkOption": {
+                    "cost": 1000
+                }
+            }
         }
     ]
 }
