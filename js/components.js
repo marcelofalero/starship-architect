@@ -361,6 +361,12 @@ export const SystemListWrapper = {
         const checkValidity = (component) => {
             const def = store.allEquipment.find(e => e.id === component.defId);
             if (!def) return true;
+
+            // Special Rule: Combat Thrusters (Colossal size only)
+            if (def.id === 'combat_thrusters') {
+                return store.chassis.size === 'Colossal';
+            }
+
             const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
             if (def.maxSize) {
                 const rankIndex = store.db.SIZE_RANK.indexOf(def.maxSize);

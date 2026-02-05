@@ -761,7 +761,8 @@
             "sizeMult": true,
             "maxSize": "Colossal (frigate)",
             "availability": "Common",
-            "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
+            "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
+            "exclusiveGroup": "atmos_thrusters"
         },
         {
             "id": "atmos_thrusters_adv",
@@ -775,7 +776,8 @@
             "sizeMult": true,
             "maxSize": "Gargantuan",
             "availability": "Common",
-            "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement."
+            "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
+            "exclusiveGroup": "atmos_thrusters"
         },
         {
             "id": "combat_thrusters",
@@ -804,7 +806,8 @@
             "description": "Maneuvering Jets give a Starship a +2 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 2
-            }
+            },
+            "exclusiveGroup": "maneuvering_jets"
         },
         {
             "id": "maneuvering_jets_4",
@@ -820,7 +823,9 @@
             "description": "Maneuvering Jets give a Starship a +4 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 4
-            }
+            },
+            "maxSize": "Colossal",
+            "exclusiveGroup": "maneuvering_jets"
         },
         {
             "id": "maneuvering_jets_6",
@@ -836,7 +841,9 @@
             "description": "Maneuvering Jets give a Starship a +6 Equipment bonus to its Dexterity score.",
             "stats": {
                 "dex_bonus": 6
-            }
+            },
+            "maxSize": "Gargantuan",
+            "exclusiveGroup": "maneuvering_jets"
         },
         {
             "id": "hyperdrive_075",
