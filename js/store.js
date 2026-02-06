@@ -393,6 +393,19 @@ export const useShipStore = defineStore('ship', () => {
     function isCustomComponentInstalled(componentId) {
         return installedComponents.value.some(m => m.defId === componentId);
     }
+    function addEquipment(component) {
+        // Prevent duplicate IDs
+        const idx = db.EQUIPMENT.findIndex(e => e.id === component.id);
+        if (idx !== -1) {
+            db.EQUIPMENT[idx] = component;
+        } else {
+            db.EQUIPMENT.push(component);
+        }
+    }
+    function removeEquipment(componentId) {
+        db.EQUIPMENT = db.EQUIPMENT.filter(e => e.id !== componentId);
+        // Also remove from installed if present? Logic in component/app usually handles missing defs gracefully or shows warning.
+    }
     function updateEquipment(newDef) {
         const idx = db.EQUIPMENT.findIndex(e => e.id === newDef.id);
         if (idx !== -1) {
@@ -463,7 +476,7 @@ export const useShipStore = defineStore('ship', () => {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
+        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         isAdmin
     };
 });

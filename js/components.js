@@ -358,7 +358,10 @@ export const AddModDialog = {
     <q-dialog v-model="store.showAddComponentDialog">
         <q-card class="bg-grey-9 text-white" style="min-width: 500px">
             <q-card-section>
-                <div class="text-h6">{{ $t('ui.install_system') }}</div>
+                <div class="row items-center justify-between">
+                    <div class="text-h6">{{ $t('ui.install_system') }}</div>
+                    <q-btn v-if="store.isAdmin" outline color="primary" label="Create New (Admin)" icon="add" size="sm" @click="createNew" />
+                </div>
                 <div class="text-caption text-grey">{{ $t('ui.install_caption') }}</div>
             </q-card-section>
 
@@ -464,6 +467,7 @@ export const AddModDialog = {
                     <div v-if="store.isAdmin" class="row q-gutter-sm q-mt-sm justify-end">
                         <q-btn flat dense icon="open_in_new" label="Wiki" color="info" @click="openWiki"></q-btn>
                         <q-btn flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
+                        <q-btn flat dense icon="delete" label="Delete" color="negative" @click="deleteComponent"></q-btn>
                     </div>
                 </q-card>
             </q-card-section>
@@ -612,6 +616,26 @@ export const AddModDialog = {
             }
         };
 
+        const createNew = () => {
+            store.openCustomDialog();
+        };
+
+        const deleteComponent = () => {
+            if (!newComponentSelection.value) return;
+            $q.dialog({
+                dark: true,
+                title: 'Confirm Deletion',
+                message: 'Are you sure you want to delete this component from the database? This cannot be undone.',
+                cancel: true,
+                persistent: true,
+                color: 'negative'
+            }).onOk(() => {
+                store.removeEquipment(newComponentSelection.value);
+                newComponentSelection.value = null;
+                $q.notify({ type: 'positive', message: 'Component deleted' });
+            });
+        };
+
         const installComponent = () => {
             if(newComponentSelection.value) {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
@@ -644,7 +668,7 @@ export const AddModDialog = {
         };
 
         return { store, newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard, categoryOptions, groupOptions, itemOptions, selectedItemDef, isSizeValid, previewCost, previewEp, resetGroup, formatCreds, installComponent, getLocalizedName, searchSelection, searchOptions, filterSearch, onSearchSelect,
-            showJsonEditor, jsonContent, openWiki, openJsonEditor, saveJson
+            showJsonEditor, jsonContent, openWiki, openJsonEditor, saveJson, createNew, deleteComponent
         };
     }
 };
@@ -776,6 +800,10 @@ export const CustomComponentDialog = {
             <q-card-section class="q-pt-none">
                 <div class="column q-gutter-md">
                     <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
+                    <div v-if="store.isAdmin">
+                        <q-input filled dark v-model="newCustomComponent.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
+                        <q-checkbox dark v-model="newCustomComponent.addToCore" label="Save to Core Database" color="accent" class="q-mt-sm"></q-checkbox>
+                    </div>
                     <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options></q-select></div>
                     <div>
                         <q-select filled dark v-model="newCustomComponent.group" use-input hide-selected fill-input input-debounce="0" new-value-mode="add-unique" :options="groupOptionsFiltered" @filter="filterGroupFn" label="Group" hint="Select existing or type new" >
@@ -900,7 +928,12 @@ export const CustomComponentDialog = {
         const createCustomComponent = () => {
             if (!newCustomComponent.name) return;
             const isEdit = !!store.customDialogState.componentId;
-            const id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+
+            let id = newCustomComponent.id;
+            if (!id) {
+                 id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+            }
+
             const comp = {
                 id,
                 name: newCustomComponent.name,
@@ -922,6 +955,14 @@ export const CustomComponentDialog = {
                     comp.upgradeSpecs[prop.key] = prop.value;
                 }
             });
+
+            if (store.isAdmin && newCustomComponent.addToCore) {
+                store.addEquipment(comp);
+                $q.notify({ type: 'positive', message: 'Saved to Core DB' });
+                store.customDialogState.visible = false;
+                return;
+            }
+
             if (isEdit) {
                 store.updateCustomComponent(comp);
                 store.customDialogState.visible = false;
@@ -939,7 +980,8 @@ export const CustomComponentDialog = {
                     if (existing) {
                         Object.assign(newCustomComponent, {
                             name: existing.name, category: existing.category, group: existing.group, type: existing.type,
-                            baseCost: existing.baseCost, baseEp: existing.baseEp, sizeMult: existing.sizeMult, stats: {}
+                            baseCost: existing.baseCost, baseEp: existing.baseEp, sizeMult: existing.sizeMult, stats: {},
+                            id: existing.id, addToCore: false
                         });
                         propertyDefinitions.forEach(def => {
                             let val = undefined;
@@ -950,7 +992,7 @@ export const CustomComponentDialog = {
                         });
                     }
                 } else {
-                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {}, id: '', addToCore: false });
                     activeProperties.value = [];
                 }
             } else {
