@@ -29,7 +29,9 @@ export const messages = {
         cat: {
             fighters: "Fighters", freighters: "Freighters", capitals: "Capital Ships",
             weapons: "Weapon Systems", movement: "Movement Systems", defense: "Defense Systems",
-            components: "Components", accessories: "Starship Accessories"
+            components: "Components", accessories: "Starship Accessories",
+            weapon_systems: "Weapon Systems", movement_systems: "Movement Systems", defense_systems: "Defense Systems",
+            modifications: "Modifications", starship_accessories: "Starship Accessories", weapon_upgrades: "Weapon Upgrades"
         },
         avail: {
             Common: "Common", Licensed: "Licensed", Restricted: "Restricted",
@@ -64,7 +66,9 @@ export const messages = {
         cat: {
             fighters: "Cazas", freighters: "Cargueros", capitals: "Naves Capitales",
             weapons: "Sistemas de Armas", movement: "Sistemas de Movimiento", defense: "Sistemas Defensivos",
-            components: "Componentes", accessories: "Accesorios"
+            components: "Componentes", accessories: "Accesorios",
+            weapon_systems: "Sistemas de Armas", movement_systems: "Sistemas de Movimiento", defense_systems: "Sistemas Defensivos",
+            modifications: "Modificaciones", starship_accessories: "Accesorios de Nave", weapon_upgrades: "Mejoras de Armas"
         },
         avail: {
             Common: "Común", Licensed: "Licenciado", Restricted: "Restringido",

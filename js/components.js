@@ -537,7 +537,11 @@ export const AddModDialog = {
 
         const categoryOptions = computed(() => {
             const cats = [...new Set(store.allEquipment.map(e => e.category))];
-            return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c })).sort((a, b) => a.label.localeCompare(b.label));
+            return cats.map(c => {
+                const key = 'cat.' + c.replace(/ /g, '_').toLowerCase();
+                const label = t(key);
+                return { label: label !== key ? label : c, value: c };
+            }).sort((a, b) => a.label.localeCompare(b.label));
         });
 
         const groupOptions = computed(() => {
@@ -891,7 +895,11 @@ export const CustomComponentDialog = {
 
         const categoryOptions = computed(() => {
             const cats = [...new Set(store.allEquipment.map(e => e.category))];
-            return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
+            return cats.map(c => {
+                const key = 'cat.' + c.replace(/ /g, '_').toLowerCase();
+                const label = t(key);
+                return { label: label !== key ? label : c, value: c };
+            });
         });
 
         const filterGroupFn = (val, update) => {
