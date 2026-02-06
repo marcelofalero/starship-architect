@@ -1,8 +1,9 @@
 import { useShipStore } from './store.js';
 import { getLocalizedName, i18n } from './i18n.js';
 
-const { computed, ref } = Vue;
+const { computed, ref, reactive, watch } = Vue;
 const { useI18n } = VueI18n;
+const { useQuasar } = Quasar;
 
 // --- BASE COMPONENTS ---
 const StatPanel = {
@@ -267,6 +268,584 @@ const ShipSheet = {
     </div>
     `,
     setup() { return {}; }
+};
+
+// --- NEW REFACTORED DIALOGS ---
+
+export const HangarDialog = {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `
+    <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
+        <q-card class="bg-grey-9 text-white" style="min-width: 500px; max-width: 90vw;">
+            <q-card-section><div class="text-h6">{{ $t('ui.hangar') }}</div></q-card-section>
+            <q-tabs v-model="hangarTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
+                <q-tab name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
+                <q-tab name="import" icon="upload_file" :label="$t('ui.import_file')"></q-tab>
+            </q-tabs>
+            <q-separator dark></q-separator>
+            <q-tab-panels v-model="hangarTab" animated class="bg-grey-9">
+                <q-tab-panel name="stock" style="height: 400px" class="q-pa-none">
+                    <q-scroll-area class="full-height">
+                        <q-list separator dark>
+                            <q-item-label header class="text-grey-5">{{ $t('cat.fighters') }}</q-item-label>
+                            <q-item clickable v-ripple v-for="ship in stockFighters" :key="ship.id" @click="selectStockShip(ship.id)"><q-item-section><q-item-label>{{ getLocalizedName(ship) }}</q-item-label><q-item-label caption class="text-grey-6">{{ ship.size }}</q-item-label></q-item-section><q-item-section side><q-btn flat round icon="chevron_right" color="primary" /></q-item-section></q-item>
+                            <q-item-label header class="text-grey-5">{{ $t('cat.freighters') }}</q-item-label>
+                            <q-item clickable v-ripple v-for="ship in stockFreighters" :key="ship.id" @click="selectStockShip(ship.id)"><q-item-section><q-item-label>{{ getLocalizedName(ship) }}</q-item-label><q-item-label caption class="text-grey-6">{{ ship.size }}</q-item-label></q-item-section><q-item-section side><q-btn flat round icon="chevron_right" color="primary" /></q-item-section></q-item>
+                            <q-item-label header class="text-grey-5">{{ $t('cat.capitals') }}</q-item-label>
+                            <q-item clickable v-ripple v-for="ship in stockCapitals" :key="ship.id" @click="selectStockShip(ship.id)"><q-item-section><q-item-label>{{ getLocalizedName(ship) }}</q-item-label><q-item-label caption class="text-grey-6">{{ ship.size }}</q-item-label></q-item-section><q-item-section side><q-btn flat round icon="chevron_right" color="primary" /></q-item-section></q-item>
+                        </q-list>
+                    </q-scroll-area>
+                </q-tab-panel>
+                <q-tab-panel name="import" style="height: 400px" class="column flex-center">
+                    <q-icon name="upload_file" size="100px" color="grey-7" class="q-mb-md">{{ $t('ui.upload_yaml') }}</q-icon>
+                    <div class="text-h6 q-mb-md">{{ $t('ui.upload_yaml') }}</div>
+                    <input type="file" ref="fileInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
+                    <q-btn color="primary" :label="$t('ui.select_file')" @click="triggerFileSelect"></q-btn>
+                </q-tab-panel>
+            </q-tab-panels>
+        </q-card>
+    </q-dialog>
+    `,
+    setup(props, { emit }) {
+        const store = useShipStore();
+        const $q = useQuasar();
+        const hangarTab = ref('stock');
+        const fileInput = ref(null);
+
+        const stockFighters = computed(() => store.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
+        const stockFreighters = computed(() => store.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
+        const stockCapitals = computed(() => store.db.STOCK_SHIPS.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
+
+        const selectStockShip = (id) => {
+            store.createNew(id);
+            emit('update:modelValue', false);
+        };
+
+        const triggerFileSelect = () => {
+             if(fileInput.value) fileInput.value.click();
+        };
+
+        const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = jsyaml.load(e.target.result);
+                    store.loadState(data);
+                    emit('update:modelValue', false);
+                    $q.notify({ type: 'positive', message: 'Ship loaded successfully' });
+                } catch (error) {
+                    console.error(error);
+                    $q.notify({ type: 'negative', message: 'Failed to parse file' });
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        return { hangarTab, stockFighters, stockFreighters, stockCapitals, selectStockShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
+    }
+};
+
+export const AddModDialog = {
+    template: `
+    <q-dialog v-model="store.showAddComponentDialog">
+        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+            <q-card-section>
+                <div class="text-h6">{{ $t('ui.install_system') }}</div>
+                <div class="text-caption text-grey">{{ $t('ui.install_caption') }}</div>
+            </q-card-section>
+
+            <q-card-section class="q-pt-none q-gutter-md">
+                <!-- Form Elements -->
+                <q-select filled dark v-model="newComponentCategory" :options="categoryOptions" :label="$t('ui.category')" emit-value map-options @update:model-value="resetGroup">
+                    <template v-slot:prepend><q-icon name="folder" /></template>
+                </q-select>
+                <q-select filled dark v-model="newComponentGroup" :options="groupOptions" :label="$t('ui.sys_type')" emit-value map-options :disable="!newComponentCategory" @update:model-value="newComponentSelection = null">
+                    <template v-slot:prepend><q-icon name="category" /></template>
+                </q-select>
+                <q-select filled dark v-model="newComponentSelection" :options="itemOptions" :label="$t('ui.component')" option-label="label" option-value="id" emit-value map-options :disable="!newComponentGroup">
+                    <template v-slot:option="scope">
+                        <q-item v-bind="scope.itemProps">
+                            <q-item-section>
+                                <q-item-label>
+                                    {{ scope.opt.label }} <span class="text-caption text-grey-5 q-ml-xs">({{ scope.opt.baseEp }} EP)</span>
+                                    <q-badge v-if="scope.opt.availability === 'Licensed'" color="info" label="Lic" />
+                                    <q-badge v-if="scope.opt.availability === 'Restricted'" color="warning" text-color="black" label="Res" />
+                                    <q-badge v-if="scope.opt.availability === 'Military'" color="negative" label="Mil" />
+                                    <q-badge v-if="scope.opt.availability === 'Illegal'" color="deep-purple" label="Ill" />
+                                    <q-badge v-if="scope.opt.availability === 'Common' || !scope.opt.availability" color="positive" label="Com" />
+                                </q-item-label>
+                            </q-item-section>
+                            <q-item-section side v-if="!isSizeValid(scope.opt)">
+                                <q-icon name="warning" color="negative">
+                                    <q-tooltip>
+                                        <span v-if="scope.opt.maxSize">{{ $t('ui.max_size') }}: {{ scope.opt.maxSize }}</span>
+                                        <span v-if="scope.opt.minShipSize">{{ $t('ui.min_size') }}: {{ scope.opt.minShipSize }}</span>
+                                    </q-tooltip>
+                                </q-icon>
+                            </q-item-section>
+                        </q-item>
+                    </template>
+                </q-select>
+                <div v-if="newComponentSelection">
+                    <q-checkbox dark v-model="newComponentNonStandard" :label="$t('ui.non_standard')" color="warning">
+                        <q-tooltip>{{ $t('ui.non_standard_tip') }}</q-tooltip>
+                    </q-checkbox>
+                </div>
+                <q-card v-if="selectedItemDef" class="bg-grey-8 q-pa-sm q-mt-md" flat bordered>
+                    <div class="row items-center justify-between">
+                        <div>
+                            <div class="text-subtitle2">{{ getLocalizedName(selectedItemDef) }} <span v-if="newComponentNonStandard" class="text-warning text-caption">({{ $t('ui.ns_tag') }})</span></div>
+                            <div class="text-caption text-grey-4">
+                                <span v-if="selectedItemDef.variableCost">{{ $t('ui.cost_variable') }}</span>
+                                <span v-else>{{ $t('ui.base_cost') }}: {{ selectedItemDef.baseCost }} cr</span> | {{ $t('ui.base_ep') }}: {{ selectedItemDef.baseEp }}
+                                <br v-if="selectedItemDef.category !== 'Modifications'">
+                                <span v-if="selectedItemDef.category !== 'Modifications'">
+                                    {{ $t('ui.avail') }}:
+                                    <q-badge v-if="selectedItemDef.availability === 'Licensed'" color="info" label="Lic" />
+                                    <q-badge v-if="selectedItemDef.availability === 'Restricted'" color="warning" text-color="black" label="Res" />
+                                    <q-badge v-if="selectedItemDef.availability === 'Military'" color="negative" label="Mil" />
+                                    <q-badge v-if="selectedItemDef.availability === 'Illegal'" color="deep-purple" label="Ill" />
+                                    <q-badge v-if="selectedItemDef.availability === 'Common' || !selectedItemDef.availability" color="positive" label="Com" />
+                                </span>
+                                <q-icon v-if="!isSizeValid(selectedItemDef)" name="warning" color="negative" class="q-ml-xs">
+                                    <q-tooltip>
+                                        <span v-if="selectedItemDef.maxSize">{{ $t('ui.max_size') }}: {{ selectedItemDef.maxSize }}</span>
+                                        <span v-if="selectedItemDef.minShipSize">{{ $t('ui.min_size') }}: {{ selectedItemDef.minShipSize }}</span>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-h6 text-amber">
+                                <span v-if="selectedItemDef.variableCost" class="text-italic text-body1">{{ $t('ui.variable') }}</span>
+                                <span v-else>{{ formatCreds(previewCost) }}</span>
+                            </div>
+                            <div class="text-caption text-positive">{{ previewEp }} EP</div>
+                        </div>
+                    </div>
+                    <div v-if="selectedItemDef.sizeMult && !selectedItemDef.variableCost" class="text-xs text-grey-5 q-mt-xs">* {{ $t('ui.size_mult_msg', { size: store.chassis.size }) }}</div>
+                </q-card>
+            </q-card-section>
+            <q-card-actions align="right">
+                <q-space></q-space>
+                <q-btn flat :label="$t('ui.cancel')" color="grey" v-close-popup></q-btn>
+                <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installComponent" v-close-popup :disable="!newComponentSelection"></q-btn>
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const { t } = useI18n();
+        const $q = useQuasar();
+
+        const newComponentCategory = ref(null);
+        const newComponentGroup = ref(null);
+        const newComponentSelection = ref(null);
+        const newComponentNonStandard = ref(false);
+
+        const categoryOptions = computed(() => {
+            const cats = [...new Set(store.allEquipment.map(e => e.category))];
+            return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
+        });
+
+        const groupOptions = computed(() => {
+            if (!newComponentCategory.value) return [];
+            const groups = [...new Set(store.allEquipment.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
+            return groups.map(g => ({ label: g, value: g }));
+        });
+
+        const itemOptions = computed(() => {
+            if (!newComponentGroup.value) return [];
+            return store.allEquipment.filter(e => e.group === newComponentGroup.value).map(e => ({
+                ...e,
+                label: getLocalizedName(e)
+            }));
+        });
+
+        const selectedItemDef = computed(() => {
+            if (!newComponentSelection.value) return null;
+            return store.allEquipment.find(e => e.id === newComponentSelection.value);
+        });
+
+        const isSizeValid = (itemDef) => {
+            const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
+
+            if (itemDef.maxSize) {
+                const rankIndex = store.db.SIZE_RANK.indexOf(itemDef.maxSize);
+                if (shipIndex > rankIndex) return false;
+            }
+
+            if (itemDef.minShipSize) {
+                const minRankIndex = store.db.SIZE_RANK.indexOf(itemDef.minShipSize);
+                if (shipIndex < minRankIndex) return false;
+            }
+
+            return true;
+        };
+
+        const previewCost = computed(() => {
+            if (!selectedItemDef.value) return 0;
+            return store.getComponentCost({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
+        });
+
+        const previewEp = computed(() => {
+            if (!selectedItemDef.value) return 0;
+            return store.getComponentEp({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
+        });
+
+        const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
+        const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
+
+        const installComponent = () => {
+            if(newComponentSelection.value) {
+                const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
+
+                const doInstall = () => {
+                    let loc = 'Installed';
+                    if (def) {
+                        if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
+                    }
+                    store.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
+                    newComponentSelection.value = null;
+                    newComponentNonStandard.value = false;
+                };
+
+                if (def && !isSizeValid(def)) {
+                    $q.dialog({
+                        dark: true,
+                        title: 'Warning',
+                        message: 'This component is not compatible with the ship\'s size class. Install anyway?',
+                        cancel: true,
+                        persistent: true,
+                        color: 'warning'
+                    }).onOk(() => {
+                        doInstall();
+                    });
+                } else {
+                    doInstall();
+                }
+            }
+        };
+
+        return { store, newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard, categoryOptions, groupOptions, itemOptions, selectedItemDef, isSizeValid, previewCost, previewEp, resetGroup, formatCreds, installComponent, getLocalizedName };
+    }
+};
+
+export const CustomManagerDialog = {
+    template: `
+    <q-dialog v-model="store.showCustomManager">
+        <q-card class="bg-grey-9 text-white" style="min-width: 600px; height: 70vh; display: flex; flex-direction: column;">
+            <q-card-section class="row items-center q-pb-none">
+                <div class="text-h6">Custom Components Library</div>
+                <q-space></q-space>
+                <q-btn icon="close" flat round dense v-close-popup></q-btn>
+            </q-card-section>
+
+            <q-card-section class="q-py-sm">
+                <div class="row q-gutter-sm">
+                    <q-btn color="primary" icon="add" label="Create New" @click="store.openCustomDialog()"></q-btn>
+                    <q-btn color="secondary" icon="upload" label="Import JSON" @click="triggerLibraryImport"></q-btn>
+                    <q-btn color="accent" icon="download" label="Export JSON" @click="exportCustomLibrary" :disable="store.customComponents.length === 0"></q-btn>
+                    <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
+                </div>
+            </q-card-section>
+
+            <q-card-section class="col q-pa-none">
+                <q-scroll-area class="fit">
+                    <q-list separator dark class="q-pa-md">
+                        <q-item v-for="comp in store.customComponents" :key="comp.id">
+                            <q-item-section>
+                                <q-item-label>{{ comp.name }}</q-item-label>
+                                <q-item-label caption class="text-grey-5">{{ comp.type }} | {{ comp.baseCost }} cr | {{ comp.baseEp }} EP</q-item-label>
+                            </q-item-section>
+                            <q-item-section side>
+                                <div class="row q-gutter-xs">
+                                    <q-btn flat round icon="edit" color="info" size="sm" @click="store.openCustomDialog(comp.id)"></q-btn>
+                                    <q-btn flat round icon="delete" :color="store.isCustomComponentInstalled(comp.id) ? 'grey-8' : 'negative'" size="sm" @click="deleteCustomComponent(comp.id)">
+                                        <q-tooltip v-if="store.isCustomComponentInstalled(comp.id)">Uninstall from ship first</q-tooltip>
+                                    </q-btn>
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                        <div v-if="store.customComponents.length === 0" class="text-center text-grey q-pa-lg">
+                            No custom components found. Create or Import one.
+                        </div>
+                    </q-list>
+                </q-scroll-area>
+            </q-card-section>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const $q = useQuasar();
+        const libraryInput = ref(null);
+
+        const triggerLibraryImport = () => { if(libraryInput.value) libraryInput.value.click(); };
+
+        const handleLibraryImport = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        let count = 0;
+                        data.forEach(item => {
+                            if (item.name && item.type) {
+                                const newId = 'custom_' + crypto.randomUUID();
+                                const comp = { ...item, id: newId };
+                                store.addCustomComponent(comp);
+                                count++;
+                            }
+                        });
+                        $q.notify({ type: 'positive', message: 'Imported ' + count + ' components.' });
+                    } else {
+                        $q.notify({ type: 'negative', message: 'Invalid file format. Expected JSON array.' });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
+                }
+                if (libraryInput.value) libraryInput.value.value = '';
+            };
+            reader.readAsText(file);
+        };
+
+        const exportCustomLibrary = () => {
+            if (store.customComponents.length === 0) {
+                $q.notify({ type: 'warning', message: 'No custom components to export.' });
+                return;
+            }
+            const jsonStr = JSON.stringify(store.customComponents, null, 2);
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'swse_custom_components.json';
+            a.click();
+        };
+
+        const deleteCustomComponent = (id) => {
+            if (store.isCustomComponentInstalled(id)) {
+                $q.notify({ type: 'warning', message: 'Cannot delete: Component is currently installed on the ship. Uninstall it first.' });
+                return;
+            }
+            $q.dialog({
+                dark: true,
+                title: 'Confirm Deletion',
+                message: 'Are you sure you want to delete this custom component?',
+                cancel: true,
+                persistent: true,
+                color: 'negative'
+            }).onOk(() => {
+                store.removeCustomComponent(id);
+            });
+        };
+
+        return { store, libraryInput, triggerLibraryImport, handleLibraryImport, exportCustomLibrary, deleteCustomComponent };
+    }
+};
+
+export const CustomComponentDialog = {
+    template: `
+    <q-dialog v-model="store.customDialogState.visible">
+        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+            <q-card-section>
+                <div class="text-h6">{{ store.customDialogState.componentId ? 'Edit Custom Component' : 'Create Custom Component' }}</div>
+            </q-card-section>
+            <q-card-section class="q-pt-none">
+                <div class="column q-gutter-md">
+                    <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
+                    <div><q-select filled dark v-model="newCustomComponent.category" :options="categoryOptions" label="Category" emit-value map-options></q-select></div>
+                    <div>
+                        <q-select filled dark v-model="newCustomComponent.group" use-input hide-selected fill-input input-debounce="0" new-value-mode="add-unique" :options="groupOptionsFiltered" @filter="filterGroupFn" label="Group" hint="Select existing or type new" >
+                            <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new group</q-item-section></q-item></template>
+                        </q-select>
+                    </div>
+                    <div><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type"></q-select></div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number"></q-input></div>
+                        <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number"></q-input></div>
+                    </div>
+                    <div>
+                        <q-checkbox dark v-model="newCustomComponent.sizeMult" label="Cost Multiplied by Size"></q-checkbox>
+                    </div>
+
+                    <div>
+                        <div class="text-subtitle2 q-mb-sm">Properties & Modifiers</div>
+                        <div class="row q-col-gutter-sm items-center q-mb-md">
+                            <div class="col">
+                                <q-select filled dark v-model="propertyToAdd" :options="propertyDefinitions" label="Select Property" dense option-label="label"></q-select>
+                            </div>
+                            <div class="col-auto">
+                                <q-btn icon="add" label="Add" color="primary" @click="addPropertyToCustomComponent" :disable="!propertyToAdd"></q-btn>
+                            </div>
+                        </div>
+
+                        <div class="q-gutter-y-sm">
+                            <div v-for="prop in activeProperties" :key="prop.key" class="row q-col-gutter-sm items-center">
+                                <div class="col">
+                                    <q-input v-if="prop.def.type === 'string'" filled dark v-model="prop.value" :label="prop.def.label" dense></q-input>
+                                    <q-input v-else-if="prop.def.type === 'text'" filled dark v-model="prop.value" :label="prop.def.label" type="textarea" autogrow dense></q-input>
+                                    <q-input v-else-if="prop.def.type === 'number'" filled dark v-model="prop.value" :label="prop.def.label" type="number" dense></q-input>
+                                    <q-select v-else-if="prop.def.type === 'exclusive_select'" filled dark v-model="prop.value" use-input hide-selected fill-input input-debounce="0" new-value-mode="add-unique" :options="exclusiveOptionsFiltered" @filter="filterExclusiveFn" :label="prop.def.label" dense>
+                                        <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new exclusive group</q-item-section></q-item></template>
+                                    </q-select>
+                                    <q-select v-else-if="prop.def.type === 'size_select'" filled dark v-model="prop.value" :options="store.db.SIZE_RANK" :label="prop.def.label" dense></q-select>
+                                    <q-checkbox v-else-if="prop.def.type === 'boolean'" dark v-model="prop.value" :label="prop.def.label" dense></q-checkbox>
+                                    <q-select v-else-if="prop.def.type === 'multiselect'" filled dark v-model="prop.value" :options="prop.def.options" :label="prop.def.label" multiple emit-value map-options dense></q-select>
+                                </div>
+                                <div class="col-auto">
+                                    <q-btn flat round icon="delete" color="negative" size="sm" @click="removePropertyFromCustomComponent(prop.key)"></q-btn>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </q-card-section>
+            <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="grey" v-close-popup />
+                <q-btn unelevated class="q-ml-sm" :label="store.customDialogState.componentId ? 'Save Changes' : 'Create'" color="positive" @click="createCustomComponent" :disable="!newCustomComponent.name" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const { t } = useI18n();
+        const newCustomComponent = reactive({ name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+        const activeProperties = ref([]);
+        const propertyToAdd = ref(null);
+        const groupOptionsFiltered = ref([]);
+        const exclusiveOptionsFiltered = ref([]);
+
+        // Property Definitions (Moved from app.js)
+        const propertyDefinitions = [
+            { label: 'Damage', key: 'damage', type: 'string', location: 'root' },
+            { label: 'Damage Type', key: 'damageType', type: 'string', location: 'root' },
+            { label: 'Description', key: 'description', type: 'text', location: 'root' },
+            { label: 'Exclusive Group', key: 'exclusiveGroup', type: 'exclusive_select', location: 'root' },
+            { label: 'Min Ship Size', key: 'minShipSize', type: 'size_select', location: 'root' },
+            { label: 'Max Ship Size', key: 'maxSize', type: 'size_select', location: 'root' },
+            { label: 'Modification Options', key: 'componentOptions', type: 'multiselect', location: 'upgradeSpecs', options: [{ label: 'Multi-Barrel (Twin/Quad)', value: 'weapon.multibarrel' }, { label: 'Fire-Link', value: 'weapon.fireLink' }, { label: 'Enhancement', value: 'weapon.enhancement' }, { label: 'Battery', value: 'weapon.battery' }, { label: 'Autofire', value: 'weapon.autofire' }, { label: 'Recall Circuit', value: 'slaveCircuits.recall' }] },
+            { label: 'Shield Rating (Set)', key: 'sr', type: 'number', location: 'stats' },
+            { label: 'Shield Bonus (Add)', key: 'sr_bonus', type: 'number', location: 'stats' },
+            { label: 'Armor Bonus (Add)', key: 'armor_bonus', type: 'number', location: 'stats' },
+            { label: 'HP (Set)', key: 'hp', type: 'number', location: 'stats' },
+            { label: 'Speed (Set)', key: 'speed', type: 'number', location: 'stats' },
+            { label: 'Hyperdrive Class (Set)', key: 'hyperdrive', type: 'number', location: 'stats' },
+            { label: 'Dex Bonus (Add)', key: 'dex_bonus', type: 'number', location: 'stats' },
+            { label: 'Str Bonus (Add)', key: 'str_bonus', type: 'number', location: 'stats' },
+            { label: 'Perception Bonus (Add)', key: 'perception_bonus', type: 'number', location: 'stats' },
+            { label: 'EP Modifier %', key: 'ep_dynamic_pct', type: 'number', location: 'stats' },
+            { label: 'Cargo Factor', key: 'cargo_factor', type: 'number', location: 'stats' }
+        ];
+
+        const categoryOptions = computed(() => {
+            const cats = [...new Set(store.allEquipment.map(e => e.category))];
+            return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
+        });
+
+        const filterGroupFn = (val, update) => {
+            update(() => {
+                const groups = [...new Set(store.allEquipment.map(e => e.group))];
+                if (val === '') groupOptionsFiltered.value = groups;
+                else groupOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            });
+        };
+
+        const filterExclusiveFn = (val, update) => {
+            update(() => {
+                const groups = [...new Set(store.allEquipment.map(e => e.exclusiveGroup).filter(g => g))];
+                if (val === '') exclusiveOptionsFiltered.value = groups;
+                else exclusiveOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            });
+        };
+
+        const addPropertyToCustomComponent = () => {
+            if (!propertyToAdd.value) return;
+            if (activeProperties.value.find(p => p.key === propertyToAdd.value.key)) return;
+            let defaultVal = '';
+            if (propertyToAdd.value.type === 'number') defaultVal = 0;
+            if (propertyToAdd.value.type === 'boolean') defaultVal = true;
+            if (propertyToAdd.value.type === 'multiselect') defaultVal = [];
+            activeProperties.value.push({ key: propertyToAdd.value.key, def: propertyToAdd.value, value: defaultVal });
+            propertyToAdd.value = null;
+        };
+
+        const removePropertyFromCustomComponent = (key) => {
+            activeProperties.value = activeProperties.value.filter(p => p.key !== key);
+        };
+
+        const createCustomComponent = () => {
+            if (!newCustomComponent.name) return;
+            const isEdit = !!store.customDialogState.componentId;
+            const id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+            const comp = {
+                id,
+                name: newCustomComponent.name,
+                name_es: newCustomComponent.name,
+                category: newCustomComponent.category,
+                group: newCustomComponent.group || 'Custom',
+                type: newCustomComponent.type,
+                baseCost: Number(newCustomComponent.baseCost),
+                baseEp: Number(newCustomComponent.baseEp),
+                sizeMult: newCustomComponent.sizeMult,
+                availability: 'Common',
+                stats: {}
+            };
+            activeProperties.value.forEach(prop => {
+                if (prop.def.location === 'root') comp[prop.key] = prop.value;
+                else if (prop.def.location === 'stats') comp.stats[prop.key] = Number(prop.value);
+                else if (prop.def.location === 'upgradeSpecs') {
+                    if (!comp.upgradeSpecs) comp.upgradeSpecs = {};
+                    comp.upgradeSpecs[prop.key] = prop.value;
+                }
+            });
+            if (isEdit) {
+                store.updateCustomComponent(comp);
+                store.customDialogState.visible = false;
+            } else {
+                store.addCustomComponent(comp);
+                store.customDialogState.visible = false;
+            }
+        };
+
+        watch(() => store.customDialogState.visible, (visible) => {
+            if (visible) {
+                activeProperties.value = [];
+                if (store.customDialogState.componentId) {
+                    const existing = store.customComponents.find(c => c.id === store.customDialogState.componentId);
+                    if (existing) {
+                        Object.assign(newCustomComponent, {
+                            name: existing.name, category: existing.category, group: existing.group, type: existing.type,
+                            baseCost: existing.baseCost, baseEp: existing.baseEp, sizeMult: existing.sizeMult, stats: {}
+                        });
+                        propertyDefinitions.forEach(def => {
+                            let val = undefined;
+                            if (def.location === 'root' && existing[def.key] !== undefined) val = existing[def.key];
+                            else if (def.location === 'stats' && existing.stats && existing.stats[def.key] !== undefined) val = existing.stats[def.key];
+                            else if (def.location === 'upgradeSpecs' && existing.upgradeSpecs && existing.upgradeSpecs[def.key] !== undefined) val = existing.upgradeSpecs[def.key];
+                            if (val !== undefined) activeProperties.value.push({ key: def.key, def: def, value: val });
+                        });
+                    }
+                } else {
+                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+                    activeProperties.value = [];
+                }
+            } else {
+                 store.customDialogState.componentId = null;
+            }
+        });
+
+        return { store, newCustomComponent, activeProperties, propertyToAdd, propertyDefinitions, groupOptionsFiltered, exclusiveOptionsFiltered, categoryOptions, filterGroupFn, filterExclusiveFn, addPropertyToCustomComponent, removePropertyFromCustomComponent, createCustomComponent };
+    }
 };
 
 // --- WRAPPERS ---

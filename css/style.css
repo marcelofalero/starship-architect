@@ -12,10 +12,42 @@
     .print-only { display: none !important; }
 }
 
-/* Previous placeholder classes - can likely be removed or kept for compatibility if used elsewhere,
-   but ShipSheet uses swse-* classes now. I'll keep them just in case. */
+/* Global Font Overrides for Rebels Vibe */
+body {
+    font-family: 'Chakra Petch', 'Roboto', sans-serif;
+}
+
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+.q-toolbar__title, .q-card__section--vert > .text-h6 {
+    font-family: 'Russo One', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Rebels Theme Colors & Textures */
+.bg-grey-10 {
+    background-color: #121212 !important; /* Darker background */
+    background-image: radial-gradient(circle at 50% 50%, #1d1d1d 0%, #0d0d0d 100%);
+}
+
+.q-card {
+    border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.q-card__section {
+    border-bottom: 1px solid #333;
+}
+
+/* Distressed/Industrial Look for dialogs and cards */
+.q-dialog .q-card {
+    border: 2px solid #444;
+    border-radius: 2px;
+}
+
+/* Previous placeholder classes */
 .stat-block {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Chakra Petch', sans-serif;
     border: 2px solid #333;
     padding: 1rem;
     max-width: 800px;
@@ -50,59 +82,62 @@
     color: #888;
 }
 
-/* SWSE Ship Sheet Styles */
+/* SWSE Ship Sheet Styles - Datapad Style */
 .swse-block {
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    border: 2px solid #2c3e50;
-    background-color: #fff;
+    font-family: 'Chakra Petch', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    border: 4px solid #2c3e50;
+    background-color: #fdfcf5; /* Slightly aged paper/screen look */
     color: #333;
     padding: 0;
     max-width: 800px;
     margin: 0 auto;
     font-size: 14px;
     line-height: 1.4;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    position: relative;
 }
 
 .swse-header {
     background-color: #2c3e50;
-    color: #fff;
-    padding: 10px 15px;
-    font-weight: 700;
-    font-size: 1.4em;
+    color: #FF5722; /* Orange Accent */
+    padding: 15px 20px;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.6em;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 2px solid #FF5722;
 }
 
 .swse-sub {
     font-style: italic;
-    padding: 6px 15px;
+    padding: 8px 20px;
     border-bottom: 2px solid #2c3e50;
-    margin-bottom: 10px;
-    background-color: #ecf0f1;
+    margin-bottom: 15px;
+    background-color: #eceff1;
     color: #2c3e50;
     font-weight: 500;
 }
 
 .sheet-body {
-    padding: 0 15px 15px 15px;
+    padding: 0 20px 20px 20px;
 }
 
 .section-title {
     color: #2c3e50;
-    font-weight: 700;
-    border-bottom: 1px solid #2c3e50;
-    margin: 12px 0 6px 0;
+    font-family: 'Russo One', sans-serif;
+    font-weight: 400;
+    border-bottom: 2px solid #FF5722;
+    margin: 15px 0 8px 0;
     text-transform: uppercase;
-    font-size: 1.1em;
-    letter-spacing: 0.5px;
+    font-size: 1.2em;
+    letter-spacing: 1px;
 }
 
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
+    gap: 10px;
     margin: 5px 0;
 }
 
@@ -112,19 +147,21 @@
 }
 
 .weapon-line {
-    padding: 4px 8px;
-    border-left: 4px solid #e74c3c;
-    background-color: #fdf2f1;
-    margin-bottom: 4px;
+    padding: 6px 10px;
+    border-left: 5px solid #FF5722;
+    background-color: #fff3e0;
+    margin-bottom: 6px;
     border-radius: 0 4px 4px 0;
 }
 
 .cost-line {
-    margin-top: 20px;
-    padding-top: 10px;
+    margin-top: 25px;
+    padding-top: 15px;
     border-top: 2px solid #2c3e50;
     text-align: right;
-    font-size: 1.1em;
+    font-size: 1.2em;
+    font-family: 'Russo One', sans-serif;
+    color: #FF5722;
 }
 
 /* Print Overrides */
@@ -134,11 +171,13 @@
         box-shadow: none;
         margin: 0;
         max-width: 100%;
+        background-color: white;
     }
     .swse-header {
         background-color: #333 !important;
         color: #fff !important;
         -webkit-print-color-adjust: exact;
+        border-bottom-color: #000;
     }
     .swse-sub {
         background-color: #eee !important;
@@ -148,6 +187,7 @@
     .section-title {
         color: #000;
         border-bottom-color: #000;
+        font-family: sans-serif; /* Fallback for print */
     }
     .weapon-line {
         border-left-color: #000;
@@ -156,9 +196,17 @@
     }
     .cost-line {
         border-top-color: #000;
+        color: #000;
     }
     .bold {
         color: #000;
+    }
+    /* Reset body font for print legibility */
+    body {
+        font-family: sans-serif;
+    }
+    .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+        font-family: sans-serif;
     }
 }
 

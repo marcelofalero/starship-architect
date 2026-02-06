@@ -1,8 +1,8 @@
 import { useShipStore } from './store.js';
 import { i18n, getLocalizedName } from './i18n.js';
-import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper } from './components.js';
+import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog } from './components.js';
 
-const { createApp, ref, computed, onMounted, reactive, watch } = Vue;
+const { createApp, ref, onMounted } = Vue;
 const { createPinia } = Pinia;
 const { useQuasar } = Quasar;
 const { useI18n } = VueI18n;
@@ -10,213 +10,18 @@ const { useI18n } = VueI18n;
 // Main App Setup
 const setup = () => {
     const $q = useQuasar();
-    const { t, locale } = useI18n();
+    const { locale } = useI18n();
     const shipStore = useShipStore();
 
     const centerTab = ref('systems');
     const mobileTab = ref('overview');
-    const hangarTab = ref('stock');
+
+    // Hangar Dialog State (Parent controlled)
     const showHangarDialog = ref(false);
 
     const leftDrawerOpen = ref(true);
     const rightDrawerOpen = ref(true);
-
-    const newComponentCategory = ref(null);
-    const newComponentGroup = ref(null);
-    const newComponentSelection = ref(null);
-    const newComponentNonStandard = ref(false);
-    const fileInput = ref(null);
-    const libraryInput = ref(null);
     const showSheetDialog = ref(false);
-
-    // Custom Component State
-    const newCustomComponent = reactive({
-        name: '',
-        category: 'Weapon Systems',
-        group: '',
-        type: 'weapon',
-        baseCost: 0,
-        baseEp: 0,
-        sizeMult: false,
-        stats: {}
-        // Dynamic root properties like exclusiveGroup, damage, etc. are added directly
-    });
-
-    // Property Definitions
-    const propertyDefinitions = [
-        // Root Properties
-        { label: 'Damage', key: 'damage', type: 'string', location: 'root' },
-        { label: 'Damage Type', key: 'damageType', type: 'string', location: 'root' },
-        { label: 'Description', key: 'description', type: 'text', location: 'root' },
-        { label: 'Exclusive Group', key: 'exclusiveGroup', type: 'exclusive_select', location: 'root' },
-        { label: 'Min Ship Size', key: 'minShipSize', type: 'size_select', location: 'root' },
-        { label: 'Max Ship Size', key: 'maxSize', type: 'size_select', location: 'root' },
-
-        // Upgrade Specs (Weapons/Systems)
-        {
-            label: 'Modification Options',
-            key: 'componentOptions',
-            type: 'multiselect',
-            location: 'upgradeSpecs',
-            options: [
-                { label: 'Multi-Barrel (Twin/Quad)', value: 'weapon.multibarrel' },
-                { label: 'Fire-Link', value: 'weapon.fireLink' },
-                { label: 'Enhancement', value: 'weapon.enhancement' },
-                { label: 'Battery', value: 'weapon.battery' },
-                { label: 'Autofire', value: 'weapon.autofire' },
-                { label: 'Recall Circuit', value: 'slaveCircuits.recall' }
-            ]
-        },
-
-        // Stats
-        { label: 'Shield Rating (Set)', key: 'sr', type: 'number', location: 'stats' },
-        { label: 'Shield Bonus (Add)', key: 'sr_bonus', type: 'number', location: 'stats' },
-        { label: 'Armor Bonus (Add)', key: 'armor_bonus', type: 'number', location: 'stats' },
-        { label: 'HP (Set)', key: 'hp', type: 'number', location: 'stats' },
-        { label: 'Speed (Set)', key: 'speed', type: 'number', location: 'stats' },
-        { label: 'Hyperdrive Class (Set)', key: 'hyperdrive', type: 'number', location: 'stats' },
-        { label: 'Dex Bonus (Add)', key: 'dex_bonus', type: 'number', location: 'stats' },
-        { label: 'Str Bonus (Add)', key: 'str_bonus', type: 'number', location: 'stats' },
-        { label: 'Perception Bonus (Add)', key: 'perception_bonus', type: 'number', location: 'stats' },
-        { label: 'EP Modifier %', key: 'ep_dynamic_pct', type: 'number', location: 'stats' },
-        { label: 'Cargo Factor', key: 'cargo_factor', type: 'number', location: 'stats' }
-    ];
-
-    const propertyToAdd = ref(null); // Selected property definition
-    const activeProperties = ref([]); // Array of { key, def, value } to manage UI state
-
-    const groupOptionsFiltered = ref([]);
-    const exclusiveOptionsFiltered = ref([]);
-
-    const filterGroupFn = (val, update) => {
-        update(() => {
-            const groups = [...new Set(shipStore.allEquipment.map(e => e.group))];
-            if (val === '') {
-                groupOptionsFiltered.value = groups;
-            } else {
-                const needle = val.toLowerCase();
-                groupOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(needle) > -1);
-            }
-        });
-    };
-
-    const filterExclusiveFn = (val, update) => {
-        update(() => {
-            const groups = [...new Set(shipStore.allEquipment.map(e => e.exclusiveGroup).filter(g => g))];
-            if (val === '') {
-                exclusiveOptionsFiltered.value = groups;
-            } else {
-                const needle = val.toLowerCase();
-                exclusiveOptionsFiltered.value = groups.filter(v => v && v.toLowerCase().indexOf(needle) > -1);
-            }
-        });
-    };
-
-    const stockFighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
-    const stockFreighters = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
-    const stockCapitals = computed(() => shipStore.db.STOCK_SHIPS.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
-
-    const categoryOptions = computed(() => {
-        const cats = [...new Set(shipStore.allEquipment.map(e => e.category))];
-        return cats.map(c => ({ label: t('cat.' + (c === 'Weapon Systems' ? 'weapons' : c === 'Movement Systems' ? 'movement' : c === 'Defense Systems' ? 'defense' : c === 'Modifications' ? 'components' : 'accessories')), value: c }));
-    });
-
-    const groupOptions = computed(() => {
-        if (!newComponentCategory.value) return [];
-        const groups = [...new Set(shipStore.allEquipment.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
-        return groups.map(g => ({ label: g, value: g }));
-    });
-
-    const itemOptions = computed(() => {
-        if (!newComponentGroup.value) return [];
-        return shipStore.allEquipment.filter(e => e.group === newComponentGroup.value).map(e => ({
-            ...e,
-            label: getLocalizedName(e)
-        }));
-    });
-
-    const selectedItemDef = computed(() => {
-        if (!newComponentSelection.value) return null;
-        return shipStore.allEquipment.find(e => e.id === newComponentSelection.value);
-    });
-
-    const isSizeValid = (itemDef) => {
-        const shipIndex = shipStore.db.SIZE_RANK.indexOf(shipStore.chassis.size);
-
-        if (itemDef.maxSize) {
-            const rankIndex = shipStore.db.SIZE_RANK.indexOf(itemDef.maxSize);
-            if (shipIndex > rankIndex) return false;
-        }
-
-        if (itemDef.minShipSize) {
-            const minRankIndex = shipStore.db.SIZE_RANK.indexOf(itemDef.minShipSize);
-            if (shipIndex < minRankIndex) return false;
-        }
-
-        return true;
-    };
-
-    const previewCost = computed(() => {
-        if (!selectedItemDef.value) return 0;
-        return shipStore.getComponentCost({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
-    });
-
-    const previewEp = computed(() => {
-        if (!selectedItemDef.value) return 0;
-        return shipStore.getComponentEp({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
-    });
-
-    const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
-    const toggleLang = () => { locale.value = locale.value === 'en' ? 'es' : 'en'; };
-
-    // Watch for Custom Dialog Open/Edit
-    watch(() => shipStore.customDialogState.visible, (visible) => {
-        if (visible) {
-            activeProperties.value = [];
-            if (shipStore.customDialogState.componentId) {
-                const existing = shipStore.customComponents.find(c => c.id === shipStore.customDialogState.componentId);
-                if (existing) {
-                    // Core Fields
-                    Object.assign(newCustomComponent, {
-                        name: existing.name,
-                        category: existing.category,
-                        group: existing.group,
-                        type: existing.type,
-                        baseCost: existing.baseCost,
-                        baseEp: existing.baseEp,
-                        sizeMult: existing.sizeMult,
-                        stats: {} // Will be populated by activeProperties logic
-                    });
-
-                    // Populate Active Properties from Existing Data
-                    propertyDefinitions.forEach(def => {
-                        let val = undefined;
-                        if (def.location === 'root' && existing[def.key] !== undefined && existing[def.key] !== null) {
-                            val = existing[def.key];
-                        } else if (def.location === 'stats' && existing.stats && existing.stats[def.key] !== undefined) {
-                            val = existing.stats[def.key];
-                        } else if (def.location === 'upgradeSpecs' && existing.upgradeSpecs && existing.upgradeSpecs[def.key] !== undefined) {
-                            val = existing.upgradeSpecs[def.key];
-                        }
-
-                        if (val !== undefined) {
-                            activeProperties.value.push({
-                                key: def.key,
-                                def: def,
-                                value: val
-                            });
-                        }
-                    });
-                }
-            } else {
-                // Reset for Create
-                Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
-                activeProperties.value = [];
-            }
-        } else {
-             shipStore.customDialogState.componentId = null;
-        }
-    });
 
     onMounted(() => {
         const saved = localStorage.getItem('swse_architect_current_build');
@@ -228,38 +33,7 @@ const setup = () => {
         }
     });
 
-    const installComponent = () => {
-        if(newComponentSelection.value) {
-            const def = shipStore.allEquipment.find(e => e.id === newComponentSelection.value);
-
-            const doInstall = () => {
-                let loc = 'Installed';
-                if (def) {
-                    if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
-                }
-                shipStore.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
-                newComponentSelection.value = null;
-                newComponentNonStandard.value = false;
-            };
-
-            if (def && !isSizeValid(def)) {
-                $q.dialog({
-                    dark: true,
-                    title: 'Warning',
-                    message: 'This component is not compatible with the ship\'s size class. Install anyway?',
-                    cancel: true,
-                    persistent: true,
-                    color: 'warning'
-                }).onOk(() => {
-                    doInstall();
-                });
-            } else {
-                doInstall();
-            }
-        }
-    };
-
-    const selectStockShip = (id) => { shipStore.createNew(id); showHangarDialog.value = false; }
+    // Toolbar Logic
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -292,158 +66,20 @@ const setup = () => {
     const printSheet = () => { window.print(); };
     const openSheetPreview = () => { showSheetDialog.value = true; };
 
-    // Enhanced Print Trigger with focus and delay for better reliability
     const triggerPrint = () => {
-        // Focus the window first (crucial for some browsers/iframes)
         window.focus();
-
-        // Small timeout to ensure UI updates (like hiding buttons) have rendered
         setTimeout(() => {
             window.print();
         }, 200);
     };
 
+    const toggleLang = () => { locale.value = locale.value === 'en' ? 'es' : 'en'; };
     const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
-    const createCustomComponent = () => {
-        if (!newCustomComponent.name) return;
-
-        const isEdit = !!shipStore.customDialogState.componentId;
-        const id = isEdit ? shipStore.customDialogState.componentId : 'custom_' + crypto.randomUUID();
-
-        const comp = {
-            id,
-            name: newCustomComponent.name,
-            name_es: newCustomComponent.name,
-            category: newCustomComponent.category,
-            group: newCustomComponent.group || 'Custom',
-            type: newCustomComponent.type,
-            baseCost: Number(newCustomComponent.baseCost),
-            baseEp: Number(newCustomComponent.baseEp),
-            sizeMult: newCustomComponent.sizeMult,
-            availability: 'Common',
-            stats: {}
-        };
-
-        // Hydrate from activeProperties
-        activeProperties.value.forEach(prop => {
-            if (prop.def.location === 'root') {
-                comp[prop.key] = prop.value;
-            } else if (prop.def.location === 'stats') {
-                comp.stats[prop.key] = Number(prop.value);
-            } else if (prop.def.location === 'upgradeSpecs') {
-                if (!comp.upgradeSpecs) comp.upgradeSpecs = {};
-                comp.upgradeSpecs[prop.key] = prop.value;
-            }
-        });
-
-        if (isEdit) {
-            shipStore.updateCustomComponent(comp);
-            shipStore.customDialogState.visible = false;
-        } else {
-            shipStore.addCustomComponent(comp);
-            shipStore.customDialogState.visible = false;
-        }
-    };
-
-    const handleLibraryImport = (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (Array.isArray(data)) {
-                    let count = 0;
-                    data.forEach(item => {
-                        // Basic Validation
-                        if (item.name && item.type) {
-                            // Check for duplicates (by name/stats?) For now, always new ID
-                            const newId = 'custom_' + crypto.randomUUID();
-                            const comp = { ...item, id: newId };
-                            shipStore.addCustomComponent(comp);
-                            count++;
-                        }
-                    });
-                    $q.notify({ type: 'positive', message: `Imported ${count} components.` });
-                } else {
-                    $q.notify({ type: 'negative', message: 'Invalid file format. Expected JSON array.' });
-                }
-            } catch (error) {
-                console.error(error);
-                $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
-            }
-            // Clear input
-            if (libraryInput.value) libraryInput.value.value = '';
-        };
-        reader.readAsText(file);
-    };
-
-    const exportCustomLibrary = () => {
-        if (shipStore.customComponents.length === 0) {
-            $q.notify({ type: 'warning', message: 'No custom components to export.' });
-            return;
-        }
-        const jsonStr = JSON.stringify(shipStore.customComponents, null, 2);
-        const blob = new Blob([jsonStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `swse_custom_components.json`;
-        a.click();
-    };
-
-    const deleteCustomComponent = (id) => {
-        if (shipStore.isCustomComponentInstalled(id)) {
-            $q.notify({ type: 'warning', message: 'Cannot delete: Component is currently installed on the ship. Uninstall it first.' });
-            return;
-        }
-        $q.dialog({
-            dark: true,
-            title: 'Confirm Deletion',
-            message: 'Are you sure you want to delete this custom component?',
-            cancel: true,
-            persistent: true,
-            color: 'negative'
-        }).onOk(() => {
-            shipStore.removeCustomComponent(id);
-        });
-    };
-
-    const addPropertyToCustomComponent = () => {
-        if (!propertyToAdd.value) return;
-
-        // Check duplicate
-        if (activeProperties.value.find(p => p.key === propertyToAdd.value.key)) return;
-
-        // Default value based on type
-        let defaultVal = '';
-        if (propertyToAdd.value.type === 'number') defaultVal = 0;
-        if (propertyToAdd.value.type === 'boolean') defaultVal = true;
-        if (propertyToAdd.value.type === 'multiselect') defaultVal = [];
-
-        activeProperties.value.push({
-            key: propertyToAdd.value.key,
-            def: propertyToAdd.value,
-            value: defaultVal
-        });
-        propertyToAdd.value = null;
-    };
-
-    const removePropertyFromCustomComponent = (key) => {
-        activeProperties.value = activeProperties.value.filter(p => p.key !== key);
-    };
-
     return {
-        shipStore, centerTab, mobileTab, hangarTab, showHangarDialog, showSheetDialog,
+        shipStore, centerTab, mobileTab, showHangarDialog, showSheetDialog,
         leftDrawerOpen, rightDrawerOpen,
-        newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard,
-        categoryOptions, groupOptions, itemOptions, selectedItemDef, previewCost, previewEp, resetGroup, isSizeValid,
-        fileInput, libraryInput, stockFighters, stockFreighters, stockCapitals, getLocalizedName, toggleLang,
-        installComponent, selectStockShip, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds,
-        newCustomComponent, propertyDefinitions, propertyToAdd, createCustomComponent, addPropertyToCustomComponent, removePropertyFromCustomComponent,
-        handleLibraryImport, exportCustomLibrary, deleteCustomComponent,
-        groupOptionsFiltered, exclusiveOptionsFiltered, filterGroupFn, filterExclusiveFn, activeProperties
+        toggleLang, handleFileUpload, exportYaml, printSheet, openSheetPreview, triggerPrint, formatCreds
     };
 };
 
@@ -456,13 +92,35 @@ fetch('data.json')
         });
 
         app.use(createPinia());
-        app.use(Quasar);
+
+        // Quasar Config with Rebels Theme
+        app.use(Quasar, {
+            config: {
+                brand: {
+                    primary: '#FF5722',   // Deep Orange (Rebels)
+                    secondary: '#263238', // Dark Blue Grey
+                    accent: '#FF9100',    // Orange Accent
+                    dark: '#1d1d1d',
+                    positive: '#21ba45',
+                    negative: '#c10015',
+                    info: '#31ccec',
+                    warning: '#f2c037'
+                }
+            }
+        });
+
         app.use(i18n);
 
         app.component('stat-panel', StatPanelWrapper);
         app.component('system-list', SystemListWrapper);
         app.component('config-panel', ConfigPanelWrapper);
         app.component('ship-sheet', ShipSheetWrapper);
+
+        // New Components
+        app.component('hangar-dialog', HangarDialog);
+        app.component('add-mod-dialog', AddModDialog);
+        app.component('custom-manager-dialog', CustomManagerDialog);
+        app.component('custom-component-dialog', CustomComponentDialog);
 
         // Initialize Store with Data
         const store = useShipStore();
