@@ -2,7 +2,7 @@
     "SIZE_COST_MULTIPLIERS": {
         "Huge": 1,
         "Gargantuan": 2,
-        "Colossal(transport)": 5,
+        "Colossal (transport)": 5,
         "Colossal (frigate)": 50,
         "Colossal (cruiser)": 500,
         "Colossal (station)": 5000
@@ -10,7 +10,7 @@
     "REFLEX_SIZE_MODS": {
         "Colossal (cruiser)": -10,
         "Colossal (frigate)": -10,
-        "Colossal(transport)": -10,
+        "Colossal (transport)": -10,
         "Gargantuan": -5,
         "Huge": -2
     },
@@ -31,7 +31,7 @@
     "SIZE_RANK": [
         "Huge",
         "Gargantuan",
-        "Colossal(transport)",
+        "Colossal (transport)",
         "Colossal (frigate)",
         "Colossal (cruiser)",
         "Colossal (station)"
@@ -150,8 +150,8 @@
         {
             "id": "gunship",
             "name": "Gunship",
-            "name_es": "Ca\u00f1onera",
-            "size": "Colossal(transport)",
+            "name_es": "Cañonera",
+            "size": "Colossal (transport)",
             "cost": 200000,
             "baseEp": 20,
             "stats": {
@@ -178,7 +178,7 @@
             "id": "shuttle",
             "name": "Shuttle",
             "name_es": "Lanzadera",
-            "size": "Colossal(transport)",
+            "size": "Colossal (transport)",
             "cost": 50000,
             "baseEp": 5,
             "stats": {
@@ -207,7 +207,7 @@
             "id": "light_freighter",
             "name": "Light Freighter",
             "name_es": "Carguero Ligero",
-            "size": "Colossal(transport)",
+            "size": "Colossal (transport)",
             "cost": 20000,
             "baseEp": 5,
             "stats": {
@@ -381,7 +381,7 @@
             "id": "citadel",
             "name": "Citadel-class Cruiser",
             "name_es": "Crucero clase Ciudadela",
-            "size": "Colossal(transport)",
+            "size": "Colossal (transport)",
             "cost": 205000,
             "baseEp": 30,
             "stats": {
@@ -420,7 +420,7 @@
             "id": "gozanti",
             "name": "Gozanti-class Cruiser",
             "name_es": "Crucero clase Gozanti",
-            "size": "Colossal(transport)",
+            "size": "Colossal (transport)",
             "cost": 150000,
             "baseEp": 1,
             "stats": {
@@ -499,11 +499,11 @@
         {
             "id": "laser_light",
             "name": "Light Laser Cannon (3d10x2)",
-            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Ligero (3d10x2)",
+            "name_es": "Cañón Láser Ligero (3d10x2)",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "type": "weapon",
-            "baseCost": 1000,
+            "baseCost": 1500,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Licensed",
@@ -517,11 +517,11 @@
         {
             "id": "laser_med",
             "name": "Medium Laser Cannon (4d10x2)",
-            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Mediano (4d10x2)",
+            "name_es": "Cañón Láser Mediano (4d10x2)",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "type": "weapon",
-            "baseCost": 2500,
+            "baseCost": 4000,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Restricted",
@@ -535,11 +535,11 @@
         {
             "id": "laser_hvy",
             "name": "Heavy Laser Cannon (5d10x2)",
-            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Pesado (5d10x2)",
+            "name_es": "Cañón Láser Pesado (5d10x2)",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "type": "weapon",
-            "baseCost": 4000,
+            "baseCost": 6000,
             "baseEp": 2,
             "sizeMult": false,
             "availability": "Military",
@@ -557,7 +557,7 @@
             "category": "Weapon Systems",
             "group": "Launchers",
             "type": "weapon",
-            "baseCost": 3000,
+            "baseCost": 2500,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Restricted",
@@ -581,7 +581,7 @@
         {
             "id": "ion_cannon_light",
             "name": "Light Ion Cannon (3d10x2)",
-            "name_es": "Ca\u00f1\u00f3n de Iones Ligero (3d10x2)",
+            "name_es": "Cañón de Iones Ligero (3d10x2)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
@@ -599,7 +599,7 @@
         {
             "id": "ion_cannon",
             "name": "Medium Ion Cannon (5d10x2)",
-            "name_es": "Ca\u00f1\u00f3n de Iones Mediano (5d10x2)",
+            "name_es": "Cañón de Iones Mediano (5d10x2)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
@@ -617,7 +617,7 @@
         {
             "id": "ion_cannon_hvy",
             "name": "Heavy Ion Cannon (3d10x5)",
-            "name_es": "Ca\u00f1\u00f3n de Iones Pesado (3d10x5)",
+            "name_es": "Cañón de Iones Pesado (3d10x5)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
@@ -636,7 +636,7 @@
         {
             "id": "ion_cannon_hapan",
             "name": "Hapan Triple Ion Cannon (5d10x5)",
-            "name_es": "Ca\u00f1\u00f3n de Iones Triple Hapan (5d10x5)",
+            "name_es": "Cañón de Iones Triple Hapan (5d10x5)",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "type": "weapon",
@@ -654,7 +654,7 @@
         {
             "id": "concussion_missile_light",
             "name": "Light Concussion Missile Launcher (7d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Ligero (7d10x2)",
+            "name_es": "Lanzador de Misiles de Concusión Ligero (7d10x2)",
             "category": "Weapon Systems",
             "group": "Launchers",
             "type": "weapon",
@@ -682,7 +682,7 @@
         {
             "id": "concussion_missile",
             "name": "Medium Concussion Missile Launcher (9d10x2)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Mediano (9d10x2)",
+            "name_es": "Lanzador de Misiles de Concusión Mediano (9d10x2)",
             "category": "Weapon Systems",
             "group": "Launchers",
             "type": "weapon",
@@ -710,7 +710,7 @@
         {
             "id": "concussion_missile_hvy",
             "name": "Heavy Concussion Missile Launcher (9d10x5)",
-            "name_es": "Lanzador de Misiles de Concusi\u00f3n Pesado (9d10x5)",
+            "name_es": "Lanzador de Misiles de Concusión Pesado (9d10x5)",
             "category": "Weapon Systems",
             "group": "Launchers",
             "type": "weapon",
@@ -718,7 +718,7 @@
             "baseEp": 20,
             "sizeMult": false,
             "availability": "Military",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "upgradeSpecs": {
                 "payload": {
                     "type": "capacity",
@@ -744,7 +744,7 @@
             "group": "Tactical",
             "type": "weapon",
             "baseCost": 10000,
-            "baseEp": 1,
+            "baseEp": 10,
             "sizeMult": false,
             "availability": "Common",
             "description": "Tractor Beams prevent another Vehicle from escaping instead of dealing damage. If the attack hits, make an opposed Grapple check. Smaller targets are immobilized and lose Dex bonus. Larger targets can be pulled closer. Docking Clamps allow boarding."
@@ -752,7 +752,7 @@
         {
             "id": "atmos_thrusters",
             "name": "Atmospheric Thrusters",
-            "name_es": "Propulsores Atmosf\u00e9ricos",
+            "name_es": "Propulsores Atmosféricos",
             "category": "Movement Systems",
             "group": "Thrusters",
             "type": "system",
@@ -767,7 +767,7 @@
         {
             "id": "atmos_thrusters_adv",
             "name": "Atmospheric Thrusters (Advanced)",
-            "name_es": "Propulsores Atmosf\u00e9ricos (Avanzados)",
+            "name_es": "Propulsores Atmosféricos (Avanzados)",
             "category": "Movement Systems",
             "group": "Thrusters",
             "type": "system",
@@ -791,7 +791,7 @@
             "sizeMult": true,
             "availability": "Military",
             "description": "Often used by smugglers, bounty hunters, and blockade runners. A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense.",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "maxSize": "Colossal (station)"
         },
         {
@@ -826,7 +826,7 @@
             "stats": {
                 "dex_bonus": 4
             },
-            "maxSize": "Colossal",
+            "maxSize": "Colossal (transport)",
             "exclusiveGroup": "maneuvering_jets"
         },
         {
@@ -1147,7 +1147,7 @@
                 "speed": 5
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Colossal(transport)",
+            "maxSize": "Colossal (transport)",
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace."
         },
@@ -1306,7 +1306,7 @@
                 "sr": 40
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected."
         },
@@ -1324,7 +1324,7 @@
                 "sr": 45
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected."
         },
@@ -1342,7 +1342,7 @@
                 "sr": 50
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected."
         },
@@ -1360,7 +1360,7 @@
                 "sr": 55
             },
             "exclusiveGroup": "shield",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected."
         },
@@ -1424,7 +1424,7 @@
             "sizeMult": true,
             "availability": "Military",
             "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment.",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "maxSize": "Colossal (station)",
             "exclusiveGroup": "cloaking_device"
         },
@@ -1446,7 +1446,7 @@
         {
             "id": "anti_concussion",
             "name": "Anti-Concussion Field",
-            "name_es": "Campo Anticoncusi\u00f3n",
+            "name_es": "Campo Anticoncusión",
             "category": "Defense Systems",
             "group": "Shields",
             "type": "system",
@@ -1458,7 +1458,7 @@
         {
             "id": "backup_battery",
             "name": "Backup Battery",
-            "name_es": "Bater\u00eda de Respaldo",
+            "name_es": "Batería de Respaldo",
             "category": "Starship Accessories",
             "group": "Power",
             "type": "system",
@@ -1679,7 +1679,7 @@
         {
             "id": "sd_emplacement",
             "name": "Add Emplacement Point",
-            "name_es": "A\u00f1adir Punto de Emplazamiento",
+            "name_es": "Añadir Punto de Emplazamiento",
             "category": "Modifications",
             "group": "Starship Designer",
             "type": "modification",
@@ -1757,8 +1757,8 @@
             "category": "Starship Accessories",
             "group": "Communications",
             "type": "system",
-            "baseCost": 30000,
-            "baseEp": 5,
+            "baseCost": 50000,
+            "baseEp": 4,
             "sizeMult": false,
             "availability": "Military",
             "description": "Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare)."
@@ -1779,11 +1779,11 @@
         {
             "id": "escape_pod",
             "name": "Escape Pod (4 beings)",
-            "name_es": "C\u00e1psula de Escape (4 seres)",
+            "name_es": "Cápsula de Escape (4 seres)",
             "category": "Starship Accessories",
             "group": "Safety",
             "type": "system",
-            "baseCost": 1000,
+            "baseCost": 1200,
             "baseEp": 1,
             "sizeMult": false,
             "availability": "Common",
@@ -1795,11 +1795,11 @@
         {
             "id": "lifeboat_small",
             "name": "Lifeboat, Small",
-            "name_es": "Bote Salvavidas, Peque\u00f1o",
+            "name_es": "Bote Salvavidas, Pequeño",
             "category": "Starship Accessories",
             "group": "Safety",
             "type": "system",
-            "baseCost": 500,
+            "baseCost": 400,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
@@ -1809,22 +1809,22 @@
         {
             "id": "droid_repair_team",
             "name": "Droid Repair Team",
-            "name_es": "Equipo de Reparaci\u00f3n Droide",
+            "name_es": "Equipo de Reparación Droide",
             "category": "Starship Accessories",
             "group": "Damage Control",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 5000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
             "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active.",
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "maxSize": "Colossal (station)"
         },
         {
             "id": "medical_bed",
             "name": "Medical Bed",
-            "name_es": "Cama M\u00e9dica",
+            "name_es": "Cama Médica",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "system",
@@ -1836,21 +1836,21 @@
         {
             "id": "medical_suite",
             "name": "Medical Suite",
-            "name_es": "Suite M\u00e9dica",
+            "name_es": "Suite Médica",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "system",
             "baseCost": 5000,
             "baseEp": 2,
             "sizeMult": false,
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Includes (Size Mod)/5 medical beds and (Size Mod)/50 Bacta Tanks. Medical beds function as Medpac (10 uses), Medical Kit, and Surgery Kit."
         },
         {
             "id": "passenger_conversion",
             "name": "Passenger Conversion",
-            "name_es": "Conversi\u00f3n de Pasajeros",
+            "name_es": "Conversión de Pasajeros",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "system",
@@ -1918,7 +1918,7 @@
             "category": "Starship Accessories",
             "group": "Sensors",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 15000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Licensed",
@@ -1934,7 +1934,8 @@
             "baseCost": 100000,
             "baseEp": 1,
             "sizeMult": true,
-            "availability": "Illegal",
+            "availability": "Military",
+            "minShipSize": "Colossal (transport)",
             "description": "Uses supercooled Tibanna gas. Always Speed 2 (Starship Scale). Range 100 squares before refuel. +5 to DC to detect ship. Moving 2x speed doesn't negate Sensor Baffling."
         },
         {
@@ -1953,7 +1954,7 @@
         {
             "id": "cockpit_ejection",
             "name": "Cockpit Ejection System",
-            "name_es": "Sistema de Eyecci\u00f3n de Cabina",
+            "name_es": "Sistema de Eyección de Cabina",
             "category": "Starship Accessories",
             "group": "Safety",
             "type": "system",
@@ -1966,14 +1967,14 @@
         {
             "id": "cotterdam",
             "name": "Cotterdam",
-            "name_es": "T\u00fanel de Acoplamiento",
+            "name_es": "Túnel de Acoplamiento",
             "category": "Starship Accessories",
             "group": "Docking",
             "type": "system",
             "baseCost": 3000,
             "baseEp": 1,
             "sizeMult": false,
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Flexible tube connecting two Colossal+ ships. Creates tunnel 3 squares long. Maneuvering to connect requires DC 15 Pilot check."
         },
@@ -2006,7 +2007,7 @@
         {
             "id": "grappler_mag",
             "name": "Grappler Mag",
-            "name_es": "Im\u00e1n de Agarre",
+            "name_es": "Imán de Agarre",
             "category": "Weapon Systems",
             "group": "Tactical",
             "type": "weapon",
@@ -2032,7 +2033,7 @@
         {
             "id": "interrogation_chamber",
             "name": "Interrogation Chamber",
-            "name_es": "C\u00e1mara de Interrogatorio",
+            "name_es": "Cámara de Interrogatorio",
             "category": "Starship Accessories",
             "group": "Security",
             "type": "system",
@@ -2097,20 +2098,20 @@
         {
             "id": "sensor_decoy",
             "name": "Sensor Decoy",
-            "name_es": "Se\u00f1uelo de Sensores",
+            "name_es": "Señuelo de Sensores",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "weapon",
             "baseCost": 2000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common",
+            "availability": "Restricted",
             "description": "Missile that emulates a Starship on sensors. DC 25 Use Computer to identify. Revealed by visual range (1-20 squares depending on size). Includes 3 decoys."
         },
         {
             "id": "sensor_mask",
             "name": "Sensor Mask",
-            "name_es": "M\u00e1scara de Sensores",
+            "name_es": "Máscara de Sensores",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "type": "system",
@@ -2188,11 +2189,11 @@
         {
             "id": "slave_circuits",
             "name": "Slave Circuits (Basic)",
-            "name_es": "Circuitos Esclavos (B\u00e1sicos)",
+            "name_es": "Circuitos Esclavos (Básicos)",
             "category": "Starship Accessories",
             "group": "Control",
             "type": "system",
-            "baseCost": 2000,
+            "baseCost": 1000,
             "baseEp": 1,
             "sizeMult": true,
             "availability": "Restricted",
@@ -2206,8 +2207,8 @@
             "category": "Starship Accessories",
             "group": "Control",
             "type": "system",
-            "baseCost": 10000,
-            "baseEp": 2,
+            "baseCost": 4000,
+            "baseEp": 1,
             "sizeMult": true,
             "availability": "Military",
             "exclusiveGroup": "slave_circuits",
@@ -2231,8 +2232,8 @@
             "category": "Starship Accessories",
             "group": "Control",
             "type": "system",
-            "baseCost": 20000,
-            "baseEp": 3,
+            "baseCost": 6000,
+            "baseEp": 0,
             "sizeMult": true,
             "availability": "Illegal",
             "exclusiveGroup": "slave_circuits",
@@ -2253,13 +2254,13 @@
         },
         {
             "id": "cargo_pod_small",
-            "name": "Cargo Pod (Small)",
-            "name_es": "M\u00f3dulo de Carga (Peque\u00f1o)",
+            "name": "Cargo Pod (Light)",
+            "name_es": "Módulo de Carga (Pequeño)",
             "category": "Starship Accessories",
             "group": "Storage",
             "type": "cargo",
-            "baseCost": 200,
-            "baseEp": 1,
+            "baseCost": 500,
+            "baseEp": 0,
             "sizeMult": true,
             "availability": "Common",
             "description": "Additional storage space. Adds (Size Mod) x 1 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
@@ -2271,12 +2272,12 @@
         {
             "id": "cargo_pod_med",
             "name": "Cargo Pod (Medium)",
-            "name_es": "M\u00f3dulo de Carga (Mediano)",
+            "name_es": "Módulo de Carga (Mediano)",
             "category": "Starship Accessories",
             "group": "Storage",
             "type": "cargo",
             "baseCost": 1000,
-            "baseEp": 2,
+            "baseEp": 1,
             "sizeMult": true,
             "availability": "Common",
             "description": "Additional storage space. Adds (Size Mod) x 5 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
@@ -2287,13 +2288,13 @@
         },
         {
             "id": "cargo_pod_large",
-            "name": "Cargo Pod (Large)",
-            "name_es": "M\u00f3dulo de Carga (Grande)",
+            "name": "Cargo Pod (Heavy)",
+            "name_es": "Módulo de Carga (Grande)",
             "category": "Starship Accessories",
             "group": "Storage",
             "type": "cargo",
-            "baseCost": 2000,
-            "baseEp": 3,
+            "baseCost": 1500,
+            "baseEp": 2,
             "sizeMult": true,
             "availability": "Common",
             "description": "Additional storage space. Adds (Size Mod) x 10 tons of cargo. Reduces Dexterity by 2 (Min Dex 1).",
@@ -2305,7 +2306,7 @@
         {
             "id": "cargo_jettison",
             "name": "Cargo Jettison System",
-            "name_es": "Sistema de Expulsi\u00f3n de Carga",
+            "name_es": "Sistema de Expulsión de Carga",
             "category": "Starship Accessories",
             "group": "Storage",
             "type": "system",
@@ -2331,16 +2332,13 @@
         {
             "id": "luxury_basic",
             "name": "Luxury Upgrade (Basic)",
-            "name_es": "Mejora de Lujo (B\u00e1sica)",
+            "name_es": "Mejora de Lujo (Básica)",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "modification",
-            "baseCost": 0,
-            "baseEp": 0,
+            "baseCost": 10000,
+            "baseEp": 1,
             "sizeMult": false,
-            "stats": {
-                "cost_dynamic_pct": 0.1
-            },
             "exclusiveGroup": "luxury",
             "availability": "Licensed",
             "description": "Changes a Starship from a harsh travel vehicle to a comfortable home. Includes comfortable beds, wardrobes, recliners, and music systems. Requires monthly maintenance (1/50 of cost)."
@@ -2352,12 +2350,9 @@
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "modification",
-            "baseCost": 0,
-            "baseEp": 0,
+            "baseCost": 20000,
+            "baseEp": 1,
             "sizeMult": false,
-            "stats": {
-                "cost_dynamic_pct": 0.25
-            },
             "exclusiveGroup": "luxury",
             "availability": "Licensed",
             "description": "Makes the ship the equivalent of an upper-scale hotel. Gourmet cooking, quality artwork, and stylish trim. Requires monthly maintenance (1/50 of cost)."
@@ -2369,12 +2364,9 @@
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "modification",
-            "baseCost": 0,
-            "baseEp": 0,
+            "baseCost": 50000,
+            "baseEp": 1,
             "sizeMult": false,
-            "stats": {
-                "cost_dynamic_pct": 0.5
-            },
             "exclusiveGroup": "luxury",
             "availability": "Restricted",
             "description": "Turns a Starship into a palace in space. Increases Crew Quality by one step (max Expert), though this has no effect on hero statistics. Requires monthly maintenance (1/50 of cost)."
@@ -2382,7 +2374,7 @@
         {
             "id": "hangar_bay",
             "name": "Hangar Bay",
-            "name_es": "Bah\u00eda de Hangar",
+            "name_es": "Bahía de Hangar",
             "category": "Starship Accessories",
             "group": "Hangar",
             "type": "system",
@@ -2396,7 +2388,7 @@
         {
             "id": "hangar_bay_concealed",
             "name": "Hangar Bay, Concealed",
-            "name_es": "Bah\u00eda de Hangar, Oculta",
+            "name_es": "Bahía de Hangar, Oculta",
             "category": "Starship Accessories",
             "group": "Hangar",
             "type": "system",
@@ -2410,12 +2402,12 @@
         {
             "id": "cryo_chambers",
             "name": "Cryogenic Chambers (10 units)",
-            "name_es": "C\u00e1maras Criog\u00e9nicas (10 uds)",
+            "name_es": "Cámaras Criogénicas (10 uds)",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "type": "cargo",
-            "baseCost": 5000,
-            "baseEp": 1,
+            "baseCost": 500,
+            "baseEp": 2,
             "sizeMult": false,
             "availability": "Common",
             "description": "Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x."
@@ -2463,7 +2455,7 @@
             "stats": {
                 "armor_bonus": 2
             },
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Restricted",
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case."
@@ -2514,7 +2506,7 @@
             "baseCost": 20000,
             "baseEp": 5,
             "sizeMult": true,
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "A Jamming Array affects all enemy Starships within 6 squares, regardless of size. The penalty on Use Computer checks is -6 for Starfighters, -4 for Space Transports, and -2 for Capital Ships."
         },
@@ -2715,7 +2707,7 @@
             "baseCost": 20000,
             "baseEp": 5,
             "sizeMult": true,
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Restricted",
             "description": "Anti-Boarding Systems include blast doors (DR 10, 250 HP), security cameras, and blaster rifle turrets at vital locations. The system has independent backup power allowing turrets to make up to 50 shots after power loss."
         },
@@ -2742,7 +2734,7 @@
             "baseCost": 4000,
             "baseEp": 2,
             "sizeMult": true,
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Military",
             "exclusiveGroup": "keel",
             "description": "A Reinforced Keel causes the ship to take only half damage from Collisions. If the ship Rams another, it deals +2 damage per die."
@@ -2757,7 +2749,7 @@
             "baseCost": 10000,
             "baseEp": 4,
             "sizeMult": true,
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Military",
             "exclusiveGroup": "keel",
             "description": "Boarding Keels function as Reinforced Keels but can also dock with an enemy ship after a successful ram that moves the target down the Condition Track, allowing boarders to invade."
@@ -2772,14 +2764,14 @@
             "baseCost": 2000,
             "baseEp": 2,
             "sizeMult": true,
-            "minShipSize": "Colossal(transport)",
+            "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Security Bracing protects Passenger Conversions and Escape Pods. When the ship is destroyed by massive damage, subtract the ship's DR from damage dealt to anyone in the protected area."
         },
         {
             "id": "turbolaser_light",
             "name": "Light Turbolaser (3d10x5)",
-            "name_es": "Turbol\u00e1ser Ligero (3d10x5)",
+            "name_es": "Turboláser Ligero (3d10x5)",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "type": "weapon",
@@ -2798,7 +2790,7 @@
         {
             "id": "turbolaser_med",
             "name": "Medium Turbolaser (5d10x5)",
-            "name_es": "Turbol\u00e1ser Mediano (5d10x5)",
+            "name_es": "Turboláser Mediano (5d10x5)",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "type": "weapon",
@@ -2817,7 +2809,7 @@
         {
             "id": "turbolaser_hvy",
             "name": "Heavy Turbolaser (7d10x5)",
-            "name_es": "Turbol\u00e1ser Pesado (7d10x5)",
+            "name_es": "Turboláser Pesado (7d10x5)",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "type": "weapon",
@@ -2836,7 +2828,7 @@
         {
             "id": "blaster_cannon_light",
             "name": "Light Blaster Cannon (3d10x2)",
-            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Ligero (3d10x2)",
+            "name_es": "Cañón Bláster Ligero (3d10x2)",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "type": "weapon",
@@ -2854,7 +2846,7 @@
         {
             "id": "blaster_cannon_med",
             "name": "Medium Blaster Cannon (4d10x2)",
-            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Mediano (4d10x2)",
+            "name_es": "Cañón Bláster Mediano (4d10x2)",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "type": "weapon",
@@ -2872,7 +2864,7 @@
         {
             "id": "blaster_cannon_hvy",
             "name": "Heavy Blaster Cannon (5d10x2)",
-            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Pesado (5d10x2)",
+            "name_es": "Cañón Bláster Pesado (5d10x2)",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "type": "weapon",
@@ -2890,7 +2882,7 @@
         {
             "id": "harpoon_gun",
             "name": "Harpoon Gun",
-            "name_es": "Ca\u00f1\u00f3n Arp\u00f3n",
+            "name_es": "Cañón Arpón",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "type": "weapon",
@@ -2903,7 +2895,7 @@
         {
             "id": "docking_gun",
             "name": "Docking Gun Mount",
-            "name_es": "Montaje de Ca\u00f1\u00f3n de Atraque",
+            "name_es": "Montaje de Cañón de Atraque",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "type": "weapon",
@@ -2929,7 +2921,7 @@
         {
             "id": "cannon_enhancements",
             "name": "Cannon Enhancements",
-            "name_es": "Mejoras de Ca\u00f1\u00f3n",
+            "name_es": "Mejoras de Cañón",
             "category": "Modifications",
             "group": "Weapon Upgrades",
             "type": "upgrade",
@@ -2942,7 +2934,7 @@
         {
             "id": "cannon_enhancements_adv",
             "name": "Cannon Enhancements (Advanced)",
-            "name_es": "Mejoras de Ca\u00f1\u00f3n (Avanzadas)",
+            "name_es": "Mejoras de Cañón (Avanzadas)",
             "category": "Modifications",
             "group": "Weapon Upgrades",
             "type": "upgrade",
@@ -2998,7 +2990,7 @@
             "type": "weapon",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
-            "baseCost": 500,
+            "baseCost": 5000,
             "sizeMult": true,
             "baseEp": 1,
             "damage": "6d10x2",
@@ -3133,9 +3125,9 @@
             "type": "weapon",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
-            "baseCost": 1500,
+            "baseCost": 5000,
             "sizeMult": true,
-            "baseEp": 1,
+            "baseEp": 2,
             "damage": "4d10x2",
             "damageType": "Energy",
             "availability": "Military",
@@ -3289,7 +3281,7 @@
         {
             "id": "mass_driver_hvy",
             "name": "Heavy Mass-Driver Cannon",
-            "name_es": "Ca\u00f1\u00f3n Mass-Driver Pesado",
+            "name_es": "Cañón Mass-Driver Pesado",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "type": "weapon",
@@ -3305,7 +3297,7 @@
         {
             "id": "autoblaster_upgrade",
             "name": "Autoblaster Modification",
-            "name_es": "Modificaci\u00f3n Autobl\u00e1ster",
+            "name_es": "Modificación Autobláster",
             "category": "Modifications",
             "group": "Weapon Upgrades",
             "type": "upgrade",
@@ -3319,7 +3311,7 @@
         {
             "id": "heavy_ordnance_launcher",
             "name": "Heavy Ordnance Launcher",
-            "name_es": "Lanzador de Artiller\u00eda Pesada",
+            "name_es": "Lanzador de Artillería Pesada",
             "category": "Weapon Systems",
             "group": "Launchers",
             "type": "weapon",
@@ -3329,7 +3321,7 @@
             "damage": "5d10x5",
             "availability": "Military",
             "description": "Launches heavy ordnance payloads.",
-            "minShipSize": "Colossal",
+            "minShipSize": "Colossal (transport)",
             "upgradeSpecs": {
                 "weaponVariants": true,
                 "fireLinkOption": {
