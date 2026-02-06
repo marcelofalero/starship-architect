@@ -411,8 +411,14 @@
                 "tractor_beam",
                 "docking_clamp",
                 "docking_clamp",
-                "escape_pod",
-                "escape_pod",
+                {
+                    "id": "escape_pod",
+                    "quantity": 3
+                },
+                {
+                    "id": "escape_pod",
+                    "quantity": 3
+                },
                 "holo_transceiver"
             ]
         },
@@ -453,7 +459,7 @@
                 },
                 {
                     "id": "escape_pod",
-                    "quantity": 6
+                    "quantity": 3
                 },
                 "proton_torp"
             ]
@@ -1643,40 +1649,6 @@
             "variableCost": true
         },
         {
-            "id": "mod_cargo_10",
-            "name": "Cargo Config (-25% Cargo)",
-            "name_es": "Config. Carga (-25% Carga)",
-            "category": "Modifications",
-            "group": "Hull Config",
-            "type": "modification",
-            "baseCost": 0,
-            "baseEp": 0,
-            "stats": {
-                "ep_dynamic_pct": -0.1,
-                "cargo_factor": 0.75
-            },
-            "exclusiveGroup": "cargo_mod",
-            "availability": "Common",
-            "variableCost": true
-        },
-        {
-            "id": "mod_cargo_20",
-            "name": "Cargo Config (-50% Cargo)",
-            "name_es": "Config. Carga (-50% Carga)",
-            "category": "Modifications",
-            "group": "Hull Config",
-            "type": "modification",
-            "baseCost": 0,
-            "baseEp": 0,
-            "stats": {
-                "ep_dynamic_pct": -0.2,
-                "cargo_factor": 0.5
-            },
-            "exclusiveGroup": "cargo_mod",
-            "availability": "Common",
-            "variableCost": true
-        },
-        {
             "id": "sd_emplacement",
             "name": "Add Emplacement Point",
             "name_es": "Añadir Punto de Emplazamiento",
@@ -1778,8 +1750,8 @@
         },
         {
             "id": "escape_pod",
-            "name": "Escape Pod (4 beings)",
-            "name_es": "Cápsula de Escape (4 seres)",
+            "name": "Escape Pod (8 beings)",
+            "name_es": "Cápsula de Escape (8 seres)",
             "category": "Starship Accessories",
             "group": "Safety",
             "type": "system",
@@ -3328,6 +3300,20 @@
                     "cost": 1000
                 }
             }
+        },
+        {
+            "id": "lifeboat_large",
+            "name": "Lifeboat, Large",
+            "name_es": "Bote Salvavidas, Grande",
+            "category": "Starship Accessories",
+            "group": "Safety",
+            "type": "system",
+            "baseCost": 400,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "minShipSize": "Colossal (frigate)",
+            "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger."
         }
     ]
 }
