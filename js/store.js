@@ -15,6 +15,7 @@ export const useShipStore = defineStore('ship', () => {
     });
 
     // App State
+    const isAdmin = ref(new URLSearchParams(window.location.search).get('admin') === 'true');
     const meta = reactive({ name: 'Untitled Ship', version: '1.0' });
     const chassisId = ref('light_fighter');
     const activeTemplate = ref(null);
@@ -392,6 +393,21 @@ export const useShipStore = defineStore('ship', () => {
     function isCustomComponentInstalled(componentId) {
         return installedComponents.value.some(m => m.defId === componentId);
     }
+    function updateEquipment(newDef) {
+        const idx = db.EQUIPMENT.findIndex(e => e.id === newDef.id);
+        if (idx !== -1) {
+            db.EQUIPMENT[idx] = newDef;
+        }
+    }
+    function downloadDataJson() {
+        const jsonStr = JSON.stringify(db, null, 4);
+        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data.json';
+        a.click();
+    }
     function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
@@ -447,6 +463,7 @@ export const useShipStore = defineStore('ship', () => {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
-        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage
+        addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
+        isAdmin
     };
 });

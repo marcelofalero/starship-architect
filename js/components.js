@@ -188,6 +188,11 @@ const ConfigPanel = {
             <div class="text-h6 q-mb-sm">{{ $t('ui.template') }}</div>
             <q-select filled dark v-model="store.activeTemplate" :options="templateOptions" :label="$t('ui.template')" emit-value map-options dense options-dense><template v-slot:prepend><q-icon name="layers" /></template></q-select>
         </q-card-section>
+
+        <q-separator dark v-if="store.isAdmin" />
+        <q-card-section v-if="store.isAdmin" class="col-auto">
+             <q-btn outline color="accent" label="Download Data.json" @click="store.downloadDataJson" class="full-width" icon="download" />
+        </q-card-section>
     </q-card>
 
     <q-dialog v-model="showEpDialog">
@@ -456,6 +461,10 @@ export const AddModDialog = {
                         </div>
                     </div>
                     <div v-if="selectedItemDef.sizeMult && !selectedItemDef.variableCost" class="text-xs text-grey-5 q-mt-xs">* {{ $t('ui.size_mult_msg', { size: store.chassis.size }) }}</div>
+                    <div v-if="store.isAdmin" class="row q-gutter-sm q-mt-sm justify-end">
+                        <q-btn flat dense icon="open_in_new" label="Wiki" color="info" @click="openWiki"></q-btn>
+                        <q-btn flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
+                    </div>
                 </q-card>
             </q-card-section>
             <q-card-actions align="right">
@@ -464,6 +473,27 @@ export const AddModDialog = {
                 <q-btn unelevated :label="$t('ui.install')" color="positive" @click="installComponent" v-close-popup :disable="!newComponentSelection"></q-btn>
             </q-card-actions>
         </q-card>
+        <q-dialog v-model="showJsonEditor" persistent>
+            <q-card class="bg-grey-9 text-white" style="min-width: 600px; max-width: 90vw;">
+                <q-card-section>
+                    <div class="text-h6">Edit Component JSON</div>
+                </q-card-section>
+                <q-card-section>
+                    <q-input
+                        v-model="jsonContent"
+                        filled
+                        dark
+                        type="textarea"
+                        autogrow
+                        style="font-family: monospace;"
+                    />
+                </q-card-section>
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancel" color="grey" v-close-popup />
+                    <q-btn flat label="Save" color="primary" @click="saveJson" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </q-dialog>
     `,
     setup() {
@@ -554,6 +584,34 @@ export const AddModDialog = {
         const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
+        const showJsonEditor = ref(false);
+        const jsonContent = ref('');
+
+        const openWiki = () => {
+            if (selectedItemDef.value) {
+                const name = selectedItemDef.value.name.replace(/ /g, '_');
+                window.open(`https://swse.fandom.com/wiki/${name}`, '_blank');
+            }
+        };
+
+        const openJsonEditor = () => {
+            if (selectedItemDef.value) {
+                jsonContent.value = JSON.stringify(selectedItemDef.value, null, 4);
+                showJsonEditor.value = true;
+            }
+        };
+
+        const saveJson = () => {
+            try {
+                const newDef = JSON.parse(jsonContent.value);
+                store.updateEquipment(newDef);
+                showJsonEditor.value = false;
+                $q.notify({ type: 'positive', message: 'Component updated' });
+            } catch (e) {
+                $q.notify({ type: 'negative', message: 'Invalid JSON' });
+            }
+        };
+
         const installComponent = () => {
             if(newComponentSelection.value) {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
@@ -585,7 +643,9 @@ export const AddModDialog = {
             }
         };
 
-        return { store, newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard, categoryOptions, groupOptions, itemOptions, selectedItemDef, isSizeValid, previewCost, previewEp, resetGroup, formatCreds, installComponent, getLocalizedName, searchSelection, searchOptions, filterSearch, onSearchSelect };
+        return { store, newComponentCategory, newComponentGroup, newComponentSelection, newComponentNonStandard, categoryOptions, groupOptions, itemOptions, selectedItemDef, isSizeValid, previewCost, previewEp, resetGroup, formatCreds, installComponent, getLocalizedName, searchSelection, searchOptions, filterSearch, onSearchSelect,
+            showJsonEditor, jsonContent, openWiki, openJsonEditor, saveJson
+        };
     }
 };
 
