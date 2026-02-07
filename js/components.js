@@ -625,6 +625,15 @@ export const AddModDialog = {
             try {
                 const newDef = JSON.parse(jsonContent.value);
                 store.updateEquipment(newDef);
+
+                // Update local state if category/group changed so UI reflects it
+                if (newDef.category !== newComponentCategory.value) {
+                    newComponentCategory.value = newDef.category;
+                }
+                if (newDef.group !== newComponentGroup.value) {
+                    newComponentGroup.value = newDef.group;
+                }
+
                 showJsonEditor.value = false;
                 $q.notify({ type: 'positive', message: 'Component updated' });
             } catch (e) {

@@ -115,6 +115,7 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Autoblaster Modification | 2,000 | 0 | No | Restricted | - | Modifies a single-mount weapon to be an Autoblaster. Increases cyclic rate, allowing Autofire but at -2 attack penalty. Cost is 2x the base cost of the weapon. |
 | Cannon Enhancements | 3,000 | 0 | No | Restricted | - | Standard Cannon Enhancements increase damage by +1 die. Costs 2x base weapon cost. |
 | Cannon Enhancements (Advanced) | 6,000 | 0 | No | Restricted | - | Advanced Cannon Enhancements increase damage by +2 dice. Costs 5x base weapon cost. Military availability. |
+| Heavy Ordnance Modification | 2,000 | 0 | No | Military | - | Modifications to standard launchers to fire heavier payloads like Proton Bombs or heavy rockets. Increases damage dice by +1d10 but reduces range by 50%. |
 
 ## Movement Systems
 
@@ -365,11 +366,3 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Heavy Turbolaser (7d10x5) | 20,000 | 10 | No | Military | - | **Damage:** 7d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |
 | Light Turbolaser (3d10x5) | 5,000 | 2 | No | Military | - | **Damage:** 3d10x5<br>Turbolasers require immense power and cooling. Light Turbolasers can be Fire-Linked with Autofire. |
 | Medium Turbolaser (5d10x5) | 10,000 | 5 | No | Military | - | **Damage:** 5d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |
-
-## Weapon Upgrades
-
-### Uncategorized
-
-| Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
-|---|---|---|---|---|---|---|
-| Heavy Ordnance Modification | 2,000 | 0 | No | Military | - | Modifications to standard launchers to fire heavier payloads like Proton Bombs or heavy rockets. Increases damage dice by +1d10 but reduces range by 50%. |

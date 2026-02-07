@@ -2973,13 +2973,14 @@
         {
             "id": "heavy_ordnance_mod",
             "name": "Heavy Ordnance Modification",
-            "category": "Weapon Upgrades",
+            "category": "Modifications",
             "baseCost": 2000,
             "sizeMult": false,
             "baseEp": 0,
             "availability": "Military",
             "description": "Modifications to standard launchers to fire heavier payloads like Proton Bombs or heavy rockets. Increases damage dice by +1d10 but reduces range by 50%.",
-            "location": "Installed"
+            "location": "Installed",
+            "group": "Weapon Upgrades"
         },
         {
             "id": "ion_pulse_cannon",
