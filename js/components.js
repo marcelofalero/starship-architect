@@ -564,7 +564,7 @@ export const AddModDialog = {
 
         const itemOptions = computed(() => {
             if (!newComponentGroup.value) return [];
-            return store.allEquipment.filter(e => e.group === newComponentGroup.value).map(e => ({
+            return store.allEquipment.filter(e => e.group === newComponentGroup.value && e.category === newComponentCategory.value).map(e => ({
                 ...e,
                 label: getLocalizedName(e)
             })).sort((a, b) => a.label.localeCompare(b.label));
