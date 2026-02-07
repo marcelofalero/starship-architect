@@ -129,7 +129,7 @@ const SystemList = {
                         <q-input dark type="number" filled v-model.number="editingInstance.modifications.quantity" label="Quantity" min="1" />
                     </div>
                     <div v-if="getUpgradeSpecs(editingInstance.defId)?.fireLinkOption && (editingInstance.modifications.fireLink || 1) > 1" class="q-mb-md">
-                        <q-checkbox dark v-model="editingInstance.modifications.fireLinkOption" :label="'Selective Fire (+' + format(getUpgradeSpecs(editingInstance.defId).fireLinkOption.cost) + ')'" />
+                        <q-checkbox dark v-model="editingInstance.modifications.fireLinkOption" :label="'Optional Fire-Link (+' + format(getOptionCost(editingInstance.defId, 'fireLinkOption')) + ')'" />
                     </div>
                     <div v-if="canPointBlank(editingInstance.defId)" class="q-mb-md">
                         <q-checkbox dark v-model="editingInstance.modifications.pointBlank" label="Point Blank" />
@@ -1240,6 +1240,41 @@ export const SystemListWrapper = {
             return true;
         };
 
+        const getOptionCost = (defId, key) => {
+             const def = store.allEquipment.find(e => e.id === defId);
+             if (!def) return 0;
+
+             let costDef = null;
+             // 1. Check Component Override
+             if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
+                 costDef = def.upgradeSpecs.optionCosts[key];
+             } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
+                 costDef = def.upgradeSpecs[key].cost;
+             }
+
+             // 2. Check Global Default
+             if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
+                 costDef = store.db.DEFAULT_OPTION_COSTS[key];
+             }
+
+             if (costDef === null) return 0;
+
+             // 3. Calculate Logic
+             if (typeof costDef === 'number') {
+                 return costDef;
+             } else if (typeof costDef === 'object') {
+                 if (costDef.multiplier) {
+                     return def.baseCost * costDef.multiplier;
+                 }
+                 if (costDef.cost) {
+                     let val = costDef.cost;
+                     if (costDef.sizeMult) val *= store.sizeMultVal;
+                     return val;
+                 }
+             }
+             return 0;
+        };
+
         const configModel = computed(() => {
             if (!editingInstance.value || !editingInstance.value.modifications) return {};
             const mods = editingInstance.value.modifications;
@@ -1277,7 +1312,7 @@ export const SystemListWrapper = {
             };
         });
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, checkValidity, configModel };
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, checkValidity, configModel, getOptionCost };
     }
 };
 
