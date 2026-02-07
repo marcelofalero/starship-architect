@@ -395,6 +395,37 @@ export const useShipStore = defineStore('ship', () => {
         }, 0);
     });
 
+    const currentCrew = computed(() => {
+        let crew = chassis.value.logistics.crew || 0;
+        let factor = 1.0;
+
+        installedComponents.value.forEach(instance => {
+            if (instance.defId === 'slave_circuits') factor = Math.min(factor, 0.666);
+            if (instance.defId === 'slave_circuits_adv' || instance.defId === 'slave_circuits_recall') factor = Math.min(factor, 0.333);
+        });
+
+        crew = Math.ceil(crew * factor);
+        if (crew < 1 && (chassis.value.logistics.crew || 0) > 0) crew = 1;
+        return crew;
+    });
+
+    const currentPassengers = computed(() => {
+        let pass = chassis.value.logistics.pass || 0;
+
+        installedComponents.value.forEach(instance => {
+            if (instance.defId === 'passenger_conversion') {
+                // Usually adds sizeMultVal passengers per instance
+                // We must check quantity if present (though upgrades usually don't have quantity unless specified)
+                // Assuming 1 per instance for now unless quantity mod exists
+                let qty = instance.modifications?.quantity || 1;
+                pass += (sizeMultVal.value * qty);
+            }
+        });
+        return pass;
+    });
+
+    const totalPopulation = computed(() => currentCrew.value + currentPassengers.value);
+
     const hasEscapePods = computed(() => {
         if (!chassis.value.size) return false;
         return chassis.value.size.startsWith('Colossal');
@@ -402,6 +433,14 @@ export const useShipStore = defineStore('ship', () => {
 
     const escapePodsEpGain = computed(() => {
         return Math.floor(escapePodsToEpPct.value / 10);
+    });
+
+    const escapePodCount = computed(() => {
+        let pop = totalPopulation.value;
+        if (hasEscapePods.value && escapePodsToEpPct.value > 0) {
+            pop = Math.ceil(pop * (100 - escapePodsToEpPct.value) / 100);
+        }
+        return Math.ceil(pop / 8);
     });
 
     const totalEP = computed(() => {
@@ -555,7 +594,7 @@ export const useShipStore = defineStore('ship', () => {
     return {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, customComponents, allEquipment, customDialogState, showCustomManager,
-        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain,
+        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, totalPopulation, escapePodCount,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         isAdmin, isWeapon, isEngine
     };

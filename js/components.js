@@ -31,6 +31,20 @@ const StatPanel = {
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.dr') }}</div><div class="text-bold">{{ store.currentStats.dr }}</div></div></div>
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.speed') }}</div><div class="text-bold">{{ store.currentStats.speed }}</div></div></div>
             </div>
+            <div class="row q-mt-sm text-caption text-grey">
+                <div class="col-4 text-center">
+                    <div>Crew</div>
+                    <div class="text-white">{{ store.currentCrew }}</div>
+                </div>
+                <div class="col-4 text-center">
+                    <div>Pass</div>
+                    <div class="text-white">{{ store.currentPassengers }}</div>
+                </div>
+                <div class="col-4 text-center">
+                    <div>Esc. Pods</div>
+                    <div class="text-white">{{ store.escapePodCount }}</div>
+                </div>
+            </div>
         </q-card-section>
     </q-card>
     `,
@@ -284,8 +298,8 @@ const ShipSheet = {
 
             <div class="section-title">Logistics</div>
             <div class="stat-grid">
-                <div><span class="bold">Crew</span> {{ store.chassis.logistics.crew }}</div>
-                <div><span class="bold">Passengers</span> {{ store.chassis.logistics.pass }}</div>
+                <div><span class="bold">Crew</span> {{ store.currentCrew }}</div>
+                <div><span class="bold">Passengers</span> {{ store.currentPassengers }}</div>
                 <div><span class="bold">Cargo</span> {{ store.currentCargo }}</div>
                 <div><span class="bold">Consumables</span> {{ store.chassis.logistics.cons }}</div>
             </div>
