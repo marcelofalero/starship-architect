@@ -42,6 +42,18 @@ export const useShipStore = defineStore('ship', () => {
         return db.STOCK_SHIPS.find(s => s.id === chassisId.value) || db.STOCK_SHIPS[0];
     });
 
+    function isWeapon(defId) {
+        const def = allEquipment.value.find(e => e.id === defId);
+        if (!def) return false;
+        return def.category === 'Weapon Systems' || def.id === 'sensor_decoy';
+    }
+
+    function isEngine(defId) {
+        const def = allEquipment.value.find(e => e.id === defId);
+        if (!def) return false;
+        return def.group === 'Sublight Drives' && def.stats && def.stats.speed !== undefined;
+    }
+
     function calculateEp(defId, batteryCount = 1, isNonStandard = false, miniaturization = 0, quantity = 1, mount = 'single', fireLink = 1, enhancement = 'normal') {
         const def = allEquipment.value.find(e => e.id === defId);
         if (!def) return 0;
@@ -369,7 +381,7 @@ export const useShipStore = defineStore('ship', () => {
             if (existing) removeComponent(existing.instanceId);
         }
         const mods = { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
-        if (def.type === 'weapon') mods.weaponUser = 'Pilot';
+        if (isWeapon(def.id)) mods.weaponUser = 'Pilot';
         installedComponents.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: mods });
     }
     function addCustomComponent(component) {
@@ -437,10 +449,10 @@ export const useShipStore = defineStore('ship', () => {
             }
 
             const def = allEquipment.value.find(e => e.id === defId);
-            let loc = 'Installed'; if(def && def.type === 'engine') loc = 'Aft Section';
+            let loc = 'Installed'; if(def && isEngine(def.id)) loc = 'Aft Section';
             if(def) {
                 const mods = { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, quantity: quantity, fireLinkOption: false };
-                if (def.type === 'weapon') mods.weaponUser = 'Pilot';
+                if (isWeapon(def.id)) mods.weaponUser = 'Pilot';
                 installedComponents.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: mods });
             }
         });
@@ -457,7 +469,7 @@ export const useShipStore = defineStore('ship', () => {
             const mods = m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
             if (!mods.quantity) mods.quantity = 1;
             const def = allEquipment.value.find(e => e.id === m.defId);
-            if (def && def.type === 'weapon' && !mods.weaponUser) mods.weaponUser = 'Pilot';
+            if (def && isWeapon(def.id) && !mods.weaponUser) mods.weaponUser = 'Pilot';
             return { instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: mods };
         });
     }
@@ -477,6 +489,6 @@ export const useShipStore = defineStore('ship', () => {
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
-        isAdmin
+        isAdmin, isWeapon, isEngine
     };
 });

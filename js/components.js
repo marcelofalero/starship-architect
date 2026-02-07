@@ -657,9 +657,12 @@ export const AddModDialog = {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
 
                 const doInstall = () => {
-                    let loc = 'Installed';
+                    let loc = 'Internal Bay';
                     if (def) {
-                        if (def.type === 'weapon') loc = 'Hardpoint'; else if (def.type === 'system') loc = 'Internal Bay'; else if (def.type === 'cargo') loc = 'Cargo Hold'; else if (def.type === 'modification') loc = 'Hull Config'; else if (def.type === 'engine') loc = 'Aft Section';
+                        if (store.isWeapon(def.id)) loc = 'Hardpoint';
+                        else if (store.isEngine(def.id)) loc = 'Aft Section';
+                        else if (def.category === 'Modifications' || def.category === 'Weapon Upgrades') loc = 'Installed';
+                        else if (def.group === 'Storage') loc = 'Cargo Hold';
                     }
                     store.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
                     newComponentSelection.value = null;
@@ -714,7 +717,7 @@ export const CustomManagerDialog = {
                         <q-item v-for="comp in store.customComponents" :key="comp.id">
                             <q-item-section>
                                 <q-item-label>{{ comp.name }}</q-item-label>
-                                <q-item-label caption class="text-grey-5">{{ comp.type }} | {{ comp.baseCost }} cr | {{ comp.baseEp }} EP</q-item-label>
+                                <q-item-label caption class="text-grey-5">{{ comp.baseCost }} cr | {{ comp.baseEp }} EP</q-item-label>
                             </q-item-section>
                             <q-item-section side>
                                 <div class="row q-gutter-xs">
@@ -826,14 +829,6 @@ export const CustomComponentDialog = {
                             <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new group</q-item-section></q-item></template>
                         </q-select>
                     </div>
-                    <div class="row items-center q-col-gutter-xs">
-                        <div class="col-grow"><q-select filled dark v-model="newCustomComponent.type" :options="['weapon', 'system', 'engine', 'modification', 'cargo']" label="Type"></q-select></div>
-                        <div class="col-auto">
-                            <q-btn flat round dense icon="info" size="sm" color="grey-5">
-                                <q-tooltip>{{ getTypeHelp(newCustomComponent.type) }}</q-tooltip>
-                            </q-btn>
-                        </div>
-                    </div>
                     <div class="row q-col-gutter-sm">
                         <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number"></q-input></div>
                         <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number"></q-input></div>
@@ -889,16 +884,11 @@ export const CustomComponentDialog = {
     setup() {
         const store = useShipStore();
         const { t } = useI18n();
-        const newCustomComponent = reactive({ name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+        const newCustomComponent = reactive({ name: '', category: 'Weapon Systems', group: '', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
         const activeProperties = ref([]);
         const propertyToAdd = ref(null);
         const groupOptionsFiltered = ref([]);
         const exclusiveOptionsFiltered = ref([]);
-
-        const getTypeHelp = (type) => {
-            if (!type) return t('ui.type_help_default');
-            return t('ui.type_' + type + '_help');
-        };
 
         // Property Definitions (Moved from app.js)
         const propertyDefinitions = [
@@ -977,7 +967,6 @@ export const CustomComponentDialog = {
                 name_es: newCustomComponent.name,
                 category: newCustomComponent.category,
                 group: newCustomComponent.group || 'Custom',
-                type: newCustomComponent.type,
                 baseCost: Number(newCustomComponent.baseCost),
                 baseEp: Number(newCustomComponent.baseEp),
                 sizeMult: newCustomComponent.sizeMult,
@@ -1016,7 +1005,7 @@ export const CustomComponentDialog = {
                     const existing = store.customComponents.find(c => c.id === store.customDialogState.componentId);
                     if (existing) {
                         Object.assign(newCustomComponent, {
-                            name: existing.name, category: existing.category, group: existing.group, type: existing.type,
+                            name: existing.name, category: existing.category, group: existing.group,
                             baseCost: existing.baseCost, baseEp: existing.baseEp, sizeMult: existing.sizeMult, stats: {},
                             id: existing.id, addToCore: false
                         });
@@ -1029,7 +1018,7 @@ export const CustomComponentDialog = {
                         });
                     }
                 } else {
-                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', type: 'weapon', baseCost: 0, baseEp: 0, sizeMult: false, stats: {}, id: '', addToCore: false });
+                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', baseCost: 0, baseEp: 0, sizeMult: false, stats: {}, id: '', addToCore: false });
                     activeProperties.value = [];
                 }
             } else {
@@ -1037,7 +1026,7 @@ export const CustomComponentDialog = {
             }
         });
 
-        return { store, newCustomComponent, activeProperties, propertyToAdd, propertyDefinitions, groupOptionsFiltered, exclusiveOptionsFiltered, categoryOptions, filterGroupFn, filterExclusiveFn, addPropertyToCustomComponent, removePropertyFromCustomComponent, createCustomComponent, getTypeHelp };
+        return { store, newCustomComponent, activeProperties, propertyToAdd, propertyDefinitions, groupOptionsFiltered, exclusiveOptionsFiltered, categoryOptions, filterGroupFn, filterExclusiveFn, addPropertyToCustomComponent, removePropertyFromCustomComponent, createCustomComponent };
     }
 };
 
@@ -1098,10 +1087,10 @@ export const SystemListWrapper = {
         }
         const getIcon = (id) => {
             const e = store.allEquipment.find(e => e.id === id);
-            if (e?.type === 'weapon') return 'gps_fixed';
-            if (e?.type === 'engine') return 'speed';
-            if (e?.type === 'upgrade') return 'upgrade';
-            if (e?.type === 'modification') return 'swap_horiz';
+            if (!e) return 'memory';
+            if (store.isWeapon(e.id)) return 'gps_fixed';
+            if (store.isEngine(e.id)) return 'speed';
+            if (e.category === 'Modifications' || e.category === 'Weapon Upgrades') return 'upgrade';
             return 'memory';
         }
         const getEpDynamic = (id) => {
@@ -1118,8 +1107,7 @@ export const SystemListWrapper = {
             return def && def.category === 'Modifications';
         }
         const isWeapon = (id) => {
-            const def = store.allEquipment.find(e => e.id === id);
-            return def && def.type === 'weapon';
+            return store.isWeapon(id);
         }
         const isLauncher = (id) => {
             const def = store.allEquipment.find(e => e.id === id);
@@ -1276,12 +1264,12 @@ export const ShipSheetWrapper = {
         const getMod = (score) => Math.floor((score - 10) / 2);
         const weapons = computed(() => store.installedComponents.filter(c => {
             const def = store.allEquipment.find(e => e.id === c.defId);
-            return def && def.type === 'weapon';
+            return def && store.isWeapon(def.id);
         }));
         const systemNames = computed(() => {
             const nonWeapons = store.installedComponents.filter(c => {
                 const def = store.allEquipment.find(e => e.id === c.defId);
-                return def && def.type !== 'weapon' && def.type !== 'engine';
+                return def && !store.isWeapon(def.id) && !store.isEngine(def.id);
             });
             if (nonWeapons.length === 0) return i18n.global.t('ui.installed_systems');
             return nonWeapons.map(c => getName(c.defId)).join(', ');

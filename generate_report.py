@@ -47,12 +47,11 @@ def main():
             items.sort(key=lambda x: (x.get('exclusiveGroup', '') or '', x.get('name', '')))
 
             # Create table
-            lines.append("| Name | Type | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |")
-            lines.append("|---|---|---|---|---|---|---|---|")
+            lines.append("| Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |")
+            lines.append("|---|---|---|---|---|---|---|")
 
             for item in items:
                 name = item.get('name', 'Unknown')
-                type_ = item.get('type', '')
                 base_cost = item.get('baseCost', 0)
                 base_ep = item.get('baseEp', 0)
                 size_mult = "Yes" if item.get('sizeMult') else "No"
@@ -84,7 +83,7 @@ def main():
                 except ValueError:
                     cost_str = str(base_cost)
 
-                row = f"| {name} | {type_} | {cost_str} | {base_ep} | {size_mult} | {avail} | {exclusive} | {notes_str} |"
+                row = f"| {name} | {cost_str} | {base_ep} | {size_mult} | {avail} | {exclusive} | {notes_str} |"
                 lines.append(row)
 
             lines.append("")
