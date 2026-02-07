@@ -522,10 +522,11 @@ export const AddModDialog = {
         const newComponentSelection = ref(null);
         const newComponentNonStandard = ref(false);
 
-        // Search State
+        // --- Helper Logic Extracted for Maintainability ---
+
+        // 1. Search Logic
         const searchSelection = ref(null);
         const searchOptions = ref([]);
-
         const filterSearch = (val, update) => {
             if (val === '') {
                 update(() => { searchOptions.value = [] });
@@ -547,6 +548,8 @@ export const AddModDialog = {
             searchSelection.value = null; // Reset search
         };
 
+        // 2. Menu Options Logic (Computed)
+        // Computes available categories based on all equipment
         const categoryOptions = computed(() => {
             const cats = [...new Set(store.allEquipment.map(e => e.category))];
             return cats.map(c => {
@@ -556,12 +559,15 @@ export const AddModDialog = {
             }).sort((a, b) => a.label.localeCompare(b.label));
         });
 
+        // Computes available groups based on selected category
         const groupOptions = computed(() => {
             if (!newComponentCategory.value) return [];
             const groups = [...new Set(store.allEquipment.filter(e => e.category === newComponentCategory.value).map(e => e.group))];
             return groups.map(g => ({ label: g, value: g })).sort((a, b) => a.label.localeCompare(b.label));
         });
 
+        // Computes available items based on selected group AND category
+        // Ensuring strict category check prevents cross-category group pollution
         const itemOptions = computed(() => {
             if (!newComponentGroup.value) return [];
             return store.allEquipment.filter(e => e.group === newComponentGroup.value && e.category === newComponentCategory.value).map(e => ({
@@ -575,6 +581,8 @@ export const AddModDialog = {
             return store.allEquipment.find(e => e.id === newComponentSelection.value);
         });
 
+        // 3. Validation Logic
+        // Checks if component is compatible with ship size
         const isSizeValid = (itemDef) => {
             const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
 
@@ -591,6 +599,7 @@ export const AddModDialog = {
             return true;
         };
 
+        // 4. Cost/EP Preview
         const previewCost = computed(() => {
             if (!selectedItemDef.value) return 0;
             return store.getComponentCost({ defId: selectedItemDef.value.id, miniaturization: 0, isStock: false, isNonStandard: newComponentNonStandard.value });
@@ -604,6 +613,7 @@ export const AddModDialog = {
         const resetGroup = () => { newComponentGroup.value = null; newComponentSelection.value = null; };
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
+        // 5. JSON Editor Logic
         const showJsonEditor = ref(false);
         const jsonContent = ref('');
 
@@ -621,12 +631,14 @@ export const AddModDialog = {
             }
         };
 
+        // Saves JSON edits and updates UI state to reflect changes immediately
         const saveJson = () => {
             try {
                 const newDef = JSON.parse(jsonContent.value);
                 store.updateEquipment(newDef);
 
-                // Update local state if category/group changed so UI reflects it
+                // Explicitly update local component state if category or group changed
+                // This forces the UI menus to refresh and show the item in its new location
                 if (newDef.category !== newComponentCategory.value) {
                     newComponentCategory.value = newDef.category;
                 }
