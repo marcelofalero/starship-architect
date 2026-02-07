@@ -12,6 +12,7 @@ Components are defined in the `EQUIPMENT` array within `data.json`. Each compone
 *   `name`: The display name of the component.
 *   `category`: Used for grouping in the UI (e.g., "Defense Systems", "Movement Systems").
 *   `group`: A sub-grouping (e.g., "Shield Generators", "Sublight Drives").
+*   `location`: The default installation location string (e.g., "Hardpoint", "Internal Bay").
 *   `baseCost`: The base credit cost.
 *   `baseEp`: The base Emplacement Point (EP) cost.
 *   `sizeMult`: Boolean. If `true`, the cost is multiplied by the ship's size multiplier (`SIZE_COST_MULTIPLIERS`).

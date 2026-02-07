@@ -59,7 +59,7 @@ const SystemList = {
                     </q-item-label>
                     <q-item-label caption class="text-grey-5">
                         <span v-if="getEpDynamic(component.defId)" class="text-positive">+{{ Math.abs(getEpDynamic(component.defId)) }} EP</span>
-                        <span v-else-if="store.getComponentEp(component) !== 0">{{ store.getComponentEp(component) }} EP</span>
+                        <span v-else-if="store.getComponentEp(component) !== 0">{{ store.getComponentEp(component) }} EP <span class="text-grey-7">| {{ component.location }}</span></span>
                         <span v-else>{{ component.location }}</span>
                     </q-item-label>
                     <q-item-label v-if="component.modifications" caption class="text-info">
@@ -657,13 +657,7 @@ export const AddModDialog = {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
 
                 const doInstall = () => {
-                    let loc = 'Internal Bay';
-                    if (def) {
-                        if (store.isWeapon(def.id)) loc = 'Hardpoint';
-                        else if (store.isEngine(def.id)) loc = 'Aft Section';
-                        else if (def.category === 'Modifications' || def.category === 'Weapon Upgrades') loc = 'Installed';
-                        else if (def.group === 'Storage') loc = 'Cargo Hold';
-                    }
+                    let loc = def.location || 'Internal Bay';
                     store.addComponent(newComponentSelection.value, loc, newComponentNonStandard.value);
                     newComponentSelection.value = null;
                     newComponentNonStandard.value = false;
@@ -829,6 +823,7 @@ export const CustomComponentDialog = {
                             <template v-slot:no-option><q-item><q-item-section class="text-grey">Type to add new group</q-item-section></q-item></template>
                         </q-select>
                     </div>
+                    <div><q-input filled dark v-model="newCustomComponent.location" label="Location" hint="Default install location"></q-input></div>
                     <div class="row q-col-gutter-sm">
                         <div class="col"><q-input filled dark v-model="newCustomComponent.baseCost" label="Base Cost" type="number"></q-input></div>
                         <div class="col"><q-input filled dark v-model="newCustomComponent.baseEp" label="Base EP" type="number"></q-input></div>
@@ -884,7 +879,7 @@ export const CustomComponentDialog = {
     setup() {
         const store = useShipStore();
         const { t } = useI18n();
-        const newCustomComponent = reactive({ name: '', category: 'Weapon Systems', group: '', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
+        const newCustomComponent = reactive({ name: '', category: 'Weapon Systems', group: '', location: 'Internal Bay', baseCost: 0, baseEp: 0, sizeMult: false, stats: {} });
         const activeProperties = ref([]);
         const propertyToAdd = ref(null);
         const groupOptionsFiltered = ref([]);
@@ -892,6 +887,7 @@ export const CustomComponentDialog = {
 
         // Property Definitions (Moved from app.js)
         const propertyDefinitions = [
+            { label: 'Location', key: 'location', type: 'string', location: 'root' },
             { label: 'Damage', key: 'damage', type: 'string', location: 'root' },
             { label: 'Damage Type', key: 'damageType', type: 'string', location: 'root' },
             { label: 'Description', key: 'description', type: 'text', location: 'root' },
@@ -967,6 +963,7 @@ export const CustomComponentDialog = {
                 name_es: newCustomComponent.name,
                 category: newCustomComponent.category,
                 group: newCustomComponent.group || 'Custom',
+                location: newCustomComponent.location,
                 baseCost: Number(newCustomComponent.baseCost),
                 baseEp: Number(newCustomComponent.baseEp),
                 sizeMult: newCustomComponent.sizeMult,
@@ -1005,7 +1002,7 @@ export const CustomComponentDialog = {
                     const existing = store.customComponents.find(c => c.id === store.customDialogState.componentId);
                     if (existing) {
                         Object.assign(newCustomComponent, {
-                            name: existing.name, category: existing.category, group: existing.group,
+                            name: existing.name, category: existing.category, group: existing.group, location: existing.location,
                             baseCost: existing.baseCost, baseEp: existing.baseEp, sizeMult: existing.sizeMult, stats: {},
                             id: existing.id, addToCore: false
                         });
@@ -1018,7 +1015,7 @@ export const CustomComponentDialog = {
                         });
                     }
                 } else {
-                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', baseCost: 0, baseEp: 0, sizeMult: false, stats: {}, id: '', addToCore: false });
+                    Object.assign(newCustomComponent, { name: '', category: 'Weapon Systems', group: '', location: 'Internal Bay', baseCost: 0, baseEp: 0, sizeMult: false, stats: {}, id: '', addToCore: false });
                     activeProperties.value = [];
                 }
             } else {

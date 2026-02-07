@@ -449,8 +449,8 @@ export const useShipStore = defineStore('ship', () => {
             }
 
             const def = allEquipment.value.find(e => e.id === defId);
-            let loc = 'Installed'; if(def && isEngine(def.id)) loc = 'Aft Section';
             if(def) {
+                let loc = def.location || 'Installed';
                 const mods = { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, quantity: quantity, fireLinkOption: false };
                 if (isWeapon(def.id)) mods.weaponUser = 'Pilot';
                 installedComponents.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: mods });
