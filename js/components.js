@@ -131,6 +131,9 @@ const SystemList = {
                     <div v-if="getUpgradeSpecs(editingInstance.defId)?.fireLinkOption && (editingInstance.modifications.fireLink || 1) > 1" class="q-mb-md">
                         <q-checkbox dark v-model="editingInstance.modifications.fireLinkOption" :label="'Selective Fire (+' + format(getUpgradeSpecs(editingInstance.defId).fireLinkOption.cost) + ')'" />
                     </div>
+                    <div v-if="canPointBlank(editingInstance.defId)" class="q-mb-md">
+                        <q-checkbox dark v-model="editingInstance.modifications.pointBlank" label="Point Blank" />
+                    </div>
                     <!-- Generic Options from componentOptions -->
                     <div v-for="opt in getGenericOptions(editingInstance.defId)" :key="opt.value" class="q-mb-md">
                          <q-checkbox dark v-model="editingInstance.modifications[opt.value]" :label="opt.label" />
@@ -586,8 +589,10 @@ export const AddModDialog = {
         const isSizeValid = (itemDef) => {
             const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
 
-            if (itemDef.maxSize) {
-                const rankIndex = store.db.SIZE_RANK.indexOf(itemDef.maxSize);
+            // Backward compatibility for maxSize -> maxShipSize
+            const max = itemDef.maxShipSize || itemDef.maxSize;
+            if (max) {
+                const rankIndex = store.db.SIZE_RANK.indexOf(max);
                 if (shipIndex > rankIndex) return false;
             }
 
@@ -1163,11 +1168,37 @@ export const SystemListWrapper = {
             if (specs.enhancement !== undefined) return specs.enhancement;
             return specs.weaponVariants && !isLauncher(defId);
         };
+        const checkConstraints = (specValue) => {
+            if (specValue === true) return true;
+            if (typeof specValue === 'object') {
+                const shipIndex = store.db.SIZE_RANK.indexOf(store.chassis.size);
+
+                if (specValue.minShipSize) {
+                    const minIndex = store.db.SIZE_RANK.indexOf(specValue.minShipSize);
+                    if (shipIndex < minIndex) return false;
+                }
+                if (specValue.maxShipSize) {
+                    const maxIndex = store.db.SIZE_RANK.indexOf(specValue.maxShipSize);
+                    if (shipIndex > maxIndex) return false;
+                }
+                return true;
+            }
+            return false;
+        };
+
         const canBattery = (defId) => {
             const specs = getUpgradeSpecs(defId);
             if (!specs) return false;
             if (specs.componentOptions && specs.componentOptions.includes('weapon.battery')) return true;
-            return specs.battery;
+
+            return checkConstraints(specs.battery);
+        };
+
+        const canPointBlank = (defId) => {
+            const specs = getUpgradeSpecs(defId);
+            if (!specs || !specs.pointBlank) return false;
+
+            return checkConstraints(specs.pointBlank);
         };
 
         const getGenericOptions = (defId) => {
@@ -1242,7 +1273,7 @@ export const SystemListWrapper = {
             };
         });
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, getGenericOptions, openConfig, checkValidity, configModel };
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, checkValidity, configModel };
     }
 };
 

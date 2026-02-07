@@ -546,7 +546,13 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "3d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
@@ -565,7 +571,13 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "4d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
@@ -584,7 +596,13 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "5d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
@@ -632,7 +650,13 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "3d10x2",
             "description": "Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament.",
@@ -808,12 +832,12 @@
             "baseCost": 2000,
             "baseEp": 2,
             "sizeMult": true,
-            "maxSize": "Colossal (frigate)",
             "availability": "Common",
             "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters"
+            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters",
+            "maxShipSize": "Colossal (frigate)"
         },
         {
             "id": "atmos_thrusters_adv",
@@ -824,12 +848,12 @@
             "baseCost": 5000,
             "baseEp": 5,
             "sizeMult": true,
-            "maxSize": "Gargantuan",
             "availability": "Common",
             "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters_(Advanced)"
+            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters_(Advanced)",
+            "maxShipSize": "Gargantuan"
         },
         {
             "id": "combat_thrusters",
@@ -843,9 +867,9 @@
             "availability": "Military",
             "description": "Often used by smugglers, bounty hunters, and blockade runners. A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense.",
             "minShipSize": "Colossal (transport)",
-            "maxSize": "Colossal (station)",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Combat_Thrusters"
+            "wiki": "https://swse.fandom.com/wiki/Combat_Thrusters",
+            "maxShipSize": "Colossal (station)"
         },
         {
             "id": "maneuvering_jets",
@@ -879,10 +903,10 @@
             "stats": {
                 "dex_bonus": 4
             },
-            "maxSize": "Colossal (transport)",
             "exclusiveGroup": "maneuvering_jets",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+4)"
+            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+4)",
+            "maxShipSize": "Colossal (transport)"
         },
         {
             "id": "maneuvering_jets_6",
@@ -898,10 +922,10 @@
             "stats": {
                 "dex_bonus": 6
             },
-            "maxSize": "Gargantuan",
             "exclusiveGroup": "maneuvering_jets",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+6)"
+            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+6)",
+            "maxShipSize": "Gargantuan"
         },
         {
             "id": "hyperdrive_075",
@@ -915,11 +939,11 @@
             "stats": {
                 "hyperdrive": 0.75
             },
-            "maxSize": "Colossal (cruiser)",
             "availability": "Military",
             "description": "The best Hyperdrive ever created is the Class .5 (which can be created by modifying a Class .75 Hyperdrive using the Starship Designer Feat). Class .5 drives are Illegal, require heavy maintenance (8h/month, DC 20 Mechanics), and impose penalties if neglected.",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_.75"
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_.75",
+            "maxShipSize": "Colossal (cruiser)"
         },
         {
             "id": "hyperdrive_1",
@@ -933,11 +957,11 @@
             "stats": {
                 "hyperdrive": 1
             },
-            "maxSize": "Colossal (cruiser)",
             "availability": "Licensed",
             "description": "The Class 1 Hyperdrive is considered the pinnacle of stable Hyperdrive technology from the Clone Wars forward. It is the favored technology of military vessels, but its high cost often results in designers settling for a Class 2 or Class 3 drive.",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1"
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1",
+            "maxShipSize": "Colossal (cruiser)"
         },
         {
             "id": "hyperdrive_15",
@@ -951,11 +975,11 @@
             "stats": {
                 "hyperdrive": 1.5
             },
-            "maxSize": "Colossal (cruiser)",
             "availability": "Licensed",
             "description": "Class 1.5 is a standard performance hyperdrive.",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1.5"
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1.5",
+            "maxShipSize": "Colossal (cruiser)"
         },
         {
             "id": "hyperdrive_2",
@@ -1127,11 +1151,11 @@
             "baseCost": 25000,
             "baseEp": 2,
             "sizeMult": false,
-            "maxSize": "Gargantuan",
             "availability": "Military",
             "description": "A SLAM system provides a +5 bonus on Pilot checks to increase a Vehicle's Speed. This bonus increases to +10 if the Pilot is using All-Out Movement.",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/SubLight_Accelerator_Motor"
+            "wiki": "https://swse.fandom.com/wiki/SubLight_Accelerator_Motor",
+            "maxShipSize": "Gargantuan"
         },
         {
             "id": "engine_1",
@@ -1182,11 +1206,11 @@
                 "speed": 3
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Colossal (cruiser)",
             "availability": "Licensed",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_3)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_3)",
+            "maxShipSize": "Colossal (cruiser)"
         },
         {
             "id": "engine_4",
@@ -1201,11 +1225,11 @@
                 "speed": 4
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Colossal (cruiser)",
             "availability": "Restricted",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_4)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_4)",
+            "maxShipSize": "Colossal (cruiser)"
         },
         {
             "id": "engine_5",
@@ -1220,11 +1244,11 @@
                 "speed": 5
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Colossal (transport)",
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_5)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_5)",
+            "maxShipSize": "Colossal (transport)"
         },
         {
             "id": "engine_6",
@@ -1239,11 +1263,11 @@
                 "speed": 6
             },
             "exclusiveGroup": "engine",
-            "maxSize": "Gargantuan",
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_6)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_6)",
+            "maxShipSize": "Gargantuan"
         },
         {
             "id": "shield_gen_5",
@@ -1514,10 +1538,10 @@
             "availability": "Military",
             "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment.",
             "minShipSize": "Colossal (transport)",
-            "maxSize": "Colossal (station)",
             "exclusiveGroup": "cloaking_device",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device_(Hibridium)"
+            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device_(Hibridium)",
+            "maxShipSize": "Colossal (station)"
         },
         {
             "id": "cloaking_stygium",
@@ -1819,9 +1843,9 @@
             "availability": "Common",
             "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active.",
             "minShipSize": "Colossal (transport)",
-            "maxSize": "Colossal (station)",
             "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Droid_Repair_Team"
+            "wiki": "https://swse.fandom.com/wiki/Droid_Repair_Team",
+            "maxShipSize": "Colossal (station)"
         },
         {
             "id": "medical_bed",
@@ -2906,7 +2930,13 @@
             "availability": "Licensed",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "3d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
@@ -2925,7 +2955,13 @@
             "availability": "Restricted",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "4d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
@@ -2944,7 +2980,13 @@
             "availability": "Military",
             "upgradeSpecs": {
                 "battery": true,
-                "weaponVariants": true
+                "weaponVariants": true,
+                "pointBlank": {
+                    "minShipSize": "Colossal (frigate)"
+                },
+                "optionCosts": {
+                    "pointBlank": 4000
+                }
             },
             "damage": "5d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
