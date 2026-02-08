@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template to deploy a static website (SWSE Starship Architect) on S3 with CloudFront and ACM Certificate.'
+Description: 'CloudFormation template to deploy a static website (SWSE Starship Architect) on S3 with CloudFront and ACM Certificate, using Origin Access Control (OAC).'
 
 Parameters:
   DomainName:
@@ -17,16 +17,29 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'swse-starship-${AWS::AccountId}-${AWS::Region}'
+      # Enable full block of public access
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # WebsiteConfiguration is typically removed for OAC, but keeping it as a backup or if direct S3 website features (like redirects) are needed is tricky.
+      # For strict OAC, we treat it as a regular private bucket.
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
 
-  # Bucket Policy for Public Read Access
+  # CloudFront Origin Access Control
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub 'swse-oac-${AWS::StackName}'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # Bucket Policy to Allow Access only from CloudFront OAC
   WebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -34,10 +47,15 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal: '*'
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
             Action: 's3:GetObject'
             Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
 
   # ACM Certificate with DNS Validation
   Certificate:
@@ -48,10 +66,6 @@ Resources:
       DomainValidationOptions:
         - DomainName: !Ref DomainName
           HostedZoneId: !Ref HostedZoneId
-    # Note: If HostedZoneId is provided in DomainValidationOptions, ACM attempts to create the validation record.
-    # However, depending on permissions, this might require manual intervention or a separate stack/custom resource.
-    # In same-account scenarios, it often works or the record creation is handled by the user manually if auto-creation fails.
-    # This template assumes the user can validate via DNS.
 
   # CloudFront Distribution
   CloudFrontDistribution:
@@ -62,11 +76,11 @@ Resources:
           - !Ref DomainName
         Origins:
           - Id: S3Origin
-            DomainName: !Select [2, !Split ['/', !GetAtt WebsiteBucket.WebsiteURL]]
-            CustomOriginConfig:
-              HTTPPort: 80
-              HTTPSPort: 443
-              OriginProtocolPolicy: http-only
+            # Use the Regional Domain Name for OAC
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: '' # Must be empty when using OAC
+            OriginAccessControlId: !Ref CloudFrontOAC
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
@@ -89,6 +103,14 @@ Resources:
           AcmCertificateArn: !Ref Certificate
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
+        # Custom Error Response to handle SPA routing (optional but recommended for Vue apps)
+        CustomErrorResponses:
+          - ErrorCode: 403 # Access Denied (S3 returns 403 for missing objects in private buckets)
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
 
   # Route 53 Record Set for CloudFront Alias
   DnsRecord:
@@ -109,10 +131,6 @@ Outputs:
   DistributionId:
     Value: !Ref CloudFrontDistribution
     Description: CloudFront Distribution ID
-
-  WebsiteURL:
-    Value: !GetAtt WebsiteBucket.WebsiteURL
-    Description: S3 Website Endpoint URL
 
   CloudFrontDomainName:
     Value: !GetAtt CloudFrontDistribution.DomainName
