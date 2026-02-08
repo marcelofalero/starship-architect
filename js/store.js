@@ -23,6 +23,7 @@ export const useShipStore = defineStore('ship', () => {
     const engineering = reactive({ hasStarshipDesigner: false });
     const showAddComponentDialog = ref(false);
     const cargoToEpAmount = ref(0);
+    const escapePodsToEpPct = ref(0);
     const customComponents = ref([]);
     const customDialogState = reactive({ visible: false, componentId: null });
     const showCustomManager = ref(false);
@@ -329,6 +330,15 @@ export const useShipStore = defineStore('ship', () => {
                 if (rank > maxRank) maxRank = rank;
             }
         });
+
+        // Escape Pod Rule
+        if (escapePodsToEpPct.value > 0) {
+             const militaryIndex = db.AVAILABILITY_RANK.indexOf('Military');
+             if (maxRank < militaryIndex) {
+                  return 'Illegal';
+             }
+        }
+
         return db.AVAILABILITY_RANK[maxRank];
     });
 
@@ -385,11 +395,62 @@ export const useShipStore = defineStore('ship', () => {
         }, 0);
     });
 
+    const currentCrew = computed(() => {
+        let crew = chassis.value.logistics.crew || 0;
+        let factor = 1.0;
+
+        installedComponents.value.forEach(instance => {
+            if (instance.defId === 'slave_circuits') factor = Math.min(factor, 0.666);
+            if (instance.defId === 'slave_circuits_adv' || instance.defId === 'slave_circuits_recall') factor = Math.min(factor, 0.333);
+        });
+
+        crew = Math.ceil(crew * factor);
+        if (crew < 1 && (chassis.value.logistics.crew || 0) > 0) crew = 1;
+        return crew;
+    });
+
+    const currentPassengers = computed(() => {
+        let pass = chassis.value.logistics.pass || 0;
+
+        installedComponents.value.forEach(instance => {
+            if (instance.defId === 'passenger_conversion') {
+                // Usually adds sizeMultVal passengers per instance
+                // We must check quantity if present (though upgrades usually don't have quantity unless specified)
+                // Assuming 1 per instance for now unless quantity mod exists
+                let qty = instance.modifications?.quantity || 1;
+                pass += (sizeMultVal.value * qty);
+            }
+        });
+        return pass;
+    });
+
+    const totalPopulation = computed(() => currentCrew.value + currentPassengers.value);
+
+    const hasEscapePods = computed(() => {
+        if (!chassis.value.size) return false;
+        return chassis.value.size.startsWith('Colossal');
+    });
+
+    const escapePodsEpGain = computed(() => {
+        return Math.floor(escapePodsToEpPct.value / 10);
+    });
+
+    const escapePodCount = computed(() => {
+        let pop = totalPopulation.value;
+        if (hasEscapePods.value && escapePodsToEpPct.value > 0) {
+            pop = Math.ceil(pop * (100 - escapePodsToEpPct.value) / 100);
+        }
+        return Math.ceil(pop / 8);
+    });
+
     const totalEP = computed(() => {
         let ep = chassis.value.baseEp + stockConfigurationEp.value;
         if(template.value) ep += (template.value.epMod || 0);
         const cargoEp = Math.min(cargoToEpAmount.value, maxCargoCapacity.value);
         ep += Math.floor(cargoEp / sizeMultVal.value);
+        if (hasEscapePods.value) {
+            ep += escapePodsEpGain.value;
+        }
         return ep;
     });
     const usedEP = computed(() => installedComponents.value.reduce((total, instance) => total + getComponentEp(instance), 0));
@@ -471,7 +532,14 @@ export const useShipStore = defineStore('ship', () => {
         a.download = 'data.json';
         a.click();
     }
-    function reset() { activeTemplate.value = null; installedComponents.value = []; engineering.hasStarshipDesigner = false; meta.name = ""; cargoToEpAmount.value = 0; }
+    function reset() {
+        activeTemplate.value = null;
+        installedComponents.value = [];
+        engineering.hasStarshipDesigner = false;
+        meta.name = "";
+        cargoToEpAmount.value = 0;
+        escapePodsToEpPct.value = 0;
+    }
     function createNew(newChassisId) {
         reset(); chassisId.value = newChassisId;
         const ship = db.STOCK_SHIPS.find(s => s.id === newChassisId);
@@ -501,6 +569,7 @@ export const useShipStore = defineStore('ship', () => {
         else activeTemplate.value = state.configuration.template;
         engineering.hasStarshipDesigner = state.configuration.feats.starshipDesigner;
         cargoToEpAmount.value = state.configuration.cargoToEpAmount || 0;
+        escapePodsToEpPct.value = state.configuration.escapePodsToEpPct || 0;
         if (state.customComponents) customComponents.value = state.customComponents;
         else customComponents.value = [];
         installedComponents.value = state.manifest.map(m => {
@@ -511,11 +580,11 @@ export const useShipStore = defineStore('ship', () => {
             return { instanceId: m.id, defId: m.defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, isNonStandard: m.isNonStandard || false, modifications: mods };
         });
     }
-    watch([meta, chassisId, activeTemplate, installedComponents, engineering, cargoToEpAmount, customComponents], () => {
+    watch([meta, chassisId, activeTemplate, installedComponents, engineering, cargoToEpAmount, escapePodsToEpPct, customComponents], () => {
         const saveObj = {
             apiVersion: "1.9",
             meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
-            configuration: { baseChassis: chassisId.value, template: activeTemplate.value, feats: { starshipDesigner: engineering.hasStarshipDesigner }, cargoToEpAmount: cargoToEpAmount.value },
+            configuration: { baseChassis: chassisId.value, template: activeTemplate.value, feats: { starshipDesigner: engineering.hasStarshipDesigner }, cargoToEpAmount: cargoToEpAmount.value, escapePodsToEpPct: escapePodsToEpPct.value },
             customComponents: customComponents.value,
             manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: m.modifications }))
         };
@@ -524,8 +593,8 @@ export const useShipStore = defineStore('ship', () => {
 
     return {
         db, initDb,
-        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, customComponents, allEquipment, customDialogState, showCustomManager,
-        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal,
+        meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, customComponents, allEquipment, customDialogState, showCustomManager,
+        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, totalPopulation, escapePodCount,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         isAdmin, isWeapon, isEngine
     };

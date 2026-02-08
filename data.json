@@ -171,11 +171,7 @@
             },
             "defaultMods": [
                 "engine_3",
-                "shield_gen_20",
-                {
-                    "id": "escape_pod",
-                    "quantity": 1
-                }
+                "shield_gen_20"
             ]
         },
         {
@@ -204,11 +200,7 @@
                 "engine_3",
                 "hyperdrive_1",
                 "shield_gen_20",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 2
-                }
+                "nav_standard"
             ]
         },
         {
@@ -237,11 +229,7 @@
                 "engine_2",
                 "hyperdrive_2",
                 "shield_gen_15",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 1
-                }
+                "nav_standard"
             ]
         },
         {
@@ -270,11 +258,7 @@
                 "engine_1",
                 "hyperdrive_2",
                 "shield_gen_20",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 3
-                }
+                "nav_standard"
             ]
         },
         {
@@ -303,11 +287,7 @@
                 "engine_3",
                 "hyperdrive_2",
                 "shield_gen_30",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 32
-                }
+                "nav_standard"
             ]
         },
         {
@@ -336,11 +316,7 @@
                 "engine_2",
                 "hyperdrive_2",
                 "shield_gen_30",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 150
-                }
+                "nav_standard"
             ]
         },
         {
@@ -369,11 +345,7 @@
                 "engine_2",
                 "hyperdrive_2",
                 "shield_gen_40",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 750
-                }
+                "nav_standard"
             ]
         },
         {
@@ -402,11 +374,7 @@
                 "engine_2",
                 "hyperdrive_1",
                 "shield_gen_60",
-                "nav_standard",
-                {
-                    "id": "escape_pod",
-                    "quantity": 3125
-                }
+                "nav_standard"
             ]
         },
         {
@@ -443,14 +411,6 @@
                 "tractor_beam",
                 "docking_clamp",
                 "docking_clamp",
-                {
-                    "id": "escape_pod",
-                    "quantity": 3
-                },
-                {
-                    "id": "escape_pod",
-                    "quantity": 3
-                },
                 "holo_transceiver"
             ]
         },
@@ -488,10 +448,6 @@
                 {
                     "id": "laser_med",
                     "batteryCount": 4
-                },
-                {
-                    "id": "escape_pod",
-                    "quantity": 3
                 },
                 "proton_torp"
             ]
@@ -1832,23 +1788,6 @@
             "description": "Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet.",
             "location": "Internal Bay",
             "wiki": "https://swse.fandom.com/wiki/Hypertransceiver"
-        },
-        {
-            "id": "escape_pod",
-            "name": "Escape Pod (8 beings)",
-            "name_es": "Cápsula de Escape (8 seres)",
-            "category": "Starship Accessories",
-            "group": "Safety",
-            "baseCost": 1200,
-            "baseEp": 1,
-            "sizeMult": false,
-            "availability": "Common",
-            "upgradeSpecs": {
-                "quantity": true
-            },
-            "description": "Typical Escape Pods are small, single-use Vehicles providing 1 day of life support for eight Medium creatures. Required by law on all Starships (Military exempt).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Escape_Pod_(8_beings)"
         },
         {
             "id": "lifeboat_small",

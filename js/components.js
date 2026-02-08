@@ -31,6 +31,20 @@ const StatPanel = {
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.dr') }}</div><div class="text-bold">{{ store.currentStats.dr }}</div></div></div>
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.speed') }}</div><div class="text-bold">{{ store.currentStats.speed }}</div></div></div>
             </div>
+            <div class="row q-mt-sm text-caption text-grey">
+                <div class="col-4 text-center">
+                    <div>Crew</div>
+                    <div class="text-white">{{ store.currentCrew }}</div>
+                </div>
+                <div class="col-4 text-center">
+                    <div>Pass</div>
+                    <div class="text-white">{{ store.currentPassengers }}</div>
+                </div>
+                <div class="col-4 text-center">
+                    <div>Esc. Pods</div>
+                    <div class="text-white">{{ store.escapePodCount }}</div>
+                </div>
+            </div>
         </q-card-section>
     </q-card>
     `,
@@ -221,6 +235,22 @@ const ConfigPanel = {
                 <div class="text-center q-mt-md text-positive text-h6">
                     +{{ Math.floor(store.cargoToEpAmount / store.sizeMultVal) }} EP
                 </div>
+
+                <div v-if="store.hasEscapePods" class="q-mt-lg">
+                    <q-separator dark class="q-mb-md" />
+                    <div class="text-h6">Escape Pods</div>
+                    <div class="text-caption text-grey">Capacity Reduced: {{ store.escapePodsToEpPct }}%</div>
+                     <div class="text-caption text-grey-5 q-mb-sm">
+                        Required Capacity: {{ store.chassis.logistics.crew + store.chassis.logistics.pass }} beings
+                    </div>
+                    <q-slider dark v-model="store.escapePodsToEpPct" :min="0" :max="100" :step="10" label color="negative" />
+                    <div class="text-center q-mt-md text-positive text-h6">
+                        +{{ store.escapePodsEpGain }} EP
+                    </div>
+                    <div class="text-caption text-negative q-mt-sm" style="font-size: 0.8em; line-height: 1.2;">
+                        * Unless the vessel is a military one it is illegal to remove escape pods.
+                    </div>
+                </div>
             </q-card-section>
 
             <q-card-actions align="right">
@@ -268,8 +298,8 @@ const ShipSheet = {
 
             <div class="section-title">Logistics</div>
             <div class="stat-grid">
-                <div><span class="bold">Crew</span> {{ store.chassis.logistics.crew }}</div>
-                <div><span class="bold">Passengers</span> {{ store.chassis.logistics.pass }}</div>
+                <div><span class="bold">Crew</span> {{ store.currentCrew }}</div>
+                <div><span class="bold">Passengers</span> {{ store.currentPassengers }}</div>
                 <div><span class="bold">Cargo</span> {{ store.currentCargo }}</div>
                 <div><span class="bold">Consumables</span> {{ store.chassis.logistics.cons }}</div>
             </div>
