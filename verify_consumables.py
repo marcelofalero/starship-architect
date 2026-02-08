@@ -7,7 +7,7 @@ def run():
         page.set_viewport_size({"width": 1280, "height": 720})
 
         # Navigate
-        page.goto("http://localhost:8000")
+        page.goto("http://localhost:8000/public/")
         page.wait_for_selector("#app-loading", state="hidden", timeout=10000)
 
         # 1. Check initial consumables

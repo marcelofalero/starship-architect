@@ -8,7 +8,7 @@ def run():
         page = context.new_page()
 
         print("Navigating to app...")
-        page.goto("http://localhost:8000")
+        page.goto("http://localhost:8000/public/")
 
         # Wait for app to load
         print("Waiting for app to load...")

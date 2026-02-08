@@ -239,7 +239,7 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Extended Range | 100 | 0 | Yes | Common | - | Improves a Starship's consumables by 10% of its original value (rounded down, minimum 1 day) x the number of times installed. |
+| Extended Range | 100 | 1 | Yes | Common | - | Improves a Starship's consumables by 10% of its original value (rounded down, minimum 1 day) x the number of times installed. |
 | Fuel Converters | 2,400 | 1 | Yes | Common | - | Transform matter into usable Fuel. 1 hour gathering = 1 unit of fuel (1 day realspace / 1 jump). |
 
 ### Power
@@ -253,7 +253,6 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
 | Cockpit Ejection System | 8,000 | 1 | No | Licensed | - | Allows cockpit to eject as an Escape Pod on ship destruction (DC 20 Pilot check to avoid damage). |
-| Escape Pod (8 beings) | 1,200 | 1 | No | Common | - | Typical Escape Pods are small, single-use Vehicles providing 1 day of life support for eight Medium creatures. Required by law on all Starships (Military exempt). |
 | Lifeboat, Large | 400 | 1 | Yes | Common | - | Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger. |
 | Lifeboat, Small | 400 | 1 | Yes | Common | - | Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger. 1 Bay includes (Cost Mod)/100 Lifeboats. |
 

@@ -86,7 +86,7 @@ jobs:
 
       - name: Sync Files to S3
         run: |
-          aws s3 sync . s3://${{ env.BUCKET_NAME }} --delete --exclude ".git/*" --exclude ".github/*" --exclude "infrastructure/*" --exclude ".gitignore" --exclude "stack.json"
+          aws s3 sync public/ s3://${{ env.BUCKET_NAME }} --delete
 
       - name: Invalidate CloudFront
         if: env.DISTRIBUTION_ID != 'null' && env.DISTRIBUTION_ID != ''
