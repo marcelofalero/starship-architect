@@ -87,6 +87,14 @@ Resources:
                   - 'cloudfront:CreateInvalidation'
                   - 'cloudfront:GetInvalidation'
                 Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+        - PolicyName: CloudFormationReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:DescribeStacks'
+                Resource: !Ref AWS::StackId
 
   # ACM Certificate with DNS Validation
   Certificate:

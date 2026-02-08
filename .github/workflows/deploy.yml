@@ -25,34 +25,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get Stack Outputs
-        id: stack-outputs
+      - name: Get AWS Account ID
+        id: get-account
         run: |
-          echo "Retrieving outputs for stack: $STACK_NAME"
-          # This assumes the stack is already created.
-          aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} > stack.json
-
-          BUCKET_NAME=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="BucketName") | .OutputValue' stack.json)
-          DISTRIBUTION_ID=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="DistributionId") | .OutputValue' stack.json)
-          DEPLOYMENT_ROLE_ARN=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="DeploymentRoleArn") | .OutputValue' stack.json)
-
-          if [ -z "$BUCKET_NAME" ] || [ "$BUCKET_NAME" == "null" ]; then
-            echo "Error: BucketName not found in stack outputs."
-            exit 1
-          fi
-
-          if [ -z "$DEPLOYMENT_ROLE_ARN" ] || [ "$DEPLOYMENT_ROLE_ARN" == "null" ]; then
-            echo "Error: DeploymentRoleArn not found in stack outputs."
-            exit 1
-          fi
-
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
-          echo "DISTRIBUTION_ID=$DISTRIBUTION_ID" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ROLE_ARN=$DEPLOYMENT_ROLE_ARN" >> $GITHUB_ENV
-
-          echo "Target Bucket: $BUCKET_NAME"
-          echo "Target Distribution: $DISTRIBUTION_ID"
-          echo "Deployment Role: $DEPLOYMENT_ROLE_ARN"
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
+          echo "Account ID: $ACCOUNT_ID"
 
       - name: Configure AWS Credentials (Deployment Role)
         uses: aws-actions/configure-aws-credentials@v2
@@ -60,9 +38,31 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ env.DEPLOYMENT_ROLE_ARN }}
+          # Construct Role ARN: arn:aws:iam::<account-id>:role/swse-deployment-role-<stack-name>
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/swse-deployment-role-${{ env.STACK_NAME }}
           role-duration-seconds: 1200
           role-skip-session-tagging: true
+
+      - name: Get Stack Outputs
+        id: stack-outputs
+        run: |
+          echo "Retrieving outputs for stack: $STACK_NAME"
+          # Now running as the Deployment Role
+          aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} > stack.json
+
+          BUCKET_NAME=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="BucketName") | .OutputValue' stack.json)
+          DISTRIBUTION_ID=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="DistributionId") | .OutputValue' stack.json)
+
+          if [ -z "$BUCKET_NAME" ] || [ "$BUCKET_NAME" == "null" ]; then
+            echo "Error: BucketName not found in stack outputs."
+            exit 1
+          fi
+
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+          echo "DISTRIBUTION_ID=$DISTRIBUTION_ID" >> $GITHUB_ENV
+
+          echo "Target Bucket: $BUCKET_NAME"
+          echo "Target Distribution: $DISTRIBUTION_ID"
 
       - name: Sync Files to S3
         run: |
