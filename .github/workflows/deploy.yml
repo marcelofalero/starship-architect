@@ -34,12 +34,12 @@ jobs:
 
       - name: Manual Assume Role & Export
         run: |
-          echo "Assuming role: ${{ env.DEPLOYMENT_ROLE_ARN }}"
+          echo "Assuming role: ${{ env.AWS_ROLE_TO_ASSUME }}"
           
           # 1. Execute the handshake and capture the JSON-less output
           # We use --query to get exactly what we need in a tab-separated string
           KST=($(aws sts assume-role \
-            --role-arn ${{ env.DEPLOYMENT_ROLE_ARN }} \
+            --role-arn ${{ env.AWS_ROLE_TO_ASSUME }} \
             --role-session-name "GitHubVibeCheck" \
             --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
             --output text))
