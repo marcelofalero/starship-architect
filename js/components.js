@@ -41,8 +41,8 @@ const StatPanel = {
                     <div class="text-white">{{ store.currentPassengers }}</div>
                 </div>
                 <div class="col-4 text-center">
-                    <div>Esc. Pods</div>
-                    <div class="text-white">{{ store.escapePodCount }}</div>
+                    <div>Esc. Cap</div>
+                    <div class="text-white">{{ store.escapePodCapacity }}</div>
                 </div>
             </div>
         </q-card-section>

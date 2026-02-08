@@ -435,12 +435,12 @@ export const useShipStore = defineStore('ship', () => {
         return Math.floor(escapePodsToEpPct.value / 10);
     });
 
-    const escapePodCount = computed(() => {
+    const escapePodCapacity = computed(() => {
         let pop = totalPopulation.value;
         if (hasEscapePods.value && escapePodsToEpPct.value > 0) {
             pop = Math.ceil(pop * (100 - escapePodsToEpPct.value) / 100);
         }
-        return Math.ceil(pop / 8);
+        return pop;
     });
 
     const totalEP = computed(() => {
@@ -594,7 +594,7 @@ export const useShipStore = defineStore('ship', () => {
     return {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, customComponents, allEquipment, customDialogState, showCustomManager,
-        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, totalPopulation, escapePodCount,
+        chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         isAdmin, isWeapon, isEngine
     };
