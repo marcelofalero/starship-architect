@@ -34,17 +34,35 @@ jobs:
 
           BUCKET_NAME=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="BucketName") | .OutputValue' stack.json)
           DISTRIBUTION_ID=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="DistributionId") | .OutputValue' stack.json)
+          DEPLOYMENT_ROLE_ARN=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="DeploymentRoleArn") | .OutputValue' stack.json)
 
           if [ -z "$BUCKET_NAME" ] || [ "$BUCKET_NAME" == "null" ]; then
             echo "Error: BucketName not found in stack outputs."
             exit 1
           fi
 
+          if [ -z "$DEPLOYMENT_ROLE_ARN" ] || [ "$DEPLOYMENT_ROLE_ARN" == "null" ]; then
+            echo "Error: DeploymentRoleArn not found in stack outputs."
+            exit 1
+          fi
+
           echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
           echo "DISTRIBUTION_ID=$DISTRIBUTION_ID" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ROLE_ARN=$DEPLOYMENT_ROLE_ARN" >> $GITHUB_ENV
 
           echo "Target Bucket: $BUCKET_NAME"
           echo "Target Distribution: $DISTRIBUTION_ID"
+          echo "Deployment Role: $DEPLOYMENT_ROLE_ARN"
+
+      - name: Configure AWS Credentials (Deployment Role)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ env.DEPLOYMENT_ROLE_ARN }}
+          role-duration-seconds: 1200
+          role-skip-session-tagging: true
 
       - name: Sync Files to S3
         run: |
