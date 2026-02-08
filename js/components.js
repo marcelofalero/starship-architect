@@ -13,6 +13,11 @@ const StatPanel = {
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
             <div class="q-mt-xs text-caption text-grey">{{ store.chassis.size }} Starship (x{{ store.sizeMultVal }})</div>
+            <div class="row items-center q-mt-sm">
+                <div v-if="!editingName" class="text-h6 col-grow">{{ store.meta.name || 'Untitled Ship' }}</div>
+                <q-input v-else dark dense v-model="store.meta.name" class="col-grow" autofocus @blur="editingName = false" @keyup.enter="editingName = false" />
+                <q-btn flat round :icon="editingName ? 'check' : 'edit'" size="sm" @click="editingName = !editingName" />
+            </div>
         </q-card-section>
         <q-separator dark />
         <q-card-section>
@@ -31,18 +36,27 @@ const StatPanel = {
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.dr') }}</div><div class="text-bold">{{ store.currentStats.dr }}</div></div></div>
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.speed') }}</div><div class="text-bold">{{ store.currentStats.speed }}</div></div></div>
             </div>
-            <div class="row q-mt-sm text-caption text-grey">
-                <div class="col-4 text-center">
-                    <div>Crew</div>
-                    <div class="text-white">{{ store.currentCrew }}</div>
+            <q-separator dark class="q-mt-sm" />
+            <div class="q-mt-sm text-caption">
+                <div class="row justify-between q-py-xs border-bottom-grey">
+                    <div class="text-grey">Crew</div>
+                    <div>{{ store.currentCrew }}</div>
                 </div>
-                <div class="col-4 text-center">
-                    <div>Pass</div>
-                    <div class="text-white">{{ store.currentPassengers }}</div>
+                <div class="row justify-between q-py-xs border-bottom-grey">
+                    <div class="text-grey">Passengers</div>
+                    <div>{{ store.currentPassengers }}</div>
                 </div>
-                <div class="col-4 text-center">
-                    <div>Esc. Cap</div>
-                    <div class="text-white">{{ store.escapePodCapacity }}</div>
+                <div class="row justify-between q-py-xs border-bottom-grey">
+                    <div class="text-grey">Escape Pods for </div>
+                    <div>{{ store.escapePodCapacity }}</div>
+                </div>
+                <div class="row justify-between q-py-xs border-bottom-grey">
+                    <div class="text-grey">Cargo Capacity</div>
+                    <div>{{ store.currentCargo }}</div>
+                </div>
+                <div class="row justify-between q-py-xs">
+                    <div class="text-grey">Consumables</div>
+                    <div>{{ store.chassis.logistics.cons }}</div>
                 </div>
             </div>
         </q-card-section>
@@ -167,7 +181,6 @@ const ConfigPanel = {
     template: `
     <q-card class="bg-grey-9 text-white full-height column">
         <q-card-section class="col-auto">
-            <q-input dark filled v-model="store.meta.name" :label="$t('ui.ship_name')" dense class="q-mb-md" />
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">
                 <q-toggle dark v-model="store.engineering.hasStarshipDesigner" :label="$t('ui.designer')" color="primary" />
@@ -1091,7 +1104,8 @@ export const StatPanelWrapper = {
     ...StatPanel,
     setup() {
         const store = useShipStore();
-        return { store, getLocalizedName };
+        const editingName = ref(false);
+        return { store, getLocalizedName, editingName };
     }
 };
 
