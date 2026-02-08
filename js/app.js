@@ -19,8 +19,8 @@ const setup = () => {
     // Hangar Dialog State (Parent controlled)
     const showHangarDialog = ref(false);
 
-    const leftDrawerOpen = ref(true);
-    const rightDrawerOpen = ref(true);
+    const leftDrawerOpen = ref(false);
+    const rightDrawerOpen = ref(false);
     const showSheetDialog = ref(false);
 
     onMounted(() => {

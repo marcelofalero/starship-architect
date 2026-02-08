@@ -55,7 +55,7 @@ const SystemList = {
     template: `
     <div class="q-pa-md col column">
         <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
-        <q-scroll-area class="col"><q-list separator dark>
+        <component :is="$q.screen.gt.sm ? 'q-scroll-area' : 'div'" :class="$q.screen.gt.sm ? 'col' : ''"><q-list separator dark>
             <q-item v-for="instance in store.installedComponents" :key="instance.instanceId">
                 <q-item-section avatar><q-icon :name="getIcon(instance.defId)" color="primary" /></q-item-section>
                 <q-item-section>
@@ -102,7 +102,7 @@ const SystemList = {
                 </q-item-section>
             </q-item>
             <div v-if="store.installedComponents.length === 0" class="text-center text-grey q-pa-lg">No systems installed.</div>
-        </q-list></q-scroll-area>
+        </q-list></component>
         <q-dialog v-model="showConfigDialog">
             <q-card class="bg-grey-9 text-white" style="min-width: 350px">
                 <q-card-section><div class="text-h6">Configure System</div></q-card-section>
