@@ -25,29 +25,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Get AWS Account ID
-        id: get-account
-        run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
-          echo "Account ID: $ACCOUNT_ID"
-
-      - name: Configure AWS Credentials (Deployment Role)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-          # Construct Role ARN: arn:aws:iam::<account-id>:role/swse-deployment-role-<stack-name>
-          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/swse-deployment-role-${{ env.STACK_NAME }}
-          role-duration-seconds: 1200
-          role-skip-session-tagging: true
-
       - name: Get Stack Outputs
         id: stack-outputs
         run: |
           echo "Retrieving outputs for stack: $STACK_NAME"
-          # Now running as the Deployment Role
+          # This assumes the AWS credentials configured above have permissions to describe stacks
+          # and (presumably) have the stack-created policy attached or are admin.
           aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} > stack.json
 
           BUCKET_NAME=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="BucketName") | .OutputValue' stack.json)

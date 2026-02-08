@@ -51,50 +51,33 @@ Resources:
               StringEquals:
                 AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
 
-  # Deployment Role
-  DeploymentRole:
-    Type: AWS::IAM::Role
+  # Deployment Managed Policy
+  DeploymentPolicy:
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      RoleName: !Sub 'swse-deployment-role-${AWS::StackName}'
-      AssumeRolePolicyDocument:
+      ManagedPolicyName: !Sub 'swse-deployment-policy-${AWS::StackName}'
+      PolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-            Action: 'sts:AssumeRole'
-      Policies:
-        - PolicyName: S3DeploymentPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 's3:ListBucket'
-                  - 's3:GetBucketLocation'
-                Resource: !GetAtt WebsiteBucket.Arn
-              - Effect: Allow
-                Action:
-                  - 's3:PutObject'
-                  - 's3:DeleteObject'
-                Resource: !Sub '${WebsiteBucket.Arn}/*'
-        - PolicyName: CloudFrontInvalidationPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'cloudfront:CreateInvalidation'
-                  - 'cloudfront:GetInvalidation'
-                Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
-        - PolicyName: CloudFormationReadPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'cloudformation:DescribeStacks'
-                Resource: !Ref AWS::StackId
+            Action:
+              - 's3:ListBucket'
+              - 's3:GetBucketLocation'
+            Resource: !GetAtt WebsiteBucket.Arn
+          - Effect: Allow
+            Action:
+              - 's3:PutObject'
+              - 's3:DeleteObject'
+            Resource: !Sub '${WebsiteBucket.Arn}/*'
+          - Effect: Allow
+            Action:
+              - 'cloudfront:CreateInvalidation'
+              - 'cloudfront:GetInvalidation'
+            Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+          - Effect: Allow
+            Action:
+              - 'cloudformation:DescribeStacks'
+            Resource: !Ref AWS::StackId
 
   # ACM Certificate with DNS Validation
   Certificate:
@@ -177,6 +160,6 @@ Outputs:
     Value: !GetAtt CloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
 
-  DeploymentRoleArn:
-    Value: !GetAtt DeploymentRole.Arn
-    Description: ARN of the Deployment Role
+  DeploymentPolicyArn:
+    Value: !Ref DeploymentPolicy
+    Description: ARN of the Deployment Managed Policy
