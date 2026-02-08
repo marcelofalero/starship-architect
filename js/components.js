@@ -132,7 +132,7 @@ const SystemList = {
                         <q-checkbox dark v-model="editingInstance.modifications.fireLinkOption" :label="'Optional Fire-Link (+' + format(getOptionCost(editingInstance.defId, 'fireLinkOption')) + ')'" />
                     </div>
                     <div v-if="canPointBlank(editingInstance.defId)" class="q-mb-md">
-                        <q-checkbox dark v-model="editingInstance.modifications.pointBlank" label="Point Blank" />
+                        <q-checkbox dark v-model="editingInstance.modifications.pointBlank" :label="'Point Blank (+' + format(getOptionCost(editingInstance.defId, 'pointBlank')) + ')'" />
                     </div>
                     <!-- Generic Options from componentOptions -->
                     <div v-for="opt in getGenericOptions(editingInstance.defId)" :key="opt.value" class="q-mb-md">
@@ -1209,7 +1209,7 @@ export const SystemListWrapper = {
             const specs = getUpgradeSpecs(defId);
             if (!specs || !specs.componentOptions) return [];
             // Filter out options that are handled by specific UI controls
-            const handled = ['weapon.multibarrel', 'weapon.fireLink', 'weapon.enhancement', 'weapon.battery', 'ordnance'];
+            const handled = ['weapon.multibarrel', 'weapon.fireLink', 'weapon.enhancement', 'weapon.battery', 'ordnance', 'weapon.pointBlank'];
             // We need labels for these. Ideally these should be localized or defined in store/app.
             // For now, mapping known ones.
             const labels = {
