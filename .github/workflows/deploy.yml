@@ -1,8 +1,6 @@
 name: Deploy SWSE Architect
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 env:
