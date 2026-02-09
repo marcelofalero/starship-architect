@@ -45,6 +45,11 @@ body {
     border-radius: 2px;
 }
 
+/* Driver.js tour style overrides */
+.driver-active-element {
+    pointer-events: none !important;
+}
+
 /* Previous placeholder classes */
 .stat-block {
     font-family: 'Chakra Petch', sans-serif;
