@@ -30,3 +30,13 @@ variable "production_branch" {
   type        = string
   default     = "main"
 }
+
+variable "custom_domain" {
+  description = "The custom domain to associate with the Pages project."
+  type        = string
+}
+
+variable "cloudflare_zone_id" {
+  description = "The Cloudflare Zone ID for the custom domain."
+  type        = string
+}
