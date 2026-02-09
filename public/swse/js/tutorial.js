@@ -85,9 +85,11 @@ export const initTutorial = () => {
         ],
         onDestroyStarted: () => {
             localStorage.setItem(COMPLETED_KEY, 'true');
+            document.body.classList.remove('tour-active');
             driverObj.destroy();
         }
     });
 
+    document.body.classList.add('tour-active');
     driverObj.drive();
 };
