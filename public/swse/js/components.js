@@ -8,7 +8,7 @@ const { useQuasar } = Quasar;
 // --- BASE COMPONENTS ---
 const StatPanel = {
     template: `
-    <q-card class="bg-grey-9 text-white">
+    <q-card id="tour-stats-panel" class="bg-grey-9 text-white">
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
@@ -67,8 +67,8 @@ const StatPanel = {
 
 const SystemList = {
     template: `
-    <div class="q-pa-md col column">
-        <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
+    <div id="tour-system-list" class="q-pa-md col column">
+        <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn id="tour-add-btn" round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
         <component :is="$q.screen.gt.sm ? 'q-scroll-area' : 'div'" :class="$q.screen.gt.sm ? 'col' : ''"><q-list separator dark>
             <q-item v-for="instance in store.installedComponents" :key="instance.instanceId">
                 <q-item-section avatar><q-icon :name="getIcon(instance.defId)" color="primary" /></q-item-section>
@@ -179,7 +179,7 @@ const SystemList = {
 
 const ConfigPanel = {
     template: `
-    <q-card class="bg-grey-9 text-white full-height column">
+    <q-card id="tour-config-panel" class="bg-grey-9 text-white full-height column">
         <q-card-section class="col-auto">
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">

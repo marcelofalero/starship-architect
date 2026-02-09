@@ -1,6 +1,7 @@
 import { useShipStore } from './store.js';
 import { i18n, getLocalizedName } from './i18n.js';
 import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog } from './components.js';
+import { initTutorial } from './tutorial.js';
 
 const { createApp, ref, onMounted } = Vue;
 const { createPinia } = Pinia;
@@ -31,6 +32,11 @@ const setup = () => {
         } else {
             shipStore.createNew('light_fighter');
         }
+
+        // Initialize Tutorial
+        setTimeout(() => {
+            initTutorial();
+        }, 500);
     });
 
     // Toolbar Logic

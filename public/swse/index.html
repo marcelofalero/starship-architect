@@ -8,6 +8,7 @@
     <!-- Quasar & Vue Dependencies -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons|Chakra+Petch:400,700|Russo+One" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/quasar@2.14.1/dist/quasar.prod.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet" type="text/css">
 </head>
 <body class="bg-grey-10 text-white">
@@ -38,8 +39,8 @@
                         <span class="text-subtitle2 q-ml-sm text-grey-4" v-if="shipStore.meta.name">{{ shipStore.meta.name }}</span>
                     </q-toolbar-title>
                     
-                    <q-btn flat icon="garage" :label="$t('ui.hangar')" @click="showHangarDialog = true" class="q-mr-sm"></q-btn>
-                    <q-btn flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
+                    <q-btn id="tour-hangar-btn" flat icon="garage" :label="$t('ui.hangar')" @click="showHangarDialog = true" class="q-mr-sm"></q-btn>
+                    <q-btn id="tour-export-btn" flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
                     <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
                     <input type="file" ref="importInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
                     <q-separator vertical spaced dark></q-separator>
@@ -139,6 +140,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-demi"></script>
     <script src="https://cdn.jsdelivr.net/npm/pinia@2.1.7/dist/pinia.iife.prod.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
     <!-- APPLICATION LOGIC -->
     <script type="module" src="js/app.js"></script>
