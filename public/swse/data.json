@@ -492,8 +492,8 @@
     "EQUIPMENT": [
         {
             "id": "laser_light",
-            "name": "Light Laser Cannon (3d10x2)",
-            "name_es": "Cañón Láser Ligero (3d10x2)",
+            "name": "Light Laser Cannon",
+            "name_es": "Cañón Láser Ligero",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 1500,
@@ -516,12 +516,12 @@
             "damage": "3d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Laser_Cannon_(3d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
         },
         {
             "id": "laser_med",
-            "name": "Medium Laser Cannon (4d10x2)",
-            "name_es": "Cañón Láser Mediano (4d10x2)",
+            "name": "Medium Laser Cannon",
+            "name_es": "Cañón Láser Mediano",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 4000,
@@ -544,12 +544,12 @@
             "damage": "4d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Medium_Laser_Cannon_(4d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
         },
         {
             "id": "laser_hvy",
-            "name": "Heavy Laser Cannon (5d10x2)",
-            "name_es": "Cañón Láser Pesado (5d10x2)",
+            "name": "Heavy Laser Cannon",
+            "name_es": "Cañón Láser Pesado",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 6000,
@@ -572,7 +572,7 @@
             "damage": "5d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Laser_Cannon_(5d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
         },
         {
             "id": "proton_torp",
@@ -825,7 +825,7 @@
             "availability": "Common",
             "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters",
             "maxShipSize": "Colossal (frigate)"
         },
@@ -841,8 +841,8 @@
             "availability": "Common",
             "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters_(Advanced)",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -857,7 +857,7 @@
             "availability": "Military",
             "description": "Often used by smugglers, bounty hunters, and blockade runners. A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense.",
             "minShipSize": "Colossal (transport)",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Combat_Thrusters",
             "maxShipSize": "Colossal (station)"
         },
@@ -876,8 +876,8 @@
                 "dex_bonus": 2
             },
             "exclusiveGroup": "maneuvering_jets",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets"
         },
         {
             "id": "maneuvering_jets_4",
@@ -894,8 +894,8 @@
                 "dex_bonus": 4
             },
             "exclusiveGroup": "maneuvering_jets",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+4)",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets",
             "maxShipSize": "Colossal (transport)"
         },
         {
@@ -913,8 +913,8 @@
                 "dex_bonus": 6
             },
             "exclusiveGroup": "maneuvering_jets",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets_(+6)",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -931,8 +931,8 @@
             },
             "availability": "Military",
             "description": "The best Hyperdrive ever created is the Class .5 (which can be created by modifying a Class .75 Hyperdrive using the Starship Designer Feat). Class .5 drives are Illegal, require heavy maintenance (8h/month, DC 20 Mechanics), and impose penalties if neglected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_.75",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -949,8 +949,8 @@
             },
             "availability": "Licensed",
             "description": "The Class 1 Hyperdrive is considered the pinnacle of stable Hyperdrive technology from the Clone Wars forward. It is the favored technology of military vessels, but its high cost often results in designers settling for a Class 2 or Class 3 drive.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -967,8 +967,8 @@
             },
             "availability": "Licensed",
             "description": "Class 1.5 is a standard performance hyperdrive.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_1.5",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -985,8 +985,8 @@
             },
             "availability": "Common",
             "description": "Class 2 was state of the art during most of the Rise of the Empire era.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_2"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_3",
@@ -1002,8 +1002,8 @@
             },
             "availability": "Common",
             "description": "Class 3 was state of the art during most of the Rise of the Empire era.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_3"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_4",
@@ -1019,8 +1019,8 @@
             },
             "availability": "Common",
             "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_4"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_6",
@@ -1036,8 +1036,8 @@
             },
             "availability": "Common",
             "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_6"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_8",
@@ -1053,8 +1053,8 @@
             },
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_8"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_10",
@@ -1070,8 +1070,8 @@
             },
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_10"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_15_slow",
@@ -1087,8 +1087,8 @@
             },
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive_Class_15"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
         },
         {
             "id": "nav_standard",
@@ -1101,7 +1101,7 @@
             "sizeMult": false,
             "availability": "Licensed",
             "description": "A Navicomputer is an astrogation calculator designed to make all the calculations necessary to travel through Hyperspace. Most Starships have Navicomputers, but those that lack Hyperdrives and some fighters that depend on Astromech Droids do not.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Navicomputer"
         },
         {
@@ -1115,8 +1115,8 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Most Navicomputers are Nonstandard Modifications for Starfighters - these ships simply don't have the room for the memory core. Starfighters often have Limited Navicomputers that store only two jumps' worth of information, enough to get to a destination and return.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Navicomputer_(Limited)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Navicomputer"
         },
         {
             "id": "nav_advanced",
@@ -1129,8 +1129,8 @@
             "sizeMult": false,
             "availability": "Licensed",
             "description": "Advanced Navicomputers grant a +10 bonus on Use Computer checks made for Astrogation, rather than a typical Navicomputer's +5 bonus. Additionally, a character aboard a ship that has a Navicomputer need not be Trained in the Use Computer Skill to make use of the Astrogation aspect of the Skill.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Navicomputer_(Advanced)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Navicomputer"
         },
         {
             "id": "slam",
@@ -1143,7 +1143,7 @@
             "sizeMult": false,
             "availability": "Military",
             "description": "A SLAM system provides a +5 bonus on Pilot checks to increase a Vehicle's Speed. This bonus increases to +10 if the Pilot is using All-Out Movement.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/SubLight_Accelerator_Motor",
             "maxShipSize": "Gargantuan"
         },
@@ -1163,7 +1163,7 @@
             "availability": "Common",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_1)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive"
         },
         {
             "id": "engine_2",
@@ -1181,7 +1181,7 @@
             "availability": "Common",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_2)"
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive"
         },
         {
             "id": "engine_3",
@@ -1199,7 +1199,7 @@
             "availability": "Licensed",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_3)",
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -1218,7 +1218,7 @@
             "availability": "Restricted",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_4)",
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -1237,7 +1237,7 @@
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_5)",
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (transport)"
         },
         {
@@ -1256,7 +1256,7 @@
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive_(Speed_6)",
+            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -1274,8 +1274,8 @@
             "exclusiveGroup": "shield",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_10",
@@ -1292,8 +1292,8 @@
             "exclusiveGroup": "shield",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_10)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_15",
@@ -1310,8 +1310,8 @@
             "exclusiveGroup": "shield",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_15)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_20",
@@ -1329,8 +1329,8 @@
             "minShipSize": "Gargantuan",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_20)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_25",
@@ -1348,8 +1348,8 @@
             "minShipSize": "Gargantuan",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_25)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_30",
@@ -1367,8 +1367,8 @@
             "minShipSize": "Gargantuan",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_30)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_35",
@@ -1386,8 +1386,8 @@
             "minShipSize": "Gargantuan",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_35)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_40",
@@ -1405,8 +1405,8 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_40)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_45",
@@ -1424,8 +1424,8 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_45)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_50",
@@ -1443,8 +1443,8 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_50)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_55",
@@ -1462,8 +1462,8 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_55)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_60",
@@ -1481,8 +1481,8 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_60)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "bulkheads",
@@ -1499,8 +1499,8 @@
             "availability": "Common",
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 10% (These improvements don't stack).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads_(+10%)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "jamming",
@@ -1513,7 +1513,7 @@
             "sizeMult": true,
             "availability": "Common",
             "description": "A Jamming Suite targets a single enemy within 6 squares. The target takes penalties on Use Computer checks (-4 for Starfighters, -2 for Space Transports) and enemy fire control systems.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Jamming_Suite"
         },
         {
@@ -1529,8 +1529,8 @@
             "description": "Grants Total Concealment. Produces 'Double-Blind' effect: occupants cannot see out while active. Treats all other targets as having Total Concealment.",
             "minShipSize": "Colossal (transport)",
             "exclusiveGroup": "cloaking_device",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device_(Hibridium)",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device",
             "maxShipSize": "Colossal (station)"
         },
         {
@@ -1546,21 +1546,8 @@
             "description": "Ancient and rare technology using Stygium crystals. Grants Total Concealment without the 'Double-Blind' penalty. Extremely expensive and hard to find.",
             "minShipSize": "Huge",
             "exclusiveGroup": "cloaking_device",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device_(Stygium)"
-        },
-        {
-            "id": "anti_concussion",
-            "name": "Anti-Concussion Field",
-            "name_es": "Campo Anticoncusión",
-            "category": "Defense Systems",
-            "group": "Shields",
-            "baseCost": 5000,
-            "baseEp": 5,
-            "sizeMult": true,
-            "availability": "Military",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Anti-Concussion_Field"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device"
         },
         {
             "id": "backup_battery",
@@ -1573,21 +1560,8 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Allows ship to operate for 1 hour after power failure. Can reverse ionization damage (DC 25 Mechanics) but drains battery.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Backup_Battery"
-        },
-        {
-            "id": "backup_shield",
-            "name": "Backup Shield Generator",
-            "name_es": "Generador de Escudos de Respaldo",
-            "category": "Defense Systems",
-            "group": "Shields",
-            "baseCost": 2000,
-            "baseEp": 1,
-            "sizeMult": true,
-            "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Backup_Shield_Generator"
         },
         {
             "id": "tech_spec_sh",
@@ -1769,11 +1743,12 @@
             "group": "Communications",
             "baseCost": 50000,
             "baseEp": 4,
-            "sizeMult": false,
-            "availability": "Military",
+            "sizeMult": true,
+            "availability": "Restricted",
+            "minShipSize": "Colossal (transport)",
             "description": "Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/HoloNet_Transceiver"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transceiver"
         },
         {
             "id": "hypertransceiver",
@@ -1781,13 +1756,13 @@
             "name_es": "Hipertransceptor",
             "category": "Starship Accessories",
             "group": "Communications",
-            "baseCost": 1000,
+            "baseCost": 2000,
             "baseEp": 1,
-            "sizeMult": false,
-            "availability": "Common",
+            "sizeMult": true,
+            "availability": "Licensed",
             "description": "Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hypertransceiver"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transceiver"
         },
         {
             "id": "lifeboat_small",
@@ -1801,8 +1776,8 @@
             "availability": "Common",
             "minShipSize": "Colossal (frigate)",
             "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger. 1 Bay includes (Cost Mod)/100 Lifeboats.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Lifeboat,_Small"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Escape_Pod"
         },
         {
             "id": "droid_repair_team",
@@ -1816,22 +1791,9 @@
             "availability": "Common",
             "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active.",
             "minShipSize": "Colossal (transport)",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Droid_Repair_Team",
             "maxShipSize": "Colossal (station)"
-        },
-        {
-            "id": "medical_bed",
-            "name": "Medical Bed",
-            "name_es": "Cama Médica",
-            "category": "Starship Accessories",
-            "group": "Accommodations",
-            "baseCost": 2000,
-            "baseEp": 1,
-            "sizeMult": false,
-            "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Medical_Bed"
         },
         {
             "id": "medical_suite",
@@ -1845,24 +1807,38 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Includes (Size Mod)/5 medical beds and (Size Mod)/50 Bacta Tanks. Medical beds function as Medpac (10 uses), Medical Kit, and Surgery Kit.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Medical_Suite"
         },
         {
             "id": "passenger_conversion",
+            "name": "Passenger Conversion(Seating)",
+            "name_es": "Conversión de Pasajeros(Asientos)",
+            "category": "Starship Accessories",
+            "group": "Accommodations",
+            "baseCost": 200,
+            "baseEp": 1,
+            "sizeMult": true,
+            "availability": "Common",
+            "description": "Provides room for (Cost Mod) passengers (Seating). Steerage quality unless combined with Luxury Upgrade.",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Passenger_Conversion"
+        },
+        {
+            "id": "passenger_conversion(Quarters)",
             "name": "Passenger Conversion",
             "name_es": "Conversión de Pasajeros",
             "category": "Starship Accessories",
             "group": "Accommodations",
-            "baseCost": 2000,
-            "baseEp": 1,
+            "baseCost": 500,
+            "baseEp": 10,
             "sizeMult": true,
             "availability": "Common",
-            "description": "Provides room for (Cost Mod) passengers (Seating or Quarters). Steerage quality unless combined with Luxury Upgrade.",
-            "location": "Internal Bay",
+            "minShipSize": "Colossal (transport)",
+            "description": "Provides room for (Cost Mod) passengers (Quarters). Steerage quality unless combined with Luxury Upgrade.",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Passenger_Conversion"
-        },
-        {
+        },        {
             "id": "sensor_array_computer_2",
             "name": "Sensor Array Computer (+2 Int)",
             "name_es": "Ordenador de Matriz de Sensores (+2 Int)",
@@ -1877,8 +1853,8 @@
             "exclusiveGroup": "sensor_computer",
             "availability": "Common",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +2 Equipment bonus to Intelligence.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer_(+2_Int)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_array_computer_4",
@@ -1895,8 +1871,8 @@
             "exclusiveGroup": "sensor_computer",
             "availability": "Licensed",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +4 Equipment bonus to Intelligence.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer_(+4_Int)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_array_computer_6",
@@ -1913,8 +1889,8 @@
             "exclusiveGroup": "sensor_computer",
             "availability": "Restricted",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +6 Equipment bonus to Intelligence.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer_(+6_Int)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_enhancement",
@@ -1927,7 +1903,7 @@
             "sizeMult": true,
             "availability": "Licensed",
             "description": "Superior sensors providing better detection. Grants +5 bonus on Perception and Use Computer checks made to Use Sensors.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Sensor_Enhancement_Package"
         },
         {
@@ -1942,7 +1918,7 @@
             "availability": "Military",
             "minShipSize": "Colossal (transport)",
             "description": "Uses supercooled Tibanna gas. Always Speed 2 (Starship Scale). Range 100 squares before refuel. +5 to DC to detect ship. Moving 2x speed doesn't negate Sensor Baffling.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Baffled_Drive"
         },
         {
@@ -1951,12 +1927,12 @@
             "name_es": "Sellos Anfibios",
             "category": "Movement Systems",
             "group": "Environmental",
-            "baseCost": 500,
-            "baseEp": 0,
+            "baseCost": 4000,
+            "baseEp": 2,
             "sizeMult": true,
             "availability": "Common",
             "description": "Allows Starship to function underwater. Swim speed 1/2 fly speed. Max underwater velocity 1/10 atmospheric.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Amphibious_Seals"
         },
         {
@@ -1970,7 +1946,7 @@
             "sizeMult": false,
             "availability": "Licensed",
             "description": "Allows cockpit to eject as an Escape Pod on ship destruction (DC 20 Pilot check to avoid damage).",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Cockpit_Ejection_System"
         },
         {
@@ -1985,7 +1961,7 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Flexible tube connecting two Colossal+ ships. Creates tunnel 3 squares long. Maneuvering to connect requires DC 15 Pilot check.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Cotterdam"
         },
         {
@@ -1999,7 +1975,7 @@
             "sizeMult": true,
             "availability": "Common",
             "description": "Allows ship to support multiple environments (gravity, atmosphere, etc.). Can be used offensively (DC 25 Use Computer) to flood sections with hazards.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Environmental_Filters"
         },
         {
@@ -2013,7 +1989,7 @@
             "sizeMult": true,
             "availability": "Common",
             "description": "Transform matter into usable Fuel. 1 hour gathering = 1 unit of fuel (1 day realspace / 1 jump).",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Fuel_Converters"
         },
         {
@@ -2053,9 +2029,10 @@
             "baseCost": 10000,
             "baseEp": 0,
             "sizeMult": false,
-            "availability": "Restricted",
+            "availability": "Illegal",
+            "minShipSize": "Colossal (transport)",
             "description": "Converts a Holding Cell. Grants +5 Persuasion vs prisoners. Allows torture (+1 Dark Side).",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Interrogation_Chamber"
         },
         {
@@ -2067,9 +2044,9 @@
             "baseCost": 1000,
             "baseEp": 0,
             "sizeMult": false,
-            "availability": "Licensed",
+            "availability": "Common",
             "description": "Personalizes one crew position. +1 bonus on checks for owner, -2 penalty for others.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Personalized_Controls"
         },
         {
@@ -2111,7 +2088,7 @@
             "sizeMult": true,
             "availability": "Restricted",
             "description": "Allows Stealth checks without Cover/Concealment. Benefit lost if moving > Speed.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Sensor_Baffling"
         },
         {
@@ -2139,7 +2116,7 @@
             "sizeMult": true,
             "availability": "Illegal",
             "description": "Replicates sensor signals to make ship appear transparent. Adds +10 to DC of Use Computer checks to detect the ship.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Sensor_Mask"
         },
         {
@@ -2162,27 +2139,55 @@
             "name_es": "Transpondedor (Enmascarado)",
             "category": "Starship Accessories",
             "group": "Communications",
-            "baseCost": 1000,
+            "baseCost": 200,
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Illegal",
             "description": "Code is impossible to read. Immediately apparent and suspicious.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Transponder_(Masked)"
         },
         {
-            "id": "transponder_disguised",
-            "name": "Transponder (Disguised)",
-            "name_es": "Transpondedor (Disfrazado)",
+            "id": "transponder_disguised_1",
+            "name": "Transponder (Disguised) (1)",
+            "name_es": "Transpondedor (Disfrazado) (1)",
+            "category": "Starship Accessories",
+            "group": "Communications",
+            "baseCost": 500,
+            "baseEp": 0,
+            "sizeMult": true,
+            "availability": "Illegal",
+            "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transponder"
+        },
+        {
+            "id": "transponder_disguised_2",
+            "name": "Transponder (Disguised) (2)",
+            "name_es": "Transpondedor (Disfrazado) (2)",
+            "category": "Starship Accessories",
+            "group": "Communications",
+            "baseCost": 1000,
+            "baseEp": 0,
+            "sizeMult": true,
+            "availability": "Illegal",
+            "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transponder"
+        },
+        {
+            "id": "transponder_disguised_3",
+            "name": "Transponder (Disguised) (3)",
+            "name_es": "Transpondedor (Disfrazado) (3)",
             "category": "Starship Accessories",
             "group": "Communications",
             "baseCost": 2000,
             "baseEp": 0,
-            "sizeMult": false,
+            "sizeMult": true,
             "availability": "Illegal",
             "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Transponder_(Disguised)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transponder"
         },
         {
             "id": "transponder_iff",
@@ -2190,13 +2195,13 @@
             "name_es": "Transpondedor (IFF)",
             "category": "Starship Accessories",
             "group": "Communications",
-            "baseCost": 5000,
+            "baseCost": 1000,
             "baseEp": 0,
             "sizeMult": false,
             "availability": "Military",
             "description": "Military Friend/Foe transponder. Can be loaded with codes to appear as 'Friend'. Can hack enemy computers to appear as Friend (Use Computer check).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Transponder_(IFF)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Transponder"
         },
         {
             "id": "workshop",
@@ -2209,7 +2214,7 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Fully equipped workshop. +2 Equipment bonus on Mechanics/Use Computer checks to repair/modify/construct objects.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Workshop"
         },
         {
@@ -2224,8 +2229,8 @@
             "availability": "Restricted",
             "exclusiveGroup": "slave_circuits",
             "description": "Reduces crew requirements by 1/3 (minimum 1).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits_(Basic)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits"
         },
         {
             "id": "slave_circuits_adv",
@@ -2246,27 +2251,13 @@
                 "optionCosts": {
                     "slaveCircuits.recall": {
                         "cost": 6000,
-                        "sizeMult": true
+                        "sizeMult": true,
+                        "availability": "Military"
                     }
                 }
             },
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits_(Advanced)"
-        },
-        {
-            "id": "slave_circuits_recall",
-            "name": "Slave Circuits (Recall)",
-            "name_es": "Circuitos Esclavos (Llamada)",
-            "category": "Starship Accessories",
-            "group": "Control",
-            "baseCost": 6000,
-            "baseEp": 0,
-            "sizeMult": true,
-            "availability": "Illegal",
-            "exclusiveGroup": "slave_circuits",
-            "description": "Functions as Advanced Slave Circuits. Allows ship to be summoned via Comlink. Ship can lift off, fly to summoner, and land automatically (Untrained crew quality).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits_(Recall)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits"
         },
         {
             "id": "smuggler_compartment",
@@ -2280,7 +2271,7 @@
             "availability": "Illegal",
             "description": "Hidden cargo spaces. DC 30 Perception to find. Holds (Cost Mod) x 200 kg. Max 5% of total cargo capacity.",
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Smuggler's_Compartment"
+            "wiki": "https://swse.fandom.com/wiki/Smuggler's_Compartments"
         },
         {
             "id": "cargo_pod_small",
@@ -2298,7 +2289,7 @@
                 "cargo_bonus_size_mult": 1
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod_(Light)"
+            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_pod_med",
@@ -2316,7 +2307,7 @@
                 "cargo_bonus_size_mult": 5
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod_(Medium)"
+            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_pod_large",
@@ -2334,7 +2325,7 @@
                 "cargo_bonus_size_mult": 10
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod_(Heavy)"
+            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_jettison",
@@ -2361,7 +2352,7 @@
             "sizeMult": true,
             "availability": "Common",
             "description": "Improves a Starship's consumables by 10% of its original value (rounded down, minimum 1 day) x the number of times installed.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Extended_Range",
             "upgradeSpecs": {
                 "quantity": true
@@ -2379,8 +2370,8 @@
             "exclusiveGroup": "luxury",
             "availability": "Licensed",
             "description": "Changes a Starship from a harsh travel vehicle to a comfortable home. Includes comfortable beds, wardrobes, recliners, and music systems. Requires monthly maintenance (1/50 of cost).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade_(Basic)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
         },
         {
             "id": "luxury_advanced",
@@ -2394,8 +2385,8 @@
             "exclusiveGroup": "luxury",
             "availability": "Licensed",
             "description": "Makes the ship the equivalent of an upper-scale hotel. Gourmet cooking, quality artwork, and stylish trim. Requires monthly maintenance (1/50 of cost).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade_(Advanced)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
         },
         {
             "id": "luxury_extreme",
@@ -2409,8 +2400,8 @@
             "exclusiveGroup": "luxury",
             "availability": "Restricted",
             "description": "Turns a Starship into a palace in space. Increases Crew Quality by one step (max Expert), though this has no effect on hero statistics. Requires monthly maintenance (1/50 of cost).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade_(Extreme)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
         },
         {
             "id": "hangar_bay",
@@ -2424,7 +2415,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "description": "Holds secondary craft. Each bay has (Cost Modifier)/50 units of hangar space (Huge=1, Gargantuan=5, Colossal=20). Can be combined.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Hangar_Bay"
         },
         {
@@ -2439,22 +2430,23 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Restricted",
             "description": "Functions as Hangar Bay but requires DC 30 Perception to notice externally. Launch/Land takes 2 Full-Round Actions.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Hangar_Bay,_Concealed"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hangar_Bay"
         },
         {
             "id": "cryo_chambers",
-            "name": "Cryogenic Chambers (10 units)",
-            "name_es": "Cámaras Criogénicas (10 uds)",
+            "name": "Cryogenic Chambers",
+            "name_es": "Cámaras Criogénicas",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 500,
             "baseEp": 2,
-            "sizeMult": false,
+            "sizeMult": true,
             "availability": "Common",
+            "minShipSize": "Colossal (transport)",
             "description": "Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Cryogenic_Chambers_(10_units)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Cryogenic_Chambers"
         },
         {
             "id": "docking_clamp",
@@ -2467,7 +2459,7 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Used to carry smaller ships (e.g. TIE Fighters on a Gozanti). A Starship can maneuver and Hyperspace with ships attached. If ship takes damage > Threshold, clamped ships are shaken off.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Docking_Clamp"
         },
         {
@@ -2485,8 +2477,8 @@
             "availability": "Licensed",
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor_(+1)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
         },
         {
             "id": "armor_2",
@@ -2504,8 +2496,8 @@
             "availability": "Restricted",
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor_(+2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
         },
         {
             "id": "armor_3",
@@ -2523,8 +2515,8 @@
             "availability": "Military",
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor_(+3)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
         },
         {
             "id": "armor_4",
@@ -2542,8 +2534,8 @@
             "availability": "Military",
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor_(+4)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
         },
         {
             "id": "jamming_array",
@@ -2557,7 +2549,7 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "A Jamming Array affects all enemy Starships within 6 squares, regardless of size. The penalty on Use Computer checks is -6 for Starfighters, -4 for Space Transports, and -2 for Capital Ships.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Jamming_Array"
         },
         {
@@ -2565,7 +2557,7 @@
             "name": "Regenerating Shields",
             "name_es": "Escudos Regenerativos",
             "category": "Defense Systems",
-            "group": "Shields",
+            "group": "Shield Generators",
             "baseCost": 5000,
             "baseEp": 2,
             "sizeMult": true,
@@ -2575,7 +2567,7 @@
             },
             "exclusiveGroup": "shield_mod",
             "description": "If a ship possesses Regenerating Shields, its current Shield Rating increases by 10 (Up to its maximum Shield Rating) when a System Operator uses the Recharge Shields Action.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Regenerating_Shields"
         },
         {
@@ -2593,8 +2585,8 @@
             "availability": "Licensed",
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 20% (These improvements don't stack).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads_(+20%)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "bulkheads_30",
@@ -2611,8 +2603,8 @@
             "availability": "Restricted",
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 30% (These improvements don't stack).",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads_(+30%)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "shield_gen_70",
@@ -2629,8 +2621,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_70)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_80",
@@ -2647,8 +2639,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_80)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_90",
@@ -2665,8 +2657,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_90)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_100",
@@ -2683,8 +2675,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_100)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_125",
@@ -2701,8 +2693,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_125)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_150",
@@ -2719,8 +2711,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_150)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_175",
@@ -2737,8 +2729,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_175)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_200",
@@ -2755,8 +2747,8 @@
             "exclusiveGroup": "shield",
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator_(SR_200)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
         },
         {
             "id": "anti_boarding",
@@ -2770,7 +2762,7 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Restricted",
             "description": "Anti-Boarding Systems include blast doors (DR 10, 250 HP), security cameras, and blaster rifle turrets at vital locations. The system has independent backup power allowing turrets to make up to 50 shots after power loss.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Anti-Boarding_Systems"
         },
         {
@@ -2784,7 +2776,7 @@
             "sizeMult": false,
             "availability": "Military",
             "description": "A Com Jammer prevents any communication within 6 squares. It takes a DC 30 Use Computer check to send or receive a message within this area. The jamming ship is also affected and is easier to detect (+20 to sensors checks).",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Com_Jammers"
         },
         {
@@ -2800,7 +2792,7 @@
             "availability": "Military",
             "exclusiveGroup": "keel",
             "description": "A Reinforced Keel causes the ship to take only half damage from Collisions. If the ship Rams another, it deals +2 damage per die.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Reinforced_Keel"
         },
         {
@@ -2816,8 +2808,8 @@
             "availability": "Military",
             "exclusiveGroup": "keel",
             "description": "Boarding Keels function as Reinforced Keels but can also dock with an enemy ship after a successful ram that moves the target down the Condition Track, allowing boarders to invade.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Keel,_Boarding"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Reinforced_Keel"
         },
         {
             "id": "security_bracing",
@@ -2831,7 +2823,7 @@
             "minShipSize": "Colossal (transport)",
             "availability": "Common",
             "description": "Security Bracing protects Passenger Conversions and Escape Pods. When the ship is destroyed by massive damage, subtract the ship's DR from damage dealt to anyone in the protected area.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Security_Bracing"
         },
         {
@@ -2911,8 +2903,8 @@
         },
         {
             "id": "blaster_cannon_light",
-            "name": "Light Blaster Cannon (3d10x2)",
-            "name_es": "Cañón Bláster Ligero (3d10x2)",
+            "name": "Light Blaster Cannon",
+            "name_es": "Cañón Bláster Ligero",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 1200,
@@ -2935,12 +2927,12 @@
             "damage": "3d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Blaster_Cannon_(3d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "blaster_cannon_med",
-            "name": "Medium Blaster Cannon (4d10x2)",
-            "name_es": "Cañón Bláster Mediano (4d10x2)",
+            "name": "Medium Blaster Cannon",
+            "name_es": "Cañón Bláster Mediano",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 2500,
@@ -2963,12 +2955,12 @@
             "damage": "4d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Medium_Blaster_Cannon_(4d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "blaster_cannon_hvy",
-            "name": "Heavy Blaster Cannon (5d10x2)",
-            "name_es": "Cañón Bláster Pesado (5d10x2)",
+            "name": "Heavy Blaster Cannon",
+            "name_es": "Cañón Bláster Pesado",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 5500,
@@ -2991,7 +2983,7 @@
             "damage": "5d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Blaster_Cannon_(5d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "harpoon_gun",
@@ -3009,17 +3001,17 @@
         },
         {
             "id": "docking_gun",
-            "name": "Docking Gun Mount",
-            "name_es": "Montaje de Cañón de Atraque",
+            "name": "Docking Gun(WIP)",
+            "name_es": "Cañón de Atraque",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "baseCost": 1000,
             "baseEp": 1,
             "sizeMult": false,
-            "availability": "Common",
+            "availability": "Licensed",
             "description": "Allows Character Scale Ranged Weapons to be added as a Docking Gun. Counts as Heavy Weapon. Draws power from ship. The cost is for the mount only - the gun itself is bought normally. Docking Guns have no effect on Starship Scale combat.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Docking_Gun_Mount"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Docking_Gun"
         },
         {
             "id": "droid_jammer",
@@ -3032,7 +3024,7 @@
             "sizeMult": false,
             "availability": "Military",
             "description": "Attacks from the Starship gain a +2 Equipment bonus to hit automated craft (like Droid Starfighters) within a 5-square radius.",
-            "location": "Internal Bay",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Droid_Jammer"
         },
         {
@@ -3152,21 +3144,6 @@
             "wiki": "https://swse.fandom.com/wiki/Composite_Beam_Cannon"
         },
         {
-            "id": "bomblet_generator",
-            "name": "Bomblet Generator",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 5000,
-            "sizeMult": true,
-            "baseEp": 2,
-            "damage": "3d10x2",
-            "damageType": "Energy",
-            "availability": "Military",
-            "description": "Automatically deploys a field of small explosives in adjacent squares. Any ship entering an adjacent square takes 3d10x2 Energy damage. Has infinite ammunition (energy based).",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Bomblet_Generator"
-        },
-        {
             "id": "heavy_ordnance_mod",
             "name": "Heavy Ordnance Modification",
             "category": "Modifications",
@@ -3191,23 +3168,8 @@
             "damageType": "Ion",
             "availability": "Military",
             "description": "A massive ion weapon used on ships like the Subjugator. It fires a massive ion pulse that affects all ships in a large area, disabling electronics and shields. Requires a massive recharge time.",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Ion_Pulse_Cannon"
-        },
-        {
-            "id": "mass_driver",
-            "name": "Mass-Driver Cannon",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 3500,
-            "sizeMult": true,
-            "baseEp": 1,
-            "damage": "6d10x2",
-            "damageType": "Physical",
-            "availability": "Military",
-            "description": "A projectile weapon. Damage 6d10x2.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Mass-Driver_Cannon"
         },
         {
             "id": "pressor_beam",
@@ -3258,37 +3220,20 @@
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "baseCost": 5000,
-            "sizeMult": true,
+            "sizeMult": false,
             "baseEp": 2,
-            "damage": "4d10x2",
-            "damageType": "Energy",
             "availability": "Military",
             "description": "Detonates when a ship enters the square, creating a temporary gravity well that prevents Hyperspace travel for 1 round and deals 4d10x2 Energy damage.",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Gravity_Mine_Launcher"
-        },
-        {
-            "id": "flak_pod",
-            "name": "Flak Pod",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 2000,
-            "sizeMult": true,
-            "baseEp": 1,
-            "damage": "3d10x2",
-            "damageType": "Physical",
-            "availability": "Military",
-            "description": "Anti-fighter defense. Deals 3d10x2 damage to all starfighters in adjacent squares.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Flak_Pod"
         },
         {
             "id": "chaff_gun",
             "name": "Chaff Gun",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
-            "baseCost": 1000,
-            "sizeMult": true,
+            "baseCost": 2000,
+            "sizeMult": false,
             "baseEp": 1,
             "availability": "Restricted",
             "description": "Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship.",
@@ -3300,13 +3245,13 @@
             "name": "Defoliator",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
-            "baseCost": 10000,
-            "sizeMult": true,
-            "baseEp": 3,
+            "baseCost": 15000,
+            "sizeMult": false,
+            "baseEp": 2,
             "availability": "Illegal",
             "description": "Biological weapon. Deals massive damage to organic crew but no damage to the ship structure. Illegal in all jurisdictions.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Defoliator"
+            "wiki": "https://swse.fandom.com/wiki/Defoliator_Launcher"
         },
         {
             "id": "point_defense_mod",
@@ -3334,8 +3279,8 @@
             "stats": {
                 "str_bonus": 2
             },
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator_(+2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
         },
         {
             "id": "aux_gen_4",
@@ -3351,8 +3296,8 @@
             "stats": {
                 "str_bonus": 4
             },
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator_(+4)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
         },
         {
             "id": "aux_gen_6",
@@ -3368,8 +3313,8 @@
             "stats": {
                 "str_bonus": 6
             },
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator_(+6)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
         },
         {
             "id": "hidden_cargo_25",
@@ -3386,7 +3331,7 @@
                 "hidden_cargo_pct": 0.25
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold_(25%)"
+            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "hidden_cargo_50",
@@ -3395,7 +3340,7 @@
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 5000,
-            "baseEp": 1,
+            "baseEp": 2,
             "sizeMult": true,
             "availability": "Illegal",
             "description": "Converts 50% of cargo space into hidden compartments.",
@@ -3403,7 +3348,7 @@
                 "hidden_cargo_pct": 0.5
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold_(50%)"
+            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "hidden_cargo_75",
@@ -3412,7 +3357,7 @@
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 10000,
-            "baseEp": 1,
+            "baseEp": 4,
             "sizeMult": true,
             "availability": "Illegal",
             "description": "Converts 75% of cargo space into hidden compartments.",
@@ -3420,7 +3365,7 @@
                 "hidden_cargo_pct": 0.75
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold_(75%)"
+            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "mass_driver_hvy",
@@ -3491,8 +3436,8 @@
             "availability": "Common",
             "minShipSize": "Colossal (frigate)",
             "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger.",
-            "location": "Internal Bay",
-            "wiki": "https://swse.fandom.com/wiki/Lifeboat,_Large"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Escape_Pod"
         }
     ],
     "DEFAULT_OPTION_COSTS": {
