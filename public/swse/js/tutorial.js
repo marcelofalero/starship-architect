@@ -1,7 +1,12 @@
 export const initTutorial = () => {
     const COMPLETED_KEY = 'swse_tutorial_completed';
 
-    if (localStorage.getItem(COMPLETED_KEY) === 'true') {
+    // Check for "noob=true" in the query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceTutorial = urlParams.get('noob') === 'true';
+
+    // If not forced and already completed, skip the tutorial
+    if (!forceTutorial && localStorage.getItem(COMPLETED_KEY) === 'true') {
         return;
     }
 
