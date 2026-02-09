@@ -620,7 +620,11 @@ export const AddModDialog = {
             return store.allEquipment.filter(e => e.group === newComponentGroup.value && e.category === newComponentCategory.value).map(e => ({
                 ...e,
                 label: getLocalizedName(e)
-            })).sort((a, b) => a.label.localeCompare(b.label));
+            })).sort((a, b) => {
+                const nameCompare = a.label.localeCompare(b.label);
+                if (nameCompare !== 0) return nameCompare;
+                return a.baseEp - b.baseEp;
+            });
         });
 
         const selectedItemDef = computed(() => {
@@ -1147,6 +1151,20 @@ export const SystemListWrapper = {
                  if (mods.fireLink > 1) currentLevel = Math.max(currentLevel, 2); // Restricted
                  if (mods.enhancement === 'enhanced') currentLevel = Math.max(currentLevel, 2); // Restricted
                  if (mods.enhancement === 'advanced') currentLevel = Math.max(currentLevel, 3); // Military
+
+                 // Check options defined in upgradeSpecs
+                 if (def.upgradeSpecs && def.upgradeSpecs.optionCosts) {
+                     for (const [key, value] of Object.entries(def.upgradeSpecs.optionCosts)) {
+                         if (mods[key]) {
+                             if (value.availability) {
+                                 const availLevel = levels[value.availability];
+                                 if (availLevel !== undefined) {
+                                     currentLevel = Math.max(currentLevel, availLevel);
+                                 }
+                             }
+                         }
+                     }
+                 }
 
                  return reverse[currentLevel];
             }

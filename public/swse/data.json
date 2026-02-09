@@ -2246,7 +2246,8 @@
                 "optionCosts": {
                     "slaveCircuits.recall": {
                         "cost": 6000,
-                        "sizeMult": true
+                        "sizeMult": true,
+                        "availability": "Military"
                     }
                 }
             },
