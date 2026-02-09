@@ -1,12 +1,10 @@
 export const initTutorial = () => {
     const COMPLETED_KEY = 'swse_tutorial_completed';
 
-    // To reset for testing: localStorage.removeItem('swse_tutorial_completed');
     if (localStorage.getItem(COMPLETED_KEY) === 'true') {
         return;
     }
 
-    // Check if driver.js is loaded
     if (!window.driver || !window.driver.js) {
         console.warn('Driver.js not loaded');
         return;
@@ -81,7 +79,6 @@ export const initTutorial = () => {
             }
         ],
         onDestroyStarted: () => {
-            // Called when the tour is skipped or finished
             localStorage.setItem(COMPLETED_KEY, 'true');
             driverObj.destroy();
         }
