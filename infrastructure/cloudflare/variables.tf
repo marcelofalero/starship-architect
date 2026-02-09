@@ -36,7 +36,7 @@ variable "custom_domain" {
   type        = string
 }
 
-variable "cloudflare_zone_id" {
-  description = "The Cloudflare Zone ID for the custom domain."
+variable "aws_route53_zone_id" {
+  description = "The Route 53 Hosted Zone ID for the custom domain."
   type        = string
 }
