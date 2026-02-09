@@ -8,6 +8,8 @@ def run():
 
         # Navigate
         page.goto("http://localhost:8000/public/swse/")
+        page.evaluate("localStorage.setItem('swse_tutorial_completed', 'true')")
+        page.reload()
         page.wait_for_selector("#app-loading", state="hidden", timeout=10000)
 
         # 1. Check initial consumables
@@ -34,7 +36,8 @@ def run():
 
         # The search input is a q-select.
         # Click it to focus
-        page.locator("label[aria-label='Search Component']").click()
+        # page.locator("label[aria-label='Search Component']").click()
+        page.get_by_label("Search Component").click()
         page.keyboard.type("Extended Range")
 
         # Select from dropdown
@@ -49,7 +52,8 @@ def run():
 
         # Install
         # Button with label "Install"
-        page.locator("button span:has-text('Install')").click()
+        # page.locator("button span:has-text('Install')").click()
+        page.get_by_role("button", name="Install").click()
 
         # Check Consumables Update
         # 2 days + max(floor(2*0.1), 1) = 2 + 1 = 3 days
@@ -69,12 +73,14 @@ def run():
         # Dialog opens
         # Find Quantity input
         # It's a q-input with label Quantity
-        page.locator("label[aria-label='Quantity']").click()
-        page.keyboard.fill("2")
+        # page.locator("label[aria-label='Quantity']").click()
+        page.get_by_label("Quantity").click()
+        page.keyboard.type("2")
         page.keyboard.press("Enter")
 
         # Close dialog
-        page.locator("button span:has-text('Close')").click()
+        # page.locator("button span:has-text('Close')").click()
+        page.get_by_role("button", name="Close").click()
 
         # Check Consumables Update
         # 2 days + (1 * 2) = 4 days

@@ -10,6 +10,10 @@ def run():
         print("Navigating to app...")
         page.goto("http://localhost:8000/public/swse/")
 
+        # Disable tutorial
+        page.evaluate("localStorage.setItem('swse_tutorial_completed', 'true')")
+        page.reload()
+
         # Wait for app to load
         print("Waiting for app to load...")
         try:

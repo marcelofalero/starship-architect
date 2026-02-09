@@ -45,6 +45,11 @@ body {
     border-radius: 2px;
 }
 
+/* Driver.js tour style overrides */
+.driver-active-element {
+    pointer-events: none !important;
+}
+
 /* Previous placeholder classes */
 .stat-block {
     font-family: 'Chakra Petch', sans-serif;
@@ -230,4 +235,20 @@ body {
 
 .border-bottom-grey {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tour Active State - Disable interactions */
+body.tour-active * {
+    pointer-events: none !important;
+}
+
+body.tour-active .driver-popover,
+body.tour-active .driver-popover * {
+    pointer-events: auto !important;
+}
+
+/* Allow closing by clicking the overlay if desired, though usually driver handles this */
+body.tour-active .driver-overlay,
+body.tour-active svg.driver-overlay-path {
+    pointer-events: auto !important;
 }

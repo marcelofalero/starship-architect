@@ -8,6 +8,8 @@ def run():
 
         # Navigate
         page.goto("http://localhost:8000/public/swse/")
+        page.evaluate("localStorage.setItem('swse_tutorial_completed', 'true')")
+        page.reload()
         page.wait_for_selector("#app-loading", state="hidden", timeout=10000)
 
         # 1. Check initial consumables
@@ -22,7 +24,8 @@ def run():
         # 2. Add Extended Range
         # Click "Hangar" to ensure we are on a ship (default is light_fighter)
         # Click "Add System" button in SystemList
-        page.get_by_role("button", name="add").click()
+        # page.get_by_role("button", name="add").click() # Flaky if icon text is not accessible
+        page.locator("#tour-add-btn").click()
 
         # In Dialog
         # Use Search
@@ -52,7 +55,8 @@ def run():
         # Edit the installed component
         # Find "Extended Range" in list
         ext_range_item = page.locator(".q-item", has_text="Extended Range")
-        ext_range_item.locator("button .q-icon[name='settings']").click() # Settings button
+        # ext_range_item.locator("button .q-icon[name='settings']").click() # Settings button
+        ext_range_item.locator("button i:has-text('settings')").click()
 
         # Change Quantity to 2
         page.get_by_label("Quantity").fill("2")

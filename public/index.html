@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWSE Starship Architect - Landing</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Chakra+Petch:400,700|Russo+One" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #1d1d1d;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+        }
+
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            color: #FF5722; /* Deep Orange Accent */
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: #FF5722;
+        }
+
+        .card-image {
+            height: 200px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Placeholder style if image fails or is missing */
+        .placeholder-image {
+            background: linear-gradient(135deg, #2c3e50, #000);
+            color: #FF5722;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #FF5722;
+        }
+
+        .card-desc {
+            font-size: 0.9em;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        footer {
+            background-color: #1d1d1d;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Starship Architect</h1>
+</header>
+
+<main>
+    <div class="grid-container">
+        <!-- SWSE Card -->
+        <a href="swse/" class="game-card">
+            <div class="card-image">
+                <!-- Using a placeholder image service, or fall back to CSS -->
+                <img src="https://placehold.co/600x400/1d1d1d/FF5722?text=SWSE&font=roboto" alt="Star Wars Saga Edition" style="width:100%; height:100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="placeholder-image" style="display:none">SWSE</div>
+            </div>
+            <div class="card-content">
+                <div class="card-title">Star Wars Saga Edition</div>
+                <div class="card-desc">Design and customize starships for the Star Wars Roleplaying Game Saga Edition. Manage systems, cargo, and crews.</div>
+            </div>
+        </a>
+
+        <!-- Placeholder for future games -->
+        <!--
+        <div class="game-card" style="opacity: 0.5; cursor: not-allowed;">
+            <div class="card-image">
+                 <div class="placeholder-image" style="background: #222; color: #555;">TBD</div>
+            </div>
+            <div class="card-content">
+                <div class="card-title" style="color: #555;">Coming Soon</div>
+                <div class="card-desc">More game systems will be supported in the future.</div>
+            </div>
+        </div>
+        -->
+    </div>
+</main>
+
+<footer>
+    &copy; 2024 Starship Architect. Not affiliated with Lucasfilm or Disney.
+</footer>
+
+</body>
+</html>

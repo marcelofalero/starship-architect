@@ -1,7 +1,0 @@
-127.0.0.1 - - [08/Feb/2026 23:42:32] "GET /public/swse/ HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/css/style.css HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/js/app.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/js/components.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/js/i18n.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/js/store.js HTTP/1.1" 200 -
-127.0.0.1 - - [08/Feb/2026 23:42:33] "GET /public/swse/data.json HTTP/1.1" 200 -

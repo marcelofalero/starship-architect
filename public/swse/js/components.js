@@ -8,7 +8,7 @@ const { useQuasar } = Quasar;
 // --- BASE COMPONENTS ---
 const StatPanel = {
     template: `
-    <q-card class="bg-grey-9 text-white">
+    <q-card id="tour-stats-panel" class="bg-grey-9 text-white">
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
@@ -67,8 +67,8 @@ const StatPanel = {
 
 const SystemList = {
     template: `
-    <div class="q-pa-md col column">
-        <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
+    <div id="tour-system-list" class="q-pa-md col column">
+        <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn id="tour-add-btn" round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
         <component :is="$q.screen.gt.sm ? 'q-scroll-area' : 'div'" :class="$q.screen.gt.sm ? 'col' : ''"><q-list separator dark>
             <q-item v-for="instance in store.installedComponents" :key="instance.instanceId">
                 <q-item-section avatar><q-icon :name="getIcon(instance.defId)" color="primary" /></q-item-section>
@@ -111,6 +111,7 @@ const SystemList = {
                     <div class="row items-center">
                         <q-badge v-if="instance.miniaturization > 0" color="orange" label="Mini" class="q-mr-xs" />
                         <q-btn v-if="hasUpgrades(instance.defId)" flat round icon="settings" color="accent" size="sm" @click="openConfig(instance)" />
+                        <q-btn flat round icon="help_outline" color="info" size="sm" @click="openWiki(instance.defId)" />
                         <q-btn flat round icon="delete" color="negative" size="sm" @click="store.removeComponent(instance.instanceId)" />
                     </div>
                 </q-item-section>
@@ -179,7 +180,7 @@ const SystemList = {
 
 const ConfigPanel = {
     template: `
-    <q-card class="bg-grey-9 text-white full-height column">
+    <q-card id="tour-config-panel" class="bg-grey-9 text-white full-height column">
         <q-card-section class="col-auto">
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">
@@ -522,10 +523,10 @@ export const AddModDialog = {
                         </div>
                     </div>
                     <div v-if="selectedItemDef.sizeMult && !selectedItemDef.variableCost" class="text-xs text-grey-5 q-mt-xs">* {{ $t('ui.size_mult_msg', { size: store.chassis.size }) }}</div>
-                    <div v-if="store.isAdmin" class="row q-gutter-sm q-mt-sm justify-end">
+                    <div class="row q-gutter-sm q-mt-sm justify-end">
                         <q-btn flat dense icon="open_in_new" label="Wiki" color="info" @click="openWiki"></q-btn>
-                        <q-btn flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
-                        <q-btn flat dense icon="delete" label="Delete" color="negative" @click="deleteComponent"></q-btn>
+                        <q-btn v-if="store.isAdmin" flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
+                        <q-btn v-if="store.isAdmin" flat dense icon="delete" label="Delete" color="negative" @click="deleteComponent"></q-btn>
                     </div>
                 </q-card>
             </q-card-section>
@@ -619,7 +620,11 @@ export const AddModDialog = {
             return store.allEquipment.filter(e => e.group === newComponentGroup.value && e.category === newComponentCategory.value).map(e => ({
                 ...e,
                 label: getLocalizedName(e)
-            })).sort((a, b) => a.label.localeCompare(b.label));
+            })).sort((a, b) => {
+                const nameCompare = a.label.localeCompare(b.label);
+                if (nameCompare !== 0) return nameCompare;
+                return a.baseEp - b.baseEp;
+            });
         });
 
         const selectedItemDef = computed(() => {
@@ -1147,6 +1152,20 @@ export const SystemListWrapper = {
                  if (mods.enhancement === 'enhanced') currentLevel = Math.max(currentLevel, 2); // Restricted
                  if (mods.enhancement === 'advanced') currentLevel = Math.max(currentLevel, 3); // Military
 
+                 // Check options defined in upgradeSpecs
+                 if (def.upgradeSpecs && def.upgradeSpecs.optionCosts) {
+                     for (const [key, value] of Object.entries(def.upgradeSpecs.optionCosts)) {
+                         if (mods[key]) {
+                             if (value.availability) {
+                                 const availLevel = levels[value.availability];
+                                 if (availLevel !== undefined) {
+                                     currentLevel = Math.max(currentLevel, availLevel);
+                                 }
+                             }
+                         }
+                     }
+                 }
+
                  return reverse[currentLevel];
             }
             return avail;
@@ -1268,6 +1287,18 @@ export const SystemListWrapper = {
 
         const openConfig = (instance) => { editingInstance.value = instance; showConfigDialog.value = true; };
 
+        const openWiki = (defId) => {
+             const def = store.allEquipment.find(e => e.id === defId);
+             if (!def) return;
+
+             if (def.wiki) {
+                 window.open(def.wiki, '_blank');
+             } else {
+                 const name = def.name.replace(/ /g, '_');
+                 window.open(`https://swse.fandom.com/wiki/${name}`, '_blank');
+             }
+        };
+
         const checkValidity = (instance) => {
             const def = store.allEquipment.find(e => e.id === instance.defId);
             if (!def) return true;
@@ -1356,7 +1387,7 @@ export const SystemListWrapper = {
             };
         });
 
-        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, checkValidity, configModel, getOptionCost };
+        return { store, getName, getIcon, getEpDynamic, getAvailability, getBaseEp, isVariableCost, isModification, isWeapon, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canMount, canFireLink, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, openWiki, checkValidity, configModel, getOptionCost };
     }
 };
 
