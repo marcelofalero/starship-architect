@@ -3,10 +3,10 @@ import collections
 
 def main():
     try:
-        with open('public/data.json', 'r') as f:
+        with open('public/swse/data.json', 'r') as f:
             data = json.load(f)
     except FileNotFoundError:
-        print("Error: public/data.json not found.")
+        print("Error: public/swse/data.json not found.")
         return
 
     equipment = data.get('EQUIPMENT', [])

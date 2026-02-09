@@ -12,7 +12,7 @@ variable "cloudflare_account_id" {
 variable "project_name" {
   description = "The name of the Cloudflare Pages project."
   type        = string
-  default     = "swse-architect"
+  default     = "starship-architect"
 }
 
 variable "github_owner" {
