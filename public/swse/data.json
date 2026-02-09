@@ -3206,7 +3206,7 @@
       "id": "chaff_gun",
       "name": "Chaff Gun",
       "name_es": "Cañón de Chaff",
-      "category": "Defensive Systems",
+      "category": "Defense Systems",
       "group": "Defensive Weapons",
       "baseCost": 2000,
       "sizeMult": false,
