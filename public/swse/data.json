@@ -603,13 +603,13 @@
             },
             "damage": "9d10x2",
             "description": "Base Capacity: 3 torpedoes. Additional capacity costs +25% per torpedo (max 16).",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Proton_Torpedo_Launcher"
         },
         {
             "id": "ion_cannon_light",
-            "name": "Light Ion Cannon (3d10x2)",
-            "name_es": "Cañón de Iones Ligero (3d10x2)",
+            "name": "Light Ion Cannon",
+            "name_es": "Cañón de Iones Ligero",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 2000,
@@ -630,9 +630,10 @@
                 ]
             },
             "damage": "3d10x2",
+            "damageType": "Ion",
             "description": "Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Ion_Cannon_(3d10x2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon",
@@ -655,13 +656,13 @@
             },
             "damage": "5d10x2",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Medium_Ion_Cannon_(5d10x2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon_hvy",
-            "name": "Heavy Ion Cannon (3d10x5)",
-            "name_es": "Cañón de Iones Pesado (3d10x5)",
+            "name": "Heavy Ion Cannon",
+            "name_es": "Cañón de Iones Pesado",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 6000,
@@ -680,13 +681,13 @@
             },
             "damage": "3d10x5",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Ion_Cannon_(3d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon_hapan",
-            "name": "Hapan Triple Ion Cannon (5d10x5)",
-            "name_es": "Cañón de Iones Triple Hapan (5d10x5)",
+            "name": "Hapan Triple Ion Cannon",
+            "name_es": "Cañón de Iones Triple Hapan",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 12000,
@@ -699,13 +700,13 @@
             },
             "damage": "5d10x5",
             "description": "Acts like a Point-Defense Weapon (no penalty for targets smaller than Colossal). Capable of Autofire, but not Starship Scale Area Attacks. Illegal outside Hapan Consortium.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Hapan_Triple_Ion_Cannon_(5d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
         },
         {
             "id": "concussion_missile_light",
-            "name": "Light Concussion Missile Launcher (7d10x2)",
-            "name_es": "Lanzador de Misiles de Concusión Ligero (7d10x2)",
+            "name": "Light Concussion Missile Launcher",
+            "name_es": "Lanzador de Misiles de Concusión Ligero",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 2000,
@@ -732,12 +733,12 @@
             "damage": "7d10x2",
             "description": "Base Capacity: 6 missiles. Additional capacity costs +20% per missile (max double capacity).",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Concussion_Missile_Launcher_(7d10x2)"
+            "wiki": "https://swse.fandom.com/wiki/Light_Concussion_Missile_Launcher"
         },
         {
             "id": "concussion_missile",
-            "name": "Medium Concussion Missile Launcher (9d10x2)",
-            "name_es": "Lanzador de Misiles de Concusión Mediano (9d10x2)",
+            "name": "Medium Concussion Missile Launcher",
+            "name_es": "Lanzador de Misiles de Concusión Mediano",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 3500,
@@ -763,13 +764,13 @@
             },
             "damage": "9d10x2",
             "description": "Base Capacity: 16 missiles. Additional capacity costs +20% per missile (max double capacity).",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Medium_Concussion_Missile_Launcher_(9d10x2)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Concussion_Missile_Launcher"
         },
         {
             "id": "concussion_missile_hvy",
-            "name": "Heavy Concussion Missile Launcher (9d10x5)",
-            "name_es": "Lanzador de Misiles de Concusión Pesado (9d10x5)",
+            "name": "Heavy Concussion Missile Launcher",
+            "name_es": "Lanzador de Misiles de Concusión Pesado",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 30000,
@@ -796,8 +797,8 @@
             },
             "damage": "9d10x5",
             "description": "Base Capacity: 30 missiles. Additional capacity costs +20% per missile (max double capacity).",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Concussion_Missile_Launcher_(9d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Concussion_Missile_Launcher"
         },
         {
             "id": "tractor_beam",
@@ -810,7 +811,7 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Tractor Beams prevent another Vehicle from escaping instead of dealing damage. If the attack hits, make an opposed Grapple check. Smaller targets are immobilized and lose Dex bonus. Larger targets can be pulled closer. Docking Clamps allow boarding.",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Tractor_Beam"
         },
         {
@@ -2003,7 +2004,7 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "Short-range grappling hook (Range 1). Can be used without power to attach clandestinely (Opposed Pilot/Stealth vs Pilot/Use Computer).",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Grappler_Mag"
         },
         {
@@ -2017,8 +2018,8 @@
             "sizeMult": false,
             "availability": "Common",
             "description": "External mounts for missiles/bombs. 1 Array = 4 Hardpoints. 1 Missile/Bomb = 1 HP (2 for Colossal weapons). Can also carry Drop Tanks. Half payload lost if Condition Track drops.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Hardpoint_(x4)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Hardpoint"
         },
         {
             "id": "interrogation_chamber",
@@ -2828,8 +2829,8 @@
         },
         {
             "id": "turbolaser_light",
-            "name": "Light Turbolaser (3d10x5)",
-            "name_es": "Turboláser Ligero (3d10x5)",
+            "name": "Light Turbolaser",
+            "name_es": "Turboláser Ligero",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 5000,
@@ -2848,13 +2849,13 @@
             "minShipSize": "Colossal (frigate)",
             "damage": "3d10x5",
             "description": "Turbolasers require immense power and cooling. Light Turbolasers can be Fire-Linked with Autofire.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Turbolaser_(3d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
         },
         {
             "id": "turbolaser_med",
-            "name": "Medium Turbolaser (5d10x5)",
-            "name_es": "Turboláser Mediano (5d10x5)",
+            "name": "Medium Turbolaser",
+            "name_es": "Turboláser Mediano",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 10000,
@@ -2873,13 +2874,13 @@
             "minShipSize": "Colossal (frigate)",
             "damage": "5d10x5",
             "description": "Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Medium_Turbolaser_(5d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
         },
         {
             "id": "turbolaser_hvy",
-            "name": "Heavy Turbolaser (7d10x5)",
-            "name_es": "Turboláser Pesado (7d10x5)",
+            "name": "Heavy Turbolaser",
+            "name_es": "Turboláser Pesado",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 20000,
@@ -2898,8 +2899,8 @@
             "minShipSize": "Colossal (frigate)",
             "damage": "7d10x5",
             "description": "Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Turbolaser_(7d10x5)"
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
         },
         {
             "id": "blaster_cannon_light",
@@ -3076,12 +3077,12 @@
             "baseCost": 1500,
             "sizeMult": true,
             "baseEp": 1,
-            "damage": "4d10x2",
+            "damage": "5d10",
             "damageType": "Ion",
             "availability": "Military",
-            "description": "Ion Bombs deal 4d10x2 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0).",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Bomb_Rack"
+            "description": "Ion Bombs deal 5d10 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0). A rack Holds up too 4 bombs",
+            "location": "",
+            "wiki": "https://swse.fandom.com/wiki/Ion_Bomb"
         },
         {
             "id": "shieldbuster_torp",
@@ -3099,18 +3100,47 @@
             "wiki": "https://swse.fandom.com/wiki/Shieldbuster_Torpedo_Launcher"
         },
         {
-            "id": "space_mine_launcher",
-            "name": "Space Mine Launcher",
+            "id": "space_mine_launcher_standard",
+            "name": "Space Mine Launcher, Standard",
             "category": "Weapon Systems",
-            "group": "Exotic Weapons",
+            "group": "Mines",
             "baseCost": 5000,
-            "sizeMult": true,
-            "baseEp": 1,
-            "damage": "6d10x2",
+            "sizeMult": false,
+            "baseEp": 2,
+            "damage": "Varies",
             "damageType": "Energy",
-            "availability": "Restricted",
+            "availability": "Military",
+            "description": "Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing energy damage to that ship depending of payload.",
+            "location": "",
+            "payload": {
+              "type": "capacity",
+              "base": 6,
+              "max": 12,
+              "costFactor": 0.25,
+              "unitLabel": "mines"
+            },
+            "wiki": "https://swse.fandom.com/wiki/Space_Mine_Launcher"
+        },
+        {
+            "id": "space_mine_launcher_heavy",
+            "name": "Space Mine Launcher, Heavy",
+            "category": "Weapon Systems",
+            "group": "Mines",
+            "baseCost": 5000,
+            "sizeMult": false,
+            "baseEp": 4,
+            "damage": "6d10x5",
+            "damageType": "Energy",
+            "availability": "Military",
             "description": "Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing 6d10x2 Energy damage to that ship.",
-            "location": "Hardpoint",
+            "location": "",
+            "payload": {
+              "type": "capacity",
+              "base": 6,
+              "max": 12,
+              "costFactor": 0.25,
+              "unitLabel": "mines"
+            },
             "wiki": "https://swse.fandom.com/wiki/Space_Mine_Launcher"
         },
         {
@@ -3144,77 +3174,6 @@
             "wiki": "https://swse.fandom.com/wiki/Composite_Beam_Cannon"
         },
         {
-            "id": "heavy_ordnance_mod",
-            "name": "Heavy Ordnance Modification",
-            "category": "Modifications",
-            "baseCost": 2000,
-            "sizeMult": false,
-            "baseEp": 0,
-            "availability": "Military",
-            "description": "Modifications to standard launchers to fire heavier payloads like Proton Bombs or heavy rockets. Increases damage dice by +1d10 but reduces range by 50%.",
-            "location": "Installed",
-            "group": "Weapon Upgrades",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Ordnance_Modification"
-        },
-        {
-            "id": "ion_pulse_cannon",
-            "name": "Ion Pulse Cannon",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 4000,
-            "sizeMult": true,
-            "baseEp": 1,
-            "damage": "9d10x10",
-            "damageType": "Ion",
-            "availability": "Military",
-            "description": "A massive ion weapon used on ships like the Subjugator. It fires a massive ion pulse that affects all ships in a large area, disabling electronics and shields. Requires a massive recharge time.",
-            "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Pulse_Cannon"
-        },
-        {
-            "id": "pressor_beam",
-            "name": "Pressor Beam",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 5000,
-            "sizeMult": true,
-            "baseEp": 2,
-            "availability": "Restricted",
-            "description": "Reverse Tractor Beam. Pushes a target ship 1 square away on a successful hit. The target must be smaller than the firing ship.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Pressor_Beam"
-        },
-        {
-            "id": "proton_grenade_launcher",
-            "name": "Proton Grenade Launcher",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 800,
-            "sizeMult": true,
-            "baseEp": 1,
-            "damage": "8d6",
-            "damageType": "Energy",
-            "availability": "Restricted",
-            "description": "Fires a cluster of proton grenades. Deals 3d10x2 Energy damage in a 1-square burst. Short range only.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Proton_Grenade_Launcher"
-        },
-        {
-            "id": "rail_cannon",
-            "name": "Rail Cannon",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 4500,
-            "sizeMult": true,
-            "baseEp": 2,
-            "damage": "5d10x5",
-            "damageType": "Physical",
-            "availability": "Military",
-            "description": "Similar to Mass-Drivers but more powerful. Deals 5d10x2 Physical damage. Ignores SR.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Rail_Cannon"
-        },
-        {
             "id": "gravity_mine_launcher",
             "name": "Gravity Mine Launcher",
             "category": "Weapon Systems",
@@ -3237,33 +3196,8 @@
             "baseEp": 1,
             "availability": "Restricted",
             "description": "Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship.",
-            "location": "Hardpoint",
+            "location": "",
             "wiki": "https://swse.fandom.com/wiki/Chaff_Gun"
-        },
-        {
-            "id": "defoliator",
-            "name": "Defoliator",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 15000,
-            "sizeMult": false,
-            "baseEp": 2,
-            "availability": "Illegal",
-            "description": "Biological weapon. Deals massive damage to organic crew but no damage to the ship structure. Illegal in all jurisdictions.",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Defoliator_Launcher"
-        },
-        {
-            "id": "point_defense_mod",
-            "name": "Point Defense System",
-            "category": "Modifications",
-            "baseCost": 4000,
-            "sizeMult": true,
-            "baseEp": 0,
-            "availability": "Military",
-            "description": "Automated laser system that shoots down incoming missiles. Provides a +5 bonus to Reflex Defense against missile attacks.",
-            "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Point_Defense_System"
         },
         {
             "id": "aux_gen_2",
@@ -3366,38 +3300,6 @@
             },
             "location": "Cargo Hold",
             "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
-        },
-        {
-            "id": "mass_driver_hvy",
-            "name": "Heavy Mass-Driver Cannon",
-            "name_es": "Cañón Mass-Driver Pesado",
-            "category": "Weapon Systems",
-            "group": "Exotic Weapons",
-            "baseCost": 15000,
-            "baseEp": 2,
-            "sizeMult": true,
-            "damage": "7d10x2",
-            "damageType": "Physical",
-            "availability": "Military",
-            "description": "A heavy projectile weapon. Damage 7d10x2.",
-            "minShipSize": "Huge",
-            "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Mass-Driver_Cannon"
-        },
-        {
-            "id": "autoblaster_upgrade",
-            "name": "Autoblaster Modification",
-            "name_es": "Modificación Autobláster",
-            "category": "Modifications",
-            "group": "Weapon Upgrades",
-            "baseCost": 2000,
-            "costMultiplier": "weapon_cost",
-            "baseEp": 0,
-            "sizeMult": false,
-            "description": "Modifies a single-mount weapon to be an Autoblaster. Increases cyclic rate, allowing Autofire but at -2 attack penalty. Cost is 2x the base cost of the weapon.",
-            "availability": "Restricted",
-            "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Autoblaster_Modification"
         },
         {
             "id": "heavy_ordnance_launcher",
