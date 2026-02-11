@@ -630,9 +630,11 @@ export const useShipStore = defineStore('ship', () => {
         return lib;
     }
 
-    function addCustomComponent(component) {
-        const lib = getEditableLibrary();
-        lib.components.push(component);
+    function addCustomComponent(component, libraryId) {
+        const lib = libraryId ? libraries.value.find(l => l.id === libraryId) : getEditableLibrary();
+        if (lib) {
+            lib.components.push(component);
+        }
     }
 
     function updateCustomComponent(component) {
@@ -660,9 +662,11 @@ export const useShipStore = defineStore('ship', () => {
         }
     }
 
-    function addCustomShip(ship) {
-        const lib = getEditableLibrary();
-        lib.ships.push(ship);
+    function addCustomShip(ship, libraryId) {
+        const lib = libraryId ? libraries.value.find(l => l.id === libraryId) : getEditableLibrary();
+        if (lib) {
+            lib.ships.push(ship);
+        }
     }
 
     function updateCustomShip(ship) {
@@ -692,11 +696,13 @@ export const useShipStore = defineStore('ship', () => {
 
     function openCustomDialog(componentId = null) {
         customDialogState.componentId = componentId;
+        customDialogState.targetLibraryId = getEditableLibrary().id;
         customDialogState.visible = true;
     }
 
     function openCustomShipDialog(shipId = null) {
         customShipDialogState.shipId = shipId;
+        customShipDialogState.targetLibraryId = getEditableLibrary().id;
         customShipDialogState.visible = true;
     }
 

@@ -1,5 +1,5 @@
-import { useShipStore } from './store.js';
-import { getLocalizedName, i18n } from './i18n.js';
+import { useShipStore } from './store.js?v=2.1';
+import { getLocalizedName, i18n } from './i18n.js?v=2.1';
 
 const { computed, ref, reactive, watch } = Vue;
 const { useI18n } = VueI18n;
@@ -285,7 +285,7 @@ const ShipSheet = {
 
             <div class="section-title">Defense</div>
             <div><span class="bold">Ref</span> {{ store.reflexDefense }} (Flat-footed {{ store.reflexDefense - getMod(store.currentStats.dex) }}), <span class="bold">Fort</span> {{ 10 + getMod(store.currentStats.str) }}; <span class="bold">+{{ store.currentStats.armor }} Armor</span></div>
-            <div><span class="bold">HP</span> {{ store.currentStats.hp }}; <span class="bold">DR</span> {{ store.currentStats.dr }}; <span class="bold">SR</span> {{ store.currentStats.sr }}; <span class="bold">Threshold</span> {{ store.currentStats.str + 10 }}</div>
+            <div><span class="bold">HP</span> {{ store.currentStats.hp }}; <span class="bold">DR</span> {{ store.currentStats.dr }}; <span class="bold">SR</span> {{ store.currentStats.sr || 0 }}; <span class="bold">Threshold</span> {{ store.damageThreshold }}</div>
 
             <div class="section-title">Offense</div>
             <div><span class="bold">Speed</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
@@ -588,10 +588,14 @@ export const CustomShipDialog = {
                 <div class="column q-gutter-md">
                     <!-- Basic Info -->
                     <div class="text-subtitle2 text-primary">General Information</div>
+                    <div><q-select filled dark v-model="store.customShipDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
                     <div class="row q-col-gutter-sm">
                         <div class="col-8"><q-input filled dark v-model="newShip.name" label="Ship Name" :rules="[val => !!val || 'Name is required']"></q-input></div>
                         <div class="col-4">
                             <q-select filled dark v-model="newShip.size" :options="store.db.SIZE_RANK" label="Size" emit-value map-options></q-select>
+                        </div>
+                        <div class="col-12" v-if="store.isAdmin">
+                            <q-input filled dark v-model="newShip.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
                         </div>
                     </div>
                     <div class="row q-col-gutter-sm">
@@ -609,14 +613,9 @@ export const CustomShipDialog = {
                         <div class="col-4"><q-input filled dark v-model.number="newShip.stats.int" label="Intelligence" type="number"></q-input></div>
                     </div>
                     <div class="row q-col-gutter-sm">
-                        <div class="col-3"><q-input filled dark v-model.number="newShip.stats.hp" label="HP" type="number"></q-input></div>
-                        <div class="col-3"><q-input filled dark v-model.number="newShip.stats.armor" label="Armor" type="number"></q-input></div>
-                        <div class="col-3"><q-input filled dark v-model.number="newShip.stats.sr" label="Shields (SR)" type="number"></q-input></div>
-                        <div class="col-3"><q-input filled dark v-model.number="newShip.stats.dr" label="DR" type="number"></q-input></div>
-                    </div>
-                    <div class="row q-col-gutter-sm">
-                        <div class="col-6"><q-input filled dark v-model.number="newShip.stats.threshold" label="Threshold" type="number" hint="Usually Str + Size Mod"></q-input></div>
-                        <div class="col-6"><q-input filled dark v-model.number="newShip.stats.speed" label="Speed (Squares)" type="number"></q-input></div>
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.hp" label="HP" type="number"></q-input></div>
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.armor" label="Armor" type="number"></q-input></div>
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.dr" label="DR" type="number"></q-input></div>
                     </div>
 
                     <q-separator dark />
@@ -632,7 +631,7 @@ export const CustomShipDialog = {
                         <div class="col-6"><q-input filled dark v-model="newShip.logistics.cons" label="Consumables" hint="e.g. '1 month'"></q-input></div>
                     </div>
                     <div>
-                        <q-input filled dark v-model="newShip.logistics.hangar" label="Hangar / Carried Craft" type="textarea" autogrow></q-input>
+                <q-input filled dark v-model="newShip.description" label="Description" type="textarea" autogrow></q-input>
                     </div>
 
                 </div>
@@ -654,8 +653,9 @@ export const CustomShipDialog = {
             size: 'Huge',
             cost: 0,
             baseEp: 0,
-            stats: { str: 0, dex: 0, int: 0, hp: 0, armor: 0, sr: 0, dr: 0, threshold: 0, speed: 0 },
-            logistics: { crew: 0, pass: 0, cargo: '', cons: '', hangar: '' }
+            description: '',
+            stats: { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0 },
+            logistics: { crew: 0, pass: 0, cargo: '', cons: '' }
         });
 
         const createCustomShip = () => {
@@ -673,6 +673,7 @@ export const CustomShipDialog = {
                 size: newShip.size,
                 cost: Number(newShip.cost),
                 baseEp: Number(newShip.baseEp),
+                description: newShip.description,
                 stats: { ...newShip.stats },
                 logistics: { ...newShip.logistics }
             };
@@ -680,7 +681,7 @@ export const CustomShipDialog = {
             if (isEdit) {
                 store.updateCustomShip(ship);
             } else {
-                store.addCustomShip(ship);
+                store.addCustomShip(ship, store.customShipDialogState.targetLibraryId);
             }
             store.customShipDialogState.visible = false;
         };
@@ -695,10 +696,10 @@ export const CustomShipDialog = {
                         newShip.size = existing.size;
                         newShip.cost = existing.cost;
                         newShip.baseEp = existing.baseEp;
+                        newShip.description = existing.description || '';
 
-                        // Deep copy stats/logistics to avoid reactivity linking directly to store until save
-                        newShip.stats = { str: 0, dex: 0, int: 0, hp: 0, armor: 0, sr: 0, dr: 0, threshold: 0, speed: 0, ...existing.stats };
-                        newShip.logistics = { crew: 0, pass: 0, cargo: '', cons: '', hangar: '', ...existing.logistics };
+                        newShip.stats = { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0, ...existing.stats };
+                        newShip.logistics = { crew: 0, pass: 0, cargo: '', cons: '', ...existing.logistics };
                     }
                 } else {
                     // Reset
@@ -707,8 +708,9 @@ export const CustomShipDialog = {
                     newShip.size = 'Huge';
                     newShip.cost = 0;
                     newShip.baseEp = 0;
-                    newShip.stats = { str: 40, dex: 10, int: 10, hp: 120, armor: 5, sr: 0, dr: 10, threshold: 50, speed: 4 };
-                    newShip.logistics = { crew: 1, pass: 0, cargo: '0 tons', cons: '1 day', hangar: '' };
+                    newShip.description = '';
+                    newShip.stats = { str: 40, dex: 10, int: 10, hp: 120, armor: 5, dr: 10 };
+                    newShip.logistics = { crew: 1, pass: 0, cargo: '0 tons', cons: '1 day' };
                 }
             } else {
                 store.customShipDialogState.shipId = null;
@@ -1086,6 +1088,7 @@ export const CustomComponentDialog = {
             </q-card-section>
             <q-card-section class="q-pt-none">
                 <div class="column q-gutter-md">
+                    <div><q-select filled dark v-model="store.customDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
                     <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
                     <div v-if="store.isAdmin">
                         <q-input filled dark v-model="newCustomComponent.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
@@ -1264,7 +1267,7 @@ export const CustomComponentDialog = {
                 store.updateCustomComponent(comp);
                 store.customDialogState.visible = false;
             } else {
-                store.addCustomComponent(comp);
+                store.addCustomComponent(comp, store.customDialogState.targetLibraryId);
                 store.customDialogState.visible = false;
             }
         };
