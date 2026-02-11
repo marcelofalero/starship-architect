@@ -35,7 +35,12 @@ const setup = () => {
 
         // Initialize Tutorial
         setTimeout(() => {
-            initTutorial();
+            initTutorial({
+                setMobileTab: (tab) => mobileTab.value = tab,
+                openLeftDrawer: () => leftDrawerOpen.value = true,
+                openRightDrawer: () => rightDrawerOpen.value = true,
+                isMobile: () => !$q.screen.gt.sm
+            });
         }, 500);
     });
 

@@ -51,13 +51,13 @@
                 </q-toolbar>
             </q-header>
 
-            <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered class="bg-grey-10">
+            <q-drawer v-if="$q.screen.gt.sm" show-if-above v-model="leftDrawerOpen" side="left" bordered class="bg-grey-10">
                 <div class="fit q-pa-sm">
                     <stat-panel></stat-panel>
                 </div>
             </q-drawer>
 
-            <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered class="bg-grey-10">
+            <q-drawer v-if="$q.screen.gt.sm" show-if-above v-model="rightDrawerOpen" side="right" bordered class="bg-grey-10">
                 <div class="fit q-pa-sm">
                     <config-panel></config-panel>
                 </div>

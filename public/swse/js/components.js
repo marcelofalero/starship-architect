@@ -334,7 +334,7 @@ export const HangarDialog = {
     emits: ['update:modelValue'],
     template: `
     <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px; max-width: 90vw;">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px; max-width: 90vw;'">
             <q-card-section><div class="text-h6">{{ $t('ui.hangar') }}</div></q-card-section>
             <q-tabs v-model="hangarTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
                 <q-tab name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
@@ -408,7 +408,7 @@ export const HangarDialog = {
 export const AddModDialog = {
     template: `
     <q-dialog v-model="store.showAddComponentDialog">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px'">
             <q-card-section>
                 <div class="row items-center justify-between">
                     <div class="text-h6">{{ $t('ui.install_system') }}</div>
@@ -537,7 +537,7 @@ export const AddModDialog = {
             </q-card-actions>
         </q-card>
         <q-dialog v-model="showJsonEditor" persistent>
-            <q-card class="bg-grey-9 text-white" style="min-width: 600px; max-width: 90vw;">
+            <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 600px; max-width: 90vw;'">
                 <q-card-section>
                     <div class="text-h6">Edit Component JSON</div>
                 </q-card-section>
@@ -766,7 +766,7 @@ export const AddModDialog = {
 export const CustomManagerDialog = {
     template: `
     <q-dialog v-model="store.showCustomManager">
-        <q-card class="bg-grey-9 text-white" style="min-width: 600px; height: 70vh; display: flex; flex-direction: column;">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%; height: 100vh; display: flex; flex-direction: column;' : 'min-width: 600px; height: 70vh; display: flex; flex-direction: column;'">
             <q-card-section class="row items-center q-pb-none">
                 <div class="text-h6">Custom Components Library</div>
                 <q-space></q-space>
@@ -883,7 +883,7 @@ export const CustomManagerDialog = {
 export const CustomComponentDialog = {
     template: `
     <q-dialog v-model="store.customDialogState.visible">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px'">
             <q-card-section>
                 <div class="text-h6">{{ store.customDialogState.componentId ? 'Edit Custom Component' : 'Create Custom Component' }}</div>
             </q-card-section>
