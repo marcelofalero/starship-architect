@@ -307,6 +307,16 @@ export const useShipStore = defineStore('ship', () => {
 
     const currentStats = computed(() => {
         const s = { ...chassis.value.stats, speed: 0 };
+        // Handle chassis SR if present, but components overwrite it.
+        // If chassis has SR, it is kept unless components overwrite it later with modSR.
+        // If chassis does NOT have SR (undefined), s.sr is undefined.
+        // We should ensure it's not undefined for display? No, UI handles it.
+        // BUT user said "SR depends on installed shield generator".
+        // If I removed SR from custom ship dialog, custom ships have NO base SR.
+        // So s.sr will be undefined (from spread) or effectively 0 if we default it.
+        // Let's ensure s.sr is handled if undefined -> 0?
+        if (s.sr === undefined) s.sr = 0;
+
         if (template.value && template.value.stats) {
             for (const [key, val] of Object.entries(template.value.stats)) {
                 if (s[key] !== undefined) s[key] += val;
@@ -359,6 +369,42 @@ export const useShipStore = defineStore('ship', () => {
         if (s.hyperdrive) s.hyperdrive += hyperdriveShift;
         s.weapon_damage_dice = (s.weapon_damage_dice || 0) + weaponDice;
         return s;
+    });
+
+    const DT_SIZE_MODS = {
+        'Fine': -10, 'Diminutive': -5, 'Tiny': -2, 'Small': -1, 'Medium': 0,
+        'Large': 5, 'Huge': 10, 'Gargantuan': 20, 'Colossal': 50,
+        'Colossal (Frigate)': 100, 'Colossal (Cruiser)': 200, 'Colossal (Station)': 500
+    };
+
+    const damageThreshold = computed(() => {
+        const str = currentStats.value.str || 10;
+        const fort = 10 + Math.floor((str - 10) / 2); // Fortitude Defense = 10 + Str Mod (assuming no class/level/equip bonus for ships usually, just Str)
+        // Wait, Starship Fortitude is 10 + Size Mod + Armor + Str Mod?
+        // Rules say: Reflex = 10 + Armor + Dex + Size. Fortitude = 10 + Str + Class/Level.
+        // But vehicles use Str mod for Fortitude.
+        // DT = Fortitude Defense (for objects/vehicles/ships).
+        // The prompt says: "DT is calculated based on the Fortitude and size (Fort. + Size Mod.)".
+        // And "Fortitude is calculated based on STR (10+STR mod.)".
+        // So Fort = 10 + StrMod.
+        // DT = Fort + SizeMod.
+
+        const size = chassis.value.size;
+        // Handle variations of Colossal if size string starts with Colossal
+        let sizeKey = size;
+        // Check if size string matches keys in DT_SIZE_MODS
+        if (!DT_SIZE_MODS[sizeKey]) {
+             // Fallback logic for Colossal variants if exact match fails?
+             if (size.startsWith('Colossal')) {
+                 if (size.includes('Frigate')) sizeKey = 'Colossal (Frigate)';
+                 else if (size.includes('Cruiser')) sizeKey = 'Colossal (Cruiser)';
+                 else if (size.includes('Station')) sizeKey = 'Colossal (Station)';
+                 else sizeKey = 'Colossal';
+             }
+        }
+
+        const sizeMod = DT_SIZE_MODS[sizeKey] || 0;
+        return fort + sizeMod;
     });
 
     const shipAvailability = computed(() => {
@@ -829,7 +875,7 @@ export const useShipStore = defineStore('ship', () => {
         customDialogState, customShipDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addCustomShip, updateCustomShip, removeCustomShip, openCustomShipDialog, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
-        addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary,
+        addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary, damageThreshold, DT_SIZE_MODS,
         isAdmin, isWeapon, isEngine
     };
 });
