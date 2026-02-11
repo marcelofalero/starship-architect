@@ -1,4 +1,4 @@
-export const initTutorial = () => {
+export const initTutorial = (context = {}) => {
     const COMPLETED_KEY = 'swse_tutorial_completed';
 
     // Check for "noob=true" in the query string
@@ -39,6 +39,13 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-stats-panel',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('overview');
+                    } else if (context.openLeftDrawer) {
+                        context.openLeftDrawer();
+                    }
+                },
                 popover: {
                     title: 'Ship Statistics',
                     description: 'This panel displays your ship\'s vital statistics like HP, SR, Threshold, and Defense scores.',
@@ -48,6 +55,11 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-system-list',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('systems');
+                    }
+                },
                 popover: {
                     title: 'Systems Manifest',
                     description: 'Your installed systems, weapons, and modifications are listed here.',
@@ -57,6 +69,11 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-add-btn',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('systems');
+                    }
+                },
                 popover: {
                     title: 'Install Components',
                     description: 'Click this button to browse and install new weapons, systems, and upgrades.',
@@ -66,6 +83,13 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-config-panel',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('config');
+                    } else if (context.openRightDrawer) {
+                        context.openRightDrawer();
+                    }
+                },
                 popover: {
                     title: 'Engineering & Config',
                     description: 'Adjust the base chassis, crew quality, and apply templates here. Also manage cargo and escape pods.',
