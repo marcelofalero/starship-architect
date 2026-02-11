@@ -113,7 +113,7 @@
                             <q-tab name="config" icon="tune" :label="$t('ui.config')"></q-tab>
                         </q-tabs>
                         
-                        <q-tab-panels v-model="mobileTab" animated class="bg-transparent q-mt-md">
+                        <q-tab-panels v-model="mobileTab" animated swipeable class="bg-transparent q-mt-md">
                             <q-tab-panel name="overview" class="q-pa-none"><stat-panel></stat-panel></q-tab-panel>
                             <q-tab-panel name="systems" class="q-pa-none"><system-list></system-list></q-tab-panel>
                             <q-tab-panel name="config" class="q-pa-none"><config-panel></config-panel></q-tab-panel>
