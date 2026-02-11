@@ -35,19 +35,45 @@
                     <q-btn flat round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" v-if="$q.screen.gt.sm"></q-btn>
                     <q-btn flat round icon="rocket" size="md" class="q-mr-sm"></q-btn>
                     <q-toolbar-title>
-                        SWSE Architect
-                        <span class="text-subtitle2 q-ml-sm text-grey-4" v-if="shipStore.meta.name">{{ shipStore.meta.name }}</span>
+                        <span v-if="$q.screen.gt.xs">SWSE Architect</span>
+                        <span v-else>SWSE</span>
+                        <span class="text-subtitle2 q-ml-sm text-grey-4" v-if="shipStore.meta.name && $q.screen.gt.sm">{{ shipStore.meta.name }}</span>
                     </q-toolbar-title>
                     
-                    <q-btn id="tour-hangar-btn" flat icon="garage" :label="$t('ui.hangar')" @click="showHangarDialog = true" class="q-mr-sm"></q-btn>
-                    <q-btn id="tour-export-btn" flat icon="save" :label="$t('ui.export')" @click="exportYaml"></q-btn>
-                    <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
+                    <q-btn id="tour-hangar-btn" flat icon="garage" :label="$q.screen.gt.sm ? $t('ui.hangar') : ''" @click="showHangarDialog = true" :class="$q.screen.gt.sm ? 'q-mr-sm' : ''"></q-btn>
+                    <q-btn id="tour-export-btn" flat icon="save" :label="$q.screen.gt.sm ? $t('ui.export') : ''" @click="exportYaml"></q-btn>
+
+                    <div v-if="$q.screen.gt.sm" class="row items-center">
+                        <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
+                        <q-separator vertical spaced dark></q-separator>
+                        <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
+                        <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
+                        <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
+                        <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen"></q-btn>
+                    </div>
+
+                    <q-btn-dropdown v-else flat round icon="more_vert" auto-close>
+                        <q-list class="bg-grey-9 text-white" separator>
+                            <q-item clickable v-ripple @click="$refs.importInput.click()">
+                                <q-item-section avatar><q-icon name="upload" /></q-item-section>
+                                <q-item-section>{{ $t('ui.import') }}</q-item-section>
+                            </q-item>
+                            <q-item clickable v-ripple @click="shipStore.showCustomManager = true">
+                                <q-item-section avatar><q-icon name="extension" /></q-item-section>
+                                <q-item-section>Custom Lib</q-item-section>
+                            </q-item>
+                            <q-item clickable v-ripple @click="openSheetPreview">
+                                <q-item-section avatar><q-icon name="description" /></q-item-section>
+                                <q-item-section>{{ $t('ui.sheet') }}</q-item-section>
+                            </q-item>
+                            <q-item clickable v-ripple @click="toggleLang">
+                                <q-item-section avatar><q-icon name="language" /></q-item-section>
+                                <q-item-section>{{ $i18n.locale === 'en' ? 'Español' : 'English' }}</q-item-section>
+                            </q-item>
+                        </q-list>
+                    </q-btn-dropdown>
+
                     <input type="file" ref="importInput" @change="handleFileUpload" accept=".yaml,.yml,.json" style="display: none" />
-                    <q-separator vertical spaced dark></q-separator>
-                    <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
-                    <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
-                    <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
-                    <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen" v-if="$q.screen.gt.sm"></q-btn>
                 </q-toolbar>
             </q-header>
 
