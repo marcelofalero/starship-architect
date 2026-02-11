@@ -590,7 +590,7 @@ export const CustomShipDialog = {
                     <div class="text-subtitle2 text-primary">General Information</div>
                     <div><q-select filled dark v-model="store.customShipDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
                     <div class="row q-col-gutter-sm">
-                        <div class="col-8"><q-input filled dark v-model="newShip.name" label="Ship Name" :rules="[val => !!val || 'Name is required']"></q-input></div>
+                        <div class="col-8"><q-input filled dark v-model="newShip.name" label="Ship Class" :rules="[val => !!val || 'Name is required']"></q-input></div>
                         <div class="col-4">
                             <q-select filled dark v-model="newShip.size" :options="store.db.SIZE_RANK" label="Size" emit-value map-options></q-select>
                         </div>
@@ -1509,14 +1509,6 @@ export const SystemListWrapper = {
         };
 
         const getOptionCost = (defId, key) => {
-            return store.getComponentCost({ defId: defId, modifications: { [key]: true }, isStock: false }); // Hacky reuse of store function?
-            // Actually store.getComponentCost is instance based.
-            // But we can replicate the cost lookup logic or just trust the store exposes it.
-            // The Wrapper previous implementation had logic here.
-            // I should have kept the previous logic for getOptionCost or use the one in store if available.
-            // Store has internal logic.
-            // Let's restore the logic from previous file content for safety as it was there.
-
              const def = store.allEquipment.find(e => e.id === defId);
              if (!def) return 0;
              let costDef = null;
