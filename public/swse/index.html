@@ -41,19 +41,28 @@
                         <span class="text-subtitle2 q-ml-sm text-grey-4" v-if="shipStore.meta.name && $q.screen.gt.sm">{{ shipStore.meta.name }}</span>
                     </q-toolbar-title>
                     
-                    <q-btn id="tour-hangar-btn" flat icon="garage" :label="$q.screen.gt.sm ? $t('ui.hangar') : ''" @click="showHangarDialog = true" :class="$q.screen.gt.sm ? 'q-mr-sm' : ''"></q-btn>
-                    <q-btn id="tour-export-btn" flat icon="save" :label="$q.screen.gt.sm ? $t('ui.export') : ''" @click="exportYaml"></q-btn>
-
-                    <div v-if="$q.screen.gt.sm" class="row items-center">
-                        <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
-                        <q-separator vertical spaced dark></q-separator>
-                        <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
-                        <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
-                        <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
-                        <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen"></q-btn>
+                    <div v-if="shipStore.isTemplateEditMode" class="row items-center q-px-md bg-negative rounded-borders q-mr-md shadow-2">
+                        <q-icon name="build" class="q-mr-sm" size="sm"></q-icon>
+                        <div class="text-bold q-mr-md gt-xs">TEMPLATE EDIT</div>
+                        <q-btn flat dense icon="save" label="Save" @click="shipStore.saveTemplateEdit()" class="q-mr-sm"></q-btn>
+                        <q-btn flat dense icon="close" label="Cancel" @click="shipStore.cancelTemplateEdit()"></q-btn>
                     </div>
 
-                    <q-btn-dropdown v-else flat round icon="more_vert" auto-close>
+                    <div v-if="!shipStore.isTemplateEditMode" class="row items-center">
+                        <q-btn id="tour-hangar-btn" flat icon="garage" :label="$q.screen.gt.sm ? $t('ui.hangar') : ''" @click="showHangarDialog = true" :class="$q.screen.gt.sm ? 'q-mr-sm' : ''"></q-btn>
+                        <q-btn id="tour-export-btn" flat icon="save" :label="$q.screen.gt.sm ? $t('ui.export') : ''" @click="exportYaml"></q-btn>
+
+                        <div v-if="$q.screen.gt.sm" class="row items-center">
+                            <q-btn flat icon="upload" :label="$t('ui.import')" @click="$refs.importInput.click()"></q-btn>
+                            <q-separator vertical spaced dark></q-separator>
+                            <q-btn flat icon="extension" label="Custom Lib" @click="shipStore.showCustomManager = true" class="q-ml-sm"></q-btn>
+                            <q-btn flat icon="description" :label="$t('ui.sheet')" @click="openSheetPreview"></q-btn>
+                            <q-btn flat :label="$i18n.locale === 'en' ? 'ES' : 'EN'" @click="toggleLang" color="amber"></q-btn>
+                            <q-btn flat round icon="tune" @click="rightDrawerOpen = !rightDrawerOpen"></q-btn>
+                        </div>
+                    </div>
+
+                    <q-btn-dropdown v-else-if="!shipStore.isTemplateEditMode" flat round icon="more_vert" auto-close>
                         <q-list class="bg-grey-9 text-white" separator>
                             <q-item clickable v-ripple @click="$refs.importInput.click()">
                                 <q-item-section avatar><q-icon name="upload" /></q-item-section>

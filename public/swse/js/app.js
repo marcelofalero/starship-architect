@@ -25,6 +25,8 @@ const setup = () => {
     const showSheetDialog = ref(false);
 
     onMounted(() => {
+        shipStore.initHangar();
+
         const saved = localStorage.getItem('swse_architect_current_build');
         if (saved) {
             try { shipStore.loadState(JSON.parse(saved)); }

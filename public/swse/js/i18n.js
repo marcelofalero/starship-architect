@@ -3,7 +3,7 @@ const { createI18n, useI18n } = VueI18n;
 export const messages = {
     en: {
         ui: {
-            hangar: "New Ship", sheet: "Sheet", export: "Save Ship", manifest: "Systems Manifest",
+            hangar: "Hangar", sheet: "Sheet", export: "Save Ship", manifest: "Systems Manifest",
             overview: "Overview", systems: "Systems", config: "Config", free_ep: "Free EP",
             install_system: "Install System", install_caption: "Select category, type, and specific component.",
             category: "Category", sys_type: "System Type", component: "Component",
