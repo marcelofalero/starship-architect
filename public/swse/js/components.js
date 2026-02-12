@@ -604,6 +604,10 @@ export const CustomShipDialog = {
                         <div class="col-6"><q-input filled dark v-model="newShip.cost" label="Base Cost (cr)" type="number"></q-input></div>
                         <div class="col-6"><q-input filled dark v-model="newShip.baseEp" label="Base EP" type="number"></q-input></div>
                     </div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model="newShip.usedCost" label="Used Cost (cr)" type="number"></q-input></div>
+                        <div class="col-6"><q-select filled dark v-model="newShip.availability" :options="store.db.AVAILABILITY_RANK" label="Availability" emit-value map-options></q-select></div>
+                    </div>
 
                     <q-separator dark />
 
@@ -655,6 +659,8 @@ export const CustomShipDialog = {
             size: 'Huge',
             cost: 0,
             baseEp: 0,
+            availability: 'Common',
+            usedCost: 0,
             description: '',
             stats: { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0 },
             logistics: { crew: 0, pass: 0, cargo: '', cons: '' }
@@ -675,6 +681,8 @@ export const CustomShipDialog = {
                 size: newShip.size,
                 cost: Number(newShip.cost),
                 baseEp: Number(newShip.baseEp),
+                availability: newShip.availability,
+                usedCost: Number(newShip.usedCost),
                 description: newShip.description,
                 stats: { ...newShip.stats },
                 logistics: { ...newShip.logistics }
@@ -698,6 +706,8 @@ export const CustomShipDialog = {
                         newShip.size = existing.size;
                         newShip.cost = existing.cost;
                         newShip.baseEp = existing.baseEp;
+                        newShip.availability = existing.availability || 'Common';
+                        newShip.usedCost = existing.usedCost || 0;
                         newShip.description = existing.description || '';
 
                         newShip.stats = { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0, ...existing.stats };
@@ -710,6 +720,8 @@ export const CustomShipDialog = {
                     newShip.size = 'Huge';
                     newShip.cost = 0;
                     newShip.baseEp = 0;
+                    newShip.availability = 'Common';
+                    newShip.usedCost = 0;
                     newShip.description = '';
                     newShip.stats = { str: 40, dex: 10, int: 10, hp: 120, armor: 5, dr: 10 };
                     newShip.logistics = { crew: 1, pass: 0, cargo: '0 tons', cons: '1 day' };
