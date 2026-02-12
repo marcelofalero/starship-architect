@@ -344,11 +344,31 @@ export const HangarDialog = {
         <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px; max-width: 90vw;'">
             <q-card-section><div class="text-h6">{{ $t('ui.hangar') }}</div></q-card-section>
             <q-tabs v-model="hangarTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
+                <q-tab name="hangar" icon="garage" :label="$t('ui.hangar')"></q-tab>
                 <q-tab name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
                 <q-tab name="import" icon="upload_file" :label="$t('ui.import_file')"></q-tab>
             </q-tabs>
             <q-separator dark></q-separator>
             <q-tab-panels v-model="hangarTab" animated class="bg-grey-9">
+                <q-tab-panel name="hangar" style="height: 400px" class="q-pa-none">
+                    <q-scroll-area class="full-height">
+                        <q-list separator dark>
+                            <q-item v-for="ship in store.hangar" :key="ship.id" clickable v-ripple @click="loadShip(ship.id)">
+                                <q-item-section>
+                                    <q-item-label>{{ ship.meta.name || 'Untitled Ship' }}</q-item-label>
+                                    <q-item-label caption class="text-grey-6">
+                                        {{ getLocalizedName(store.allShips.find(s => s.id === ship.configuration.baseChassis) || {name: ship.configuration.baseChassis}) }}
+                                        <span v-if="ship.activeShipId === store.activeShipId" class="text-positive q-ml-sm">(Active)</span>
+                                    </q-item-label>
+                                </q-item-section>
+                                <q-item-section side>
+                                    <q-btn flat round icon="delete" color="negative" size="sm" @click.stop="deleteShip(ship.id)" />
+                                </q-item-section>
+                            </q-item>
+                            <div v-if="store.hangar.length === 0" class="text-center text-grey q-pa-lg">Hangar is empty.</div>
+                        </q-list>
+                    </q-scroll-area>
+                </q-tab-panel>
                 <q-tab-panel name="stock" style="height: 400px" class="q-pa-none">
                     <q-scroll-area class="full-height">
                         <q-list separator dark>
@@ -374,7 +394,7 @@ export const HangarDialog = {
     setup(props, { emit }) {
         const store = useShipStore();
         const $q = useQuasar();
-        const hangarTab = ref('stock');
+        const hangarTab = ref('hangar');
         const fileInput = ref(null);
 
         const stockFighters = computed(() => store.allShips.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
@@ -384,6 +404,24 @@ export const HangarDialog = {
         const selectStockShip = (id) => {
             store.createNew(id);
             emit('update:modelValue', false);
+        };
+
+        const loadShip = (shipId) => {
+            store.loadFromHangar(shipId);
+            emit('update:modelValue', false);
+        };
+
+        const deleteShip = (shipId) => {
+             $q.dialog({
+                dark: true,
+                title: 'Confirm Deletion',
+                message: 'Delete this ship from the hangar?',
+                cancel: true,
+                persistent: true,
+                color: 'negative'
+            }).onOk(() => {
+                store.removeFromHangar(shipId);
+            });
         };
 
         const triggerFileSelect = () => {
@@ -408,7 +446,7 @@ export const HangarDialog = {
             reader.readAsText(file);
         };
 
-        return { hangarTab, stockFighters, stockFreighters, stockCapitals, selectStockShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
+        return { store, hangarTab, stockFighters, stockFreighters, stockCapitals, selectStockShip, loadShip, deleteShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
     }
 };
 
@@ -483,6 +521,9 @@ export const CustomManagerDialog = {
                                         <q-item-section>{{ ship.name }} ({{ ship.size }})</q-item-section>
                                         <q-item-section side>
                                             <div class="row q-gutter-xs">
+                                                <q-btn flat round icon="build" size="xs" color="accent" @click="editTemplate(ship.id)" :disable="!lib.editable">
+                                                    <q-tooltip>Edit Template Components</q-tooltip>
+                                                </q-btn>
                                                 <q-btn flat round icon="edit" size="xs" color="info" @click="store.openCustomShipDialog(ship.id)" :disable="!lib.editable" />
                                                 <q-btn flat round icon="delete" size="xs" color="negative" @click="store.removeCustomShip(ship.id)" :disable="!lib.editable" />
                                             </div>
@@ -583,7 +624,12 @@ export const CustomManagerDialog = {
             });
         };
 
-        return { store, libraryInput, triggerLibraryImport, handleLibraryImport, exportLibrary, deleteLibrary, editLibraryName };
+        const editTemplate = (shipId) => {
+            store.startTemplateEdit(shipId);
+            store.showCustomManager = false;
+        };
+
+        return { store, libraryInput, triggerLibraryImport, handleLibraryImport, exportLibrary, deleteLibrary, editLibraryName, editTemplate };
     }
 };
 

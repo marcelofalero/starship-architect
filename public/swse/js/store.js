@@ -26,6 +26,15 @@ export const useShipStore = defineStore('ship', () => {
     const escapePodsToEpPct = ref(0);
     const crewQuality = ref('Normal');
 
+    // Hangar State
+    const hangar = ref([]);
+    const activeShipId = ref(null);
+
+    // Template Edit State
+    const isTemplateEditMode = ref(false);
+    const templateEditId = ref(null);
+    const preEditState = ref(null);
+
     // Libraries State (Replaces customComponents)
     const libraries = ref([]);
 
@@ -803,24 +812,38 @@ export const useShipStore = defineStore('ship', () => {
         escapePodsToEpPct.value = 0;
     }
     function createNew(newChassisId) {
+        if (!isTemplateEditMode.value) {
+            activeShipId.value = crypto.randomUUID();
+        }
+
         reset(); chassisId.value = newChassisId;
         const ship = allShips.value.find(s => s.id === newChassisId) || db.STOCK_SHIPS.find(s => s.id === newChassisId);
         if(ship && ship.defaultMods) ship.defaultMods.forEach(modConfig => {
             let defId = modConfig;
-            let batteryCount = 1;
-            let quantity = 1;
+
+            // Default Mods Object
+            const mods = { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
 
             if (typeof modConfig === 'object' && modConfig !== null) {
                 defId = modConfig.id;
-                if (modConfig.batteryCount) batteryCount = modConfig.batteryCount;
-                if (modConfig.quantity) quantity = modConfig.quantity;
+                if (modConfig.batteryCount) mods.batteryCount = modConfig.batteryCount;
+                if (modConfig.quantity) mods.quantity = modConfig.quantity;
+                if (modConfig.mount) mods.mount = modConfig.mount;
+                if (modConfig.fireLink) mods.fireLink = modConfig.fireLink;
+                if (modConfig.enhancement) mods.enhancement = modConfig.enhancement;
+                if (modConfig.payloadCount) mods.payloadCount = modConfig.payloadCount;
+                if (modConfig.payloadOption) mods.payloadOption = modConfig.payloadOption;
+                if (modConfig.fireLinkOption) mods.fireLinkOption = modConfig.fireLinkOption;
+                if (modConfig.pointBlank) mods.pointBlank = modConfig.pointBlank;
+                if (modConfig.weaponUser) mods.weaponUser = modConfig.weaponUser;
+            } else {
+                 defId = modConfig;
             }
 
             const def = allEquipment.value.find(e => e.id === defId);
             if(def) {
                 let loc = def.location || '';
-                const mods = { payloadCount: 0, payloadOption: false, batteryCount: batteryCount, quantity: quantity, fireLinkOption: false };
-                if (isWeapon(def.id)) mods.weaponUser = 'Pilot';
+                if (isWeapon(def.id) && !mods.weaponUser) mods.weaponUser = 'Pilot';
                 installedComponents.value.push({ instanceId: crypto.randomUUID(), defId: def.id, location: loc, miniaturization: 0, isStock: true, isNonStandard: false, modifications: mods });
             }
         });
@@ -860,6 +883,153 @@ export const useShipStore = defineStore('ship', () => {
         });
     }
 
+    // Hangar Actions
+    function initHangar() {
+        const saved = localStorage.getItem('swse_architect_hangar');
+        if (saved) {
+            try {
+                hangar.value = JSON.parse(saved);
+            } catch (e) {
+                console.error('Failed to load hangar:', e);
+                hangar.value = [];
+            }
+        }
+    }
+
+    function saveHangar() {
+        localStorage.setItem('swse_architect_hangar', JSON.stringify(hangar.value));
+    }
+
+    function syncActiveToHangar() {
+        if (!activeShipId.value) return;
+
+        const idx = hangar.value.findIndex(s => s.id === activeShipId.value);
+        const snapshot = {
+            id: activeShipId.value,
+            lastModified: Date.now(),
+            apiVersion: "2.0",
+            meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
+            configuration: { baseChassis: chassisId.value, template: activeTemplate.value, feats: { starshipDesigner: engineering.hasStarshipDesigner }, cargoToEpAmount: cargoToEpAmount.value, escapePodsToEpPct: escapePodsToEpPct.value, crewQuality: crewQuality.value },
+            libraries: libraries.value,
+            manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: { ...m.modifications } }))
+        };
+
+        if (idx !== -1) {
+            hangar.value[idx] = snapshot;
+        } else {
+            hangar.value.push(snapshot);
+        }
+        saveHangar();
+    }
+
+    function loadFromHangar(shipId) {
+        const ship = hangar.value.find(s => s.id === shipId);
+        if (ship) {
+            loadState(ship);
+            activeShipId.value = ship.id;
+        }
+    }
+
+    function removeFromHangar(shipId) {
+        hangar.value = hangar.value.filter(s => s.id !== shipId);
+        if (activeShipId.value === shipId) {
+            activeShipId.value = null;
+        }
+        saveHangar();
+    }
+
+    // Template Actions
+    function startTemplateEdit(shipId) {
+        const ship = allShips.value.find(s => s.id === shipId);
+        if (!ship) return;
+
+        // Snapshot Current State
+        preEditState.value = {
+            activeShipId: activeShipId.value,
+            meta: { ...meta },
+            chassisId: chassisId.value,
+            activeTemplate: activeTemplate.value,
+            engineering: { ...engineering },
+            cargoToEpAmount: cargoToEpAmount.value,
+            escapePodsToEpPct: escapePodsToEpPct.value,
+            crewQuality: crewQuality.value,
+            manifest: installedComponents.value.map(m => ({ ...m, modifications: { ...m.modifications } }))
+        };
+
+        activeShipId.value = null;
+        isTemplateEditMode.value = true;
+        templateEditId.value = shipId;
+
+        createNew(ship.id);
+
+        meta.name = `Template: ${ship.name}`;
+    }
+
+    function restorePreEditState() {
+        if (!preEditState.value) {
+            reset();
+            return;
+        }
+        const s = preEditState.value;
+        activeShipId.value = s.activeShipId;
+        meta.name = s.meta.name;
+        meta.version = s.meta.version;
+        chassisId.value = s.chassisId;
+        activeTemplate.value = s.activeTemplate;
+        engineering.hasStarshipDesigner = s.engineering.hasStarshipDesigner;
+        cargoToEpAmount.value = s.cargoToEpAmount;
+        escapePodsToEpPct.value = s.escapePodsToEpPct;
+        crewQuality.value = s.crewQuality;
+        installedComponents.value = s.manifest;
+
+        preEditState.value = null;
+    }
+
+    function saveTemplateEdit() {
+        if (!isTemplateEditMode.value || !templateEditId.value) return;
+
+        // Serialize Components
+        const defaultMods = installedComponents.value.map(c => {
+             const mods = c.modifications;
+             const entry = { id: c.defId };
+
+             if (mods.batteryCount > 1) entry.batteryCount = mods.batteryCount;
+             if (mods.quantity > 1) entry.quantity = mods.quantity;
+             if (mods.mount && mods.mount !== 'single') entry.mount = mods.mount;
+             if (mods.fireLink && mods.fireLink > 1) entry.fireLink = mods.fireLink;
+             if (mods.enhancement && mods.enhancement !== 'normal') entry.enhancement = mods.enhancement;
+             if (mods.payloadCount > 0) entry.payloadCount = mods.payloadCount;
+             if (mods.payloadOption) entry.payloadOption = true;
+             if (mods.fireLinkOption) entry.fireLinkOption = true;
+             if (mods.pointBlank) entry.pointBlank = true;
+             if (mods.weaponUser && mods.weaponUser !== 'Pilot') entry.weaponUser = mods.weaponUser;
+
+             // Check if entry can be simplified to string (only id)
+             if (Object.keys(entry).length === 1) return c.defId;
+             return entry;
+        });
+
+        // Update Library
+        for (const lib of libraries.value) {
+            const idx = lib.ships.findIndex(s => s.id === templateEditId.value);
+            if (idx !== -1) {
+                lib.ships[idx].defaultMods = defaultMods;
+                break;
+            }
+        }
+
+        isTemplateEditMode.value = false;
+        templateEditId.value = null;
+
+        restorePreEditState();
+    }
+
+    function cancelTemplateEdit() {
+        isTemplateEditMode.value = false;
+        templateEditId.value = null;
+        restorePreEditState();
+    }
+
     // Watch libraries instead of customComponents
     watch([meta, chassisId, activeTemplate, installedComponents, engineering, cargoToEpAmount, escapePodsToEpPct, libraries, crewQuality], () => {
         const saveObj = {
@@ -870,6 +1040,9 @@ export const useShipStore = defineStore('ship', () => {
             manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, isNonStandard: m.isNonStandard, modifications: m.modifications }))
         };
         localStorage.setItem('swse_architect_current_build', JSON.stringify(saveObj));
+
+        // Sync to Hangar
+        syncActiveToHangar();
     }, { deep: true });
 
     const CREW_QUALITY_STATS = {
@@ -887,6 +1060,8 @@ export const useShipStore = defineStore('ship', () => {
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, crewQuality, crewStats, CREW_QUALITY_STATS,
         libraries, allEquipment, allShips, customComponents, // Exported for components.js
         customDialogState, customShipDialogState, showCustomManager,
+        hangar, activeShipId, initHangar, loadFromHangar, removeFromHangar, // Hangar Exports
+        isTemplateEditMode, startTemplateEdit, saveTemplateEdit, cancelTemplateEdit, // Template Exports
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addCustomShip, updateCustomShip, removeCustomShip, openCustomShipDialog, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary, damageThreshold, fortitudeDefense, DT_SIZE_MODS,
