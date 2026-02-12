@@ -594,7 +594,22 @@ export const useShipStore = defineStore('ship', () => {
     const remainingEP = computed(() => totalEP.value - usedEP.value);
     const epUsagePct = computed(() => usedEP.value / totalEP.value);
 
-    const hullCost = computed(() => Math.floor(chassis.value.cost * templateCostMult.value));
+    const hullCost = computed(() => {
+        let base = Math.floor(chassis.value.cost * templateCostMult.value);
+
+        // In Template Mode, add cost of "Stock" components to Hull Base
+        if (isTemplateEditMode.value) {
+            const stockCost = installedComponents.value.reduce((total, instance) => {
+                // Calculate cost as if it wasn't stock
+                const def = allEquipment.value.find(e => e.id === instance.defId);
+                if (!def) return total;
+                const mockInstance = { ...instance, isStock: false };
+                return total + getComponentCost(mockInstance);
+            }, 0);
+            base += stockCost;
+        }
+        return base;
+    });
     const componentsCost = computed(() => installedComponents.value.reduce((total, instance) => total + getComponentCost(instance), 0));
     const licensingCost = computed(() => installedComponents.value.reduce((total, instance) => {
         if (instance.isStock) return total;
@@ -618,7 +633,11 @@ export const useShipStore = defineStore('ship', () => {
         }
         const mods = { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
         if (isWeapon(def.id)) mods.weaponUser = 'Pilot';
-        installedComponents.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock: false, isNonStandard, modifications: mods });
+
+        // In Template Mode, new components are Stock
+        const isStock = isTemplateEditMode.value;
+
+        installedComponents.value.push({ instanceId: crypto.randomUUID(), defId, location, miniaturization: 0, isStock, isNonStandard, modifications: mods });
     }
 
     // Library Actions
