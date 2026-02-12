@@ -377,17 +377,13 @@ export const useShipStore = defineStore('ship', () => {
         'Colossal (Frigate)': 100, 'Colossal (Cruiser)': 200, 'Colossal (Station)': 500
     };
 
-    const damageThreshold = computed(() => {
+    const fortitudeDefense = computed(() => {
         const str = currentStats.value.str || 10;
-        const fort = 10 + Math.floor((str - 10) / 2); // Fortitude Defense = 10 + Str Mod (assuming no class/level/equip bonus for ships usually, just Str)
-        // Wait, Starship Fortitude is 10 + Size Mod + Armor + Str Mod?
-        // Rules say: Reflex = 10 + Armor + Dex + Size. Fortitude = 10 + Str + Class/Level.
-        // But vehicles use Str mod for Fortitude.
-        // DT = Fortitude Defense (for objects/vehicles/ships).
-        // The prompt says: "DT is calculated based on the Fortitude and size (Fort. + Size Mod.)".
-        // And "Fortitude is calculated based on STR (10+STR mod.)".
-        // So Fort = 10 + StrMod.
-        // DT = Fort + SizeMod.
+        return 10 + Math.floor((str - 10) / 2);
+    });
+
+    const damageThreshold = computed(() => {
+        const fort = fortitudeDefense.value;
 
         const size = chassis.value.size;
         // Handle variations of Colossal if size string starts with Colossal
@@ -881,7 +877,7 @@ export const useShipStore = defineStore('ship', () => {
         customDialogState, customShipDialogState, showCustomManager,
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addCustomShip, updateCustomShip, removeCustomShip, openCustomShipDialog, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
-        addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary, damageThreshold, DT_SIZE_MODS,
+        addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary, damageThreshold, fortitudeDefense, DT_SIZE_MODS,
         isAdmin, isWeapon, isEngine
     };
 });
