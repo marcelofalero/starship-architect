@@ -91,7 +91,7 @@
             </q-drawer>
 
             <q-page-container>
-                <q-page :class="$q.screen.gt.sm ? 'q-pa-md fit column no-wrap' : 'q-pa-md'">
+                <q-page :class="$q.screen.gt.sm ? 'q-pa-md fit column no-wrap' : 'q-pa-md column'">
                     
                     <!-- DESKTOP LAYOUT -->
                     <div v-if="$q.screen.gt.sm" class="col column">
@@ -107,17 +107,17 @@
                     </div>
 
                     <!-- MOBILE LAYOUT -->
-                    <div v-else>
+                    <div v-else class="col column">
                         <q-tabs v-model="mobileTab" class="bg-grey-9 text-grey-5" active-color="primary" sticky>
                             <q-tab name="overview" icon="analytics" :label="$t('ui.overview')"></q-tab>
                             <q-tab name="systems" icon="build" :label="$t('ui.systems')"></q-tab>
                             <q-tab name="config" icon="tune" :label="$t('ui.config')"></q-tab>
                         </q-tabs>
                         
-                        <q-tab-panels v-model="mobileTab" animated swipeable class="bg-transparent q-mt-md">
-                            <q-tab-panel name="overview" class="q-pa-none"><stat-panel></stat-panel></q-tab-panel>
-                            <q-tab-panel name="systems" class="q-pa-none"><system-list></system-list></q-tab-panel>
-                            <q-tab-panel name="config" class="q-pa-none"><config-panel></config-panel></q-tab-panel>
+                        <q-tab-panels v-model="mobileTab" animated swipeable class="bg-transparent q-mt-md col column">
+                            <q-tab-panel name="overview" class="q-pa-none col column"><stat-panel></stat-panel></q-tab-panel>
+                            <q-tab-panel name="systems" class="q-pa-none col column"><system-list></system-list></q-tab-panel>
+                            <q-tab-panel name="config" class="q-pa-none col column"><config-panel></config-panel></q-tab-panel>
                         </q-tab-panels>
 
                         <!-- Mobile Sticky Footer -->

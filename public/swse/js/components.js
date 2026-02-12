@@ -8,7 +8,7 @@ const { useQuasar } = Quasar;
 // --- BASE COMPONENTS ---
 const StatPanel = {
     template: `
-    <q-card id="tour-stats-panel" class="bg-grey-9 text-white">
+    <q-card id="tour-stats-panel" class="bg-grey-9 text-white col">
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
@@ -179,7 +179,7 @@ const SystemList = {
 
 const ConfigPanel = {
     template: `
-    <q-card id="tour-config-panel" class="bg-grey-9 text-white full-height column">
+    <q-card id="tour-config-panel" class="bg-grey-9 text-white col column">
         <q-card-section class="col-auto">
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">
