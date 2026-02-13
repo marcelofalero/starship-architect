@@ -17,7 +17,7 @@ export const useShipStore = defineStore('ship', () => {
     // App State
     const isAdmin = ref(new URLSearchParams(window.location.search).get('admin') === 'true');
     const meta = reactive({ name: 'Untitled Ship', version: '1.0' });
-    const chassisId = ref('light_fighter');
+    const chassisId = ref(null);
     const activeTemplate = ref(null);
     const installedComponents = ref([]);
     const engineering = reactive({ hasStarshipDesigner: false });
@@ -950,12 +950,20 @@ export const useShipStore = defineStore('ship', () => {
         }
     }
 
+    function unloadShip() {
+        activeShipId.value = null;
+        chassisId.value = null;
+        reset();
+        localStorage.removeItem('swse_architect_current_build');
+    }
+
     function removeFromHangar(shipId) {
         hangar.value = hangar.value.filter(s => s.id !== shipId);
         if (activeShipId.value === shipId) {
-            activeShipId.value = null;
+            unloadShip();
+        } else {
+            saveHangar();
         }
-        saveHangar();
     }
 
     // Template Actions
@@ -1080,7 +1088,7 @@ export const useShipStore = defineStore('ship', () => {
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, crewQuality, crewStats, CREW_QUALITY_STATS,
         libraries, allEquipment, allShips, customComponents, // Exported for components.js
         customDialogState, customShipDialogState, showCustomManager,
-        hangar, activeShipId, initHangar, loadFromHangar, removeFromHangar, // Hangar Exports
+        hangar, activeShipId, initHangar, loadFromHangar, removeFromHangar, unloadShip, // Hangar Exports
         isTemplateEditMode, startTemplateEdit, saveTemplateEdit, cancelTemplateEdit, // Template Exports
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addCustomShip, updateCustomShip, removeCustomShip, openCustomShipDialog, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
