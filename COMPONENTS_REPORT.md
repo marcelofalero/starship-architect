@@ -71,13 +71,6 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Shield Generator (SR 70) | 10,000 | 3 | Yes | Common | shield | **Stats:** sr: 70 |
 | Shield Generator (SR 80) | 12,500 | 4 | Yes | Common | shield | **Stats:** sr: 80 |
 | Shield Generator (SR 90) | 15,000 | 4 | Yes | Common | shield | **Stats:** sr: 90 |
-
-### Shields
-
-| Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
-|---|---|---|---|---|---|---|
-| Anti-Concussion Field | 5,000 | 5 | Yes | Military | - |  |
-| Backup Shield Generator | 2,000 | 1 | Yes | Common | - |  |
 | Regenerating Shields | 5,000 | 2 | Yes | Restricted | shield_mod | **Stats:** regenerating: True<br>If a ship possesses Regenerating Shields, its current Shield Rating increases by 10 (Up to its maximum Shield Rating) when a System Operator uses the Recharge Shields Action. |
 
 ## Modifications
@@ -102,20 +95,12 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Tech Spec: Armor (+2) | 0 | 0 | No | Common | tech_upgrade | **Stats:** armor_bonus: 2 |
 | Tech Spec: Shields (+10 SR) | 0 | 0 | No | Common | tech_upgrade | **Stats:** sr_bonus: 10 |
 
-### Uncategorized
-
-| Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
-|---|---|---|---|---|---|---|
-| Point Defense System | 4,000 | 0 | Yes | Military | - | Automated laser system that shoots down incoming missiles. Provides a +5 bonus to Reflex Defense against missile attacks. |
-
 ### Weapon Upgrades
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Autoblaster Modification | 2,000 | 0 | No | Restricted | - | Modifies a single-mount weapon to be an Autoblaster. Increases cyclic rate, allowing Autofire but at -2 attack penalty. Cost is 2x the base cost of the weapon. |
 | Cannon Enhancements | 3,000 | 0 | No | Restricted | - | Standard Cannon Enhancements increase damage by +1 die. Costs 2x base weapon cost. |
 | Cannon Enhancements (Advanced) | 6,000 | 0 | No | Restricted | - | Advanced Cannon Enhancements increase damage by +2 dice. Costs 5x base weapon cost. Military availability. |
-| Heavy Ordnance Modification | 2,000 | 0 | No | Military | - | Modifications to standard launchers to fire heavier payloads like Proton Bombs or heavy rockets. Increases damage dice by +1d10 but reduces range by 50%. |
 
 ## Movement Systems
 
@@ -123,7 +108,7 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Amphibious Seals | 500 | 0 | Yes | Common | - | Allows Starship to function underwater. Swim speed 1/2 fly speed. Max underwater velocity 1/10 atmospheric. |
+| Amphibious Seals | 4,000 | 2 | Yes | Common | - | Allows Starship to function underwater. Swim speed 1/2 fly speed. Max underwater velocity 1/10 atmospheric. |
 
 ### Hyperdrives
 
@@ -178,11 +163,11 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Cryogenic Chambers (10 units) | 500 | 2 | No | Common | - | Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x. |
+| Cryogenic Chambers | 500 | 2 | Yes | Common | - | Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x. |
 | Environmental Filters | 2,000 | 1 | Yes | Common | - | Allows ship to support multiple environments (gravity, atmosphere, etc.). Can be used offensively (DC 25 Use Computer) to flood sections with hazards. |
-| Medical Bed | 2,000 | 1 | No | Common | - |  |
 | Medical Suite | 5,000 | 2 | No | Common | - | Includes (Size Mod)/5 medical beds and (Size Mod)/50 Bacta Tanks. Medical beds function as Medpac (10 uses), Medical Kit, and Surgery Kit. |
-| Passenger Conversion | 2,000 | 1 | Yes | Common | - | Provides room for (Cost Mod) passengers (Seating or Quarters). Steerage quality unless combined with Luxury Upgrade. |
+| Passenger Conversion | 500 | 10 | Yes | Common | - | Provides room for (Cost Mod) passengers (Quarters). Steerage quality unless combined with Luxury Upgrade. |
+| Passenger Conversion(Seating) | 200 | 1 | Yes | Common | - | Provides room for (Cost Mod) passengers (Seating). Steerage quality unless combined with Luxury Upgrade. |
 | Workshop | 3,000 | 5 | No | Common | - | Fully equipped workshop. +2 Equipment bonus on Mechanics/Use Computer checks to repair/modify/construct objects. |
 | Luxury Upgrade (Advanced) | 20,000 | 1 | No | Licensed | luxury | Makes the ship the equivalent of an upper-scale hotel. Gourmet cooking, quality artwork, and stylish trim. Requires monthly maintenance (1/50 of cost). |
 | Luxury Upgrade (Basic) | 10,000 | 1 | No | Licensed | luxury | Changes a Starship from a harsh travel vehicle to a comfortable home. Includes comfortable beds, wardrobes, recliners, and music systems. Requires monthly maintenance (1/50 of cost). |
@@ -192,11 +177,13 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| HoloNet Transceiver | 50,000 | 4 | No | Military | - | Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare). |
-| Hypertransceiver | 1,000 | 1 | No | Common | - | Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet. |
-| Transponder (Disguised) | 2,000 | 0 | No | Illegal | - | Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder. |
-| Transponder (IFF) | 5,000 | 0 | No | Military | - | Military Friend/Foe transponder. Can be loaded with codes to appear as 'Friend'. Can hack enemy computers to appear as Friend (Use Computer check). |
-| Transponder (Masked) | 1,000 | 0 | No | Illegal | - | Code is impossible to read. Immediately apparent and suspicious. |
+| HoloNet Transceiver | 50,000 | 4 | Yes | Restricted | - | Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare). |
+| Hypertransceiver | 2,000 | 1 | Yes | Licensed | - | Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet. |
+| Transponder (Disguised) (1) | 500 | 0 | Yes | Illegal | - | Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder. |
+| Transponder (Disguised) (2) | 1,000 | 0 | Yes | Illegal | - | Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder. |
+| Transponder (Disguised) (3) | 2,000 | 0 | Yes | Illegal | - | Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder. |
+| Transponder (IFF) | 1,000 | 0 | No | Military | - | Military Friend/Foe transponder. Can be loaded with codes to appear as 'Friend'. Can hack enemy computers to appear as Friend (Use Computer check). |
+| Transponder (Masked) | 200 | 0 | No | Illegal | - | Code is impossible to read. Immediately apparent and suspicious. |
 
 ### Computers
 
@@ -210,10 +197,9 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Personalized Controls | 1,000 | 0 | No | Licensed | - | Personalizes one crew position. +1 bonus on checks for owner, -2 penalty for others. |
+| Personalized Controls | 1,000 | 0 | No | Common | - | Personalizes one crew position. +1 bonus on checks for owner, -2 penalty for others. |
 | Slave Circuits (Advanced) | 4,000 | 1 | Yes | Military | slave_circuits | Reduces crew requirements by 2/3 (minimum 1). |
 | Slave Circuits (Basic) | 1,000 | 1 | Yes | Restricted | slave_circuits | Reduces crew requirements by 1/3 (minimum 1). |
-| Slave Circuits (Recall) | 6,000 | 0 | Yes | Illegal | slave_circuits | Functions as Advanced Slave Circuits. Allows ship to be summoned via Comlink. Ship can lift off, fly to summoner, and land automatically (Untrained crew quality). |
 
 ### Damage Control
 
@@ -260,7 +246,7 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Interrogation Chamber | 10,000 | 0 | No | Restricted | - | Converts a Holding Cell. Grants +5 Persuasion vs prisoners. Allows torture (+1 Dark Side). |
+| Interrogation Chamber | 10,000 | 0 | No | Illegal | - | Converts a Holding Cell. Grants +5 Persuasion vs prisoners. Allows torture (+1 Dark Side). |
 
 ### Sensors
 
@@ -277,8 +263,8 @@ This report lists all starship components defined in `data.json`, grouped by cat
 | Cargo Pod (Light) | 500 | 0 | Yes | Common | - | **Stats:** dex_bonus: -2, cargo_bonus_size_mult: 1<br>Additional storage space. Adds (Size Mod) x 1 tons of cargo. Reduces Dexterity by 2 (Min Dex 1). |
 | Cargo Pod (Medium) | 1,000 | 1 | Yes | Common | - | **Stats:** dex_bonus: -2, cargo_bonus_size_mult: 5<br>Additional storage space. Adds (Size Mod) x 5 tons of cargo. Reduces Dexterity by 2 (Min Dex 1). |
 | Hidden Cargo Hold (25%) | 2,000 | 1 | Yes | Illegal | - | **Stats:** hidden_cargo_pct: 0.25<br>Converts 25% of cargo space into hidden compartments (-5 to Perception checks to find). |
-| Hidden Cargo Hold (50%) | 5,000 | 1 | Yes | Illegal | - | **Stats:** hidden_cargo_pct: 0.5<br>Converts 50% of cargo space into hidden compartments. |
-| Hidden Cargo Hold (75%) | 10,000 | 1 | Yes | Illegal | - | **Stats:** hidden_cargo_pct: 0.75<br>Converts 75% of cargo space into hidden compartments. |
+| Hidden Cargo Hold (50%) | 5,000 | 2 | Yes | Illegal | - | **Stats:** hidden_cargo_pct: 0.5<br>Converts 50% of cargo space into hidden compartments. |
+| Hidden Cargo Hold (75%) | 10,000 | 4 | Yes | Illegal | - | **Stats:** hidden_cargo_pct: 0.75<br>Converts 75% of cargo space into hidden compartments. |
 | Smuggler's Compartment | 1,000 | 1 | Yes | Illegal | - | Hidden cargo spaces. DC 30 Perception to find. Holds (Cost Mod) x 200 kg. Max 5% of total cargo capacity. |
 
 ## Weapon Systems
@@ -287,60 +273,57 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Heavy Blaster Cannon (5d10x2) | 5,500 | 2 | No | Military | - | **Damage:** 5d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
-| Light Blaster Cannon (3d10x2) | 1,200 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
-| Medium Blaster Cannon (4d10x2) | 2,500 | 1 | No | Restricted | - | **Damage:** 4d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
+| Heavy Blaster Cannon | 5,500 | 2 | No | Military | - | **Damage:** 5d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
+| Light Blaster Cannon | 1,200 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
+| Medium Blaster Cannon | 2,500 | 1 | No | Restricted | - | **Damage:** 4d10x2<br>Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range. |
 
 ### Exotic Weapons
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Bomblet Generator | 5,000 | 2 | Yes | Military | - | **Damage:** 3d10x2<br>Automatically deploys a field of small explosives in adjacent squares. Any ship entering an adjacent square takes 3d10x2 Energy damage. Has infinite ammunition (energy based). |
-| Chaff Gun | 1,000 | 1 | Yes | Restricted | - | Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship. |
+| Chaff Gun | 2,000 | 1 | No | Restricted | - | Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship. |
 | Composite Beam Cannon | 3,000 | 1 | Yes | Military | - | **Damage:** 5d10x2<br>A laser weapon that ignores 5 points of the target's Shield Rating (treat SR as 5 lower against this attack). |
-| Defoliator | 10,000 | 3 | Yes | Illegal | - | Biological weapon. Deals massive damage to organic crew but no damage to the ship structure. Illegal in all jurisdictions. |
 | Discord Missile Launcher | 1,000 | 1 | Yes | Military | - | **Damage:** 2d10/turn<br>Deploys a buzz droid swarm on the target ship. The target takes 2d10 damage per turn (ignoring DR and SR) until the droids are removed or destroyed. Requires a successful attack roll to hit. |
-| Docking Gun Mount | 1,000 | 1 | No | Common | - | Allows Character Scale Ranged Weapons to be added as a Docking Gun. Counts as Heavy Weapon. Draws power from ship. The cost is for the mount only - the gun itself is bought normally. Docking Guns have no effect on Starship Scale combat. |
-| Flak Pod | 2,000 | 1 | Yes | Military | - | **Damage:** 3d10x2<br>Anti-fighter defense. Deals 3d10x2 damage to all starfighters in adjacent squares. |
-| Gravity Mine Launcher | 5,000 | 2 | Yes | Military | - | **Damage:** 4d10x2<br>Detonates when a ship enters the square, creating a temporary gravity well that prevents Hyperspace travel for 1 round and deals 4d10x2 Energy damage. |
+| Docking Gun(WIP) | 1,000 | 1 | No | Licensed | - | Allows Character Scale Ranged Weapons to be added as a Docking Gun. Counts as Heavy Weapon. Draws power from ship. The cost is for the mount only - the gun itself is bought normally. Docking Guns have no effect on Starship Scale combat. |
+| Gravity Mine Launcher | 5,000 | 2 | No | Military | - | Detonates when a ship enters the square, creating a temporary gravity well that prevents Hyperspace travel for 1 round and deals 4d10x2 Energy damage. |
 | Gravity Well Projector | 25,000 | 5 | Yes | Military | - | A Gravity Well Projector creates an artificial gravity well that prevents Hyperspace travel. Any Starship within 12 squares of an active Gravity Well Projector cannot activate its Hyperdrive. Additionally, any ship traveling through Hyperspace that passes within 12 squares of the active Gravity Well Projector is immediately pulled out of Hyperspace. |
 | Harpoon Gun | 2,000 | 1 | No | Common | - | A Gunner may use the Harpoon Gun to make a Grapple check against a target Walker. If the Grapple check succeeds, the target Walker cannot move without first making a Pilot check (DC = Harpoon Gun's Grapple check result). If this Pilot check fails, the Walker suffers an automatic Collision, taking twice its Collision damage. |
-| Heavy Mass-Driver Cannon | 15,000 | 2 | Yes | Military | - | **Damage:** 7d10x2<br>A heavy projectile weapon. Damage 7d10x2. |
-| Ion Bomb Rack | 1,500 | 1 | Yes | Military | - | **Damage:** 4d10x2<br>Ion Bombs deal 4d10x2 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0). |
-| Ion Pulse Cannon | 4,000 | 1 | Yes | Military | - | **Damage:** 9d10x10<br>A massive ion weapon used on ships like the Subjugator. It fires a massive ion pulse that affects all ships in a large area, disabling electronics and shields. Requires a massive recharge time. |
-| Mass-Driver Cannon | 3,500 | 1 | Yes | Military | - | **Damage:** 6d10x2<br>A projectile weapon. Damage 6d10x2. |
-| Pressor Beam | 5,000 | 2 | Yes | Restricted | - | Reverse Tractor Beam. Pushes a target ship 1 square away on a successful hit. The target must be smaller than the firing ship. |
-| Proton Grenade Launcher | 800 | 1 | Yes | Restricted | - | **Damage:** 8d6<br>Fires a cluster of proton grenades. Deals 3d10x2 Energy damage in a 1-square burst. Short range only. |
-| Rail Cannon | 4,500 | 2 | Yes | Military | - | **Damage:** 5d10x5<br>Similar to Mass-Drivers but more powerful. Deals 5d10x2 Physical damage. Ignores SR. |
+| Ion Bomb Rack | 1,500 | 1 | Yes | Military | - | **Damage:** 5d10<br>Ion Bombs deal 5d10 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0). A rack Holds up too 4 bombs |
 | Shieldbuster Torpedo Launcher | 2,000 | 1 | Yes | Military | - | **Damage:** 4d10x2<br>A specialized torpedo designed to overload shielding systems. On a hit, it reduces the target's Shield Rating by -10 (instead of the usual -5). Shields damaged in this way can be recharged normally. |
-| Space Mine Launcher | 5,000 | 1 | Yes | Restricted | - | **Damage:** 6d10x2<br>Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing 6d10x2 Energy damage to that ship. |
 
 ### Ion Weapons
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Hapan Triple Ion Cannon (5d10x5) | 12,000 | 3 | No | Illegal | - | **Damage:** 5d10x5<br>Acts like a Point-Defense Weapon (no penalty for targets smaller than Colossal). Capable of Autofire, but not Starship Scale Area Attacks. Illegal outside Hapan Consortium. |
-| Heavy Ion Cannon (3d10x5) | 6,000 | 5 | No | Military | - | **Damage:** 3d10x5<br>Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire. |
-| Light Ion Cannon (3d10x2) | 2,000 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament. |
+| Hapan Triple Ion Cannon | 12,000 | 3 | No | Illegal | - | **Damage:** 5d10x5<br>Acts like a Point-Defense Weapon (no penalty for targets smaller than Colossal). Capable of Autofire, but not Starship Scale Area Attacks. Illegal outside Hapan Consortium. |
+| Heavy Ion Cannon | 6,000 | 5 | No | Military | - | **Damage:** 3d10x5<br>Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire. |
+| Light Ion Cannon | 2,000 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament. |
 | Medium Ion Cannon (5d10x2) | 3,000 | 2 | No | Restricted | - | **Damage:** 5d10x2<br>Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire. |
 
 ### Laser Cannons
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Heavy Laser Cannon (5d10x2) | 6,000 | 2 | No | Military | - | **Damage:** 5d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
-| Light Laser Cannon (3d10x2) | 1,500 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
-| Medium Laser Cannon (4d10x2) | 4,000 | 1 | No | Restricted | - | **Damage:** 4d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
+| Heavy Laser Cannon | 6,000 | 2 | No | Military | - | **Damage:** 5d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
+| Light Laser Cannon | 1,500 | 1 | No | Licensed | - | **Damage:** 3d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
+| Medium Laser Cannon | 4,000 | 1 | No | Restricted | - | **Damage:** 4d10x2<br>Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive. |
 
 ### Launchers
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Heavy Concussion Missile Launcher (9d10x5) | 30,000 | 20 | No | Military | - | **Damage:** 9d10x5<br>Base Capacity: 30 missiles. Additional capacity costs +20% per missile (max double capacity). |
+| Heavy Concussion Missile Launcher | 30,000 | 20 | No | Military | - | **Damage:** 9d10x5<br>Base Capacity: 30 missiles. Additional capacity costs +20% per missile (max double capacity). |
 | Heavy Ordnance Launcher | 10,000 | 2 | Yes | Military | - | **Damage:** 5d10x5<br>Launches heavy ordnance payloads. |
-| Light Concussion Missile Launcher (7d10x2) | 2,000 | 2 | No | Military | - | **Damage:** 7d10x2<br>Base Capacity: 6 missiles. Additional capacity costs +20% per missile (max double capacity). |
-| Medium Concussion Missile Launcher (9d10x2) | 3,500 | 5 | No | Military | - | **Damage:** 9d10x2<br>Base Capacity: 16 missiles. Additional capacity costs +20% per missile (max double capacity). |
+| Light Concussion Missile Launcher | 2,000 | 2 | No | Military | - | **Damage:** 7d10x2<br>Base Capacity: 6 missiles. Additional capacity costs +20% per missile (max double capacity). |
+| Medium Concussion Missile Launcher | 3,500 | 5 | No | Military | - | **Damage:** 9d10x2<br>Base Capacity: 16 missiles. Additional capacity costs +20% per missile (max double capacity). |
 | Proton Torpedo Launcher | 2,500 | 1 | No | Restricted | - | **Damage:** 9d10x2<br>Base Capacity: 3 torpedoes. Additional capacity costs +25% per torpedo (max 16). |
+
+### Mines
+
+| Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
+|---|---|---|---|---|---|---|
+| Space Mine Launcher, Heavy | 5,000 | 4 | No | Military | - | **Damage:** 6d10x5<br>Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing 6d10x2 Energy damage to that ship. |
+| Space Mine Launcher, Standard | 5,000 | 2 | No | Military | - | **Damage:** Varies<br>Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing energy damage to that ship depending of payload. |
 
 ### Mounts
 
@@ -362,6 +345,6 @@ This report lists all starship components defined in `data.json`, grouped by cat
 
 | Name | Cost | EP | Size Mult | Availability | Exclusive Group | Notes |
 |---|---|---|---|---|---|---|
-| Heavy Turbolaser (7d10x5) | 20,000 | 10 | No | Military | - | **Damage:** 7d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |
-| Light Turbolaser (3d10x5) | 5,000 | 2 | No | Military | - | **Damage:** 3d10x5<br>Turbolasers require immense power and cooling. Light Turbolasers can be Fire-Linked with Autofire. |
-| Medium Turbolaser (5d10x5) | 10,000 | 5 | No | Military | - | **Damage:** 5d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |
+| Heavy Turbolaser | 20,000 | 10 | No | Military | - | **Damage:** 7d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |
+| Light Turbolaser | 5,000 | 2 | No | Military | - | **Damage:** 3d10x5<br>Turbolasers require immense power and cooling. Light Turbolasers can be Fire-Linked with Autofire. |
+| Medium Turbolaser | 10,000 | 5 | No | Military | - | **Damage:** 5d10x5<br>Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences. |

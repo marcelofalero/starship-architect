@@ -1,5 +1,6 @@
-export const initTutorial = () => {
+export const initTutorial = (context = {}) => {
     const COMPLETED_KEY = 'swse_tutorial_completed';
+    const PART1_KEY = 'swse_tutorial_part1_completed';
 
     // Check for "noob=true" in the query string
     const urlParams = new URLSearchParams(window.location.search);
@@ -16,29 +17,51 @@ export const initTutorial = () => {
     }
 
     const driver = window.driver.js.driver;
+    let steps = [];
+    let isPart1 = false;
 
-    const driverObj = driver({
-        showProgress: true,
-        allowClose: true,
-        animate: true,
-        steps: [
+    if (context.firstRun && !context.hasShip) {
+        // Intro Tour
+        if (localStorage.getItem(PART1_KEY) === 'true' && !forceTutorial) return;
+        isPart1 = true;
+        steps = [
             {
                 popover: {
                     title: 'Welcome Commander',
-                    description: 'Welcome to the SWSE Starship Architect. Let\'s take a quick tour of the controls to get you started.',
+                    description: 'Welcome to the SWSE Starship Architect. Let\'s get you started with your first ship.',
                 }
             },
             {
-                element: '#tour-hangar-btn',
+                element: '#hangar-dialog-card',
                 popover: {
-                    title: 'Hangar',
-                    description: 'Start here. Select a stock ship from the library or load a saved ship file.',
+                    title: 'The Hangar',
+                    description: 'This is the Hangar where you manage your fleet. To begin, select the "New Stock" tab and choose a chassis.',
+                    side: "top",
+                    align: 'center'
+                }
+            },
+            {
+                element: '#hangar-tab-stock',
+                popover: {
+                    title: 'Select a Chassis',
+                    description: 'Click here to browse available stock ships.',
                     side: "bottom",
                     align: 'start'
                 }
-            },
+            }
+        ];
+    } else if (context.hasShip) {
+        // Main UI Tour
+        steps = [
             {
                 element: '#tour-stats-panel',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('overview');
+                    } else if (context.openLeftDrawer) {
+                        context.openLeftDrawer();
+                    }
+                },
                 popover: {
                     title: 'Ship Statistics',
                     description: 'This panel displays your ship\'s vital statistics like HP, SR, Threshold, and Defense scores.',
@@ -48,6 +71,11 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-system-list',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('systems');
+                    }
+                },
                 popover: {
                     title: 'Systems Manifest',
                     description: 'Your installed systems, weapons, and modifications are listed here.',
@@ -57,6 +85,11 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-add-btn',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('systems');
+                    }
+                },
                 popover: {
                     title: 'Install Components',
                     description: 'Click this button to browse and install new weapons, systems, and upgrades.',
@@ -66,6 +99,13 @@ export const initTutorial = () => {
             },
             {
                 element: '#tour-config-panel',
+                onHighlightStarted: () => {
+                    if (context.isMobile && context.isMobile()) {
+                        context.setMobileTab && context.setMobileTab('config');
+                    } else if (context.openRightDrawer) {
+                        context.openRightDrawer();
+                    }
+                },
                 popover: {
                     title: 'Engineering & Config',
                     description: 'Adjust the base chassis, crew quality, and apply templates here. Also manage cargo and escape pods.',
@@ -81,10 +121,32 @@ export const initTutorial = () => {
                     side: "bottom",
                     align: 'end'
                 }
+            },
+            {
+                element: '#tour-hangar-btn',
+                popover: {
+                    title: 'Hangar',
+                    description: 'You can return to the Hangar at any time to load, save, or manage your ships.',
+                    side: "bottom",
+                    align: 'start'
+                }
             }
-        ],
+        ];
+    } else {
+        return;
+    }
+
+    const driverObj = driver({
+        showProgress: true,
+        allowClose: true,
+        animate: true,
+        steps: steps,
         onDestroyStarted: () => {
-            localStorage.setItem(COMPLETED_KEY, 'true');
+            if (isPart1) {
+                localStorage.setItem(PART1_KEY, 'true');
+            } else {
+                localStorage.setItem(COMPLETED_KEY, 'true');
+            }
             document.body.classList.remove('tour-active');
             driverObj.destroy();
         }

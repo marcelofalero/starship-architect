@@ -1,9 +1,9 @@
-import { useShipStore } from './store.js';
-import { i18n, getLocalizedName } from './i18n.js';
-import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog } from './components.js';
-import { initTutorial } from './tutorial.js';
+import { useShipStore } from './store.js?v=2.1';
+import { i18n, getLocalizedName } from './i18n.js?v=2.1';
+import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog, CustomShipDialog } from './components.js?v=2.2';
+import { initTutorial } from './tutorial.js?v=2.1';
 
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted, watch } = Vue;
 const { createPinia } = Pinia;
 const { useQuasar } = Quasar;
 const { useI18n } = VueI18n;
@@ -25,18 +25,50 @@ const setup = () => {
     const showSheetDialog = ref(false);
 
     onMounted(() => {
+        shipStore.initHangar();
+
         const saved = localStorage.getItem('swse_architect_current_build');
         if (saved) {
-            try { shipStore.loadState(JSON.parse(saved)); }
-            catch(e) { console.error("Save corruption", e); shipStore.createNew('light_fighter'); }
+            try {
+                const state = JSON.parse(saved);
+                if (state.configuration && state.configuration.baseChassis) {
+                    shipStore.loadState(state);
+                } else {
+                    showHangarDialog.value = true;
+                }
+            } catch(e) {
+                console.error("Save corruption", e);
+                showHangarDialog.value = true;
+            }
         } else {
-            shipStore.createNew('light_fighter');
+            showHangarDialog.value = true;
         }
 
         // Initialize Tutorial
         setTimeout(() => {
-            initTutorial();
+            initTutorial({
+                firstRun: showHangarDialog.value,
+                hasShip: !!shipStore.chassisId,
+                setMobileTab: (tab) => mobileTab.value = tab,
+                openLeftDrawer: () => leftDrawerOpen.value = true,
+                openRightDrawer: () => rightDrawerOpen.value = true,
+                isMobile: () => !$q.screen.gt.sm
+            });
         }, 500);
+
+        watch(() => shipStore.chassisId, (newVal) => {
+            if (newVal) {
+                setTimeout(() => {
+                    initTutorial({
+                        hasShip: true,
+                        setMobileTab: (tab) => mobileTab.value = tab,
+                        openLeftDrawer: () => leftDrawerOpen.value = true,
+                        openRightDrawer: () => rightDrawerOpen.value = true,
+                        isMobile: () => !$q.screen.gt.sm
+                    });
+                }, 500);
+            }
+        });
     });
 
     // Toolbar Logic
@@ -127,6 +159,7 @@ fetch('data.json')
         app.component('add-mod-dialog', AddModDialog);
         app.component('custom-manager-dialog', CustomManagerDialog);
         app.component('custom-component-dialog', CustomComponentDialog);
+        app.component('custom-ship-dialog', CustomShipDialog);
 
         // Initialize Store with Data
         const store = useShipStore();

@@ -1,0 +1,654 @@
+Migration Report
+================
+
+UNVERIFIED COMPONENTS (162) - Updated/Checked (Network/Block Issue):
+Note: verification may fail (403 Forbidden) in some environments (e.g., cloud sandboxes) due to anti-bot measures.
+These links were updated assuming the page exists or is temporarily inaccessible to the script.
+
+- Light Laser Cannon (ID: laser_light)
+  New: https://swse.miraheze.org/wiki/Laser_Cannon
+  Error: 403 Forbidden
+
+- Medium Laser Cannon (ID: laser_med)
+  New: https://swse.miraheze.org/wiki/Laser_Cannon
+  Error: 403 Forbidden
+
+- Heavy Laser Cannon (ID: laser_hvy)
+  New: https://swse.miraheze.org/wiki/Laser_Cannon
+  Error: 403 Forbidden
+
+- Proton Torpedo Launcher (ID: proton_torp)
+  New: https://swse.miraheze.org/wiki/Proton_Torpedo_Launcher
+  Error: 403 Forbidden
+
+- Light Ion Cannon (ID: ion_cannon_light)
+  New: https://swse.miraheze.org/wiki/Ion_Cannon
+  Error: 403 Forbidden
+
+- Medium Ion Cannon (5d10x2) (ID: ion_cannon)
+  New: https://swse.miraheze.org/wiki/Ion_Cannon
+  Error: 403 Forbidden
+
+- Heavy Ion Cannon (ID: ion_cannon_hvy)
+  New: https://swse.miraheze.org/wiki/Ion_Cannon
+  Error: 403 Forbidden
+
+- Hapan Triple Ion Cannon (ID: ion_cannon_hapan)
+  New: https://swse.miraheze.org/wiki/Ion_Cannon
+  Error: 403 Forbidden
+
+- Light Concussion Missile Launcher (ID: concussion_missile_light)
+  New: https://swse.miraheze.org/wiki/Light_Concussion_Missile_Launcher
+  Error: 403 Forbidden
+
+- Medium Concussion Missile Launcher (ID: concussion_missile)
+  New: https://swse.miraheze.org/wiki/Concussion_Missile_Launcher
+  Error: 403 Forbidden
+
+- Heavy Concussion Missile Launcher (ID: concussion_missile_hvy)
+  New: https://swse.miraheze.org/wiki/Concussion_Missile_Launcher
+  Error: 403 Forbidden
+
+- Tractor Beam (ID: tractor_beam)
+  New: https://swse.miraheze.org/wiki/Tractor_Beam
+  Error: 403 Forbidden
+
+- Atmospheric Thrusters (ID: atmos_thrusters)
+  New: https://swse.miraheze.org/wiki/Atmospheric_Thrusters
+  Error: 403 Forbidden
+
+- Atmospheric Thrusters (Advanced) (ID: atmos_thrusters_adv)
+  New: https://swse.miraheze.org/wiki/Atmospheric_Thrusters
+  Error: 403 Forbidden
+
+- Combat Thrusters (ID: combat_thrusters)
+  New: https://swse.miraheze.org/wiki/Combat_Thrusters
+  Error: 403 Forbidden
+
+- Maneuvering Jets (+2) (ID: maneuvering_jets)
+  New: https://swse.miraheze.org/wiki/Maneuvering_Jets
+  Error: 403 Forbidden
+
+- Maneuvering Jets (+4) (ID: maneuvering_jets_4)
+  New: https://swse.miraheze.org/wiki/Maneuvering_Jets
+  Error: 403 Forbidden
+
+- Maneuvering Jets (+6) (ID: maneuvering_jets_6)
+  New: https://swse.miraheze.org/wiki/Maneuvering_Jets
+  Error: 403 Forbidden
+
+- Hyperdrive Class .75 (ID: hyperdrive_075)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 1 (ID: hyperdrive_1)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 1.5 (ID: hyperdrive_15)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 2 (ID: hyperdrive_2)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 3 (ID: hyperdrive_3)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 4 (ID: hyperdrive_4)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 6 (ID: hyperdrive_6)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 8 (ID: hyperdrive_8)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 10 (ID: hyperdrive_10)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Hyperdrive Class 15 (ID: hyperdrive_15_slow)
+  New: https://swse.miraheze.org/wiki/Hyperdrive
+  Error: 403 Forbidden
+
+- Navicomputer (ID: nav_standard)
+  New: https://swse.miraheze.org/wiki/Navicomputer
+  Error: 403 Forbidden
+
+- Navicomputer (Limited) (ID: nav_limited)
+  New: https://swse.miraheze.org/wiki/Navicomputer
+  Error: 403 Forbidden
+
+- Navicomputer (Advanced) (ID: nav_advanced)
+  New: https://swse.miraheze.org/wiki/Navicomputer
+  Error: 403 Forbidden
+
+- SubLight Accelerator Motor (ID: slam)
+  New: https://swse.miraheze.org/wiki/SubLight_Accelerator_Motor
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 1) (ID: engine_1)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 2) (ID: engine_2)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 3) (ID: engine_3)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 4) (ID: engine_4)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 5) (ID: engine_5)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Sublight Drive (Speed 6) (ID: engine_6)
+  New: https://swse.miraheze.org/wiki/Sublight_Drive
+  Error: 403 Forbidden
+
+- Shield Generator (SR 5) (ID: shield_gen_5)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 10) (ID: shield_gen_10)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 15) (ID: shield_gen_15)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 20) (ID: shield_gen_20)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 25) (ID: shield_gen_25)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 30) (ID: shield_gen_30)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 35) (ID: shield_gen_35)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 40) (ID: shield_gen_40)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 45) (ID: shield_gen_45)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 50) (ID: shield_gen_50)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 55) (ID: shield_gen_55)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 60) (ID: shield_gen_60)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Reinforced Bulkheads (+10%) (ID: bulkheads)
+  New: https://swse.miraheze.org/wiki/Reinforced_Bulkheads
+  Error: 403 Forbidden
+
+- Jamming Suite (ID: jamming)
+  New: https://swse.miraheze.org/wiki/Jamming_Suite
+  Error: 403 Forbidden
+
+- Cloaking Device (Hibridium) (ID: cloaking_hibridium)
+  New: https://swse.miraheze.org/wiki/Cloaking_Device
+  Error: 403 Forbidden
+
+- Cloaking Device (Stygium) (ID: cloaking_stygium)
+  New: https://swse.miraheze.org/wiki/Cloaking_Device
+  Error: 403 Forbidden
+
+- Backup Battery (ID: backup_battery)
+  New: https://swse.miraheze.org/wiki/Backup_Battery
+  Error: 403 Forbidden
+
+- Tech Spec: Shields (+10 SR) (ID: tech_spec_sh)
+  New: https://swse.miraheze.org/wiki/Tech_Spec:_Shields_(+10_SR)
+  Error: 403 Forbidden
+
+- Tech Spec: Armor (+2) (ID: tech_spec_ar)
+  New: https://swse.miraheze.org/wiki/Tech_Spec:_Armor_(+2)
+  Error: 403 Forbidden
+
+- Enhanced Dexterity (+2 Dex) (ID: ts_dex)
+  New: https://swse.miraheze.org/wiki/Enhanced_Dexterity_(+2_Dex)
+  Error: 403 Forbidden
+
+- Improved Speed (+25%) (ID: ts_speed)
+  New: https://swse.miraheze.org/wiki/Improved_Speed_(+25%)
+  Error: 400 Bad Request
+
+- Shields (+20 SR) (ID: sup_tech_sh)
+  New: https://swse.miraheze.org/wiki/Shields_(+20_SR)
+  Error: 403 Forbidden
+
+- Armor (+2 Armor) (ID: sup_tech_ar)
+  New: https://swse.miraheze.org/wiki/Armor_(+2_Armor)
+  Error: 403 Forbidden
+
+- Superior Dex (+4 Dex) (ID: st_dex)
+  New: https://swse.miraheze.org/wiki/Superior_Dex_(+4_Dex)
+  Error: 403 Forbidden
+
+- Superior Str (+2 Str) (ID: st_str)
+  New: https://swse.miraheze.org/wiki/Superior_Str_(+2_Str)
+  Error: 403 Forbidden
+
+- Superior Sensors (+2 Per) (ID: st_sensors)
+  New: https://swse.miraheze.org/wiki/Superior_Sensors_(+2_Per)
+  Error: 403 Forbidden
+
+- Superior Speed (+33%) (ID: st_speed)
+  New: https://swse.miraheze.org/wiki/Superior_Speed_(+33%)
+  Error: 400 Bad Request
+
+- HoloNet Transceiver (ID: holo_transceiver)
+  New: https://swse.miraheze.org/wiki/Transceiver
+  Error: 403 Forbidden
+
+- Hypertransceiver (ID: hypertransceiver)
+  New: https://swse.miraheze.org/wiki/Transceiver
+  Error: 403 Forbidden
+
+- Lifeboat, Small (ID: lifeboat_small)
+  New: https://swse.miraheze.org/wiki/Escape_Pod
+  Error: 403 Forbidden
+
+- Droid Repair Team (ID: droid_repair_team)
+  New: https://swse.miraheze.org/wiki/Droid_Repair_Team
+  Error: 403 Forbidden
+
+- Medical Suite (ID: medical_suite)
+  New: https://swse.miraheze.org/wiki/Medical_Suite
+  Error: 403 Forbidden
+
+- Passenger Conversion(Seating) (ID: passenger_conversion)
+  New: https://swse.miraheze.org/wiki/Passenger_Conversion
+  Error: 403 Forbidden
+
+- Passenger Conversion (ID: passenger_conversion(Quarters))
+  New: https://swse.miraheze.org/wiki/Passenger_Conversion
+  Error: 403 Forbidden
+
+- Sensor Array Computer (+2 Int) (ID: sensor_array_computer_2)
+  New: https://swse.miraheze.org/wiki/Sensor_Array_Computer
+  Error: 403 Forbidden
+
+- Sensor Array Computer (+4 Int) (ID: sensor_array_computer_4)
+  New: https://swse.miraheze.org/wiki/Sensor_Array_Computer
+  Error: 403 Forbidden
+
+- Sensor Array Computer (+6 Int) (ID: sensor_array_computer_6)
+  New: https://swse.miraheze.org/wiki/Sensor_Array_Computer
+  Error: 403 Forbidden
+
+- Sensor Enhancement Package (ID: sensor_enhancement)
+  New: https://swse.miraheze.org/wiki/Sensor_Enhancement_Package
+  Error: 403 Forbidden
+
+- Baffled Drive (ID: baffled_drive)
+  New: https://swse.miraheze.org/wiki/Baffled_Drive
+  Error: 403 Forbidden
+
+- Amphibious Seals (ID: amphibious_seals)
+  New: https://swse.miraheze.org/wiki/Amphibious_Seals
+  Error: 403 Forbidden
+
+- Cockpit Ejection System (ID: cockpit_ejection)
+  New: https://swse.miraheze.org/wiki/Cockpit_Ejection_System
+  Error: 403 Forbidden
+
+- Cotterdam (ID: cotterdam)
+  New: https://swse.miraheze.org/wiki/Cotterdam
+  Error: 403 Forbidden
+
+- Environmental Filters (ID: environmental_filters)
+  New: https://swse.miraheze.org/wiki/Environmental_Filters
+  Error: 403 Forbidden
+
+- Fuel Converters (ID: fuel_converters)
+  New: https://swse.miraheze.org/wiki/Fuel_Converters
+  Error: 403 Forbidden
+
+- Grappler Mag (ID: grappler_mag)
+  New: https://swse.miraheze.org/wiki/Grappler_Mag
+  Error: 403 Forbidden
+
+- Hardpoint (x4) (ID: hardpoint)
+  New: https://swse.miraheze.org/wiki/Hardpoint
+  Error: 403 Forbidden
+
+- Interrogation Chamber (ID: interrogation_chamber)
+  New: https://swse.miraheze.org/wiki/Interrogation_Chamber
+  Error: 403 Forbidden
+
+- Personalized Controls (ID: personalized_controls)
+  New: https://swse.miraheze.org/wiki/Personalized_Controls
+  Error: 403 Forbidden
+
+- Plasma Punch (ID: plasma_punch)
+  New: https://swse.miraheze.org/wiki/Plasma_Punch
+  Error: 403 Forbidden
+
+- Plasma Torch (ID: plasma_torch)
+  New: https://swse.miraheze.org/wiki/Plasma_Torch
+  Error: 403 Forbidden
+
+- Sensor Baffling (ID: sensor_baffling)
+  New: https://swse.miraheze.org/wiki/Sensor_Baffling
+  Error: 403 Forbidden
+
+- Sensor Decoy (ID: sensor_decoy)
+  New: https://swse.miraheze.org/wiki/Sensor_Decoy
+  Error: 403 Forbidden
+
+- Sensor Mask (ID: sensor_mask)
+  New: https://swse.miraheze.org/wiki/Sensor_Mask
+  Error: 403 Forbidden
+
+- Tractor Clamp (ID: tractor_clamp)
+  New: https://swse.miraheze.org/wiki/Tractor_Clamp
+  Error: 403 Forbidden
+
+- Transponder (Masked) (ID: transponder_masked)
+  New: https://swse.miraheze.org/wiki/Transponder_(Masked)
+  Error: 403 Forbidden
+
+- Transponder (Disguised) (1) (ID: transponder_disguised_1)
+  New: https://swse.miraheze.org/wiki/Transponder
+  Error: 403 Forbidden
+
+- Transponder (Disguised) (2) (ID: transponder_disguised_2)
+  New: https://swse.miraheze.org/wiki/Transponder
+  Error: 403 Forbidden
+
+- Transponder (Disguised) (3) (ID: transponder_disguised_3)
+  New: https://swse.miraheze.org/wiki/Transponder
+  Error: 403 Forbidden
+
+- Transponder (IFF) (ID: transponder_iff)
+  New: https://swse.miraheze.org/wiki/Transponder
+  Error: 403 Forbidden
+
+- Workshop (ID: workshop)
+  New: https://swse.miraheze.org/wiki/Workshop
+  Error: 403 Forbidden
+
+- Slave Circuits (Basic) (ID: slave_circuits)
+  New: https://swse.miraheze.org/wiki/Slave_Circuits
+  Error: 403 Forbidden
+
+- Slave Circuits (Advanced) (ID: slave_circuits_adv)
+  New: https://swse.miraheze.org/wiki/Slave_Circuits
+  Error: 403 Forbidden
+
+- Smuggler's Compartment (ID: smuggler_compartment)
+  New: https://swse.miraheze.org/wiki/Smuggler's_Compartments
+  Error: 403 Forbidden
+
+- Cargo Pod (Light) (ID: cargo_pod_small)
+  New: https://swse.miraheze.org/wiki/Cargo_Pod
+  Error: 403 Forbidden
+
+- Cargo Pod (Medium) (ID: cargo_pod_med)
+  New: https://swse.miraheze.org/wiki/Cargo_Pod
+  Error: 403 Forbidden
+
+- Cargo Pod (Heavy) (ID: cargo_pod_large)
+  New: https://swse.miraheze.org/wiki/Cargo_Pod
+  Error: 403 Forbidden
+
+- Cargo Jettison System (ID: cargo_jettison)
+  New: https://swse.miraheze.org/wiki/Cargo_Jettison_System
+  Error: 403 Forbidden
+
+- Extended Range (ID: extended_range)
+  New: https://swse.miraheze.org/wiki/Extended_Range
+  Error: 0 <urlopen error [Errno 101] Network is unreachable>
+
+- Luxury Upgrade (Basic) (ID: luxury_basic)
+  New: https://swse.miraheze.org/wiki/Luxury_Upgrade
+  Error: 403 Forbidden
+
+- Luxury Upgrade (Advanced) (ID: luxury_advanced)
+  New: https://swse.miraheze.org/wiki/Luxury_Upgrade
+  Error: 403 Forbidden
+
+- Luxury Upgrade (Extreme) (ID: luxury_extreme)
+  New: https://swse.miraheze.org/wiki/Luxury_Upgrade
+  Error: 403 Forbidden
+
+- Hangar Bay (ID: hangar_bay)
+  New: https://swse.miraheze.org/wiki/Hangar_Bay
+  Error: 403 Forbidden
+
+- Hangar Bay, Concealed (ID: hangar_bay_concealed)
+  New: https://swse.miraheze.org/wiki/Hangar_Bay
+  Error: 403 Forbidden
+
+- Cryogenic Chambers (ID: cryo_chambers)
+  New: https://swse.miraheze.org/wiki/Cryogenic_Chambers
+  Error: 403 Forbidden
+
+- Docking Clamp (ID: docking_clamp)
+  New: https://swse.miraheze.org/wiki/Docking_Clamp
+  Error: 403 Forbidden
+
+- Starship Armor (+1) (ID: armor_1)
+  New: https://swse.miraheze.org/wiki/Starship_Armor
+  Error: 403 Forbidden
+
+- Starship Armor (+2) (ID: armor_2)
+  New: https://swse.miraheze.org/wiki/Starship_Armor
+  Error: 403 Forbidden
+
+- Starship Armor (+3) (ID: armor_3)
+  New: https://swse.miraheze.org/wiki/Starship_Armor
+  Error: 403 Forbidden
+
+- Starship Armor (+4) (ID: armor_4)
+  New: https://swse.miraheze.org/wiki/Starship_Armor
+  Error: 403 Forbidden
+
+- Jamming Array (ID: jamming_array)
+  New: https://swse.miraheze.org/wiki/Jamming_Array
+  Error: 403 Forbidden
+
+- Regenerating Shields (ID: regenerating_shields)
+  New: https://swse.miraheze.org/wiki/Regenerating_Shields
+  Error: 403 Forbidden
+
+- Reinforced Bulkheads (+20%) (ID: bulkheads_20)
+  New: https://swse.miraheze.org/wiki/Reinforced_Bulkheads
+  Error: 403 Forbidden
+
+- Reinforced Bulkheads (+30%) (ID: bulkheads_30)
+  New: https://swse.miraheze.org/wiki/Reinforced_Bulkheads
+  Error: 403 Forbidden
+
+- Shield Generator (SR 70) (ID: shield_gen_70)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 80) (ID: shield_gen_80)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 90) (ID: shield_gen_90)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 100) (ID: shield_gen_100)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 125) (ID: shield_gen_125)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 150) (ID: shield_gen_150)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 175) (ID: shield_gen_175)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Shield Generator (SR 200) (ID: shield_gen_200)
+  New: https://swse.miraheze.org/wiki/Shield_Generator
+  Error: 403 Forbidden
+
+- Anti-Boarding Systems (ID: anti_boarding)
+  New: https://swse.miraheze.org/wiki/Anti-Boarding_Systems
+  Error: 403 Forbidden
+
+- Com Jammers (ID: com_jammers)
+  New: https://swse.miraheze.org/wiki/Com_Jammers
+  Error: 403 Forbidden
+
+- Reinforced Keel (ID: reinforced_keel)
+  New: https://swse.miraheze.org/wiki/Reinforced_Keel
+  Error: 403 Forbidden
+
+- Reinforced Keel, Boarding (ID: reinforced_keel_boarding)
+  New: https://swse.miraheze.org/wiki/Reinforced_Keel
+  Error: 403 Forbidden
+
+- Security Bracing (ID: security_bracing)
+  New: https://swse.miraheze.org/wiki/Security_Bracing
+  Error: 403 Forbidden
+
+- Light Turbolaser (ID: turbolaser_light)
+  New: https://swse.miraheze.org/wiki/Turbolaser
+  Error: 403 Forbidden
+
+- Medium Turbolaser (ID: turbolaser_med)
+  New: https://swse.miraheze.org/wiki/Turbolaser
+  Error: 403 Forbidden
+
+- Heavy Turbolaser (ID: turbolaser_hvy)
+  New: https://swse.miraheze.org/wiki/Turbolaser
+  Error: 403 Forbidden
+
+- Light Blaster Cannon (ID: blaster_cannon_light)
+  New: https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)
+  Error: 403 Forbidden
+
+- Medium Blaster Cannon (ID: blaster_cannon_med)
+  New: https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)
+  Error: 403 Forbidden
+
+- Heavy Blaster Cannon (ID: blaster_cannon_hvy)
+  New: https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)
+  Error: 403 Forbidden
+
+- Harpoon Gun (ID: harpoon_gun)
+  New: https://swse.miraheze.org/wiki/Harpoon_Gun
+  Error: 403 Forbidden
+
+- Docking Gun(WIP) (ID: docking_gun)
+  New: https://swse.miraheze.org/wiki/Docking_Gun
+  Error: 403 Forbidden
+
+- Droid Jammer (ID: droid_jammer)
+  New: https://swse.miraheze.org/wiki/Droid_Jammer
+  Error: 403 Forbidden
+
+- Cannon Enhancements (ID: cannon_enhancements)
+  New: https://swse.miraheze.org/wiki/Cannon_Enhancements
+  Error: 403 Forbidden
+
+- Cannon Enhancements (Advanced) (ID: cannon_enhancements_adv)
+  New: https://swse.miraheze.org/wiki/Cannon_Enhancements_(Advanced)
+  Error: 403 Forbidden
+
+- Gravity Well Projector (ID: gravity_well)
+  New: https://swse.miraheze.org/wiki/Gravity_Well_Projector
+  Error: 403 Forbidden
+
+- Ion Bomb Rack (ID: ion_bomb_rack)
+  New: https://swse.miraheze.org/wiki/Ion_Bomb
+  Error: 403 Forbidden
+
+- Shieldbuster Torpedo Launcher (ID: shieldbuster_torp)
+  New: https://swse.miraheze.org/wiki/Shieldbuster_Torpedo_Launcher
+  Error: 403 Forbidden
+
+- Space Mine Launcher, Standard (ID: space_mine_launcher_standard)
+  New: https://swse.miraheze.org/wiki/Space_Mine_Launcher
+  Error: 403 Forbidden
+
+- Space Mine Launcher, Heavy (ID: space_mine_launcher_heavy)
+  New: https://swse.miraheze.org/wiki/Space_Mine_Launcher
+  Error: 403 Forbidden
+
+- Discord Missile Launcher (ID: discord_missile_launcher)
+  New: https://swse.miraheze.org/wiki/Discord_Missile_Launcher
+  Error: 403 Forbidden
+
+- Composite Beam Cannon (ID: composite_beam)
+  New: https://swse.miraheze.org/wiki/Composite_Beam_Cannon
+  Error: 403 Forbidden
+
+- Gravity Mine Launcher (ID: gravity_mine_launcher)
+  New: https://swse.miraheze.org/wiki/Gravity_Mine_Launcher
+  Error: 403 Forbidden
+
+- Chaff Gun (ID: chaff_gun)
+  New: https://swse.miraheze.org/wiki/Chaff_Gun
+  Error: 403 Forbidden
+
+- Auxiliary Generator (+2) (ID: aux_gen_2)
+  New: https://swse.miraheze.org/wiki/Auxiliary_Generator
+  Error: 403 Forbidden
+
+- Auxiliary Generator (+4) (ID: aux_gen_4)
+  New: https://swse.miraheze.org/wiki/Auxiliary_Generator
+  Error: 403 Forbidden
+
+- Auxiliary Generator (+6) (ID: aux_gen_6)
+  New: https://swse.miraheze.org/wiki/Auxiliary_Generator
+  Error: 403 Forbidden
+
+- Hidden Cargo Hold (25%) (ID: hidden_cargo_25)
+  New: https://swse.miraheze.org/wiki/Hidden_Cargo_Hold
+  Error: 403 Forbidden
+
+- Hidden Cargo Hold (50%) (ID: hidden_cargo_50)
+  New: https://swse.miraheze.org/wiki/Hidden_Cargo_Hold
+  Error: 403 Forbidden
+
+- Hidden Cargo Hold (75%) (ID: hidden_cargo_75)
+  New: https://swse.miraheze.org/wiki/Hidden_Cargo_Hold
+  Error: 403 Forbidden
+
+- Heavy Ordnance Launcher (ID: heavy_ordnance_launcher)
+  New: https://swse.miraheze.org/wiki/Heavy_Ordnance_Launcher
+  Error: 403 Forbidden
+
+- Lifeboat, Large (ID: lifeboat_large)
+  New: https://swse.miraheze.org/wiki/Escape_Pod
+  Error: 403 Forbidden

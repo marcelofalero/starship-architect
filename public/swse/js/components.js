@@ -1,5 +1,5 @@
-import { useShipStore } from './store.js';
-import { getLocalizedName, i18n } from './i18n.js';
+import { useShipStore } from './store.js?v=2.1';
+import { getLocalizedName, i18n } from './i18n.js?v=2.1';
 
 const { computed, ref, reactive, watch } = Vue;
 const { useI18n } = VueI18n;
@@ -8,7 +8,7 @@ const { useQuasar } = Quasar;
 // --- BASE COMPONENTS ---
 const StatPanel = {
     template: `
-    <q-card id="tour-stats-panel" class="bg-grey-9 text-white">
+    <q-card id="tour-stats-panel" class="bg-grey-9 text-white col">
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
@@ -26,15 +26,17 @@ const StatPanel = {
                 <div class="col-4"><div class="bg-grey-8 q-pa-xs rounded-borders"><div>{{ $t('stats.dex') }}</div><div class="text-bold">{{ store.currentStats.dex }}</div></div></div>
                 <div class="col-4"><div class="bg-grey-8 q-pa-xs rounded-borders"><div>{{ $t('stats.int') }}</div><div class="text-bold">{{ store.currentStats.int }}</div></div></div>
             </div>
-            <div class="row q-mt-sm">
-                <div class="col-12 row justify-between items-center q-pa-xs bg-primary rounded-borders"><span>{{ $t('stats.ref') }}</span><span class="text-h6">{{ store.reflexDefense }}</span></div>
+            <div class="row q-mt-sm q-col-gutter-xs">
+                <div class="col-6"><div class="row justify-between items-center q-pa-xs bg-primary rounded-borders"><span>{{ $t('stats.ref') }}</span><span class="text-h6">{{ store.reflexDefense }}</span></div></div>
+                <div class="col-6"><div class="row justify-between items-center q-pa-xs bg-primary rounded-borders"><span>{{ $t('stats.fort') }}</span><span class="text-h6">{{ store.fortitudeDefense }}</span></div></div>
             </div>
                 <div class="row q-mt-xs text-center"><div class="col-12"><div class="bg-grey-8 q-pa-xs">{{ $t('stats.armor') }} +{{ store.currentStats.armor }}</div></div></div>
             <div class="row q-mt-xs q-col-gutter-xs">
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.hp') }}</div><div class="text-bold text-positive">{{ store.currentStats.hp }}</div></div></div>
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.shields') }}</div><div :class="store.isSrIllegal ? 'text-bold text-negative' : 'text-bold text-cyan'">{{ store.currentStats.sr }} <q-tooltip v-if="store.isSrIllegal" class="bg-negative">Max SR: {{ store.maxSrAllowed }}</q-tooltip></div></div></div>
                 <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.dr') }}</div><div class="text-bold">{{ store.currentStats.dr }}</div></div></div>
-                <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.speed') }}</div><div class="text-bold">{{ store.currentStats.speed }}</div></div></div>
+                <div class="col-6"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.dt') }}</div><div class="text-bold">{{ store.damageThreshold }}</div></div></div>
+                <div class="col-12"><div class="bg-grey-8 q-pa-xs text-center"><div>{{ $t('stats.speed') }}</div><div class="text-bold">{{ store.currentStats.speed }}</div></div></div>
             </div>
             <q-separator dark class="q-mt-sm" />
             <div class="q-mt-sm text-caption">
@@ -67,7 +69,7 @@ const StatPanel = {
 
 const SystemList = {
     template: `
-    <div id="tour-system-list" class="q-pa-md col column">
+    <div id="tour-system-list" class="q-pa-md col column bg-grey-9">
         <div class="row justify-between items-center q-mb-md"><div class="text-h6">{{ $t('ui.installed_systems') }}</div><q-btn id="tour-add-btn" round color="positive" icon="add" size="sm" @click="store.showAddComponentDialog = true" /></div>
         <component :is="$q.screen.gt.sm ? 'q-scroll-area' : 'div'" :class="$q.screen.gt.sm ? 'col' : ''"><q-list separator dark>
             <q-item v-for="instance in store.installedComponents" :key="instance.instanceId">
@@ -163,7 +165,6 @@ const SystemList = {
                     <div v-if="canPointBlank(editingInstance.defId)" class="q-mb-md">
                         <q-checkbox dark v-model="editingInstance.modifications.pointBlank" :label="'Point Blank (+' + format(getOptionCost(editingInstance.defId, 'pointBlank')) + ')'" />
                     </div>
-                    <!-- Generic Options from componentOptions -->
                     <div v-for="opt in getGenericOptions(editingInstance.defId)" :key="opt.value" class="q-mb-md">
                          <q-checkbox dark v-model="editingInstance.modifications[opt.value]" :label="opt.label" />
                     </div>
@@ -180,7 +181,7 @@ const SystemList = {
 
 const ConfigPanel = {
     template: `
-    <q-card id="tour-config-panel" class="bg-grey-9 text-white full-height column">
+    <q-card id="tour-config-panel" class="bg-grey-9 text-white col column">
         <q-card-section class="col-auto">
             <div class="text-h6">{{ $t('ui.engineering') }}</div>
             <div class="row items-center">
@@ -188,6 +189,11 @@ const ConfigPanel = {
                 <q-btn flat round dense icon="info" size="xs" color="grey-5" class="q-ml-xs">
                     <q-tooltip content-class="bg-grey-9" max-width="250px">{{ $t('ui.starship_designer_tip') }}</q-tooltip>
                 </q-btn>
+            </div>
+            <div class="q-mt-sm">
+                <q-select filled dark v-model="store.crewQuality" :options="crewQualityOptions" label="Crew Quality" emit-value map-options dense options-dense>
+                    <template v-slot:prepend><q-icon name="group" /></template>
+                </q-select>
             </div>
         </q-card-section>
 
@@ -282,15 +288,18 @@ const ShipSheet = {
         <div class="swse-header"><span>{{ store.meta.name || 'Untitled Ship' }}</span><span>CL {{ calculateCL }}</span></div>
         <div class="swse-sub">{{ store.chassis.size }} Starfighter ({{ getLocalizedName(store.chassis) }})</div>
         <div class="sheet-body">
-            <div><span class="bold">Init</span> +{{ getMod(store.currentStats.dex) }}; <span class="bold">Senses</span> Perception +{{ getMod(store.currentStats.int) }}</div>
+            <div><span class="bold">Init</span> +{{ getMod(store.currentStats.dex) + store.crewStats.skill }}; <span class="bold">Senses</span> Perception +{{ getMod(store.currentStats.int) + store.crewStats.skill }}</div>
 
             <div class="section-title">Defense</div>
             <div><span class="bold">Ref</span> {{ store.reflexDefense }} (Flat-footed {{ store.reflexDefense - getMod(store.currentStats.dex) }}), <span class="bold">Fort</span> {{ 10 + getMod(store.currentStats.str) }}; <span class="bold">+{{ store.currentStats.armor }} Armor</span></div>
-            <div><span class="bold">HP</span> {{ store.currentStats.hp }}; <span class="bold">DR</span> {{ store.currentStats.dr }}; <span class="bold">SR</span> {{ store.currentStats.sr }}; <span class="bold">Threshold</span> {{ store.currentStats.str + 10 }}</div>
+            <div><span class="bold">HP</span> {{ store.currentStats.hp }}; <span class="bold">DR</span> {{ store.currentStats.dr }}; <span class="bold">SR</span> {{ store.currentStats.sr || 0 }}; <span class="bold">Threshold</span> {{ store.damageThreshold }}</div>
 
             <div class="section-title">Offense</div>
             <div><span class="bold">Speed</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
-            <div v-for="w in weapons" :key="w.instanceId" class="weapon-line"><span class="bold">Ranged</span> {{ getName(w) }} +5 ({{ getDmg(w) }})</div>
+            <div v-for="w in weaponData" :key="w.instanceId" class="weapon-line">
+                <span class="bold">Ranged</span> {{ w.name }} +{{ w.attackBonus }} ({{ w.damage }})
+                <div v-if="w.details" class="text-caption text-italic q-ml-md" style="font-size: 0.8em;">{{ w.details }}</div>
+            </div>
 
             <div class="section-title">Statistics</div>
             <div class="stat-grid">
@@ -298,7 +307,7 @@ const ShipSheet = {
                 <div><span class="bold">Dex</span> {{ store.currentStats.dex }}</div>
                 <div><span class="bold">Int</span> {{ store.currentStats.int }}</div>
             </div>
-            <div><span class="bold">Base Atk</span> +2; <span class="bold">Grapple</span> +{{ 2 + (getMod(store.currentStats.str)) + (store.sizeMultVal > 1 ? 10 : 0) }}</div>
+            <div><span class="bold">Base Atk</span> +{{ store.crewStats.atk }}; <span class="bold">Grapple</span> +{{ store.crewStats.atk + (getMod(store.currentStats.str)) + (store.sizeMultVal > 1 ? 10 : 0) }}</div>
 
             <div class="section-title">Systems</div>
             <div>{{ systemNames }}</div>
@@ -327,21 +336,39 @@ const ShipSheet = {
     setup() { return {}; }
 };
 
-// --- NEW REFACTORED DIALOGS ---
-
 export const HangarDialog = {
     props: ['modelValue'],
     emits: ['update:modelValue'],
     template: `
     <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px; max-width: 90vw;">
+        <q-card id="hangar-dialog-card" class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px; max-width: 90vw;'">
             <q-card-section><div class="text-h6">{{ $t('ui.hangar') }}</div></q-card-section>
             <q-tabs v-model="hangarTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-                <q-tab name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
+                <q-tab name="hangar" icon="garage" :label="$t('ui.hangar')"></q-tab>
+                <q-tab id="hangar-tab-stock" name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
                 <q-tab name="import" icon="upload_file" :label="$t('ui.import_file')"></q-tab>
             </q-tabs>
             <q-separator dark></q-separator>
             <q-tab-panels v-model="hangarTab" animated class="bg-grey-9">
+                <q-tab-panel name="hangar" style="height: 400px" class="q-pa-none">
+                    <q-scroll-area class="full-height">
+                        <q-list separator dark>
+                            <q-item v-for="ship in store.hangar" :key="ship.id" clickable v-ripple @click="loadShip(ship.id)">
+                                <q-item-section>
+                                    <q-item-label>{{ ship.meta.name || 'Untitled Ship' }}</q-item-label>
+                                    <q-item-label caption class="text-grey-6">
+                                        {{ getLocalizedName(store.allShips.find(s => s.id === ship.configuration.baseChassis) || {name: ship.configuration.baseChassis}) }}
+                                        <span v-if="ship.activeShipId === store.activeShipId" class="text-positive q-ml-sm">(Active)</span>
+                                    </q-item-label>
+                                </q-item-section>
+                                <q-item-section side>
+                                    <q-btn flat round icon="delete" color="negative" size="sm" @click.stop="deleteShip(ship.id)" />
+                                </q-item-section>
+                            </q-item>
+                            <div v-if="store.hangar.length === 0" class="text-center text-grey q-pa-lg">Hangar is empty.</div>
+                        </q-list>
+                    </q-scroll-area>
+                </q-tab-panel>
                 <q-tab-panel name="stock" style="height: 400px" class="q-pa-none">
                     <q-scroll-area class="full-height">
                         <q-list separator dark>
@@ -367,16 +394,34 @@ export const HangarDialog = {
     setup(props, { emit }) {
         const store = useShipStore();
         const $q = useQuasar();
-        const hangarTab = ref('stock');
+        const hangarTab = ref('hangar');
         const fileInput = ref(null);
 
-        const stockFighters = computed(() => store.db.STOCK_SHIPS.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
-        const stockFreighters = computed(() => store.db.STOCK_SHIPS.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
-        const stockCapitals = computed(() => store.db.STOCK_SHIPS.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
+        const stockFighters = computed(() => store.allShips.filter(s => ['Huge', 'Gargantuan'].includes(s.size)));
+        const stockFreighters = computed(() => store.allShips.filter(s => s.name.includes('Freighter') || s.name === 'Shuttle'));
+        const stockCapitals = computed(() => store.allShips.filter(s => s.size.includes('Colossal') && !s.name.includes('Freighter') && !s.name.includes('Shuttle')));
 
         const selectStockShip = (id) => {
             store.createNew(id);
             emit('update:modelValue', false);
+        };
+
+        const loadShip = (shipId) => {
+            store.loadFromHangar(shipId);
+            emit('update:modelValue', false);
+        };
+
+        const deleteShip = (shipId) => {
+             $q.dialog({
+                dark: true,
+                title: 'Confirm Deletion',
+                message: 'Delete this ship from the hangar?',
+                cancel: true,
+                persistent: true,
+                color: 'negative'
+            }).onOk(() => {
+                store.removeFromHangar(shipId);
+            });
         };
 
         const triggerFileSelect = () => {
@@ -401,14 +446,360 @@ export const HangarDialog = {
             reader.readAsText(file);
         };
 
-        return { hangarTab, stockFighters, stockFreighters, stockCapitals, selectStockShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
+        return { store, hangarTab, stockFighters, stockFreighters, stockCapitals, selectStockShip, loadShip, deleteShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
+    }
+};
+
+export const CustomManagerDialog = {
+    template: `
+    <q-dialog v-model="store.showCustomManager">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%; height: 100vh; display: flex; flex-direction: column;' : 'min-width: 600px; height: 80vh; display: flex; flex-direction: column;'">
+            <q-card-section class="row items-center q-pb-none">
+                <div class="text-h6">Library Manager</div>
+                <q-space></q-space>
+                <q-btn icon="close" flat round dense v-close-popup></q-btn>
+            </q-card-section>
+
+            <q-card-section class="q-py-sm">
+                <div class="row q-gutter-sm">
+                    <q-btn color="primary" icon="add" label="New Library" @click="store.addLibrary()"></q-btn>
+                    <q-btn color="secondary" icon="upload" label="Import Library" @click="triggerLibraryImport"></q-btn>
+                    <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
+                </div>
+            </q-card-section>
+
+            <q-card-section class="col q-pa-none scroll">
+                <q-list separator dark class="q-pa-md">
+                    <q-expansion-item v-for="(lib, index) in store.libraries" :key="lib.id" class="bg-grey-8 q-mb-sm rounded-borders" group="libraries">
+                        <template v-slot:header>
+                            <q-item-section avatar>
+                                <q-toggle v-model="lib.active" color="positive" @click.stop />
+                            </q-item-section>
+                            <q-item-section>
+                                <q-item-label class="text-bold">
+                                    {{ lib.name }}
+                                    <q-badge v-if="lib.editable" color="info" label="Editable" class="q-ml-sm" />
+                                </q-item-label>
+                                <q-item-label caption class="text-grey-4">
+                                    {{ lib.components.length }} Components, {{ lib.ships.length }} Ships
+                                </q-item-label>
+                            </q-item-section>
+                            <q-item-section side>
+                                <div class="row q-gutter-xs">
+                                    <q-btn flat round icon="keyboard_arrow_up" size="sm" @click.stop="store.moveLibrary(lib.id, 'up')" :disable="index === 0"></q-btn>
+                                    <q-btn flat round icon="keyboard_arrow_down" size="sm" @click.stop="store.moveLibrary(lib.id, 'down')" :disable="index === store.libraries.length - 1"></q-btn>
+                                    <q-btn flat round icon="edit" color="info" size="sm" @click.stop="editLibraryName(lib)"></q-btn>
+                                    <q-btn flat round icon="download" color="accent" size="sm" @click.stop="exportLibrary(lib)"></q-btn>
+                                    <q-btn flat round icon="delete" color="negative" size="sm" @click.stop="deleteLibrary(lib)"></q-btn>
+                                </div>
+                            </q-item-section>
+                        </template>
+
+                        <q-card class="bg-grey-9">
+                             <q-card-section class="row items-center q-pb-none">
+                                <div class="text-subtitle2">Contents</div>
+                                <q-space></q-space>
+                                <q-btn size="sm" color="primary" icon="add" label="Add Component" @click="store.openCustomDialog()" :disable="!lib.editable" class="q-mr-sm" />
+                                <q-btn size="sm" color="accent" icon="rocket" label="New Ship" @click="store.openCustomShipDialog()" :disable="!lib.editable" />
+                             </q-card-section>
+                             <q-card-section>
+                                <q-list separator dark dense>
+                                    <q-item-label header class="text-grey-5">Components</q-item-label>
+                                    <q-item v-for="comp in lib.components" :key="comp.id">
+                                        <q-item-section>{{ comp.name }}</q-item-section>
+                                        <q-item-section side>
+                                            <div class="row q-gutter-xs">
+                                                <q-btn flat round icon="edit" size="xs" color="info" @click="store.openCustomDialog(comp.id)" :disable="!lib.editable" />
+                                                <q-btn flat round icon="delete" size="xs" color="negative" @click="store.removeCustomComponent(comp.id)" :disable="!lib.editable" />
+                                            </div>
+                                        </q-item-section>
+                                    </q-item>
+                                    <div v-if="lib.components.length === 0" class="text-caption text-grey q-ml-md">None</div>
+
+                                    <q-item-label header class="text-grey-5">Ships</q-item-label>
+                                    <q-item v-for="ship in lib.ships" :key="ship.id">
+                                        <q-item-section>{{ ship.name }} ({{ ship.size }})</q-item-section>
+                                        <q-item-section side>
+                                            <div class="row q-gutter-xs">
+                                                <q-btn flat round icon="build" size="xs" color="accent" @click="editTemplate(ship.id)" :disable="!lib.editable">
+                                                    <q-tooltip>Edit Template Components</q-tooltip>
+                                                </q-btn>
+                                                <q-btn flat round icon="edit" size="xs" color="info" @click="store.openCustomShipDialog(ship.id)" :disable="!lib.editable" />
+                                                <q-btn flat round icon="delete" size="xs" color="negative" @click="store.removeCustomShip(ship.id)" :disable="!lib.editable" />
+                                            </div>
+                                        </q-item-section>
+                                    </q-item>
+                                    <div v-if="lib.ships.length === 0" class="text-caption text-grey q-ml-md">None</div>
+                                </q-list>
+                             </q-card-section>
+                        </q-card>
+                    </q-expansion-item>
+                    <div v-if="store.libraries.length === 0" class="text-center text-grey q-pa-lg">
+                        No libraries loaded.
+                    </div>
+                </q-list>
+            </q-card-section>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const $q = useQuasar();
+        const libraryInput = ref(null);
+
+        const triggerLibraryImport = () => { if(libraryInput.value) libraryInput.value.click(); };
+
+        const handleLibraryImport = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // Support legacy import (array of components) by wrapping
+                    if (Array.isArray(data)) {
+                        store.importLibrary({
+                            name: file.name.replace('.json', ''),
+                            components: data
+                        });
+                         $q.notify({ type: 'positive', message: 'Legacy library imported successfully.' });
+                    } else if (data.components || data.ships) {
+                         // Standard Library Import
+                         store.importLibrary(data);
+                         $q.notify({ type: 'positive', message: 'Library imported successfully.' });
+                    } else {
+                        $q.notify({ type: 'negative', message: 'Invalid file format.' });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
+                }
+                if (libraryInput.value) libraryInput.value.value = '';
+            };
+            reader.readAsText(file);
+        };
+
+        const exportLibrary = (lib) => {
+            const exportObj = {
+                name: lib.name,
+                version: "1.0",
+                components: lib.components,
+                ships: lib.ships
+            };
+            const jsonStr = JSON.stringify(exportObj, null, 2);
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `swse_lib_${lib.name.replace(/\s+/g, '_').toLowerCase()}.json`;
+            a.click();
+        };
+
+        const deleteLibrary = (lib) => {
+            $q.dialog({
+                dark: true,
+                title: 'Confirm Deletion',
+                message: `Are you sure you want to delete library "${lib.name}"?`,
+                cancel: true,
+                persistent: true,
+                color: 'negative'
+            }).onOk(() => {
+                store.removeLibrary(lib.id);
+            });
+        };
+
+        const editLibraryName = (lib) => {
+             $q.dialog({
+                dark: true,
+                title: 'Edit Library Name',
+                prompt: {
+                    model: lib.name,
+                    type: 'text'
+                },
+                cancel: true,
+                persistent: true,
+                color: 'primary'
+            }).onOk(data => {
+                store.updateLibrary(lib.id, { name: data });
+            });
+        };
+
+        const editTemplate = (shipId) => {
+            store.startTemplateEdit(shipId);
+            store.showCustomManager = false;
+        };
+
+        return { store, libraryInput, triggerLibraryImport, handleLibraryImport, exportLibrary, deleteLibrary, editLibraryName, editTemplate };
+    }
+};
+
+export const CustomShipDialog = {
+    template: `
+    <q-dialog v-model="store.customShipDialogState.visible">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 600px'">
+            <q-card-section>
+                <div class="text-h6">{{ store.customShipDialogState.shipId ? 'Edit Custom Ship' : 'Create Custom Ship' }}</div>
+            </q-card-section>
+            <q-card-section class="q-pt-none scroll" style="max-height: 80vh">
+                <div class="column q-gutter-md">
+                    <!-- Basic Info -->
+                    <div class="text-subtitle2 text-primary">General Information</div>
+                    <div><q-select filled dark v-model="store.customShipDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model="newShip.name" label="Ship Class" :rules="[val => !!val || 'Name is required']"></q-input></div>
+                        <div class="col-3">
+                            <q-select filled dark v-model="newShip.size" :options="store.db.SIZE_RANK" label="Size" emit-value map-options></q-select>
+                        </div>
+                        <div class="col-3">
+                            <q-input filled dark v-model.number="newShip.challengeLevel" label="CL" hint="Override" type="number"></q-input>
+                        </div>
+                        <div class="col-12" v-if="store.isAdmin">
+                            <q-input filled dark v-model="newShip.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model="newShip.cost" label="Base Cost (cr)" type="number"></q-input></div>
+                        <div class="col-6"><q-input filled dark v-model="newShip.baseEp" label="Base EP" type="number"></q-input></div>
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model="newShip.usedCost" label="Used Cost (cr)" type="number"></q-input></div>
+                        <div class="col-6"><q-select filled dark v-model="newShip.availability" :options="store.db.AVAILABILITY_RANK" label="Availability" emit-value map-options></q-select></div>
+                    </div>
+
+                    <q-separator dark />
+
+                    <!-- Stats -->
+                    <div class="text-subtitle2 text-primary">Base Statistics</div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-4"><q-input filled dark v-model.number="newShip.stats.str" label="Strength" type="number"></q-input></div>
+                        <div class="col-4"><q-input filled dark v-model.number="newShip.stats.dex" label="Dexterity" type="number"></q-input></div>
+                        <div class="col-4"><q-input filled dark v-model.number="newShip.stats.int" label="Intelligence" type="number"></q-input></div>
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.hp" label="HP" type="number"></q-input></div>
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.armor" label="Armor" type="number"></q-input></div>
+                <div class="col-6"><q-input filled dark v-model.number="newShip.stats.dr" label="DR" type="number"></q-input></div>
+                    </div>
+
+                    <q-separator dark />
+
+                    <!-- Logistics -->
+                    <div class="text-subtitle2 text-primary">Logistics</div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model.number="newShip.logistics.crew" label="Min Crew" type="number"></q-input></div>
+                        <div class="col-6"><q-input filled dark v-model.number="newShip.logistics.pass" label="Passengers" type="number"></q-input></div>
+                    </div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-6"><q-input filled dark v-model="newShip.logistics.cargo" label="Cargo Capacity" hint="e.g. '100 tons'"></q-input></div>
+                        <div class="col-6"><q-input filled dark v-model="newShip.logistics.cons" label="Consumables" hint="e.g. '1 month'"></q-input></div>
+                    </div>
+                    <div>
+                <q-input filled dark v-model="newShip.description" label="Description" type="textarea" autogrow></q-input>
+                    </div>
+
+                </div>
+            </q-card-section>
+            <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="grey" v-close-popup />
+                <q-btn unelevated class="q-ml-sm" :label="store.customShipDialogState.shipId ? 'Save Changes' : 'Create'" color="positive" @click="createCustomShip" :disable="!newShip.name" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const $q = useQuasar();
+
+        const newShip = reactive({
+            id: '',
+            name: '',
+            size: 'Huge',
+            challengeLevel: null,
+            cost: 0,
+            baseEp: 0,
+            availability: 'Common',
+            usedCost: 0,
+            description: '',
+            stats: { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0 },
+            logistics: { crew: 0, pass: 0, cargo: '', cons: '' }
+        });
+
+        const createCustomShip = () => {
+            if (!newShip.name) return;
+            const isEdit = !!store.customShipDialogState.shipId;
+
+            let id = newShip.id;
+            if (!id) {
+                 id = isEdit ? store.customShipDialogState.shipId : 'custom_ship_' + crypto.randomUUID();
+            }
+
+            const ship = {
+                id: id,
+                name: newShip.name,
+                size: newShip.size,
+                challengeLevel: newShip.challengeLevel !== '' && newShip.challengeLevel !== null ? Number(newShip.challengeLevel) : null,
+                cost: Number(newShip.cost),
+                baseEp: Number(newShip.baseEp),
+                availability: newShip.availability,
+                usedCost: Number(newShip.usedCost),
+                description: newShip.description,
+                stats: { ...newShip.stats },
+                logistics: { ...newShip.logistics }
+            };
+
+            if (isEdit) {
+                store.updateCustomShip(ship);
+            } else {
+                store.addCustomShip(ship, store.customShipDialogState.targetLibraryId);
+            }
+            store.customShipDialogState.visible = false;
+        };
+
+        watch(() => store.customShipDialogState.visible, (visible) => {
+            if (visible) {
+                if (store.customShipDialogState.shipId) {
+                    const existing = store.allShips.find(s => s.id === store.customShipDialogState.shipId);
+                    if (existing) {
+                        newShip.id = existing.id;
+                        newShip.name = existing.name;
+                        newShip.size = existing.size;
+                        newShip.challengeLevel = existing.challengeLevel || null;
+                        newShip.cost = existing.cost;
+                        newShip.baseEp = existing.baseEp;
+                        newShip.availability = existing.availability || 'Common';
+                        newShip.usedCost = existing.usedCost || 0;
+                        newShip.description = existing.description || '';
+
+                        newShip.stats = { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0, ...existing.stats };
+                        newShip.logistics = { crew: 0, pass: 0, cargo: '', cons: '', ...existing.logistics };
+                    }
+                } else {
+                    // Reset
+                    newShip.id = '';
+                    newShip.name = '';
+                    newShip.size = 'Huge';
+                    newShip.challengeLevel = null;
+                    newShip.cost = 0;
+                    newShip.baseEp = 0;
+                    newShip.availability = 'Common';
+                    newShip.usedCost = 0;
+                    newShip.description = '';
+                    newShip.stats = { str: 40, dex: 10, int: 10, hp: 120, armor: 5, dr: 10 };
+                    newShip.logistics = { crew: 1, pass: 0, cargo: '0 tons', cons: '1 day' };
+                }
+            } else {
+                store.customShipDialogState.shipId = null;
+            }
+        });
+
+        return { store, newShip, createCustomShip };
     }
 };
 
 export const AddModDialog = {
     template: `
     <q-dialog v-model="store.showAddComponentDialog">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px'">
             <q-card-section>
                 <div class="row items-center justify-between">
                     <div class="text-h6">{{ $t('ui.install_system') }}</div>
@@ -537,7 +928,7 @@ export const AddModDialog = {
             </q-card-actions>
         </q-card>
         <q-dialog v-model="showJsonEditor" persistent>
-            <q-card class="bg-grey-9 text-white" style="min-width: 600px; max-width: 90vw;">
+            <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 600px; max-width: 90vw;'">
                 <q-card-section>
                     <div class="text-h6">Edit Component JSON</div>
                 </q-card-section>
@@ -763,132 +1154,16 @@ export const AddModDialog = {
     }
 };
 
-export const CustomManagerDialog = {
-    template: `
-    <q-dialog v-model="store.showCustomManager">
-        <q-card class="bg-grey-9 text-white" style="min-width: 600px; height: 70vh; display: flex; flex-direction: column;">
-            <q-card-section class="row items-center q-pb-none">
-                <div class="text-h6">Custom Components Library</div>
-                <q-space></q-space>
-                <q-btn icon="close" flat round dense v-close-popup></q-btn>
-            </q-card-section>
-
-            <q-card-section class="q-py-sm">
-                <div class="row q-gutter-sm">
-                    <q-btn color="primary" icon="add" label="Create New" @click="store.openCustomDialog()"></q-btn>
-                    <q-btn color="secondary" icon="upload" label="Import JSON" @click="triggerLibraryImport"></q-btn>
-                    <q-btn color="accent" icon="download" label="Export JSON" @click="exportCustomLibrary" :disable="store.customComponents.length === 0"></q-btn>
-                    <input type="file" ref="libraryInput" @change="handleLibraryImport" accept=".json" style="display: none" />
-                </div>
-            </q-card-section>
-
-            <q-card-section class="col q-pa-none">
-                <q-scroll-area class="fit">
-                    <q-list separator dark class="q-pa-md">
-                        <q-item v-for="comp in store.customComponents" :key="comp.id">
-                            <q-item-section>
-                                <q-item-label>{{ comp.name }}</q-item-label>
-                                <q-item-label caption class="text-grey-5">{{ comp.baseCost }} cr | {{ comp.baseEp }} EP</q-item-label>
-                            </q-item-section>
-                            <q-item-section side>
-                                <div class="row q-gutter-xs">
-                                    <q-btn flat round icon="edit" color="info" size="sm" @click="store.openCustomDialog(comp.id)"></q-btn>
-                                    <q-btn flat round icon="delete" :color="store.isCustomComponentInstalled(comp.id) ? 'grey-8' : 'negative'" size="sm" @click="deleteCustomComponent(comp.id)">
-                                        <q-tooltip v-if="store.isCustomComponentInstalled(comp.id)">Uninstall from ship first</q-tooltip>
-                                    </q-btn>
-                                </div>
-                            </q-item-section>
-                        </q-item>
-                        <div v-if="store.customComponents.length === 0" class="text-center text-grey q-pa-lg">
-                            No custom components found. Create or Import one.
-                        </div>
-                    </q-list>
-                </q-scroll-area>
-            </q-card-section>
-        </q-card>
-    </q-dialog>
-    `,
-    setup() {
-        const store = useShipStore();
-        const $q = useQuasar();
-        const libraryInput = ref(null);
-
-        const triggerLibraryImport = () => { if(libraryInput.value) libraryInput.value.click(); };
-
-        const handleLibraryImport = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (Array.isArray(data)) {
-                        let count = 0;
-                        data.forEach(item => {
-                            if (item.name && item.type) {
-                                const newId = 'custom_' + crypto.randomUUID();
-                                const comp = { ...item, id: newId };
-                                store.addCustomComponent(comp);
-                                count++;
-                            }
-                        });
-                        $q.notify({ type: 'positive', message: 'Imported ' + count + ' components.' });
-                    } else {
-                        $q.notify({ type: 'negative', message: 'Invalid file format. Expected JSON array.' });
-                    }
-                } catch (error) {
-                    console.error(error);
-                    $q.notify({ type: 'negative', message: 'Failed to parse JSON.' });
-                }
-                if (libraryInput.value) libraryInput.value.value = '';
-            };
-            reader.readAsText(file);
-        };
-
-        const exportCustomLibrary = () => {
-            if (store.customComponents.length === 0) {
-                $q.notify({ type: 'warning', message: 'No custom components to export.' });
-                return;
-            }
-            const jsonStr = JSON.stringify(store.customComponents, null, 2);
-            const blob = new Blob([jsonStr], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'swse_custom_components.json';
-            a.click();
-        };
-
-        const deleteCustomComponent = (id) => {
-            if (store.isCustomComponentInstalled(id)) {
-                $q.notify({ type: 'warning', message: 'Cannot delete: Component is currently installed on the ship. Uninstall it first.' });
-                return;
-            }
-            $q.dialog({
-                dark: true,
-                title: 'Confirm Deletion',
-                message: 'Are you sure you want to delete this custom component?',
-                cancel: true,
-                persistent: true,
-                color: 'negative'
-            }).onOk(() => {
-                store.removeCustomComponent(id);
-            });
-        };
-
-        return { store, libraryInput, triggerLibraryImport, handleLibraryImport, exportCustomLibrary, deleteCustomComponent };
-    }
-};
-
 export const CustomComponentDialog = {
     template: `
     <q-dialog v-model="store.customDialogState.visible">
-        <q-card class="bg-grey-9 text-white" style="min-width: 500px">
+        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px'">
             <q-card-section>
                 <div class="text-h6">{{ store.customDialogState.componentId ? 'Edit Custom Component' : 'Create Custom Component' }}</div>
             </q-card-section>
             <q-card-section class="q-pt-none">
                 <div class="column q-gutter-md">
+                    <div><q-select filled dark v-model="store.customDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
                     <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
                     <div v-if="store.isAdmin">
                         <q-input filled dark v-model="newCustomComponent.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
@@ -1067,7 +1342,7 @@ export const CustomComponentDialog = {
                 store.updateCustomComponent(comp);
                 store.customDialogState.visible = false;
             } else {
-                store.addCustomComponent(comp);
+                store.addCustomComponent(comp, store.customDialogState.targetLibraryId);
                 store.customDialogState.visible = false;
             }
         };
@@ -1076,7 +1351,7 @@ export const CustomComponentDialog = {
             if (visible) {
                 activeProperties.value = [];
                 if (store.customDialogState.componentId) {
-                    const existing = store.customComponents.find(c => c.id === store.customDialogState.componentId);
+                    const existing = store.allEquipment.find(c => c.id === store.customDialogState.componentId);
                     if (existing) {
                         Object.assign(newCustomComponent, {
                             name: existing.name, category: existing.category, group: existing.group, location: existing.location,
@@ -1139,20 +1414,17 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === id);
             let avail = def && def.availability ? def.availability : 'Common';
 
-            // If a full component object is passed, check modifications
             if (idOrInstance.modifications) {
                  const levels = { 'Common': 0, 'Licensed': 1, 'Restricted': 2, 'Military': 3, 'Illegal': 4 };
                  const reverse = ['Common', 'Licensed', 'Restricted', 'Military', 'Illegal'];
                  let currentLevel = levels[avail] || 0;
                  const mods = idOrInstance.modifications;
 
-                 // Mod Availabilities (Best Effort based on context)
-                 if (mods.mount === 'quad') currentLevel = Math.max(currentLevel, 2); // Restricted
-                 if (mods.fireLink > 1) currentLevel = Math.max(currentLevel, 2); // Restricted
-                 if (mods.enhancement === 'enhanced') currentLevel = Math.max(currentLevel, 2); // Restricted
-                 if (mods.enhancement === 'advanced') currentLevel = Math.max(currentLevel, 3); // Military
+                 if (mods.mount === 'quad') currentLevel = Math.max(currentLevel, 2);
+                 if (mods.fireLink > 1) currentLevel = Math.max(currentLevel, 2);
+                 if (mods.enhancement === 'enhanced') currentLevel = Math.max(currentLevel, 2);
+                 if (mods.enhancement === 'advanced') currentLevel = Math.max(currentLevel, 3);
 
-                 // Check options defined in upgradeSpecs
                  if (def.upgradeSpecs && def.upgradeSpecs.optionCosts) {
                      for (const [key, value] of Object.entries(def.upgradeSpecs.optionCosts)) {
                          if (mods[key]) {
@@ -1203,6 +1475,8 @@ export const SystemListWrapper = {
             return def && def.group === 'Launchers';
         }
         const isCustom = (id) => {
+            // Updated to check flattened allEquipment vs base equipment?
+            // Actually, customComponents in store now returns all components from libraries.
             return store.customComponents.some(c => c.id === id);
         }
         const format = (n) => n === 0 ? '-' : new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
@@ -1261,20 +1535,14 @@ export const SystemListWrapper = {
             const specs = getUpgradeSpecs(defId);
             if (!specs) return false;
             if (!specs.componentOptions || !specs.componentOptions.includes('weapon.pointBlank')) return false;
-
-            // Check specs.pointBlank constraint if available
             if (specs.pointBlank) return checkConstraints(specs.pointBlank);
-
             return true;
         };
 
         const getGenericOptions = (defId) => {
             const specs = getUpgradeSpecs(defId);
             if (!specs || !specs.componentOptions) return [];
-            // Filter out options that are handled by specific UI controls
             const handled = ['weapon.multibarrel', 'weapon.fireLink', 'weapon.enhancement', 'weapon.battery', 'ordnance', 'weapon.pointBlank'];
-            // We need labels for these. Ideally these should be localized or defined in store/app.
-            // For now, mapping known ones.
             const labels = {
                 'weapon.autofire': 'Autofire Capability',
                 'slaveCircuits.recall': 'Recall Circuit Functionality',
@@ -1318,29 +1586,20 @@ export const SystemListWrapper = {
         const getOptionCost = (defId, key) => {
              const def = store.allEquipment.find(e => e.id === defId);
              if (!def) return 0;
-
              let costDef = null;
-             // 1. Check Component Override
              if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
                  costDef = def.upgradeSpecs.optionCosts[key];
              } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
                  costDef = def.upgradeSpecs[key].cost;
              }
-
-             // 2. Check Global Default
              if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
                  costDef = store.db.DEFAULT_OPTION_COSTS[key];
              }
-
              if (costDef === null) return 0;
-
-             // 3. Calculate Logic
              if (typeof costDef === 'number') {
                  return costDef;
              } else if (typeof costDef === 'object') {
-                 if (costDef.multiplier) {
-                     return def.baseCost * costDef.multiplier;
-                 }
+                 if (costDef.multiplier) return def.baseCost * costDef.multiplier;
                  if (costDef.cost) {
                      let val = costDef.cost;
                      if (costDef.sizeMult) val *= store.sizeMultVal;
@@ -1404,8 +1663,12 @@ export const ConfigPanelWrapper = {
                 ...store.db.TEMPLATES.map(tmp => ({ label: getLocalizedName(tmp), value: tmp.id }))
             ];
         });
+        const crewQualityOptions = computed(() => {
+            if (!store.CREW_QUALITY_STATS) return [];
+            return Object.keys(store.CREW_QUALITY_STATS).map(k => ({ label: k, value: k }));
+        });
         const format = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
-        return { store, templateOptions, format, showEpDialog };
+        return { store, templateOptions, crewQualityOptions, format, showEpDialog };
     }
 };
 
@@ -1441,12 +1704,55 @@ export const ShipSheetWrapper = {
             return nonWeapons.map(instance => getName(instance.defId)).join(', ');
         });
 
-        // Enhanced Damage Logic for Variants
         const getDmg = (instance) => {
             return store.getComponentDamage(instance) || '-';
         }
-        const calculateCL = computed(() => { let cl = 10; if(store.chassis.size.includes('Colossal')) cl += 5; cl += Math.floor(store.installedComponents.length / 2); if(store.template) cl += 2; return cl; });
+        const calculateCL = computed(() => {
+            if (store.chassis.challengeLevel !== null && store.chassis.challengeLevel !== undefined) {
+                return store.chassis.challengeLevel;
+            }
+            let cl = 10;
+            if(store.chassis.size.includes('Colossal')) cl += 5;
+            cl += Math.floor(store.installedComponents.length / 2);
+            if(store.template) cl += 2;
+            cl += store.crewStats.cl;
+            return cl;
+        });
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
+
+        const weaponData = computed(() => {
+            return weapons.value.map(w => {
+                const def = store.allEquipment.find(e => e.id === w.defId);
+                const name = getName(w); // Uses the existing getName which handles some mods
+                const damage = getDmg(w);
+
+                // Calculate Attack Bonus: Crew Atk + Int Mod + Range(0) + Size?
+                // Usually Starship weapons are Int based.
+                // SotG p16: "Attack Bonus" is Base Atk.
+                // We add ship's Int modifier (or Pilot's Dex if we had a pilot, but we assume generic crew).
+                // "Generic crew use the ship's Intelligence modifier for attack rolls with ship weapons."
+                const atk = store.crewStats.atk + getMod(store.currentStats.int);
+
+                const detailsParts = [];
+                if (w.modifications.batteryCount > 1) detailsParts.push(`Battery (${w.modifications.batteryCount} guns)`);
+                if (w.modifications.fireLink > 1) detailsParts.push(`Fire-Linked (${w.modifications.fireLink})`);
+                if (w.modifications.autofire) detailsParts.push('Autofire');
+                if (w.modifications.pointBlank) detailsParts.push('Point-Blank');
+
+                // Range isn't easily available in data.json currently without parsing description or adding a field.
+                // We'll skip range for now or infer it? Laser Cannon = Short?
+                // We'll just stick to declarative mods.
+
+                return {
+                    instanceId: w.instanceId,
+                    name: name,
+                    damage: damage,
+                    attackBonus: atk,
+                    details: detailsParts.join(', '),
+                    defId: w.defId
+                };
+            });
+        });
 
         const componentsWithDescriptions = computed(() => {
             const seen = new Set();
@@ -1465,6 +1771,6 @@ export const ShipSheetWrapper = {
              return def ? def.description : '';
         };
 
-        return { store, getName, getMod, weapons, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName, componentsWithDescriptions, getDescription };
+        return { store, getName, getMod, weapons, weaponData, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName, componentsWithDescriptions, getDescription };
     }
 };

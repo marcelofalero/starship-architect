@@ -3,7 +3,7 @@ const { createI18n, useI18n } = VueI18n;
 export const messages = {
     en: {
         ui: {
-            hangar: "New Ship", sheet: "Sheet", export: "Save Ship", manifest: "Systems Manifest",
+            hangar: "Hangar", sheet: "Sheet", export: "Save Ship", manifest: "Systems Manifest",
             overview: "Overview", systems: "Systems", config: "Config", free_ep: "Free EP",
             install_system: "Install System", install_caption: "Select category, type, and specific component.",
             category: "Category", sys_type: "System Type", component: "Component",
@@ -32,8 +32,8 @@ export const messages = {
             template_help: "Apply a base template to modify the ship's stats (e.g. Refitted, Cheater)."
         },
         stats: {
-            str: "STR", dex: "DEX", int: "INT", ref: "Reflex Defense", armor: "Armor",
-            hp: "HP", shields: "Shields", dr: "DR", speed: "Speed"
+            str: "STR", dex: "DEX", int: "INT", ref: "Reflex", fort: "Fortitude", armor: "Armor",
+            hp: "HP", shields: "Shields", dr: "DR", dt: "DT", speed: "Speed"
         },
         cat: {
             fighters: "Fighters", freighters: "Freighters", capitals: "Capital Ships",
@@ -78,8 +78,8 @@ export const messages = {
             template_help: "Aplica una plantilla base para modificar estadísticas de la nave (ej. Reacondicionado)."
         },
         stats: {
-            str: "FUE", dex: "DES", int: "INT", ref: "Defensa de Reflejos", armor: "Armadura",
-            hp: "PV", shields: "Escudos", dr: "RD", speed: "Velocidad"
+            str: "FUE", dex: "DES", int: "INT", ref: "Reflejos", fort: "Fortaleza", armor: "Armadura",
+            hp: "PV", shields: "Escudos", dr: "RD", dt: "UD", speed: "Velocidad"
         },
         cat: {
             fighters: "Cazas", freighters: "Cargueros", capitals: "Naves Capitales",

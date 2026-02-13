@@ -4,11 +4,20 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4.0"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 }
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+provider "aws" {
+  # Assumes AWS credentials are provided via environment variables or default profile
+  region = "us-east-1"
 }
 
 resource "cloudflare_pages_project" "swse_architect" {
@@ -38,20 +47,16 @@ resource "cloudflare_pages_project" "swse_architect" {
   }
 }
 
-data "cloudflare_zone" "this" {
-  zone_id = var.cloudflare_zone_id
-}
-
 resource "cloudflare_pages_domain" "custom_domain" {
   account_id   = var.cloudflare_account_id
   project_name = cloudflare_pages_project.swse_architect.name
   domain       = var.custom_domain
 }
 
-resource "cloudflare_record" "custom_domain" {
-  zone_id = var.cloudflare_zone_id
-  name    = var.custom_domain == data.cloudflare_zone.this.name ? "@" : replace(var.custom_domain, "/\\.${data.cloudflare_zone.this.name}$/", "")
+resource "aws_route53_record" "custom_domain" {
+  zone_id = var.aws_route53_zone_id
+  name    = var.custom_domain
   type    = "CNAME"
-  value   = cloudflare_pages_project.swse_architect.subdomain
-  proxied = true
+  ttl     = 300
+  records = [cloudflare_pages_project.swse_architect.subdomain]
 }
