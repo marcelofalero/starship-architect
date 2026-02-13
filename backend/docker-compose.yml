@@ -1,0 +1,25 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8787:8787"
+    volumes:
+      - .:/app
+      - wrangler-state:/app/.wrangler
+    environment:
+      - GOOGLE_CLIENT_ID=dev-mock-client-id
+      - SESSION_SECRET=dev-mock-secret
+    command: sh -c "npx wrangler dev --host 0.0.0.0"
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ../public:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+
+volumes:
+  wrangler-state:

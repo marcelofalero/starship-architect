@@ -40,3 +40,15 @@ variable "aws_route53_zone_id" {
   description = "The Route 53 Hosted Zone ID for the custom domain."
   type        = string
 }
+
+variable "google_client_id" {
+  description = "The Google Client ID for OIDC."
+  type        = string
+  sensitive   = true
+}
+
+variable "session_secret" {
+  description = "The secret used to sign session tokens."
+  type        = string
+  sensitive   = true
+}

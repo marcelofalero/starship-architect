@@ -1,0 +1,4 @@
+fastapi
+python-jose[rsa]
+httpx
+pydantic

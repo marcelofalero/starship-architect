@@ -60,3 +60,37 @@ resource "aws_route53_record" "custom_domain" {
   ttl     = 300
   records = [cloudflare_pages_project.swse_architect.subdomain]
 }
+
+resource "cloudflare_d1_database" "swse_db" {
+  account_id = var.cloudflare_account_id
+  name       = "swse-db"
+}
+
+resource "cloudflare_worker_script" "swse_backend" {
+  account_id          = var.cloudflare_account_id
+  name                = "swse-backend"
+  content             = file("${path.module}/../../backend/main.py")
+  module              = true
+  compatibility_date  = "2024-04-01"
+  compatibility_flags = ["python_workers"]
+
+  # Note: Python workers with dependencies (requirements.txt) typically require
+  # deployment via `wrangler` to bundle the environment.
+  # This Terraform resource defines the script but may not fully support
+  # dependency resolution without external build steps or using `wrangler deploy`.
+
+  d1_database_binding {
+    name        = "DB"
+    database_id = cloudflare_d1_database.swse_db.id
+  }
+
+  secret_text_binding {
+    name = "GOOGLE_CLIENT_ID"
+    text = var.google_client_id
+  }
+
+  secret_text_binding {
+    name = "SESSION_SECRET"
+    text = var.session_secret
+  }
+}
