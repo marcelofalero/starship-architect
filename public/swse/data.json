@@ -608,7 +608,7 @@
         },
         {
             "id": "ion_cannon_light",
-            "name": "Light Ion Cannon",
+            "name": "Ion Cannon, Light",
             "name_es": "Cañón de Iones Ligero",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
@@ -637,8 +637,8 @@
         },
         {
             "id": "ion_cannon",
-            "name": "Medium Ion Cannon (5d10x2)",
-            "name_es": "Cañón de Iones Mediano (5d10x2)",
+            "name": "Ion Cannon, Medium",
+            "name_es": "Cañón de Iones Mediano",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 3000,
@@ -661,7 +661,7 @@
         },
         {
             "id": "ion_cannon_hvy",
-            "name": "Heavy Ion Cannon",
+            "name": "Ion Cannon, Heavy",
             "name_es": "Cañón de Iones Pesado",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
@@ -705,7 +705,7 @@
         },
         {
             "id": "concussion_missile_light",
-            "name": "Light Concussion Missile Launcher",
+            "name": "Concussion Missile Launcher, Light",
             "name_es": "Lanzador de Misiles de Concusión Ligero",
             "category": "Weapon Systems",
             "group": "Launchers",
@@ -1778,9 +1778,9 @@
             "wiki": "https://swse.miraheze.org/wiki/Medical_Suite"
         },
         {
-            "id": "passenger_conversion",
-            "name": "Passenger Conversion(Seating)",
-            "name_es": "Conversión de Pasajeros(Asientos)",
+            "id": "passenger_conversion_seating",
+            "name": "Passenger Conversion, Seating",
+            "name_es": "Conversión a Pasajeros, Asientos",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 200,
@@ -1792,9 +1792,9 @@
             "wiki": "https://swse.miraheze.org/wiki/Passenger_Conversion"
         },
         {
-            "id": "passenger_conversion(Quarters)",
-            "name": "Passenger Conversion",
-            "name_es": "Conversión de Pasajeros",
+            "id": "passenger_conversion_quarters",
+            "name": "Passenger Conversion, Quarters",
+            "name_es": "Conversión a Pasajeros, Cuartos",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 500,
