@@ -87,13 +87,13 @@
                 </q-toolbar>
             </q-header>
 
-            <q-drawer v-if="$q.screen.gt.sm" show-if-above v-model="leftDrawerOpen" side="left" bordered class="bg-grey-10">
+            <q-drawer v-if="shipStore.chassisId && $q.screen.gt.sm" show-if-above v-model="leftDrawerOpen" side="left" bordered class="bg-grey-10">
                 <div class="fit q-pa-sm">
                     <stat-panel></stat-panel>
                 </div>
             </q-drawer>
 
-            <q-drawer v-if="$q.screen.gt.sm" show-if-above v-model="rightDrawerOpen" side="right" bordered class="bg-grey-10">
+            <q-drawer v-if="shipStore.chassisId && $q.screen.gt.sm" show-if-above v-model="rightDrawerOpen" side="right" bordered class="bg-grey-10">
                 <div class="fit q-pa-sm">
                     <config-panel></config-panel>
                 </div>
@@ -102,47 +102,56 @@
             <q-page-container>
                 <q-page :class="$q.screen.gt.sm ? 'q-pa-md fit column no-wrap' : 'q-pa-md column'">
                     
-                    <!-- DESKTOP LAYOUT -->
-                    <div v-if="$q.screen.gt.sm" class="col column">
-                         <q-card class="bg-grey-9 col column">
-                            <q-tabs v-model="centerTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
-                                <q-tab name="systems" :label="$t('ui.manifest')"></q-tab>
+                    <div v-if="shipStore.chassisId" class="col column">
+                        <!-- DESKTOP LAYOUT -->
+                        <div v-if="$q.screen.gt.sm" class="col column">
+                            <q-card class="bg-grey-9 col column">
+                                <q-tabs v-model="centerTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
+                                    <q-tab name="systems" :label="$t('ui.manifest')"></q-tab>
+                                </q-tabs>
+                                <q-separator></q-separator>
+                                <q-tab-panels v-model="centerTab" animated class="bg-grey-9 col column">
+                                    <q-tab-panel name="systems" class="q-pa-none col column"><system-list></system-list></q-tab-panel>
+                                </q-tab-panels>
+                            </q-card>
+                        </div>
+
+                        <!-- MOBILE LAYOUT -->
+                        <div v-else class="col column">
+                            <q-tabs v-model="mobileTab" class="bg-grey-9 text-grey-5" active-color="primary" sticky>
+                                <q-tab name="overview" icon="analytics" :label="$t('ui.overview')"></q-tab>
+                                <q-tab name="systems" icon="build" :label="$t('ui.systems')"></q-tab>
+                                <q-tab name="config" icon="tune" :label="$t('ui.config')"></q-tab>
                             </q-tabs>
-                            <q-separator></q-separator>
-                            <q-tab-panels v-model="centerTab" animated class="bg-grey-9 col column">
+
+                            <q-tab-panels v-model="mobileTab" animated swipeable class="bg-transparent q-mt-md col column">
+                                <q-tab-panel name="overview" class="q-pa-none col column"><stat-panel></stat-panel></q-tab-panel>
                                 <q-tab-panel name="systems" class="q-pa-none col column"><system-list></system-list></q-tab-panel>
+                                <q-tab-panel name="config" class="q-pa-none col column"><config-panel></config-panel></q-tab-panel>
                             </q-tab-panels>
-                        </q-card>
-                    </div>
 
-                    <!-- MOBILE LAYOUT -->
-                    <div v-else class="col column">
-                        <q-tabs v-model="mobileTab" class="bg-grey-9 text-grey-5" active-color="primary" sticky>
-                            <q-tab name="overview" icon="analytics" :label="$t('ui.overview')"></q-tab>
-                            <q-tab name="systems" icon="build" :label="$t('ui.systems')"></q-tab>
-                            <q-tab name="config" icon="tune" :label="$t('ui.config')"></q-tab>
-                        </q-tabs>
-                        
-                        <q-tab-panels v-model="mobileTab" animated swipeable class="bg-transparent q-mt-md col column">
-                            <q-tab-panel name="overview" class="q-pa-none col column"><stat-panel></stat-panel></q-tab-panel>
-                            <q-tab-panel name="systems" class="q-pa-none col column"><system-list></system-list></q-tab-panel>
-                            <q-tab-panel name="config" class="q-pa-none col column"><config-panel></config-panel></q-tab-panel>
-                        </q-tab-panels>
-
-                        <!-- Mobile Sticky Footer -->
-                        <q-footer class="bg-grey-10 border-top-primary">
-                            <div class="row items-center q-pa-sm justify-between">
-                                <div class="column">
-                                    <div class="text-caption text-grey-4">{{ $t('ui.free_ep') }}</div>
-                                    <div :class="shipStore.remainingEP < 0 ? 'text-h6 text-negative' : 'text-h6 text-amber'">
-                                        {{ shipStore.remainingEP }}
+                            <!-- Mobile Sticky Footer -->
+                            <q-footer class="bg-grey-10 border-top-primary">
+                                <div class="row items-center q-pa-sm justify-between">
+                                    <div class="column">
+                                        <div class="text-caption text-grey-4">{{ $t('ui.free_ep') }}</div>
+                                        <div :class="shipStore.remainingEP < 0 ? 'text-h6 text-negative' : 'text-h6 text-amber'">
+                                            {{ shipStore.remainingEP }}
+                                        </div>
+                                    </div>
+                                    <div class="text-h6 text-primary">
+                                        {{ formatCreds(shipStore.totalCost) }}
                                     </div>
                                 </div>
-                                <div class="text-h6 text-primary">
-                                    {{ formatCreds(shipStore.totalCost) }}
-                                </div>
-                            </div>
-                        </q-footer>
+                            </q-footer>
+                        </div>
+                    </div>
+
+                    <!-- EMPTY STATE -->
+                    <div v-else class="absolute-full flex flex-center column">
+                        <div class="text-h4 text-grey-5 q-mb-md">No Ship Loaded</div>
+                        <div class="text-subtitle1 text-grey-6 q-mb-lg">Create a new ship or load one from the hangar to get started.</div>
+                        <q-btn color="primary" icon="garage" label="Open Hangar" size="lg" @click="showHangarDialog = true" />
                     </div>
 
                 </q-page>

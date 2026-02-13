@@ -341,11 +341,11 @@ export const HangarDialog = {
     emits: ['update:modelValue'],
     template: `
     <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-        <q-card class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px; max-width: 90vw;'">
+        <q-card id="hangar-dialog-card" class="bg-grey-9 text-white" :style="$q.screen.lt.sm ? 'width: 100%' : 'min-width: 500px; max-width: 90vw;'">
             <q-card-section><div class="text-h6">{{ $t('ui.hangar') }}</div></q-card-section>
             <q-tabs v-model="hangarTab" dense class="text-grey" active-color="primary" indicator-color="primary" align="justify">
                 <q-tab name="hangar" icon="garage" :label="$t('ui.hangar')"></q-tab>
-                <q-tab name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
+                <q-tab id="hangar-tab-stock" name="stock" icon="factory" :label="$t('ui.new_stock')"></q-tab>
                 <q-tab name="import" icon="upload_file" :label="$t('ui.import_file')"></q-tab>
             </q-tabs>
             <q-separator dark></q-separator>
