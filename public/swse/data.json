@@ -516,7 +516,7 @@
             "damage": "3d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Laser_Cannon"
         },
         {
             "id": "laser_med",
@@ -544,7 +544,7 @@
             "damage": "4d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Laser_Cannon"
         },
         {
             "id": "laser_hvy",
@@ -572,7 +572,7 @@
             "damage": "5d10x2",
             "description": "Laser Cannons are the most common Starship weapons. They generally have better Range than Blaster Cannons but are somewhat more expensive.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Laser_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Laser_Cannon"
         },
         {
             "id": "proton_torp",
@@ -604,7 +604,7 @@
             "damage": "9d10x2",
             "description": "Base Capacity: 3 torpedoes. Additional capacity costs +25% per torpedo (max 16).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Proton_Torpedo_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Proton_Torpedo_Launcher"
         },
         {
             "id": "ion_cannon_light",
@@ -633,7 +633,7 @@
             "damageType": "Ion",
             "description": "Ion Cannons deal Ion damage. Starship-mounted Ion Cannons are generally defense armament.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon",
@@ -657,7 +657,7 @@
             "damage": "5d10x2",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon_hvy",
@@ -682,7 +682,7 @@
             "damage": "3d10x5",
             "description": "Ion Cannons deal Ion damage. Most Starship-mounted Ion Cannons do not have a high enough rate of fire for Autofire.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Cannon"
         },
         {
             "id": "ion_cannon_hapan",
@@ -701,7 +701,7 @@
             "damage": "5d10x5",
             "description": "Acts like a Point-Defense Weapon (no penalty for targets smaller than Colossal). Capable of Autofire, but not Starship Scale Area Attacks. Illegal outside Hapan Consortium.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Cannon"
         },
         {
             "id": "concussion_missile_light",
@@ -733,7 +733,7 @@
             "damage": "7d10x2",
             "description": "Base Capacity: 6 missiles. Additional capacity costs +20% per missile (max double capacity).",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Light_Concussion_Missile_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Light_Concussion_Missile_Launcher"
         },
         {
             "id": "concussion_missile",
@@ -765,7 +765,7 @@
             "damage": "9d10x2",
             "description": "Base Capacity: 16 missiles. Additional capacity costs +20% per missile (max double capacity).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Concussion_Missile_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Concussion_Missile_Launcher"
         },
         {
             "id": "concussion_missile_hvy",
@@ -798,7 +798,7 @@
             "damage": "9d10x5",
             "description": "Base Capacity: 30 missiles. Additional capacity costs +20% per missile (max double capacity).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Concussion_Missile_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Concussion_Missile_Launcher"
         },
         {
             "id": "tractor_beam",
@@ -812,7 +812,7 @@
             "availability": "Common",
             "description": "Tractor Beams prevent another Vehicle from escaping instead of dealing damage. If the attack hits, make an opposed Grapple check. Smaller targets are immobilized and lose Dex bonus. Larger targets can be pulled closer. Docking Clamps allow boarding.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Tractor_Beam"
+            "wiki": "https://swse.miraheze.org/wiki/Tractor_Beam"
         },
         {
             "id": "atmos_thrusters",
@@ -827,7 +827,7 @@
             "description": "Atmospheric Thrusters increase a Starship's speed when the ship is flying in the atmosphere of a planet. Standard Atmospheric Thrusters increase a Starship's maximum velocity and fly speed by 10% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters",
+            "wiki": "https://swse.miraheze.org/wiki/Atmospheric_Thrusters",
             "maxShipSize": "Colossal (frigate)"
         },
         {
@@ -843,7 +843,7 @@
             "description": "Advanced Atmospheric Thrusters increase these by 25% (rounded down to the nearest square of speed and 10 km/h). Atmospheric Thrusters have no effect on Starship Scale movement.",
             "exclusiveGroup": "atmos_thrusters",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Atmospheric_Thrusters",
+            "wiki": "https://swse.miraheze.org/wiki/Atmospheric_Thrusters",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -859,7 +859,7 @@
             "description": "Often used by smugglers, bounty hunters, and blockade runners. A ship with Combat Thrusters is treated as one size category smaller than its actual size category for the purpose of being targeted by Capital Ship weapons. Additionally, the Space Transport is treated as a Starfighter for the purpose of Dogfighting and Starship Maneuvers. This Starship Modification does not change the ship's size modifier to Reflex Defense.",
             "minShipSize": "Colossal (transport)",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Combat_Thrusters",
+            "wiki": "https://swse.miraheze.org/wiki/Combat_Thrusters",
             "maxShipSize": "Colossal (station)"
         },
         {
@@ -878,7 +878,7 @@
             },
             "exclusiveGroup": "maneuvering_jets",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets"
+            "wiki": "https://swse.miraheze.org/wiki/Maneuvering_Jets"
         },
         {
             "id": "maneuvering_jets_4",
@@ -896,7 +896,7 @@
             },
             "exclusiveGroup": "maneuvering_jets",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets",
+            "wiki": "https://swse.miraheze.org/wiki/Maneuvering_Jets",
             "maxShipSize": "Colossal (transport)"
         },
         {
@@ -915,7 +915,7 @@
             },
             "exclusiveGroup": "maneuvering_jets",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Maneuvering_Jets",
+            "wiki": "https://swse.miraheze.org/wiki/Maneuvering_Jets",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -933,7 +933,7 @@
             "availability": "Military",
             "description": "The best Hyperdrive ever created is the Class .5 (which can be created by modifying a Class .75 Hyperdrive using the Starship Designer Feat). Class .5 drives are Illegal, require heavy maintenance (8h/month, DC 20 Mechanics), and impose penalties if neglected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -951,7 +951,7 @@
             "availability": "Licensed",
             "description": "The Class 1 Hyperdrive is considered the pinnacle of stable Hyperdrive technology from the Clone Wars forward. It is the favored technology of military vessels, but its high cost often results in designers settling for a Class 2 or Class 3 drive.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -969,7 +969,7 @@
             "availability": "Licensed",
             "description": "Class 1.5 is a standard performance hyperdrive.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive",
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -987,7 +987,7 @@
             "availability": "Common",
             "description": "Class 2 was state of the art during most of the Rise of the Empire era.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_3",
@@ -1004,7 +1004,7 @@
             "availability": "Common",
             "description": "Class 3 was state of the art during most of the Rise of the Empire era.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_4",
@@ -1021,7 +1021,7 @@
             "availability": "Common",
             "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_6",
@@ -1038,7 +1038,7 @@
             "availability": "Common",
             "description": "A Hyperdrive of Class 4 to Class 6 is normally either old technology or an aftermarket retrofit crammed into a vessel not designed to support a Hyperdrive.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_8",
@@ -1055,7 +1055,7 @@
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_10",
@@ -1072,7 +1072,7 @@
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "hyperdrive_15_slow",
@@ -1089,7 +1089,7 @@
             "availability": "Common",
             "description": "Backup Hyperdrives, usually ranging from Class 8 to Class 15, are often used as emergency systems. Though no one wants to wait a month to arrive someplace when using a Class 10 Backup Hyperdrive, often the alternative is to drift aimlessly in space for centuries.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hyperdrive"
+            "wiki": "https://swse.miraheze.org/wiki/Hyperdrive"
         },
         {
             "id": "nav_standard",
@@ -1103,7 +1103,7 @@
             "availability": "Licensed",
             "description": "A Navicomputer is an astrogation calculator designed to make all the calculations necessary to travel through Hyperspace. Most Starships have Navicomputers, but those that lack Hyperdrives and some fighters that depend on Astromech Droids do not.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Navicomputer"
+            "wiki": "https://swse.miraheze.org/wiki/Navicomputer"
         },
         {
             "id": "nav_limited",
@@ -1117,7 +1117,7 @@
             "availability": "Common",
             "description": "Most Navicomputers are Nonstandard Modifications for Starfighters - these ships simply don't have the room for the memory core. Starfighters often have Limited Navicomputers that store only two jumps' worth of information, enough to get to a destination and return.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Navicomputer"
+            "wiki": "https://swse.miraheze.org/wiki/Navicomputer"
         },
         {
             "id": "nav_advanced",
@@ -1131,7 +1131,7 @@
             "availability": "Licensed",
             "description": "Advanced Navicomputers grant a +10 bonus on Use Computer checks made for Astrogation, rather than a typical Navicomputer's +5 bonus. Additionally, a character aboard a ship that has a Navicomputer need not be Trained in the Use Computer Skill to make use of the Astrogation aspect of the Skill.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Navicomputer"
+            "wiki": "https://swse.miraheze.org/wiki/Navicomputer"
         },
         {
             "id": "slam",
@@ -1145,7 +1145,7 @@
             "availability": "Military",
             "description": "A SLAM system provides a +5 bonus on Pilot checks to increase a Vehicle's Speed. This bonus increases to +10 if the Pilot is using All-Out Movement.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/SubLight_Accelerator_Motor",
+            "wiki": "https://swse.miraheze.org/wiki/SubLight_Accelerator_Motor",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -1164,7 +1164,7 @@
             "availability": "Common",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive"
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive"
         },
         {
             "id": "engine_2",
@@ -1182,7 +1182,7 @@
             "availability": "Common",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive"
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive"
         },
         {
             "id": "engine_3",
@@ -1200,7 +1200,7 @@
             "availability": "Licensed",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -1219,7 +1219,7 @@
             "availability": "Restricted",
             "description": "A Sublight Drive determines a ship's Speed when moving through Realspace. Replacing a ship's Sublight Drive can be expensive, and many ships cannot reach high speeds due to the bulk of their Sublight Drives.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (cruiser)"
         },
         {
@@ -1238,7 +1238,7 @@
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive",
             "maxShipSize": "Colossal (transport)"
         },
         {
@@ -1257,7 +1257,7 @@
             "availability": "Military",
             "description": "Only military vessels are permitted to use incredibly fast ion drives. A Sublight Drive determines a ship's Speed when moving through Realspace.",
             "location": "Aft Section",
-            "wiki": "https://swse.fandom.com/wiki/Sublight_Drive",
+            "wiki": "https://swse.miraheze.org/wiki/Sublight_Drive",
             "maxShipSize": "Gargantuan"
         },
         {
@@ -1276,7 +1276,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_10",
@@ -1294,7 +1294,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_15",
@@ -1312,7 +1312,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_20",
@@ -1331,7 +1331,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_25",
@@ -1350,7 +1350,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_30",
@@ -1369,7 +1369,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_35",
@@ -1388,7 +1388,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_40",
@@ -1407,7 +1407,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_45",
@@ -1426,7 +1426,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_50",
@@ -1445,7 +1445,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_55",
@@ -1464,7 +1464,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_60",
@@ -1483,7 +1483,7 @@
             "availability": "Common",
             "description": "Not all Starships have deflector shields, and they are an extremely popular addition for those that lack them. However, the energy and space cost of Starship Shields is extremely high, and it grows with the size of the craft to be protected.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "bulkheads",
@@ -1501,7 +1501,7 @@
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 10% (These improvements don't stack).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
+            "wiki": "https://swse.miraheze.org/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "jamming",
@@ -1515,7 +1515,7 @@
             "availability": "Common",
             "description": "A Jamming Suite targets a single enemy within 6 squares. The target takes penalties on Use Computer checks (-4 for Starfighters, -2 for Space Transports) and enemy fire control systems.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Jamming_Suite"
+            "wiki": "https://swse.miraheze.org/wiki/Jamming_Suite"
         },
         {
             "id": "cloaking_hibridium",
@@ -1531,7 +1531,7 @@
             "minShipSize": "Colossal (transport)",
             "exclusiveGroup": "cloaking_device",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device",
+            "wiki": "https://swse.miraheze.org/wiki/Cloaking_Device",
             "maxShipSize": "Colossal (station)"
         },
         {
@@ -1548,7 +1548,7 @@
             "minShipSize": "Huge",
             "exclusiveGroup": "cloaking_device",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Cloaking_Device"
+            "wiki": "https://swse.miraheze.org/wiki/Cloaking_Device"
         },
         {
             "id": "backup_battery",
@@ -1562,7 +1562,7 @@
             "availability": "Common",
             "description": "Allows ship to operate for 1 hour after power failure. Can reverse ionization damage (DC 25 Mechanics) but drains battery.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Backup_Battery"
+            "wiki": "https://swse.miraheze.org/wiki/Backup_Battery"
         },
         {
             "id": "tech_spec_sh",
@@ -1580,7 +1580,7 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Tech_Spec:_Shields_(+10_SR)"
+            "wiki": "https://swse.miraheze.org/wiki/Tech_Spec:_Shields_(+10_SR)"
         },
         {
             "id": "tech_spec_ar",
@@ -1598,7 +1598,7 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Tech_Spec:_Armor_(+2)"
+            "wiki": "https://swse.miraheze.org/wiki/Tech_Spec:_Armor_(+2)"
         },
         {
             "id": "ts_dex",
@@ -1615,7 +1615,7 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Enhanced_Dexterity_(+2_Dex)"
+            "wiki": "https://swse.miraheze.org/wiki/Enhanced_Dexterity_(+2_Dex)"
         },
         {
             "id": "ts_speed",
@@ -1632,7 +1632,7 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Improved_Speed_(+25%)"
+            "wiki": "https://swse.miraheze.org/wiki/Improved_Speed_(+25%)"
         },
         {
             "id": "sup_tech_sh",
@@ -1649,7 +1649,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Shields_(+20_SR)"
+            "wiki": "https://swse.miraheze.org/wiki/Shields_(+20_SR)"
         },
         {
             "id": "sup_tech_ar",
@@ -1666,7 +1666,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Armor_(+2_Armor)"
+            "wiki": "https://swse.miraheze.org/wiki/Armor_(+2_Armor)"
         },
         {
             "id": "st_dex",
@@ -1683,7 +1683,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Superior_Dex_(+4_Dex)"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Dex_(+4_Dex)"
         },
         {
             "id": "st_str",
@@ -1700,7 +1700,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Superior_Str_(+2_Str)"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Str_(+2_Str)"
         },
         {
             "id": "st_sensors",
@@ -1717,7 +1717,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Superior_Sensors_(+2_Per)"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Sensors_(+2_Per)"
         },
         {
             "id": "st_speed",
@@ -1734,7 +1734,7 @@
             "availability": "Rare",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Superior_Speed_(+33%)"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Speed_(+33%)"
         },
         {
             "id": "holo_transceiver",
@@ -1749,7 +1749,7 @@
             "minShipSize": "Colossal (transport)",
             "description": "Extremely rare and expensive systems that allow for real-time audio, visual, and holographic communication over an unlimited range via the HoloNet. Grants a +5 Equipment bonus to Use Computer checks made to gain information. During the Empire, availability is Military (normally Restricted/Rare).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transceiver"
+            "wiki": "https://swse.miraheze.org/wiki/Transceiver"
         },
         {
             "id": "hypertransceiver",
@@ -1763,7 +1763,7 @@
             "availability": "Licensed",
             "description": "Hypertransceivers effectively have an unlimited range, allowing ships at opposite ends of the galaxy to communicate (with time lag). Allows access to information on The HoloNet.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transceiver"
+            "wiki": "https://swse.miraheze.org/wiki/Transceiver"
         },
         {
             "id": "lifeboat_small",
@@ -1778,7 +1778,7 @@
             "minShipSize": "Colossal (frigate)",
             "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger. 1 Bay includes (Cost Mod)/100 Lifeboats.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Escape_Pod"
+            "wiki": "https://swse.miraheze.org/wiki/Escape_Pod"
         },
         {
             "id": "droid_repair_team",
@@ -1793,7 +1793,7 @@
             "description": "Automatically deploys to repair a Starship when it moves -1 or more steps down the Condition Track. Makes a +13 Mechanics check to Jury-Rig (+1 step). 25% chance of destruction if damage > SR while active.",
             "minShipSize": "Colossal (transport)",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Droid_Repair_Team",
+            "wiki": "https://swse.miraheze.org/wiki/Droid_Repair_Team",
             "maxShipSize": "Colossal (station)"
         },
         {
@@ -1809,7 +1809,7 @@
             "availability": "Common",
             "description": "Includes (Size Mod)/5 medical beds and (Size Mod)/50 Bacta Tanks. Medical beds function as Medpac (10 uses), Medical Kit, and Surgery Kit.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Medical_Suite"
+            "wiki": "https://swse.miraheze.org/wiki/Medical_Suite"
         },
         {
             "id": "passenger_conversion",
@@ -1823,7 +1823,7 @@
             "availability": "Common",
             "description": "Provides room for (Cost Mod) passengers (Seating). Steerage quality unless combined with Luxury Upgrade.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Passenger_Conversion"
+            "wiki": "https://swse.miraheze.org/wiki/Passenger_Conversion"
         },
         {
             "id": "passenger_conversion(Quarters)",
@@ -1838,8 +1838,9 @@
             "minShipSize": "Colossal (transport)",
             "description": "Provides room for (Cost Mod) passengers (Quarters). Steerage quality unless combined with Luxury Upgrade.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Passenger_Conversion"
-        },        {
+            "wiki": "https://swse.miraheze.org/wiki/Passenger_Conversion"
+        },
+        {
             "id": "sensor_array_computer_2",
             "name": "Sensor Array Computer (+2 Int)",
             "name_es": "Ordenador de Matriz de Sensores (+2 Int)",
@@ -1855,7 +1856,7 @@
             "availability": "Common",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +2 Equipment bonus to Intelligence.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_array_computer_4",
@@ -1873,7 +1874,7 @@
             "availability": "Licensed",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +4 Equipment bonus to Intelligence.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_array_computer_6",
@@ -1891,7 +1892,7 @@
             "availability": "Restricted",
             "description": "Exclusively processes sensor data, freeing the main computer. Grants +6 Equipment bonus to Intelligence.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Array_Computer"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Array_Computer"
         },
         {
             "id": "sensor_enhancement",
@@ -1905,7 +1906,7 @@
             "availability": "Licensed",
             "description": "Superior sensors providing better detection. Grants +5 bonus on Perception and Use Computer checks made to Use Sensors.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Enhancement_Package"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Enhancement_Package"
         },
         {
             "id": "baffled_drive",
@@ -1920,7 +1921,7 @@
             "minShipSize": "Colossal (transport)",
             "description": "Uses supercooled Tibanna gas. Always Speed 2 (Starship Scale). Range 100 squares before refuel. +5 to DC to detect ship. Moving 2x speed doesn't negate Sensor Baffling.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Baffled_Drive"
+            "wiki": "https://swse.miraheze.org/wiki/Baffled_Drive"
         },
         {
             "id": "amphibious_seals",
@@ -1934,7 +1935,7 @@
             "availability": "Common",
             "description": "Allows Starship to function underwater. Swim speed 1/2 fly speed. Max underwater velocity 1/10 atmospheric.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Amphibious_Seals"
+            "wiki": "https://swse.miraheze.org/wiki/Amphibious_Seals"
         },
         {
             "id": "cockpit_ejection",
@@ -1948,7 +1949,7 @@
             "availability": "Licensed",
             "description": "Allows cockpit to eject as an Escape Pod on ship destruction (DC 20 Pilot check to avoid damage).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Cockpit_Ejection_System"
+            "wiki": "https://swse.miraheze.org/wiki/Cockpit_Ejection_System"
         },
         {
             "id": "cotterdam",
@@ -1963,7 +1964,7 @@
             "availability": "Common",
             "description": "Flexible tube connecting two Colossal+ ships. Creates tunnel 3 squares long. Maneuvering to connect requires DC 15 Pilot check.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Cotterdam"
+            "wiki": "https://swse.miraheze.org/wiki/Cotterdam"
         },
         {
             "id": "environmental_filters",
@@ -1977,7 +1978,7 @@
             "availability": "Common",
             "description": "Allows ship to support multiple environments (gravity, atmosphere, etc.). Can be used offensively (DC 25 Use Computer) to flood sections with hazards.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Environmental_Filters"
+            "wiki": "https://swse.miraheze.org/wiki/Environmental_Filters"
         },
         {
             "id": "fuel_converters",
@@ -1991,7 +1992,7 @@
             "availability": "Common",
             "description": "Transform matter into usable Fuel. 1 hour gathering = 1 unit of fuel (1 day realspace / 1 jump).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Fuel_Converters"
+            "wiki": "https://swse.miraheze.org/wiki/Fuel_Converters"
         },
         {
             "id": "grappler_mag",
@@ -2005,7 +2006,7 @@
             "availability": "Common",
             "description": "Short-range grappling hook (Range 1). Can be used without power to attach clandestinely (Opposed Pilot/Stealth vs Pilot/Use Computer).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Grappler_Mag"
+            "wiki": "https://swse.miraheze.org/wiki/Grappler_Mag"
         },
         {
             "id": "hardpoint",
@@ -2019,7 +2020,7 @@
             "availability": "Common",
             "description": "External mounts for missiles/bombs. 1 Array = 4 Hardpoints. 1 Missile/Bomb = 1 HP (2 for Colossal weapons). Can also carry Drop Tanks. Half payload lost if Condition Track drops.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hardpoint"
+            "wiki": "https://swse.miraheze.org/wiki/Hardpoint"
         },
         {
             "id": "interrogation_chamber",
@@ -2034,7 +2035,7 @@
             "minShipSize": "Colossal (transport)",
             "description": "Converts a Holding Cell. Grants +5 Persuasion vs prisoners. Allows torture (+1 Dark Side).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Interrogation_Chamber"
+            "wiki": "https://swse.miraheze.org/wiki/Interrogation_Chamber"
         },
         {
             "id": "personalized_controls",
@@ -2048,7 +2049,7 @@
             "availability": "Common",
             "description": "Personalizes one crew position. +1 bonus on checks for owner, -2 penalty for others.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Personalized_Controls"
+            "wiki": "https://swse.miraheze.org/wiki/Personalized_Controls"
         },
         {
             "id": "plasma_punch",
@@ -2062,7 +2063,7 @@
             "availability": "Military",
             "description": "Bores through hull to create airlocks. Halves target DR for drilling time. Functions like Plasma Torch but faster and doesn't require Tractor Clamp.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Plasma_Punch"
+            "wiki": "https://swse.miraheze.org/wiki/Plasma_Punch"
         },
         {
             "id": "plasma_torch",
@@ -2076,7 +2077,7 @@
             "availability": "Military",
             "description": "Modification for Tractor Clamp. Cuts hole in secured ship's hull. 1 round per point of DR. Deal 1d6 damage per round to ship.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Plasma_Torch"
+            "wiki": "https://swse.miraheze.org/wiki/Plasma_Torch"
         },
         {
             "id": "sensor_baffling",
@@ -2090,7 +2091,7 @@
             "availability": "Restricted",
             "description": "Allows Stealth checks without Cover/Concealment. Benefit lost if moving > Speed.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Baffling"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Baffling"
         },
         {
             "id": "sensor_decoy",
@@ -2104,7 +2105,7 @@
             "availability": "Restricted",
             "description": "Missile that emulates a Starship on sensors. DC 25 Use Computer to identify. Revealed by visual range (1-20 squares depending on size). Includes 3 decoys.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Decoy"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Decoy"
         },
         {
             "id": "sensor_mask",
@@ -2118,7 +2119,7 @@
             "availability": "Illegal",
             "description": "Replicates sensor signals to make ship appear transparent. Adds +10 to DC of Use Computer checks to detect the ship.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Sensor_Mask"
+            "wiki": "https://swse.miraheze.org/wiki/Sensor_Mask"
         },
         {
             "id": "tractor_clamp",
@@ -2132,7 +2133,7 @@
             "availability": "Common",
             "description": "Secures enemy ships for boarding. +5 Grapple bonus to maintain hold. Includes boarding tube. Can equip Plasma Torch.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Tractor_Clamp"
+            "wiki": "https://swse.miraheze.org/wiki/Tractor_Clamp"
         },
         {
             "id": "transponder_masked",
@@ -2146,7 +2147,7 @@
             "availability": "Illegal",
             "description": "Code is impossible to read. Immediately apparent and suspicious.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transponder_(Masked)"
+            "wiki": "https://swse.miraheze.org/wiki/Transponder_(Masked)"
         },
         {
             "id": "transponder_disguised_1",
@@ -2160,7 +2161,7 @@
             "availability": "Illegal",
             "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transponder"
+            "wiki": "https://swse.miraheze.org/wiki/Transponder"
         },
         {
             "id": "transponder_disguised_2",
@@ -2174,7 +2175,7 @@
             "availability": "Illegal",
             "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transponder"
+            "wiki": "https://swse.miraheze.org/wiki/Transponder"
         },
         {
             "id": "transponder_disguised_3",
@@ -2188,7 +2189,7 @@
             "availability": "Illegal",
             "description": "Mimics another ship's code. Requires Use Computer + Deception check to install. -5 Deception for each additional disguised transponder.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transponder"
+            "wiki": "https://swse.miraheze.org/wiki/Transponder"
         },
         {
             "id": "transponder_iff",
@@ -2202,7 +2203,7 @@
             "availability": "Military",
             "description": "Military Friend/Foe transponder. Can be loaded with codes to appear as 'Friend'. Can hack enemy computers to appear as Friend (Use Computer check).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Transponder"
+            "wiki": "https://swse.miraheze.org/wiki/Transponder"
         },
         {
             "id": "workshop",
@@ -2216,7 +2217,7 @@
             "availability": "Common",
             "description": "Fully equipped workshop. +2 Equipment bonus on Mechanics/Use Computer checks to repair/modify/construct objects.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Workshop"
+            "wiki": "https://swse.miraheze.org/wiki/Workshop"
         },
         {
             "id": "slave_circuits",
@@ -2231,7 +2232,7 @@
             "exclusiveGroup": "slave_circuits",
             "description": "Reduces crew requirements by 1/3 (minimum 1).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits"
+            "wiki": "https://swse.miraheze.org/wiki/Slave_Circuits"
         },
         {
             "id": "slave_circuits_adv",
@@ -2258,7 +2259,7 @@
                 }
             },
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Slave_Circuits"
+            "wiki": "https://swse.miraheze.org/wiki/Slave_Circuits"
         },
         {
             "id": "smuggler_compartment",
@@ -2272,7 +2273,7 @@
             "availability": "Illegal",
             "description": "Hidden cargo spaces. DC 30 Perception to find. Holds (Cost Mod) x 200 kg. Max 5% of total cargo capacity.",
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Smuggler's_Compartments"
+            "wiki": "https://swse.miraheze.org/wiki/Smuggler's_Compartments"
         },
         {
             "id": "cargo_pod_small",
@@ -2290,7 +2291,7 @@
                 "cargo_bonus_size_mult": 1
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
+            "wiki": "https://swse.miraheze.org/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_pod_med",
@@ -2308,7 +2309,7 @@
                 "cargo_bonus_size_mult": 5
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
+            "wiki": "https://swse.miraheze.org/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_pod_large",
@@ -2326,7 +2327,7 @@
                 "cargo_bonus_size_mult": 10
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Pod"
+            "wiki": "https://swse.miraheze.org/wiki/Cargo_Pod"
         },
         {
             "id": "cargo_jettison",
@@ -2340,7 +2341,7 @@
             "availability": "Common",
             "description": "Allows a ship to dump part or all of its cargo into space without docking or slowing down as a Swift Action.",
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Cargo_Jettison_System"
+            "wiki": "https://swse.miraheze.org/wiki/Cargo_Jettison_System"
         },
         {
             "id": "extended_range",
@@ -2354,7 +2355,7 @@
             "availability": "Common",
             "description": "Improves a Starship's consumables by 10% of its original value (rounded down, minimum 1 day) x the number of times installed.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Extended_Range",
+            "wiki": "https://swse.miraheze.org/wiki/Extended_Range",
             "upgradeSpecs": {
                 "quantity": true
             }
@@ -2372,7 +2373,7 @@
             "availability": "Licensed",
             "description": "Changes a Starship from a harsh travel vehicle to a comfortable home. Includes comfortable beds, wardrobes, recliners, and music systems. Requires monthly maintenance (1/50 of cost).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
+            "wiki": "https://swse.miraheze.org/wiki/Luxury_Upgrade"
         },
         {
             "id": "luxury_advanced",
@@ -2387,7 +2388,7 @@
             "availability": "Licensed",
             "description": "Makes the ship the equivalent of an upper-scale hotel. Gourmet cooking, quality artwork, and stylish trim. Requires monthly maintenance (1/50 of cost).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
+            "wiki": "https://swse.miraheze.org/wiki/Luxury_Upgrade"
         },
         {
             "id": "luxury_extreme",
@@ -2402,7 +2403,7 @@
             "availability": "Restricted",
             "description": "Turns a Starship into a palace in space. Increases Crew Quality by one step (max Expert), though this has no effect on hero statistics. Requires monthly maintenance (1/50 of cost).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Luxury_Upgrade"
+            "wiki": "https://swse.miraheze.org/wiki/Luxury_Upgrade"
         },
         {
             "id": "hangar_bay",
@@ -2417,7 +2418,7 @@
             "availability": "Common",
             "description": "Holds secondary craft. Each bay has (Cost Modifier)/50 units of hangar space (Huge=1, Gargantuan=5, Colossal=20). Can be combined.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hangar_Bay"
+            "wiki": "https://swse.miraheze.org/wiki/Hangar_Bay"
         },
         {
             "id": "hangar_bay_concealed",
@@ -2432,7 +2433,7 @@
             "availability": "Restricted",
             "description": "Functions as Hangar Bay but requires DC 30 Perception to notice externally. Launch/Land takes 2 Full-Round Actions.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Hangar_Bay"
+            "wiki": "https://swse.miraheze.org/wiki/Hangar_Bay"
         },
         {
             "id": "cryo_chambers",
@@ -2447,7 +2448,7 @@
             "minShipSize": "Colossal (transport)",
             "description": "Hibernation systems that allow live creatures to be carried in stasis. Capacity: (Cost Mod)/5 Medium creatures per unit. Large=5x space, Huge=20x.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Cryogenic_Chambers"
+            "wiki": "https://swse.miraheze.org/wiki/Cryogenic_Chambers"
         },
         {
             "id": "docking_clamp",
@@ -2461,7 +2462,7 @@
             "availability": "Common",
             "description": "Used to carry smaller ships (e.g. TIE Fighters on a Gozanti). A Starship can maneuver and Hyperspace with ships attached. If ship takes damage > Threshold, clamped ships are shaken off.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Docking_Clamp"
+            "wiki": "https://swse.miraheze.org/wiki/Docking_Clamp"
         },
         {
             "id": "armor_1",
@@ -2479,7 +2480,7 @@
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
+            "wiki": "https://swse.miraheze.org/wiki/Starship_Armor"
         },
         {
             "id": "armor_2",
@@ -2498,7 +2499,7 @@
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
+            "wiki": "https://swse.miraheze.org/wiki/Starship_Armor"
         },
         {
             "id": "armor_3",
@@ -2517,7 +2518,7 @@
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
+            "wiki": "https://swse.miraheze.org/wiki/Starship_Armor"
         },
         {
             "id": "armor_4",
@@ -2536,7 +2537,7 @@
             "exclusiveGroup": "armor",
             "description": "Starship Armor is bought as an Equipment bonus to the Armor a Starship adds to its Reflex Defense. Skilled pilots often prefer ships without heavy armor, since they can use their Character Level in place of a ship's Armor bonus in any case.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Starship_Armor"
+            "wiki": "https://swse.miraheze.org/wiki/Starship_Armor"
         },
         {
             "id": "jamming_array",
@@ -2551,7 +2552,7 @@
             "availability": "Common",
             "description": "A Jamming Array affects all enemy Starships within 6 squares, regardless of size. The penalty on Use Computer checks is -6 for Starfighters, -4 for Space Transports, and -2 for Capital Ships.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Jamming_Array"
+            "wiki": "https://swse.miraheze.org/wiki/Jamming_Array"
         },
         {
             "id": "regenerating_shields",
@@ -2569,7 +2570,7 @@
             "exclusiveGroup": "shield_mod",
             "description": "If a ship possesses Regenerating Shields, its current Shield Rating increases by 10 (Up to its maximum Shield Rating) when a System Operator uses the Recharge Shields Action.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Regenerating_Shields"
+            "wiki": "https://swse.miraheze.org/wiki/Regenerating_Shields"
         },
         {
             "id": "bulkheads_20",
@@ -2587,7 +2588,7 @@
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 20% (These improvements don't stack).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
+            "wiki": "https://swse.miraheze.org/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "bulkheads_30",
@@ -2605,7 +2606,7 @@
             "exclusiveGroup": "bulkheads",
             "description": "Reinforced Bulkheads increase a Starship's Hit Points by 30% (These improvements don't stack).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Bulkheads"
+            "wiki": "https://swse.miraheze.org/wiki/Reinforced_Bulkheads"
         },
         {
             "id": "shield_gen_70",
@@ -2623,7 +2624,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_80",
@@ -2641,7 +2642,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_90",
@@ -2659,7 +2660,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_100",
@@ -2677,7 +2678,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_125",
@@ -2695,7 +2696,7 @@
             "minShipSize": "Colossal (frigate)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_150",
@@ -2713,7 +2714,7 @@
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_175",
@@ -2731,7 +2732,7 @@
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "shield_gen_200",
@@ -2749,7 +2750,7 @@
             "minShipSize": "Colossal (cruiser)",
             "availability": "Common",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Shield_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Shield_Generator"
         },
         {
             "id": "anti_boarding",
@@ -2764,7 +2765,7 @@
             "availability": "Restricted",
             "description": "Anti-Boarding Systems include blast doors (DR 10, 250 HP), security cameras, and blaster rifle turrets at vital locations. The system has independent backup power allowing turrets to make up to 50 shots after power loss.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Anti-Boarding_Systems"
+            "wiki": "https://swse.miraheze.org/wiki/Anti-Boarding_Systems"
         },
         {
             "id": "com_jammers",
@@ -2778,7 +2779,7 @@
             "availability": "Military",
             "description": "A Com Jammer prevents any communication within 6 squares. It takes a DC 30 Use Computer check to send or receive a message within this area. The jamming ship is also affected and is easier to detect (+20 to sensors checks).",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Com_Jammers"
+            "wiki": "https://swse.miraheze.org/wiki/Com_Jammers"
         },
         {
             "id": "reinforced_keel",
@@ -2794,7 +2795,7 @@
             "exclusiveGroup": "keel",
             "description": "A Reinforced Keel causes the ship to take only half damage from Collisions. If the ship Rams another, it deals +2 damage per die.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Keel"
+            "wiki": "https://swse.miraheze.org/wiki/Reinforced_Keel"
         },
         {
             "id": "reinforced_keel_boarding",
@@ -2810,7 +2811,7 @@
             "exclusiveGroup": "keel",
             "description": "Boarding Keels function as Reinforced Keels but can also dock with an enemy ship after a successful ram that moves the target down the Condition Track, allowing boarders to invade.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Reinforced_Keel"
+            "wiki": "https://swse.miraheze.org/wiki/Reinforced_Keel"
         },
         {
             "id": "security_bracing",
@@ -2825,7 +2826,7 @@
             "availability": "Common",
             "description": "Security Bracing protects Passenger Conversions and Escape Pods. When the ship is destroyed by massive damage, subtract the ship's DR from damage dealt to anyone in the protected area.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Security_Bracing"
+            "wiki": "https://swse.miraheze.org/wiki/Security_Bracing"
         },
         {
             "id": "turbolaser_light",
@@ -2850,7 +2851,7 @@
             "damage": "3d10x5",
             "description": "Turbolasers require immense power and cooling. Light Turbolasers can be Fire-Linked with Autofire.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
+            "wiki": "https://swse.miraheze.org/wiki/Turbolaser"
         },
         {
             "id": "turbolaser_med",
@@ -2875,7 +2876,7 @@
             "damage": "5d10x5",
             "description": "Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
+            "wiki": "https://swse.miraheze.org/wiki/Turbolaser"
         },
         {
             "id": "turbolaser_hvy",
@@ -2900,7 +2901,7 @@
             "damage": "7d10x5",
             "description": "Turbolasers require immense power and cooling. Most Turbolasers are incapable of Autofire due to longer firing sequences.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Turbolaser"
+            "wiki": "https://swse.miraheze.org/wiki/Turbolaser"
         },
         {
             "id": "blaster_cannon_light",
@@ -2928,7 +2929,7 @@
             "damage": "3d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
+            "wiki": "https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "blaster_cannon_med",
@@ -2956,7 +2957,7 @@
             "damage": "4d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
+            "wiki": "https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "blaster_cannon_hvy",
@@ -2984,7 +2985,7 @@
             "damage": "5d10x2",
             "description": "Blaster Cannons are frequently mounted on Starfighters. They are less expensive than Laser Cannons but have a more limited range.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Blaster_Cannon_(Vehicles)"
+            "wiki": "https://swse.miraheze.org/wiki/Blaster_Cannon_(Vehicles)"
         },
         {
             "id": "harpoon_gun",
@@ -2998,7 +2999,7 @@
             "availability": "Common",
             "description": "A Gunner may use the Harpoon Gun to make a Grapple check against a target Walker. If the Grapple check succeeds, the target Walker cannot move without first making a Pilot check (DC = Harpoon Gun's Grapple check result). If this Pilot check fails, the Walker suffers an automatic Collision, taking twice its Collision damage.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Harpoon_Gun"
+            "wiki": "https://swse.miraheze.org/wiki/Harpoon_Gun"
         },
         {
             "id": "docking_gun",
@@ -3012,7 +3013,7 @@
             "availability": "Licensed",
             "description": "Allows Character Scale Ranged Weapons to be added as a Docking Gun. Counts as Heavy Weapon. Draws power from ship. The cost is for the mount only - the gun itself is bought normally. Docking Guns have no effect on Starship Scale combat.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Docking_Gun"
+            "wiki": "https://swse.miraheze.org/wiki/Docking_Gun"
         },
         {
             "id": "droid_jammer",
@@ -3026,7 +3027,7 @@
             "availability": "Military",
             "description": "Attacks from the Starship gain a +2 Equipment bonus to hit automated craft (like Droid Starfighters) within a 5-square radius.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Droid_Jammer"
+            "wiki": "https://swse.miraheze.org/wiki/Droid_Jammer"
         },
         {
             "id": "cannon_enhancements",
@@ -3040,7 +3041,7 @@
             "availability": "Restricted",
             "description": "Standard Cannon Enhancements increase damage by +1 die. Costs 2x base weapon cost.",
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Cannon_Enhancements"
+            "wiki": "https://swse.miraheze.org/wiki/Cannon_Enhancements"
         },
         {
             "id": "cannon_enhancements_adv",
@@ -3054,7 +3055,7 @@
             "availability": "Restricted",
             "description": "Advanced Cannon Enhancements increase damage by +2 dice. Costs 5x base weapon cost. Military availability.",
             "location": "Installed",
-            "wiki": "https://swse.fandom.com/wiki/Cannon_Enhancements_(Advanced)"
+            "wiki": "https://swse.miraheze.org/wiki/Cannon_Enhancements_(Advanced)"
         },
         {
             "id": "gravity_well",
@@ -3067,7 +3068,7 @@
             "availability": "Military",
             "description": "A Gravity Well Projector creates an artificial gravity well that prevents Hyperspace travel. Any Starship within 12 squares of an active Gravity Well Projector cannot activate its Hyperdrive. Additionally, any ship traveling through Hyperspace that passes within 12 squares of the active Gravity Well Projector is immediately pulled out of Hyperspace.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Gravity_Well_Projector"
+            "wiki": "https://swse.miraheze.org/wiki/Gravity_Well_Projector"
         },
         {
             "id": "ion_bomb_rack",
@@ -3082,7 +3083,7 @@
             "availability": "Military",
             "description": "Ion Bombs deal 5d10 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0). A rack Holds up too 4 bombs",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Ion_Bomb"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Bomb"
         },
         {
             "id": "shieldbuster_torp",
@@ -3097,7 +3098,7 @@
             "availability": "Military",
             "description": "A specialized torpedo designed to overload shielding systems. On a hit, it reduces the target's Shield Rating by -10 (instead of the usual -5). Shields damaged in this way can be recharged normally.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Shieldbuster_Torpedo_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Shieldbuster_Torpedo_Launcher"
         },
         {
             "id": "space_mine_launcher_standard",
@@ -3113,13 +3114,13 @@
             "description": "Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing energy damage to that ship depending of payload.",
             "location": "",
             "payload": {
-              "type": "capacity",
-              "base": 6,
-              "max": 12,
-              "costFactor": 0.25,
-              "unitLabel": "mines"
+                "type": "capacity",
+                "base": 6,
+                "max": 12,
+                "costFactor": 0.25,
+                "unitLabel": "mines"
             },
-            "wiki": "https://swse.fandom.com/wiki/Space_Mine_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Space_Mine_Launcher"
         },
         {
             "id": "space_mine_launcher_heavy",
@@ -3135,13 +3136,13 @@
             "description": "Space Mines are stationary explosives deployed in space. If a ship enters a square containing a Space Mine, it detonates, dealing 6d10x2 Energy damage to that ship.",
             "location": "",
             "payload": {
-              "type": "capacity",
-              "base": 6,
-              "max": 12,
-              "costFactor": 0.25,
-              "unitLabel": "mines"
+                "type": "capacity",
+                "base": 6,
+                "max": 12,
+                "costFactor": 0.25,
+                "unitLabel": "mines"
             },
-            "wiki": "https://swse.fandom.com/wiki/Space_Mine_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Space_Mine_Launcher"
         },
         {
             "id": "discord_missile_launcher",
@@ -3156,7 +3157,7 @@
             "availability": "Military",
             "description": "Deploys a buzz droid swarm on the target ship. The target takes 2d10 damage per turn (ignoring DR and SR) until the droids are removed or destroyed. Requires a successful attack roll to hit.",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Discord_Missile_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Discord_Missile_Launcher"
         },
         {
             "id": "composite_beam",
@@ -3171,7 +3172,7 @@
             "availability": "Military",
             "description": "A laser weapon that ignores 5 points of the target's Shield Rating (treat SR as 5 lower against this attack).",
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Composite_Beam_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Composite_Beam_Cannon"
         },
         {
             "id": "gravity_mine_launcher",
@@ -3184,7 +3185,7 @@
             "availability": "Military",
             "description": "Detonates when a ship enters the square, creating a temporary gravity well that prevents Hyperspace travel for 1 round and deals 4d10x2 Energy damage.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Gravity_Mine_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Gravity_Mine_Launcher"
         },
         {
             "id": "chaff_gun",
@@ -3197,7 +3198,7 @@
             "availability": "Restricted",
             "description": "Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Chaff_Gun"
+            "wiki": "https://swse.miraheze.org/wiki/Chaff_Gun"
         },
         {
             "id": "aux_gen_2",
@@ -3214,7 +3215,7 @@
                 "str_bonus": 2
             },
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Auxiliary_Generator"
         },
         {
             "id": "aux_gen_4",
@@ -3231,7 +3232,7 @@
                 "str_bonus": 4
             },
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Auxiliary_Generator"
         },
         {
             "id": "aux_gen_6",
@@ -3248,7 +3249,7 @@
                 "str_bonus": 6
             },
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Auxiliary_Generator"
+            "wiki": "https://swse.miraheze.org/wiki/Auxiliary_Generator"
         },
         {
             "id": "hidden_cargo_25",
@@ -3265,7 +3266,7 @@
                 "hidden_cargo_pct": 0.25
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
+            "wiki": "https://swse.miraheze.org/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "hidden_cargo_50",
@@ -3282,7 +3283,7 @@
                 "hidden_cargo_pct": 0.5
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
+            "wiki": "https://swse.miraheze.org/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "hidden_cargo_75",
@@ -3299,7 +3300,7 @@
                 "hidden_cargo_pct": 0.75
             },
             "location": "Cargo Hold",
-            "wiki": "https://swse.fandom.com/wiki/Hidden_Cargo_Hold"
+            "wiki": "https://swse.miraheze.org/wiki/Hidden_Cargo_Hold"
         },
         {
             "id": "heavy_ordnance_launcher",
@@ -3324,7 +3325,7 @@
                 ]
             },
             "location": "Hardpoint",
-            "wiki": "https://swse.fandom.com/wiki/Heavy_Ordnance_Launcher"
+            "wiki": "https://swse.miraheze.org/wiki/Heavy_Ordnance_Launcher"
         },
         {
             "id": "lifeboat_large",
@@ -3339,7 +3340,7 @@
             "minShipSize": "Colossal (frigate)",
             "description": "Provide life support for up to 50 Medium creatures for 2 months. Includes Class 15 Hyperdrive. Can be installed on ships of Colossal (Frigate) size or larger.",
             "location": "",
-            "wiki": "https://swse.fandom.com/wiki/Escape_Pod"
+            "wiki": "https://swse.miraheze.org/wiki/Escape_Pod"
         }
     ],
     "DEFAULT_OPTION_COSTS": {
