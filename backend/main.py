@@ -1,15 +1,99 @@
+import js
+import json
+import asyncio
 from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-import json
 import time
 import uuid
-from jose import jwt
-import js
+import jwt
+from jwt import PyJWKClient
 import hashlib
 import secrets
 import os
+
+# --- ASGI Adapter ---
+
+async def asgi_fetch(app, request, env):
+    # Parse URL
+    url = js.URL.new(request.url)
+
+    # Parse headers
+    headers = []
+    # request.headers is a Headers object. Iterate over entries.
+    try:
+        iterator = request.headers.entries()
+        while True:
+            entry = iterator.next()
+            if entry.done:
+                break
+            key, value = entry.value
+            headers.append((key.encode("latin-1"), value.encode("latin-1")))
+    except Exception:
+        # Fallback or empty if iteration fails
+        pass
+
+    # Read body
+    try:
+        body_text = await request.text()
+        body_bytes = body_text.encode("utf-8")
+    except:
+        body_bytes = b""
+
+    scope = {
+        "type": "http",
+        "asgi": {"version": "3.0", "spec_version": "2.1"},
+        "http_version": "1.1",
+        "method": request.method,
+        "scheme": url.protocol.replace(":", ""),
+        "path": url.pathname,
+        "query_string": url.search.encode("utf-8")[1:] if url.search else b"",
+        "root_path": "",
+        "headers": headers,
+        "server": (url.hostname, 443 if url.protocol == "https:" else 80),
+        "client": ("127.0.0.1", 0),
+        "extensions": {"cloudflare": {"env": env}},
+    }
+
+    async def receive():
+        return {
+            "type": "http.request",
+            "body": body_bytes,
+            "more_body": False,
+        }
+
+    response = {}
+
+    async def send(message):
+        nonlocal response
+        if message["type"] == "http.response.start":
+            response["status"] = message["status"]
+            response["headers"] = message["headers"]
+        elif message["type"] == "http.response.body":
+            body = message.get("body", b"")
+            if "body" in response:
+                response["body"] += body
+            else:
+                response["body"] = body
+
+    await app(scope, receive, send)
+
+    # Convert headers
+    resp_headers = js.Headers.new()
+    if "headers" in response:
+        for k, v in response["headers"]:
+            resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
+
+    # Return Response
+    return js.Response.new(
+        response.get("body", b"").decode("utf-8"), # Simplified: assume text/json
+        headers=resp_headers,
+        status=response.get("status", 200),
+        statusText=""
+    )
+
+# --- App ---
 
 app = FastAPI()
 
@@ -101,23 +185,37 @@ async def get_jwks():
             return None
         data = await resp.json()
         # Convert JS object to Python dict
-        keys = data.to_py()
-        jwks_cache["keys"] = keys
+        keys_data = data.to_py()
+        jwks_cache["keys"] = keys_data.get("keys", [])
         jwks_cache["expiry"] = now + 3600
-        return keys
+        return jwks_cache["keys"]
     except Exception as e:
         print(f"Failed to fetch JWKS: {e}")
         return None
 
 async def verify_google_token(token: str, client_id: str):
-    jwks = await get_jwks()
-    if not jwks:
+    keys = await get_jwks()
+    if not keys:
         return None
 
     try:
+        # Get the kid from the header
+        header = jwt.get_unverified_header(token)
+        kid = header.get("kid")
+        if not kid:
+            return None
+
+        # Find the signing key
+        key_data = next((k for k in keys if k["kid"] == kid), None)
+        if not key_data:
+            return None
+
+        # Construct public key from JWK
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key_data))
+
         payload = jwt.decode(
             token,
-            jwks,
+            public_key,
             algorithms=["RS256"],
             audience=client_id,
             options={"verify_at_hash": False}
@@ -395,5 +493,4 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
 # --- Worker Entry Point ---
 
 async def on_fetch(request, env):
-    import asgi
-    return await asgi.fetch(app, request, env)
+    return await asgi_fetch(app, request, env)

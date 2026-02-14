@@ -12,7 +12,8 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret
-    command: sh -c "npx wrangler dev --host 0.0.0.0"
+    # Ensure requirements.txt exists for wrangler by copying from cf-requirements.txt at runtime
+    command: sh -c "cp cf-requirements.txt requirements.txt && npx wrangler dev --host 0.0.0.0"
 
   frontend:
     image: nginx:alpine

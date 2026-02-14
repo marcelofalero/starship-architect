@@ -15,8 +15,8 @@ WORKDIR /app
 
 RUN npm install -g wrangler
 
-# Copy backend requirements for bundling
-COPY backend/requirements.txt .
+# Copy backend requirements for bundling as requirements.txt for wrangler
+COPY backend/cf-requirements.txt ./requirements.txt
 
 # Expose default wrangler dev port
 EXPOSE 8787

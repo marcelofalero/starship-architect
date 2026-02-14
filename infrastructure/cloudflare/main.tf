@@ -74,7 +74,7 @@ resource "cloudflare_worker_script" "swse_backend" {
   compatibility_date  = "2024-04-01"
   compatibility_flags = ["python_workers"]
 
-  # Note: Python workers with dependencies (requirements.txt) typically require
+  # Note: Python workers with dependencies (cf-requirements.txt) typically require
   # deployment via `wrangler` to bundle the environment.
   # This Terraform resource defines the script but may not fully support
   # dependency resolution without external build steps or using `wrangler deploy`.
