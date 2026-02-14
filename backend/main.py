@@ -421,26 +421,43 @@ async def get_current_user(request: Request) -> Optional[User]:
 @app.post("/auth/register")
 async def register(user_req: RegisterUser, request: Request):
     print("DEBUG: Entering register endpoint", flush=True)
-    db = await get_db(request)
+    try:
+        db = await get_db(request)
+        print(f"DEBUG: DB Object: {db}", flush=True)
 
-    # Check if user exists
-    print(f"DEBUG: Checking for existing user {user_req.email}", flush=True)
-    res = await db.prepare("SELECT id FROM users WHERE email = ?").bind(user_req.email).all()
-    results = safe_results(res)
+        # Check if user exists
+        print(f"DEBUG: Checking for existing user {user_req.email}", flush=True)
+        stmt = db.prepare("SELECT id FROM users WHERE email = ?")
+        print("DEBUG: Statement prepared", flush=True)
+        stmt = stmt.bind(user_req.email)
+        print("DEBUG: Statement bound", flush=True)
 
-    if results:
-        print("DEBUG: User already exists", flush=True)
-        raise HTTPException(status_code=400, detail="User already exists")
+        # Add timeout to catch hangs
+        res = await asyncio.wait_for(stmt.all(), timeout=5.0)
+        print(f"DEBUG: Query executed. Result: {res}", flush=True)
+        results = safe_results(res)
 
-    user_id = str(uuid.uuid4())
-    pw_hash = hash_password(user_req.password)
+        if results:
+            print("DEBUG: User already exists", flush=True)
+            raise HTTPException(status_code=400, detail="User already exists")
 
-    print("DEBUG: Creating new user", flush=True)
-    await db.prepare("INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)").bind(
-        user_id, user_req.email, user_req.name, pw_hash
-    ).run()
+        user_id = str(uuid.uuid4())
+        pw_hash = hash_password(user_req.password)
 
-    return {"status": "ok", "user_id": user_id}
+        print("DEBUG: Creating new user", flush=True)
+        insert_stmt = db.prepare("INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)")
+        insert_stmt = insert_stmt.bind(user_id, user_req.email, user_req.name, pw_hash)
+        await asyncio.wait_for(insert_stmt.run(), timeout=5.0)
+
+        print("DEBUG: User created successfully", flush=True)
+        return {"status": "ok", "user_id": user_id}
+    except asyncio.TimeoutError:
+        print("DEBUG: Database operation timed out!", flush=True)
+        raise HTTPException(status_code=504, detail="Database operation timed out")
+    except Exception as e:
+        print(f"DEBUG: Error in register: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
+        raise e
 
 @app.post("/auth/login")
 async def login(login_req: LoginUser, request: Request):
