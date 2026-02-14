@@ -11,86 +11,96 @@ import hashlib
 import secrets
 import os
 import base64
+import traceback
 
 # --- ASGI Adapter ---
 
 async def asgi_fetch(app, request, env):
-    # Parse URL
-    url = js.URL.new(request.url)
-
-    # Parse headers
-    headers = []
-    # request.headers is a Headers object. Iterate over entries.
     try:
-        iterator = request.headers.entries()
-        while True:
-            entry = iterator.next()
-            if entry.done:
-                break
-            key, value = entry.value
-            headers.append((key.encode("latin-1"), value.encode("latin-1")))
-    except Exception:
-        # Fallback or empty if iteration fails
-        pass
+        # Parse URL
+        url = js.URL.new(request.url)
 
-    # Read body
-    try:
-        body_text = await request.text()
-        body_bytes = body_text.encode("utf-8")
-    except:
-        body_bytes = b""
+        # Parse headers
+        headers = []
+        # request.headers is a Headers object. Iterate over entries.
+        try:
+            iterator = request.headers.entries()
+            while True:
+                entry = iterator.next()
+                if entry.done:
+                    break
+                key, value = entry.value
+                headers.append((key.encode("latin-1"), value.encode("latin-1")))
+        except Exception:
+            # Fallback or empty if iteration fails
+            pass
 
-    scope = {
-        "type": "http",
-        "asgi": {"version": "3.0", "spec_version": "2.1"},
-        "http_version": "1.1",
-        "method": request.method,
-        "scheme": url.protocol.replace(":", ""),
-        "path": url.pathname,
-        "query_string": url.search.encode("utf-8")[1:] if url.search else b"",
-        "root_path": "",
-        "headers": headers,
-        "server": (url.hostname, 443 if url.protocol == "https:" else 80),
-        "client": ("127.0.0.1", 0),
-        "extensions": {"cloudflare": {"env": env}},
-    }
+        # Read body
+        try:
+            body_text = await request.text()
+            body_bytes = body_text.encode("utf-8")
+        except:
+            body_bytes = b""
 
-    async def receive():
-        return {
-            "type": "http.request",
-            "body": body_bytes,
-            "more_body": False,
+        scope = {
+            "type": "http",
+            "asgi": {"version": "3.0", "spec_version": "2.1"},
+            "http_version": "1.1",
+            "method": request.method,
+            "scheme": url.protocol.replace(":", ""),
+            "path": url.pathname,
+            "query_string": url.search.encode("utf-8")[1:] if url.search else b"",
+            "root_path": "",
+            "headers": headers,
+            "server": (url.hostname, 443 if url.protocol == "https:" else 80),
+            "client": ("127.0.0.1", 0),
+            "extensions": {"cloudflare": {"env": env}},
         }
 
-    response = {}
+        async def receive():
+            return {
+                "type": "http.request",
+                "body": body_bytes,
+                "more_body": False,
+            }
 
-    async def send(message):
-        nonlocal response
-        if message["type"] == "http.response.start":
-            response["status"] = message["status"]
-            response["headers"] = message["headers"]
-        elif message["type"] == "http.response.body":
-            body = message.get("body", b"")
-            if "body" in response:
-                response["body"] += body
-            else:
-                response["body"] = body
+        response = {}
 
-    await app(scope, receive, send)
+        async def send(message):
+            nonlocal response
+            if message["type"] == "http.response.start":
+                response["status"] = message["status"]
+                response["headers"] = message["headers"]
+            elif message["type"] == "http.response.body":
+                body = message.get("body", b"")
+                if "body" in response:
+                    response["body"] += body
+                else:
+                    response["body"] = body
 
-    # Convert headers
-    resp_headers = js.Headers.new()
-    if "headers" in response:
-        for k, v in response["headers"]:
-            resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
+        await app(scope, receive, send)
 
-    # Return Response
-    return js.Response.new(
-        response.get("body", b"").decode("utf-8"), # Simplified: assume text/json
-        headers=resp_headers,
-        status=response.get("status", 200),
-        statusText=""
-    )
+        # Convert headers
+        resp_headers = js.Headers.new()
+        if "headers" in response:
+            for k, v in response["headers"]:
+                resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
+
+        # Return Response
+        return js.Response.new(
+            response.get("body", b"").decode("utf-8"), # Simplified: assume text/json
+            headers=resp_headers,
+            status=response.get("status", 200),
+            statusText=""
+        )
+    except Exception as e:
+        print(f"Internal Server Error: {e}")
+        traceback.print_exc()
+        return js.Response.new(
+            "Internal Server Error",
+            status=500,
+            statusText="Internal Server Error"
+        )
 
 # --- App ---
 
@@ -424,7 +434,6 @@ async def login(login_req: LoginUser, request: Request):
         "name": user_row['name'],
         "exp": int(time.time()) + 86400 * 7 # 7 days
     }
-
     session_token = await sign_hs256_token(session_payload, env.SESSION_SECRET)
     return {"access_token": session_token, "token_type": "bearer"}
 
@@ -628,11 +637,11 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
 
     return {"status": "ok"}
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 # --- Worker Entry Point ---
 
 async def on_fetch(request, env):
     return await asgi_fetch(app, request, env)
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}

@@ -6,7 +6,7 @@ def wait_for_api():
     url = "http://backend:8787/health"
     print(f"Waiting for API at {url}...")
 
-    timeout = 60
+    timeout = 120
     start_time = time.time()
 
     while time.time() - start_time < timeout:
@@ -15,8 +15,10 @@ def wait_for_api():
             if resp.status_code == 200:
                 print("API is up!")
                 return
+            else:
+                print(f"API responded with status {resp.status_code}")
         except Exception as e:
-            pass
+            print(f"Connection failed: {e}")
         time.sleep(1)
 
     print("Timeout waiting for API")
