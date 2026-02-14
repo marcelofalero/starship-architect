@@ -1,0 +1,26 @@
+import httpx
+import time
+import sys
+
+def wait_for_api():
+    url = "http://backend:8787/health"
+    print(f"Waiting for API at {url}...")
+
+    timeout = 60
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        try:
+            resp = httpx.get(url)
+            if resp.status_code == 200:
+                print("API is up!")
+                return
+        except Exception as e:
+            pass
+        time.sleep(1)
+
+    print("Timeout waiting for API")
+    sys.exit(1)
+
+if __name__ == "__main__":
+    wait_for_api()

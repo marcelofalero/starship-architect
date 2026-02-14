@@ -632,3 +632,7 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
 
 async def on_fetch(request, env):
     return await asgi_fetch(app, request, env)
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}

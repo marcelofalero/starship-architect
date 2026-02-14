@@ -12,8 +12,7 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret
-    # Ensure requirements.txt exists for wrangler by copying from cf-requirements.txt at runtime
-    command: sh -c "cp cf-requirements.txt requirements.txt && npx wrangler dev --host 0.0.0.0"
+    # Entrypoint is handled by Dockerfile now
 
   frontend:
     image: nginx:alpine
@@ -24,6 +23,16 @@ services:
       - ./backend/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
+
+  tests:
+    build:
+      context: tests
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    environment:
+      - BASE_URL=http://backend:8787
+    command: sh -c "python wait_for_api.py && pytest"
 
 volumes:
   wrangler-state:
