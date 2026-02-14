@@ -7,91 +7,108 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import time
 import uuid
-import jwt
-from jwt import PyJWKClient
-import hashlib
 import secrets
 import os
+import base64
+import traceback
+import sys
 
 # --- ASGI Adapter ---
 
 async def asgi_fetch(app, request, env):
-    # Parse URL
-    url = js.URL.new(request.url)
-
-    # Parse headers
-    headers = []
-    # request.headers is a Headers object. Iterate over entries.
     try:
-        iterator = request.headers.entries()
-        while True:
-            entry = iterator.next()
-            if entry.done:
-                break
-            key, value = entry.value
-            headers.append((key.encode("latin-1"), value.encode("latin-1")))
-    except Exception:
-        # Fallback or empty if iteration fails
-        pass
+        print(f"DEBUG: Handling request {request.method} {request.url}", flush=True)
+        # Parse URL
+        url = js.URL.new(request.url)
 
-    # Read body
-    try:
-        body_text = await request.text()
-        body_bytes = body_text.encode("utf-8")
-    except:
-        body_bytes = b""
+        # Parse headers
+        headers = []
+        try:
+            iterator = request.headers.entries()
+            while True:
+                entry = iterator.next()
+                if entry.done:
+                    break
+                key, value = entry.value
+                headers.append((key.encode("latin-1"), value.encode("latin-1")))
+        except Exception as e:
+            print(f"DEBUG: Header parsing error: {e}", flush=True)
+            pass
 
-    scope = {
-        "type": "http",
-        "asgi": {"version": "3.0", "spec_version": "2.1"},
-        "http_version": "1.1",
-        "method": request.method,
-        "scheme": url.protocol.replace(":", ""),
-        "path": url.pathname,
-        "query_string": url.search.encode("utf-8")[1:] if url.search else b"",
-        "root_path": "",
-        "headers": headers,
-        "server": (url.hostname, 443 if url.protocol == "https:" else 80),
-        "client": ("127.0.0.1", 0),
-        "extensions": {"cloudflare": {"env": env}},
-    }
+        # Read body
+        try:
+            body_text = await request.text()
+            body_bytes = body_text.encode("utf-8")
+        except:
+            body_bytes = b""
 
-    async def receive():
-        return {
-            "type": "http.request",
-            "body": body_bytes,
-            "more_body": False,
+        scope = {
+            "type": "http",
+            "asgi": {"version": "3.0", "spec_version": "2.1"},
+            "http_version": "1.1",
+            "method": request.method,
+            "scheme": url.protocol.replace(":", ""),
+            "path": url.pathname,
+            "query_string": url.search.encode("utf-8")[1:] if url.search else b"",
+            "root_path": "",
+            "headers": headers,
+            "server": (url.hostname, 443 if url.protocol == "https:" else 80),
+            "client": ("127.0.0.1", 0),
+            "extensions": {"cloudflare": {"env": env}},
         }
 
-    response = {}
+        async def receive():
+            return {
+                "type": "http.request",
+                "body": body_bytes,
+                "more_body": False,
+            }
 
-    async def send(message):
-        nonlocal response
-        if message["type"] == "http.response.start":
-            response["status"] = message["status"]
-            response["headers"] = message["headers"]
-        elif message["type"] == "http.response.body":
-            body = message.get("body", b"")
-            if "body" in response:
-                response["body"] += body
-            else:
-                response["body"] = body
+        response = {}
 
-    await app(scope, receive, send)
+        async def send(message):
+            nonlocal response
+            if message["type"] == "http.response.start":
+                response["status"] = message["status"]
+                response["headers"] = message["headers"]
+            elif message["type"] == "http.response.body":
+                body = message.get("body", b"")
+                if "body" in response:
+                    response["body"] += body
+                else:
+                    response["body"] = body
 
-    # Convert headers
-    resp_headers = js.Headers.new()
-    if "headers" in response:
-        for k, v in response["headers"]:
-            resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
+        await app(scope, receive, send)
 
-    # Return Response
-    return js.Response.new(
-        response.get("body", b"").decode("utf-8"), # Simplified: assume text/json
-        headers=resp_headers,
-        status=response.get("status", 200),
-        statusText=""
-    )
+        # Convert headers
+        resp_headers = js.Headers.new()
+        if "headers" in response:
+            for k, v in response["headers"]:
+                resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
+
+        # Create Response options object
+        resp_init = js.Object.new()
+        resp_init.headers = resp_headers
+        resp_init.status = response.get("status", 200)
+        resp_init.statusText = ""
+
+        # Return Response
+        return js.Response.new(
+            response.get("body", b"").decode("utf-8"),
+            resp_init
+        )
+    except BaseException as e:
+        print(f"Internal Server Error: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
+
+        resp_init = js.Object.new()
+        resp_init.status = 500
+        resp_init.statusText = "Internal Server Error"
+
+        return js.Response.new(
+            "Internal Server Error",
+            resp_init
+        )
 
 # --- App ---
 
@@ -104,29 +121,292 @@ async def get_env(request: Request):
 
 async def get_db(request: Request):
     env = await get_env(request)
+    print(f"DEBUG: Accessing DB from env: {env}", flush=True)
+    if not hasattr(env, 'DB'):
+        print("DEBUG: env.DB is missing!", flush=True)
     return env.DB
 
-def hash_password(password: str) -> str:
-    salt = secrets.token_hex(16)
-    pw_hash = hashlib.pbkdf2_hmac(
-        'sha256',
-        password.encode(),
-        salt.encode(),
-        100000
-    ).hex()
-    return f"{salt}${pw_hash}"
+def safe_results(res):
+    """Safely extract results from D1 result object."""
+    print(f"DEBUG: safe_results input: {res}", flush=True)
+    # Check if res is valid
+    if not res:
+        print("DEBUG: res is falsy", flush=True)
+        return []
 
-def verify_password(stored_password: str, provided_password: str) -> bool:
-    if not stored_password or '$' not in stored_password:
+    # Try to access results property
+    try:
+        results = res.results
+        print(f"DEBUG: res.results: {results}", flush=True)
+    except Exception as e:
+        print(f"DEBUG: Failed to access res.results: {e}", flush=True)
+        results = None
+
+    if results is None:
+        return []
+
+    # Convert from JS proxy if needed
+    try:
+        if hasattr(results, 'to_py'):
+            py_results = results.to_py()
+            print(f"DEBUG: Converted to python: {py_results}", flush=True)
+            return py_results
+    except Exception as e:
+        print(f"DEBUG: to_py() failed: {e}", flush=True)
+
+    return results
+
+# --- Password Hashing (Web Crypto) ---
+
+async def hash_password(password: str) -> str:
+    print(f"DEBUG: hashing password...", flush=True)
+    try:
+        enc = js.TextEncoder.new()
+        password_key = await js.crypto.subtle.importKey(
+            "raw",
+            enc.encode(password),
+            js.JSON.parse('{"name": "PBKDF2"}'),
+            False,
+            js.JSON.parse('["deriveBits", "deriveKey"]')
+        )
+
+        # Generate salt using os.urandom (supported in Pyodide usually)
+        # or js.crypto.getRandomValues if python random is flaky
+        salt_js = js.Uint8Array.new(16)
+        js.crypto.getRandomValues(salt_js)
+        salt_bytes = bytes(salt_js)
+        salt_hex = salt_bytes.hex()
+
+        # Derive bits
+        algo = js.Object.new()
+        algo.name = "PBKDF2"
+        algo.salt = salt_js
+        algo.iterations = 100000
+        algo.hash = "SHA-256"
+
+        derived_bits = await js.crypto.subtle.deriveBits(
+            algo,
+            password_key,
+            256
+        )
+
+        hash_bytes = bytes(js.Uint8Array.new(derived_bits))
+        hash_hex = hash_bytes.hex()
+
+        print(f"DEBUG: password hashed successfully", flush=True)
+        return f"{salt_hex}${hash_hex}"
+    except Exception as e:
+        print(f"DEBUG: hash_password failed: {e}", flush=True)
+        raise e
+
+async def verify_password(stored_password: str, provided_password: str) -> bool:
+    try:
+        if not stored_password or '$' not in stored_password:
+            return False
+        salt_hex, stored_hash_hex = stored_password.split('$')
+
+        salt_bytes = bytes.fromhex(salt_hex)
+        salt_js = js.Uint8Array.new(salt_bytes)
+
+        enc = js.TextEncoder.new()
+        password_key = await js.crypto.subtle.importKey(
+            "raw",
+            enc.encode(provided_password),
+            js.JSON.parse('{"name": "PBKDF2"}'),
+            False,
+            js.JSON.parse('["deriveBits", "deriveKey"]')
+        )
+
+        algo = js.Object.new()
+        algo.name = "PBKDF2"
+        algo.salt = salt_js
+        algo.iterations = 100000
+        algo.hash = "SHA-256"
+
+        derived_bits = await js.crypto.subtle.deriveBits(
+            algo,
+            password_key,
+            256
+        )
+
+        hash_bytes = bytes(js.Uint8Array.new(derived_bits))
+        hash_hex = hash_bytes.hex()
+
+        # Constant time compare (secrets module is good for this)
+        return secrets.compare_digest(stored_hash_hex, hash_hex)
+    except Exception as e:
+        print(f"DEBUG: verify_password failed: {e}", flush=True)
         return False
-    salt, stored_hash = stored_password.split('$')
-    pw_hash = hashlib.pbkdf2_hmac(
-        'sha256',
-        provided_password.encode(),
-        salt.encode(),
-        100000
-    ).hex()
-    return secrets.compare_digest(stored_hash, pw_hash)
+
+# --- Web Crypto JWT Implementation ---
+
+def base64url_decode(input: str) -> bytes:
+    input += "=" * (-len(input) % 4)
+    return base64.urlsafe_b64decode(input)
+
+def base64url_encode(input: bytes) -> str:
+    return base64.urlsafe_b64encode(input).rstrip(b"=").decode("utf-8")
+
+async def verify_rs256_token(token: str, client_id: str):
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+
+        header_b64, payload_b64, signature_b64 = parts
+
+        header = json.loads(base64url_decode(header_b64))
+        payload = json.loads(base64url_decode(payload_b64))
+
+        # Verify audience
+        if payload.get("aud") != client_id:
+            return None
+
+        # Verify expiration
+        if payload.get("exp", 0) < time.time():
+            return None
+
+        kid = header.get("kid")
+        if not kid:
+            return None
+
+        # Fetch keys using js.fetch
+        jwks = await get_jwks()
+        if not jwks:
+            return None
+
+        key_data = next((k for k in jwks if k["kid"] == kid), None)
+        if not key_data:
+            return None
+
+        # Import key using Web Crypto
+        # key_data is a dict. Convert to JS object
+        key_js = js.JSON.parse(json.dumps(key_data))
+        algo = js.Object.new()
+        algo.name = "RSASSA-PKCS1-v1_5"
+        algo.hash = "SHA-256"
+
+        crypto_key = await js.crypto.subtle.importKey(
+            "jwk",
+            key_js,
+            algo,
+            False,
+            js.Array.new("verify")
+        )
+
+        # Verify signature
+        # Signature is base64url encoded
+        signature = base64url_decode(signature_b64)
+        signature_js = js.Uint8Array.new(signature)
+
+        # Data to verify is header.payload
+        data = f"{header_b64}.{payload_b64}".encode("utf-8")
+        data_js = js.Uint8Array.new(data)
+
+        is_valid = await js.crypto.subtle.verify(
+            algo,
+            crypto_key,
+            signature_js,
+            data_js
+        )
+
+        if is_valid:
+            return payload
+        return None
+
+    except Exception as e:
+        print(f"RS256 verification error: {e}", flush=True)
+        return None
+
+async def sign_hs256_token(payload: dict, secret: str) -> str:
+    try:
+        header = {"typ": "JWT", "alg": "HS256"}
+        header_b64 = base64url_encode(json.dumps(header).encode("utf-8"))
+        payload_b64 = base64url_encode(json.dumps(payload).encode("utf-8"))
+
+        data = f"{header_b64}.{payload_b64}".encode("utf-8")
+        data_js = js.Uint8Array.new(data)
+
+        # Import secret key
+        secret_bytes = secret.encode("utf-8")
+        secret_js = js.Uint8Array.new(secret_bytes)
+
+        algo = js.Object.new()
+        algo.name = "HMAC"
+        algo.hash = "SHA-256"
+
+        crypto_key = await js.crypto.subtle.importKey(
+            "raw",
+            secret_js,
+            algo,
+            False,
+            js.Array.new("sign")
+        )
+
+        signature_ab = await js.crypto.subtle.sign(
+            algo,
+            crypto_key,
+            data_js
+        )
+        # signature_ab is ArrayBuffer, convert to bytes
+        signature_bytes = bytes(js.Uint8Array.new(signature_ab))
+        signature_b64 = base64url_encode(signature_bytes)
+
+        return f"{header_b64}.{payload_b64}.{signature_b64}"
+    except Exception as e:
+        print(f"HS256 signing error: {e}", flush=True)
+        return ""
+
+async def verify_hs256_token(token: str, secret: str):
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+
+        header_b64, payload_b64, signature_b64 = parts
+
+        # Decode payload for expiry check
+        payload = json.loads(base64url_decode(payload_b64))
+
+        if payload.get("exp", 0) < time.time():
+            return None
+
+        # Verify signature
+        data = f"{header_b64}.{payload_b64}".encode("utf-8")
+        data_js = js.Uint8Array.new(data)
+
+        signature = base64url_decode(signature_b64)
+        signature_js = js.Uint8Array.new(signature)
+
+        secret_bytes = secret.encode("utf-8")
+        secret_js = js.Uint8Array.new(secret_bytes)
+
+        algo = js.Object.new()
+        algo.name = "HMAC"
+        algo.hash = "SHA-256"
+
+        crypto_key = await js.crypto.subtle.importKey(
+            "raw",
+            secret_js,
+            algo,
+            False,
+            js.Array.new("verify")
+        )
+
+        is_valid = await js.crypto.subtle.verify(
+            algo,
+            crypto_key,
+            signature_js,
+            data_js
+        )
+
+        if is_valid:
+            return payload
+        return None
+
+    except Exception as e:
+        print(f"HS256 verification error: {e}", flush=True)
+        return None
 
 # --- Models ---
 
@@ -169,7 +449,7 @@ class LoginUser(BaseModel):
     email: str
     password: str
 
-# --- Auth ---
+# --- Auth Helpers ---
 
 jwks_cache = {"keys": None, "expiry": 0}
 
@@ -190,39 +470,7 @@ async def get_jwks():
         jwks_cache["expiry"] = now + 3600
         return jwks_cache["keys"]
     except Exception as e:
-        print(f"Failed to fetch JWKS: {e}")
-        return None
-
-async def verify_google_token(token: str, client_id: str):
-    keys = await get_jwks()
-    if not keys:
-        return None
-
-    try:
-        # Get the kid from the header
-        header = jwt.get_unverified_header(token)
-        kid = header.get("kid")
-        if not kid:
-            return None
-
-        # Find the signing key
-        key_data = next((k for k in keys if k["kid"] == kid), None)
-        if not key_data:
-            return None
-
-        # Construct public key from JWK
-        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key_data))
-
-        payload = jwt.decode(
-            token,
-            public_key,
-            algorithms=["RS256"],
-            audience=client_id,
-            options={"verify_at_hash": False}
-        )
-        return payload
-    except Exception as e:
-        print(f"Token verification failed: {e}")
+        print(f"Failed to fetch JWKS: {e}", flush=True)
         return None
 
 async def get_current_user(request: Request) -> Optional[User]:
@@ -231,31 +479,57 @@ async def get_current_user(request: Request) -> Optional[User]:
         return None
     token = auth.split(" ")[1]
     env = await get_env(request)
-    try:
-        payload = jwt.decode(token, env.SESSION_SECRET, algorithms=["HS256"])
+
+    payload = await verify_hs256_token(token, env.SESSION_SECRET)
+    if payload:
         return User(id=payload["sub"], email=payload["email"], name=payload["name"])
-    except:
-        return None
+    return None
 
 # --- Endpoints ---
 
 @app.post("/auth/register")
 async def register(user_req: RegisterUser, request: Request):
-    db = await get_db(request)
+    print("DEBUG: Entering register endpoint", flush=True)
+    try:
+        db = await get_db(request)
+        print(f"DEBUG: DB Object: {db}", flush=True)
 
-    # Check if user exists
-    res = await db.prepare("SELECT id FROM users WHERE email = ?").bind(user_req.email).all()
-    if res.results:
-        raise HTTPException(status_code=400, detail="User already exists")
+        # Check if user exists
+        print(f"DEBUG: Checking for existing user {user_req.email}", flush=True)
+        stmt = db.prepare("SELECT id FROM users WHERE email = ?")
+        print("DEBUG: Statement prepared", flush=True)
+        stmt = stmt.bind(user_req.email)
+        print("DEBUG: Statement bound", flush=True)
 
-    user_id = str(uuid.uuid4())
-    pw_hash = hash_password(user_req.password)
+        # Add timeout to catch hangs
+        res = await asyncio.wait_for(stmt.all(), timeout=5.0)
+        print(f"DEBUG: Query executed. Result: {res}", flush=True)
+        results = safe_results(res)
 
-    await db.prepare("INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)").bind(
-        user_id, user_req.email, user_req.name, pw_hash
-    ).run()
+        if results:
+            print("DEBUG: User already exists", flush=True)
+            raise HTTPException(status_code=400, detail="User already exists")
 
-    return {"status": "ok", "user_id": user_id}
+        print("DEBUG: Generating UUID", flush=True)
+        user_id = str(uuid.uuid4())
+        print(f"DEBUG: Generated UUID: {user_id}", flush=True)
+
+        pw_hash = await hash_password(user_req.password)
+
+        print("DEBUG: Creating new user", flush=True)
+        insert_stmt = db.prepare("INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)")
+        insert_stmt = insert_stmt.bind(user_id, user_req.email, user_req.name, pw_hash)
+        await asyncio.wait_for(insert_stmt.run(), timeout=5.0)
+
+        print("DEBUG: User created successfully", flush=True)
+        return {"status": "ok", "user_id": user_id}
+    except asyncio.TimeoutError:
+        print("DEBUG: Database operation timed out!", flush=True)
+        raise HTTPException(status_code=504, detail="Database operation timed out")
+    except Exception as e:
+        print(f"DEBUG: Error in register: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
+        raise e
 
 @app.post("/auth/login")
 async def login(login_req: LoginUser, request: Request):
@@ -263,9 +537,7 @@ async def login(login_req: LoginUser, request: Request):
     env = await get_env(request)
 
     res = await db.prepare("SELECT * FROM users WHERE email = ?").bind(login_req.email).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -277,7 +549,7 @@ async def login(login_req: LoginUser, request: Request):
         # User might be a Google-only user
         raise HTTPException(status_code=401, detail="Invalid credentials (try Google login)")
 
-    if not verify_password(stored_hash, login_req.password):
+    if not await verify_password(stored_hash, login_req.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     # Create session token
@@ -287,13 +559,13 @@ async def login(login_req: LoginUser, request: Request):
         "name": user_row['name'],
         "exp": int(time.time()) + 86400 * 7 # 7 days
     }
-    session_token = jwt.encode(session_payload, env.SESSION_SECRET, algorithm="HS256")
+    session_token = await sign_hs256_token(session_payload, env.SESSION_SECRET)
     return {"access_token": session_token, "token_type": "bearer"}
 
 @app.get("/auth/google")
 async def auth_google(token: str, request: Request):
     env = await get_env(request)
-    payload = await verify_google_token(token, env.GOOGLE_CLIENT_ID)
+    payload = await verify_rs256_token(token, env.GOOGLE_CLIENT_ID)
     if not payload:
         raise HTTPException(status_code=400, detail="Invalid token")
 
@@ -305,16 +577,12 @@ async def auth_google(token: str, request: Request):
 
     # Upsert user
     res = await db.prepare("SELECT * FROM users WHERE id = ?").bind(user_id).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         # Check by email
         res_email = await db.prepare("SELECT * FROM users WHERE email = ?").bind(email).all()
-        email_results = res_email.results
-        if hasattr(email_results, 'to_py'):
-            email_results = email_results.to_py()
+        email_results = safe_results(res_email)
 
         if email_results:
             user_row = email_results[0]
@@ -329,7 +597,7 @@ async def auth_google(token: str, request: Request):
         "name": name,
         "exp": int(time.time()) + 86400 * 7 # 7 days
     }
-    session_token = jwt.encode(session_payload, env.SESSION_SECRET, algorithm="HS256")
+    session_token = await sign_hs256_token(session_payload, env.SESSION_SECRET)
     return {"access_token": session_token, "token_type": "bearer"}
 
 @app.get("/ships", response_model=List[Ship])
@@ -365,9 +633,7 @@ async def list_ships(request: Request):
         params = []
 
     res = await db.prepare(sql).bind(*params).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     ships = []
     for row in results:
@@ -462,14 +728,13 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
     """
 
     res = await db.prepare(sql).bind(user.id, ship_id, user.id, user.id, user.id).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         # Check if ship exists
         check = await db.prepare("SELECT 1 FROM ships WHERE id = ?").bind(ship_id).all()
-        if not check.results:
+        check_results = safe_results(check)
+        if not check_results:
             raise HTTPException(status_code=404, detail="Ship not found")
         raise HTTPException(status_code=403, detail="Not authorized")
 
@@ -488,6 +753,10 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
         ship_id, share_req.grantee_id, share_req.grantee_type, share_req.access_level
     ).run()
 
+    return {"status": "ok"}
+
+@app.get("/health")
+async def health():
     return {"status": "ok"}
 
 # --- Worker Entry Point ---

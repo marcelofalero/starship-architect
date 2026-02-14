@@ -23,16 +23,20 @@ This project uses Docker Compose to provide a full-stack local development envir
    This will start:
    - **Frontend App**: `http://localhost:8080` (Nginx serving `public/` + API Proxy)
    - **Backend Service**: `http://localhost:8787` (Cloudflare Worker with D1)
+   - **Tests**: Runs integration tests automatically.
 
-2. **Initialize the local database:**
+   The database schema is applied automatically on startup.
 
-   Wait for the backend service to be fully up (check `docker compose logs backend`), then apply the schema:
+2. **Access the App:**
+   Open `http://localhost:8080` in your browser.
 
-   ```bash
-   docker compose exec backend wrangler d1 execute swse-db --local --file=schema.sql
-   ```
+### Running Tests
 
-   This creates the necessary tables (`users`, `ships`, `permissions`, etc.) in the local SQLite database managed by Wrangler inside the container.
+Tests run automatically when `docker compose up` is called. To run them manually:
+
+```bash
+docker compose run --rm tests
+```
 
 ### Architecture
 
