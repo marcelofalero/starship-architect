@@ -12,17 +12,18 @@ import secrets
 import os
 import base64
 import traceback
+import sys
 
 # --- ASGI Adapter ---
 
 async def asgi_fetch(app, request, env):
     try:
+        print(f"DEBUG: Handling request {request.method} {request.url}", flush=True)
         # Parse URL
         url = js.URL.new(request.url)
 
         # Parse headers
         headers = []
-        # request.headers is a Headers object. Iterate over entries.
         try:
             iterator = request.headers.entries()
             while True:
@@ -31,8 +32,8 @@ async def asgi_fetch(app, request, env):
                     break
                 key, value = entry.value
                 headers.append((key.encode("latin-1"), value.encode("latin-1")))
-        except Exception:
-            # Fallback or empty if iteration fails
+        except Exception as e:
+            print(f"DEBUG: Header parsing error: {e}", flush=True)
             pass
 
         # Read body
@@ -86,16 +87,20 @@ async def asgi_fetch(app, request, env):
             for k, v in response["headers"]:
                 resp_headers.append(k.decode("latin-1"), v.decode("latin-1"))
 
+        # Create Response options object
+        resp_init = js.Object.new()
+        resp_init.headers = resp_headers
+        resp_init.status = response.get("status", 200)
+        resp_init.statusText = ""
+
         # Return Response
         return js.Response.new(
-            response.get("body", b"").decode("utf-8"), # Simplified: assume text/json
-            headers=resp_headers,
-            status=response.get("status", 200),
-            statusText=""
+            response.get("body", b"").decode("utf-8"),
+            resp_init
         )
-    except Exception as e:
-        print(f"Internal Server Error: {e}")
-        traceback.print_exc()
+    except BaseException as e:
+        print(f"Internal Server Error: {e}", flush=True)
+        traceback.print_exc(file=sys.stdout)
         return js.Response.new(
             "Internal Server Error",
             status=500,
@@ -113,7 +118,30 @@ async def get_env(request: Request):
 
 async def get_db(request: Request):
     env = await get_env(request)
+    print(f"DEBUG: Accessing DB from env: {env}", flush=True)
+    if not hasattr(env, 'DB'):
+        print("DEBUG: env.DB is missing!", flush=True)
     return env.DB
+
+def safe_results(res):
+    """Safely extract results from D1 result object."""
+    # Check if res is valid
+    if not res:
+        return []
+
+    # Try to access results property
+    try:
+        results = res.results
+    except Exception:
+        results = None
+
+    if results is None:
+        return []
+
+    # Convert from JS proxy if needed
+    if hasattr(results, 'to_py'):
+        return results.to_py()
+    return results
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -214,7 +242,7 @@ async def verify_rs256_token(token: str, client_id: str):
         return None
 
     except Exception as e:
-        print(f"RS256 verification error: {e}")
+        print(f"RS256 verification error: {e}", flush=True)
         return None
 
 async def sign_hs256_token(payload: dict, secret: str) -> str:
@@ -253,7 +281,7 @@ async def sign_hs256_token(payload: dict, secret: str) -> str:
 
         return f"{header_b64}.{payload_b64}.{signature_b64}"
     except Exception as e:
-        print(f"HS256 signing error: {e}")
+        print(f"HS256 signing error: {e}", flush=True)
         return ""
 
 async def verify_hs256_token(token: str, secret: str):
@@ -304,7 +332,7 @@ async def verify_hs256_token(token: str, secret: str):
         return None
 
     except Exception as e:
-        print(f"HS256 verification error: {e}")
+        print(f"HS256 verification error: {e}", flush=True)
         return None
 
 # --- Models ---
@@ -369,7 +397,7 @@ async def get_jwks():
         jwks_cache["expiry"] = now + 3600
         return jwks_cache["keys"]
     except Exception as e:
-        print(f"Failed to fetch JWKS: {e}")
+        print(f"Failed to fetch JWKS: {e}", flush=True)
         return None
 
 async def get_current_user(request: Request) -> Optional[User]:
@@ -388,16 +416,22 @@ async def get_current_user(request: Request) -> Optional[User]:
 
 @app.post("/auth/register")
 async def register(user_req: RegisterUser, request: Request):
+    print("DEBUG: Entering register endpoint", flush=True)
     db = await get_db(request)
 
     # Check if user exists
+    print(f"DEBUG: Checking for existing user {user_req.email}", flush=True)
     res = await db.prepare("SELECT id FROM users WHERE email = ?").bind(user_req.email).all()
-    if res.results:
+    results = safe_results(res)
+
+    if results:
+        print("DEBUG: User already exists", flush=True)
         raise HTTPException(status_code=400, detail="User already exists")
 
     user_id = str(uuid.uuid4())
     pw_hash = hash_password(user_req.password)
 
+    print("DEBUG: Creating new user", flush=True)
     await db.prepare("INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)").bind(
         user_id, user_req.email, user_req.name, pw_hash
     ).run()
@@ -410,9 +444,7 @@ async def login(login_req: LoginUser, request: Request):
     env = await get_env(request)
 
     res = await db.prepare("SELECT * FROM users WHERE email = ?").bind(login_req.email).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -452,16 +484,12 @@ async def auth_google(token: str, request: Request):
 
     # Upsert user
     res = await db.prepare("SELECT * FROM users WHERE id = ?").bind(user_id).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         # Check by email
         res_email = await db.prepare("SELECT * FROM users WHERE email = ?").bind(email).all()
-        email_results = res_email.results
-        if hasattr(email_results, 'to_py'):
-            email_results = email_results.to_py()
+        email_results = safe_results(res_email)
 
         if email_results:
             user_row = email_results[0]
@@ -512,9 +540,7 @@ async def list_ships(request: Request):
         params = []
 
     res = await db.prepare(sql).bind(*params).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     ships = []
     for row in results:
@@ -609,14 +635,13 @@ async def share_ship(ship_id: str, share_req: ShareShip, request: Request):
     """
 
     res = await db.prepare(sql).bind(user.id, ship_id, user.id, user.id, user.id).all()
-    results = res.results
-    if hasattr(results, 'to_py'):
-        results = results.to_py()
+    results = safe_results(res)
 
     if not results:
         # Check if ship exists
         check = await db.prepare("SELECT 1 FROM ships WHERE id = ?").bind(ship_id).all()
-        if not check.results:
+        check_results = safe_results(check)
+        if not check_results:
             raise HTTPException(status_code=404, detail="Ship not found")
         raise HTTPException(status_code=403, detail="Not authorized")
 
