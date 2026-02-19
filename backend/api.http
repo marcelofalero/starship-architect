@@ -1,0 +1,63 @@
+@host = http://localhost:8787
+@token = {{login.response.body.access_token}}
+
+### Health Check
+GET {{host}}/health
+
+### Register User
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "securepassword123",
+  "name": "Test User"
+}
+
+### Login User
+# @name login
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "securepassword123"
+}
+
+### Google Auth (Mock Token)
+GET {{host}}/auth/google?token=mock_google_id_token
+
+### List Public Ships
+GET {{host}}/ships
+
+### List My Ships (Authenticated)
+GET {{host}}/ships
+Authorization: Bearer {{token}}
+
+### Create Ship
+# @name createShip
+POST {{host}}/ships
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "My Custom Freighter",
+  "visibility": "private",
+  "data": {
+    "hull": "freighter",
+    "speed": 80,
+    "cargo": 5000
+  }
+}
+
+### Share Ship
+@shipId = {{createShip.response.body.id}}
+PATCH {{host}}/ships/{{shipId}}/share
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "grantee_id": "another-user-uuid",
+  "grantee_type": "user",
+  "access_level": "read"
+}
