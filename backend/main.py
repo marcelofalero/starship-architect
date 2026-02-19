@@ -247,7 +247,7 @@ def base64url_decode(input: str) -> bytes:
 def base64url_encode(input: bytes) -> str:
     return base64.urlsafe_b64encode(input).rstrip(b"=").decode("utf-8")
 
-async def verify_rs256_token(token: str, client_id: str):
+async def verify_rs256_token(token: str, client_id: str, valid_issuers: List[str]):
     try:
         parts = token.split(".")
         if len(parts) != 3:
@@ -257,6 +257,10 @@ async def verify_rs256_token(token: str, client_id: str):
 
         header = json.loads(base64url_decode(header_b64))
         payload = json.loads(base64url_decode(payload_b64))
+
+        # Verify issuer
+        if payload.get("iss") not in valid_issuers:
+            return None
 
         # Verify audience
         if payload.get("aud") != client_id:
@@ -565,7 +569,8 @@ async def login(login_req: LoginUser, request: Request):
 @app.get("/auth/google")
 async def auth_google(token: str, request: Request):
     env = await get_env(request)
-    payload = await verify_rs256_token(token, env.GOOGLE_CLIENT_ID)
+    valid_issuers = ["https://accounts.google.com", "accounts.google.com"]
+    payload = await verify_rs256_token(token, env.GOOGLE_CLIENT_ID, valid_issuers)
     if not payload:
         raise HTTPException(status_code=400, detail="Invalid token")
 
