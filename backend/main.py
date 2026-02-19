@@ -137,7 +137,6 @@ def safe_results(res):
     # Try to access results property
     try:
         results = res.results
-        print(f"DEBUG: res.results: {results}", flush=True)
     except Exception as e:
         print(f"DEBUG: Failed to access res.results: {e}", flush=True)
         results = None
@@ -153,6 +152,12 @@ def safe_results(res):
             return py_results
     except Exception as e:
         print(f"DEBUG: to_py() failed: {e}", flush=True)
+
+    try:
+        if results is not None:
+            print(f"DEBUG: res.results (raw): {js.JSON.stringify(results)}", flush=True)
+    except:
+        print(f"DEBUG: res.results (raw): {results}", flush=True)
 
     return results
 
