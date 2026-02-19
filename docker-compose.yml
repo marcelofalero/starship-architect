@@ -30,9 +30,10 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - backend
+      - frontend
     environment:
       - BASE_URL=http://backend:8787
-    command: sh -c "python wait_for_api.py && pytest"
+    command: sh -c "python wait_for_api.py && pytest --base-url http://frontend"
 
 volumes:
   wrangler-state:
