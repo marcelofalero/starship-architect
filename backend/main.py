@@ -12,6 +12,7 @@ import os
 import base64
 import traceback
 import sys
+import hashlib
 
 # --- ASGI Adapter ---
 
@@ -161,86 +162,100 @@ def safe_results(res):
 
     return results
 
-# --- Password Hashing (Web Crypto) ---
+# --- Password Hashing (Web Crypto & Scrypt) ---
 
 async def hash_password(password: str) -> str:
-    print(f"DEBUG: hashing password...", flush=True)
+    # 1. Try Scrypt (Primary, Secure)
     try:
-        enc = js.TextEncoder.new()
-        password_key = await js.crypto.subtle.importKey(
-            "raw",
-            enc.encode(password),
-            js.JSON.parse('{"name": "PBKDF2"}'),
-            False,
-            js.JSON.parse('["deriveBits", "deriveKey"]')
-        )
+        if hasattr(hashlib, 'scrypt'):
+            salt = os.urandom(16)
+            # N=4096, r=8, p=1 (~4MB RAM) to avoid memory crashes on Workers
+            n, r, p = 4096, 8, 1
+            dk = hashlib.scrypt(password.encode(), salt=salt, n=n, r=r, p=p)
+            salt_hex = salt.hex()
+            hash_hex = dk.hex()
+            return f"scrypt${n}${r}${p}${salt_hex}${hash_hex}"
+    except Exception:
+        pass
 
-        # Generate salt using os.urandom (supported in Pyodide usually)
-        # or js.crypto.getRandomValues if python random is flaky
-        salt_js = js.Uint8Array.new(16)
-        js.crypto.getRandomValues(salt_js)
-        salt_bytes = bytes(salt_js)
-        salt_hex = salt_bytes.hex()
-
-        # Derive bits
-        algo = js.Object.new()
-        algo.name = "PBKDF2"
-        algo.salt = salt_js
-        algo.iterations = 100000
-        algo.hash = "SHA-256"
-
-        derived_bits = await js.crypto.subtle.deriveBits(
-            algo,
-            password_key,
-            256
-        )
-
-        hash_bytes = bytes(js.Uint8Array.new(derived_bits))
-        hash_hex = hash_bytes.hex()
-
-        print(f"DEBUG: password hashed successfully", flush=True)
-        return f"{salt_hex}${hash_hex}"
+    # 2. Fallback to PBKDF2 (hashlib)
+    try:
+        salt = os.urandom(16)
+        salt_hex = salt.hex()
+        # 10,000 iterations is a safe bet for Workers (much faster than 100k)
+        iterations = 10000
+        dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, iterations)
+        hash_hex = dk.hex()
+        return f"pbkdf2${iterations}${salt_hex}${hash_hex}"
     except Exception as e:
-        print(f"DEBUG: hash_password failed: {e}", flush=True)
+        print(f"Hash password failed: {e}", flush=True)
         raise e
 
 async def verify_password(stored_password: str, provided_password: str) -> bool:
     try:
-        if not stored_password or '$' not in stored_password:
+        if not stored_password:
             return False
-        salt_hex, stored_hash_hex = stored_password.split('$')
 
+        parts = stored_password.split('$')
+
+        # Scrypt Verification: scrypt$n$r$p$salt$hash
+        if len(parts) == 6 and parts[0] == 'scrypt':
+            try:
+                n, r, p = int(parts[1]), int(parts[2]), int(parts[3])
+                salt_hex = parts[4]
+                stored_hash_hex = parts[5]
+
+                if hasattr(hashlib, 'scrypt'):
+                    salt = bytes.fromhex(salt_hex)
+                    dk = hashlib.scrypt(provided_password.encode(), salt=salt, n=n, r=r, p=p)
+                    return secrets.compare_digest(stored_hash_hex, dk.hex())
+            except Exception:
+                pass
+            return False
+
+        # PBKDF2 Verification: pbkdf2$iterations$salt$hash
+        elif len(parts) == 4 and parts[0] == 'pbkdf2':
+            try:
+                iterations = int(parts[1])
+                salt_hex = parts[2]
+                stored_hash_hex = parts[3]
+            except ValueError:
+                return False
+
+        # Legacy PBKDF2 Verification (100k): salt$hash
+        elif len(parts) == 2:
+            salt_hex, stored_hash_hex = parts
+            iterations = 100000
+
+        # Intermediate Scrypt format (from previous patch attempt): scrypt$salt$hash (Assume N=4096)
+        elif len(parts) == 3 and parts[0] == 'scrypt':
+            try:
+                salt_hex = parts[1]
+                stored_hash_hex = parts[2]
+                if hasattr(hashlib, 'scrypt'):
+                    salt = bytes.fromhex(salt_hex)
+                    dk = hashlib.scrypt(provided_password.encode(), salt=salt, n=4096, r=8, p=1)
+                    return secrets.compare_digest(stored_hash_hex, dk.hex())
+            except Exception:
+                pass
+            return False
+
+        # Intermediate PBKDF2 format (from previous patch attempt): pbkdf2$salt$hash (Assume 10000)
+        elif len(parts) == 3 and parts[0] == 'pbkdf2':
+             salt_hex, stored_hash_hex = parts[1], parts[2]
+             iterations = 10000
+
+        else:
+            return False
+
+        # Perform PBKDF2 Verification (using hashlib for stability)
         salt_bytes = bytes.fromhex(salt_hex)
-        salt_js = js.Uint8Array.new(salt_bytes)
+        dk = hashlib.pbkdf2_hmac('sha256', provided_password.encode(), salt_bytes, iterations)
+        hash_hex = dk.hex()
 
-        enc = js.TextEncoder.new()
-        password_key = await js.crypto.subtle.importKey(
-            "raw",
-            enc.encode(provided_password),
-            js.JSON.parse('{"name": "PBKDF2"}'),
-            False,
-            js.JSON.parse('["deriveBits", "deriveKey"]')
-        )
-
-        algo = js.Object.new()
-        algo.name = "PBKDF2"
-        algo.salt = salt_js
-        algo.iterations = 100000
-        algo.hash = "SHA-256"
-
-        derived_bits = await js.crypto.subtle.deriveBits(
-            algo,
-            password_key,
-            256
-        )
-
-        hash_bytes = bytes(js.Uint8Array.new(derived_bits))
-        hash_hex = hash_bytes.hex()
-
-        # Constant time compare (secrets module is good for this)
         return secrets.compare_digest(stored_hash_hex, hash_hex)
     except Exception as e:
-        print(f"DEBUG: verify_password failed: {e}", flush=True)
+        print(f"Verify password failed: {e}", flush=True)
         return False
 
 # --- Web Crypto JWT Implementation ---
