@@ -5,19 +5,22 @@ FROM golang:1.24-alpine
 # ca-certificates: for HTTPS requests
 # curl: for healthchecks
 # nodejs/npm: for wrangler
-# Using a single RUN command to minimize layers and avoid overlayfs issues
+# bash: for entrypoint script (Alpine uses ash by default)
 RUN apk add --no-cache \
     git \
     ca-certificates \
     curl \
     nodejs \
-    npm
+    npm \
+    bash
 
+# Install Wrangler globally
 RUN npm install -g wrangler
 
 WORKDIR /app
 
 # Copy entrypoint script
+# Use a destination path that won't be masked by volumes
 COPY backend-go/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
