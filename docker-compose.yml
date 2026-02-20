@@ -2,13 +2,13 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
-    working_dir: /app/backend
+      dockerfile: backend-go/Dockerfile
+    working_dir: /app/backend-go
     ports:
       - "8787:8787"
     volumes:
       - .:/app
-      - wrangler-state:/app/backend/.wrangler
+      - wrangler-state:/app/backend-go/.wrangler
     environment:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret

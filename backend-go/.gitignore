@@ -1,0 +1,5 @@
+build/app.wasm
+.wrangler/
+*.wasm
+node_modules/
+wrangler.log

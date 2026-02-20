@@ -1,0 +1,17 @@
+name = "swse-backend-go"
+main = "build/worker.mjs"
+compatibility_date = "2024-04-01"
+
+[vars]
+GOOGLE_CLIENT_ID = "mock_google_id"
+SESSION_SECRET = "mock_session_secret"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "swse-db"
+database_id = "local-db-id"
+
+[[rules]]
+  type = "CompiledWasm"
+  globs = ["**/*.wasm"]
+  fallthrough = true
