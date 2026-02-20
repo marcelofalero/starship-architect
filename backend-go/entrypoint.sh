@@ -7,7 +7,10 @@ if [ ! -f schema.sql ]; then
 fi
 
 echo "Building Go application..."
-GOOS=js GOARCH=wasm go build -buildvcs=false -o build/app.wasm .
+# Only rebuild if the binary doesn't exist (e.g., volume mount overriding) or if source has changed (optional check, but simple existence is good for now)
+if [ ! -f build/app.wasm ]; then
+    GOOS=js GOARCH=wasm go build -buildvcs=false -o build/app.wasm .
+fi
 
 echo "Initializing D1 database..."
 # Check if DB exists locally or just execute?

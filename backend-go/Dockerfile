@@ -14,7 +14,6 @@ RUN apk add --no-cache \
 RUN npm install -g wrangler
 
 # Create a non-root user (appuser) with UID/GID 1000
-# (Usually matches the first user on most Linux distros)
 RUN groupadd -g 1000 appuser && \
     useradd -u 1000 -g appuser -m -s /bin/bash appuser
 
@@ -28,15 +27,15 @@ RUN chmod +x /usr/local/bin/entrypoint.sh && \
     chown appuser:appuser /usr/local/bin/entrypoint.sh
 
 # Create the backend-go directory to ensure permissions are correct when mounting
-# (though docker volume mount overrides permissions usually, creating it first helps)
 RUN mkdir -p /app/backend-go && chown -R appuser:appuser /app/backend-go
 
-EXPOSE 8787
-
-# Switch to non-root user
+# Copy source and build the application inside the image
+# This binary will be used unless overridden by a volume mount
 USER appuser
-
-# Set working directory
 WORKDIR /app/backend-go
+COPY --chown=appuser:appuser backend-go/ .
+RUN GOOS=js GOARCH=wasm go build -buildvcs=false -o build/app.wasm .
+
+EXPOSE 8787
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
