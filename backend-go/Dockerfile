@@ -1,17 +1,18 @@
-FROM golang:alpine
+FROM golang:1.24-alpine
 
-# Install Node.js, NPM, CA certificates, and Git
-# nodejs/npm: Required for Wrangler
-# ca-certificates: Required for HTTPS requests (e.g. Google Auth, JWKS)
-# git: Required for 'go get' and module fetching
+# Install build dependencies, Node.js, and CA certificates
+# git: for go mod download
+# ca-certificates: for HTTPS requests
+# curl: for healthchecks
+# nodejs/npm: for wrangler
+# Using a single RUN command to minimize layers and avoid overlayfs issues
 RUN apk add --no-cache \
-    nodejs \
-    npm \
-    ca-certificates \
     git \
-    curl
+    ca-certificates \
+    curl \
+    nodejs \
+    npm
 
-# Install Wrangler globally
 RUN npm install -g wrangler
 
 WORKDIR /app
@@ -22,7 +23,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 8787
 
-# Set working directory to the module root
+# Set working directory to where the Go module lives
 WORKDIR /app/backend-go
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
