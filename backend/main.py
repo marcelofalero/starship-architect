@@ -162,19 +162,30 @@ def safe_results(res):
 
     return results
 
-# --- Password Hashing (Hashlib PBKDF2) ---
+# --- Password Hashing (Web Crypto & Scrypt) ---
 
 async def hash_password(password: str) -> str:
+    # 1. Try Scrypt (Primary, Secure)
     try:
-        # Use hashlib (native C extension) for stable performance
-        # 10,000 iterations is a reasonable balance for Worker constraints
-        iterations = 10000
-        salt = secrets.token_bytes(16)
-        salt_hex = salt.hex()
+        if hasattr(hashlib, 'scrypt'):
+            salt = os.urandom(16)
+            # N=4096, r=8, p=1 (~4MB RAM) to avoid memory crashes on Workers
+            n, r, p = 4096, 8, 1
+            dk = hashlib.scrypt(password.encode(), salt=salt, n=n, r=r, p=p)
+            salt_hex = salt.hex()
+            hash_hex = dk.hex()
+            return f"scrypt${n}${r}${p}${salt_hex}${hash_hex}"
+    except Exception:
+        pass
 
+    # 2. Fallback to PBKDF2 (hashlib)
+    try:
+        salt = os.urandom(16)
+        salt_hex = salt.hex()
+        # 10,000 iterations is a safe bet for Workers (much faster than 100k)
+        iterations = 10000
         dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, iterations)
         hash_hex = dk.hex()
-
         return f"pbkdf2${iterations}${salt_hex}${hash_hex}"
     except Exception as e:
         print(f"Hash password failed: {e}", flush=True)
@@ -187,22 +198,8 @@ async def verify_password(stored_password: str, provided_password: str) -> bool:
 
         parts = stored_password.split('$')
 
-        # PBKDF2 Verification: pbkdf2$iterations$salt$hash
-        if len(parts) == 4 and parts[0] == 'pbkdf2':
-            try:
-                iterations = int(parts[1])
-                salt_hex = parts[2]
-                stored_hash_hex = parts[3]
-            except ValueError:
-                return False
-
-        # Legacy PBKDF2 Verification (100k): salt$hash
-        elif len(parts) == 2:
-            salt_hex, stored_hash_hex = parts
-            iterations = 100000
-
-        # Legacy Scrypt format (if any exist): scrypt$n$r$p$salt$hash
-        elif len(parts) == 6 and parts[0] == 'scrypt':
+        # Scrypt Verification: scrypt$n$r$p$salt$hash
+        if len(parts) == 6 and parts[0] == 'scrypt':
             try:
                 n, r, p = int(parts[1]), int(parts[2]), int(parts[3])
                 salt_hex = parts[4]
@@ -216,7 +213,21 @@ async def verify_password(stored_password: str, provided_password: str) -> bool:
                 pass
             return False
 
-        # Intermediate/Test Scrypt format: scrypt$salt$hash (Assume N=4096)
+        # PBKDF2 Verification: pbkdf2$iterations$salt$hash
+        elif len(parts) == 4 and parts[0] == 'pbkdf2':
+            try:
+                iterations = int(parts[1])
+                salt_hex = parts[2]
+                stored_hash_hex = parts[3]
+            except ValueError:
+                return False
+
+        # Legacy PBKDF2 Verification (100k): salt$hash
+        elif len(parts) == 2:
+            salt_hex, stored_hash_hex = parts
+            iterations = 100000
+
+        # Intermediate Scrypt format (from previous patch attempt): scrypt$salt$hash (Assume N=4096)
         elif len(parts) == 3 and parts[0] == 'scrypt':
             try:
                 salt_hex = parts[1]
@@ -229,7 +240,7 @@ async def verify_password(stored_password: str, provided_password: str) -> bool:
                 pass
             return False
 
-        # Intermediate PBKDF2 format: pbkdf2$salt$hash (Assume 10000)
+        # Intermediate PBKDF2 format (from previous patch attempt): pbkdf2$salt$hash (Assume 10000)
         elif len(parts) == 3 and parts[0] == 'pbkdf2':
              salt_hex, stored_hash_hex = parts[1], parts[2]
              iterations = 10000
