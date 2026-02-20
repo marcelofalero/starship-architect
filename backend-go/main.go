@@ -17,7 +17,7 @@ var db *sql.DB
 //go:embed docs/openapi.yaml
 var openAPIContent []byte
 
-//go:embed docs/api.html
+//go:embed docs/index.html
 var apiHTMLContent []byte
 
 func main() {

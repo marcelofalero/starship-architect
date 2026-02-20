@@ -34,7 +34,15 @@ services:
       - frontend
     environment:
       - BASE_URL=http://backend:8787
+      - HEADLESS=true
     command: sh -c "python wait_for_api.py && pytest --base-url http://frontend"
+
+  swagger:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend-go/docs:/usr/share/nginx/html:ro
 
 volumes:
   wrangler-state:

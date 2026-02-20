@@ -1,5 +1,14 @@
 import pytest
+import os
 from playwright.sync_api import Page
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    headless = os.environ.get("HEADLESS", "false").lower() == "true"
+    return {
+        **browser_type_launch_args,
+        "headless": headless,
+    }
 
 @pytest.fixture(scope="function", autouse=True)
 def disable_tutorial(page: Page):
