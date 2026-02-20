@@ -27,6 +27,10 @@ Content-Type: application/json
 ### Google Auth (Mock Token)
 GET {{host}}/auth/google?token=mock_google_id_token
 
+# ==========================================
+# Ships
+# ==========================================
+
 ### List Public Ships
 GET {{host}}/ships
 
@@ -44,9 +48,26 @@ Content-Type: application/json
   "name": "My Custom Freighter",
   "visibility": "private",
   "data": {
-    "hull": "freighter",
-    "speed": 80,
-    "cargo": 5000
+    "configuration": { "hull": "freighter", "speed": 80, "cargo": 5000 },
+    "manifest": []
+  }
+}
+
+### Get Ship
+GET {{host}}/ships/{{createShip.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Update Ship
+PUT {{host}}/ships/{{createShip.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Freighter",
+  "visibility": "public",
+  "data": {
+    "configuration": { "hull": "freighter", "speed": 90, "cargo": 6000 },
+    "manifest": []
   }
 }
 
@@ -61,3 +82,142 @@ Content-Type: application/json
   "grantee_type": "user",
   "access_level": "read"
 }
+
+### Delete Ship
+DELETE {{host}}/ships/{{shipId}}
+Authorization: Bearer {{token}}
+
+# ==========================================
+# Libraries
+# ==========================================
+
+### List Libraries
+GET {{host}}/libraries
+Authorization: Bearer {{token}}
+
+### Create Library
+# @name createLibrary
+POST {{host}}/libraries
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "My Components Library",
+  "visibility": "private",
+  "data": {
+    "components": [
+      { "id": "custom-laser", "name": "Enhanced Laser", "damage": "3d10x2" }
+    ],
+    "ships": []
+  }
+}
+
+### Get Library
+GET {{host}}/libraries/{{createLibrary.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Update Library
+PUT {{host}}/libraries/{{createLibrary.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "My Updated Library",
+  "visibility": "group",
+  "data": {
+    "components": [],
+    "ships": []
+  }
+}
+
+### Delete Library
+DELETE {{host}}/libraries/{{createLibrary.response.body.id}}
+Authorization: Bearer {{token}}
+
+# ==========================================
+# Hangars
+# ==========================================
+
+### List Hangars
+GET {{host}}/hangars
+Authorization: Bearer {{token}}
+
+### Create Hangar
+# @name createHangar
+POST {{host}}/hangars
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rebel Base Hangar",
+  "visibility": "private",
+  "data": {
+    "ships": [
+      { "id": "x-wing-01", "name": "Red 5" }
+    ]
+  }
+}
+
+### Get Hangar
+GET {{host}}/hangars/{{createHangar.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Update Hangar
+PUT {{host}}/hangars/{{createHangar.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rebel Hangar (Expanded)",
+  "visibility": "private",
+  "data": {
+    "ships": []
+  }
+}
+
+### Delete Hangar
+DELETE {{host}}/hangars/{{createHangar.response.body.id}}
+Authorization: Bearer {{token}}
+
+# ==========================================
+# Configurations
+# ==========================================
+
+### List Configurations
+GET {{host}}/configurations
+Authorization: Bearer {{token}}
+
+### Create Configuration
+# @name createConfig
+POST {{host}}/configurations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Campaign Ruleset",
+  "visibility": "public",
+  "data": {
+    "rules": { "legacy": true, "house_rules": ["no_force_points"] }
+  }
+}
+
+### Get Configuration
+GET {{host}}/configurations/{{createConfig.response.body.id}}
+Authorization: Bearer {{token}}
+
+### Update Configuration
+PUT {{host}}/configurations/{{createConfig.response.body.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Campaign Ruleset v2",
+  "visibility": "public",
+  "data": {
+    "rules": { "legacy": false }
+  }
+}
+
+### Delete Configuration
+DELETE {{host}}/configurations/{{createConfig.response.body.id}}
+Authorization: Bearer {{token}}

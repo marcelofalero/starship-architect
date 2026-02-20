@@ -22,10 +22,11 @@ CREATE TABLE IF NOT EXISTS group_members (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS ships (
+CREATE TABLE IF NOT EXISTS resources (
     id TEXT PRIMARY KEY,
     owner_id TEXT NOT NULL,
     name TEXT,
+    type TEXT DEFAULT 'ship' CHECK(type IN ('ship', 'library', 'hangar', 'config')),
     data TEXT CHECK(json_valid(data)),
     visibility TEXT DEFAULT 'private' CHECK(visibility IN ('private', 'group', 'public')),
     created_at INTEGER DEFAULT (unixepoch()),
@@ -40,11 +41,11 @@ CREATE TABLE IF NOT EXISTS permissions (
     access_level TEXT NOT NULL CHECK(access_level IN ('read', 'write', 'admin')),
     created_at INTEGER DEFAULT (unixepoch()),
     PRIMARY KEY (target_id, grantee_id, grantee_type),
-    FOREIGN KEY (target_id) REFERENCES ships(id) ON DELETE CASCADE
+    FOREIGN KEY (target_id) REFERENCES resources(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER IF NOT EXISTS update_ships_timestamp
-AFTER UPDATE ON ships
+CREATE TRIGGER IF NOT EXISTS update_resources_timestamp
+AFTER UPDATE ON resources
 BEGIN
-    UPDATE ships SET updated_at = unixepoch() WHERE id = OLD.id;
+    UPDATE resources SET updated_at = unixepoch() WHERE id = OLD.id;
 END;
