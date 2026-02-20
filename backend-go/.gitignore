@@ -1,5 +1,12 @@
-build/app.wasm
+build/
 .wrangler/
 *.wasm
 node_modules/
 wrangler.log
+entrypoint.sh
+*.sql
+*.toml
+Makefile
+go.sum
+go.mod
+Dockerfile

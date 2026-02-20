@@ -12,6 +12,8 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret
+      - WRANGLER_LOG=debug
+    user: "${UID:-1000}:${GID:-1000}"
     # Entrypoint is handled by Dockerfile now
 
   frontend:

@@ -17,4 +17,4 @@ echo "Initializing D1 database..."
 wrangler d1 execute swse-db --local --file=schema.sql
 
 echo "Starting wrangler dev..."
-exec wrangler dev --local --ip 0.0.0.0 --port 8787
+exec wrangler dev --local --ip 0.0.0.0 --port 8787 --log-level debug
