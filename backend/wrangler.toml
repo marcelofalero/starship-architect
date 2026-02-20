@@ -14,4 +14,4 @@ SESSION_SECRET = "mock_session_secret"
 [[d1_databases]]
 binding = "DB"
 database_name = "swse-db"
-database_id = "local-db-id"
+database_id = "550e8400-e29b-41d4-a716-446655440000"

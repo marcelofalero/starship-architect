@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS permissions (
 
 CREATE TRIGGER IF NOT EXISTS update_ships_timestamp
 AFTER UPDATE ON ships
+FOR EACH ROW
+WHEN NEW.updated_at <= OLD.updated_at -- Only fire if updated_at wasn't already manually bumped
 BEGIN
-    UPDATE ships SET updated_at = unixepoch() WHERE id = OLD.id;
+UPDATE ships SET updated_at = unixepoch() WHERE id = OLD.id;
 END;

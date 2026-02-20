@@ -12,12 +12,13 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret
-    # Entrypoint is handled by Dockerfile now
+      - WRANGLER_LOG=info
+      - WRANGLER_SEND_METRICS=false
 
   frontend:
     image: nginx:alpine
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - ./public:/usr/share/nginx/html
       - ./backend-go/nginx.conf:/etc/nginx/conf.d/default.conf
