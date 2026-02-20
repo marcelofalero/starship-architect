@@ -221,13 +221,16 @@ func generateUUID() string {
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			// No token, proceed as anonymous (handlers might check user)
+		parts := strings.Fields(authHeader)
+
+		// Check for Bearer token (case-insensitive)
+		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+			// No token or invalid format, proceed as anonymous
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenString := parts[1]
 		secret := os.Getenv("SESSION_SECRET")
 		claims, err := verifyHS256Token(tokenString, secret)
 
