@@ -35,9 +35,37 @@ func main() {
 	r.Post("/auth/login", loginHandler)
 	r.Get("/auth/google", authGoogleHandler)
 
-	r.Get("/ships", listShipsHandler)
-	r.Post("/ships", createShipHandler)
-	r.Patch("/ships/{shipID}/share", shareShipHandler)
+	// Ships
+	r.Get("/ships", listResourcesHandler("ship"))
+	r.Post("/ships", createResourceHandler("ship"))
+	r.Get("/ships/{resourceID}", getResourceHandler)
+	r.Put("/ships/{resourceID}", updateResourceHandler)
+	r.Delete("/ships/{resourceID}", deleteResourceHandler)
+	r.Patch("/ships/{resourceID}/share", shareResourceHandler)
+
+	// Libraries
+	r.Get("/libraries", listResourcesHandler("library"))
+	r.Post("/libraries", createResourceHandler("library"))
+	r.Get("/libraries/{resourceID}", getResourceHandler)
+	r.Put("/libraries/{resourceID}", updateResourceHandler)
+	r.Delete("/libraries/{resourceID}", deleteResourceHandler)
+	r.Patch("/libraries/{resourceID}/share", shareResourceHandler)
+
+	// Hangars
+	r.Get("/hangars", listResourcesHandler("hangar"))
+	r.Post("/hangars", createResourceHandler("hangar"))
+	r.Get("/hangars/{resourceID}", getResourceHandler)
+	r.Put("/hangars/{resourceID}", updateResourceHandler)
+	r.Delete("/hangars/{resourceID}", deleteResourceHandler)
+	r.Patch("/hangars/{resourceID}/share", shareResourceHandler)
+
+	// Configurations
+	r.Get("/configurations", listResourcesHandler("config"))
+	r.Post("/configurations", createResourceHandler("config"))
+	r.Get("/configurations/{resourceID}", getResourceHandler)
+	r.Put("/configurations/{resourceID}", updateResourceHandler)
+	r.Delete("/configurations/{resourceID}", deleteResourceHandler)
+	r.Patch("/configurations/{resourceID}/share", shareResourceHandler)
 
 	workers.Serve(r)
 }

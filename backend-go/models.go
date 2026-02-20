@@ -21,10 +21,11 @@ type LoginUser struct {
 	Password string `json:"password"`
 }
 
-type Ship struct {
+type Resource struct {
 	ID         string                 `json:"id"`
 	OwnerID    string                 `json:"owner_id"`
 	Name       string                 `json:"name"`
+	Type       string                 `json:"type"`
 	Data       map[string]interface{} `json:"data"`
 	Visibility string                 `json:"visibility"`
 	CreatedAt  int64                  `json:"created_at"`
@@ -32,13 +33,14 @@ type Ship struct {
 	Links      map[string]Link        `json:"_links"`
 }
 
-type CreateShip struct {
+type CreateResource struct {
 	Name       string                 `json:"name"`
+	Type       string                 `json:"type"`
 	Data       map[string]interface{} `json:"data"`
 	Visibility string                 `json:"visibility"`
 }
 
-type ShareShip struct {
+type ShareResource struct {
 	GranteeID   string `json:"grantee_id"`
 	GranteeType string `json:"grantee_type"` // user, group, app
 	AccessLevel string `json:"access_level"` // read, write, admin
