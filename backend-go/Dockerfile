@@ -1,6 +1,8 @@
 FROM golang:1.24-alpine
 
 # Install build dependencies, Node.js, and CA certificates
+# shadow: for user/group management (useradd/groupadd)
+# su-exec: for stepping down from root in entrypoint
 RUN apk add --no-cache \
     git \
     ca-certificates \
@@ -8,7 +10,8 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     bash \
-    shadow
+    shadow \
+    su-exec
 
 # Install Wrangler globally
 RUN npm install -g wrangler
@@ -19,22 +22,26 @@ RUN groupadd -g 1000 appuser && \
 
 # Set up the app directory and permissions
 WORKDIR /app
+# We keep root as the default user so entrypoint can fix permissions
+# But we ensure the directories are owned by appuser initially
 RUN chown -R appuser:appuser /app
 
-# Ensure entrypoint is executable and owned by the user
+# Ensure entrypoint is executable
 COPY backend-go/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh && \
-    chown appuser:appuser /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Create the backend-go directory to ensure permissions are correct when mounting
 RUN mkdir -p /app/backend-go && chown -R appuser:appuser /app/backend-go
 
 # Copy source and build the application inside the image
-# This binary will be used unless overridden by a volume mount
+# We temporarily switch to appuser to build, ensuring artifacts are owned by appuser
 USER appuser
 WORKDIR /app/backend-go
 COPY --chown=appuser:appuser backend-go/ .
 RUN GOOS=js GOARCH=wasm go build -buildvcs=false -o build/app.wasm .
+
+# Switch back to root for entrypoint execution (to fix volume permissions)
+USER root
 
 EXPOSE 8787
 

@@ -13,7 +13,7 @@ services:
       - GOOGLE_CLIENT_ID=dev-mock-client-id
       - SESSION_SECRET=dev-mock-secret
       - WRANGLER_LOG=debug
-    user: "${UID:-1000}:${GID:-1000}"
+    # Entrypoint handles user switching via su-exec, so start as root
     # Entrypoint is handled by Dockerfile now
 
   frontend:
