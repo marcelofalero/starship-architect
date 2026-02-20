@@ -12,6 +12,16 @@ def run():
         page.reload()
         page.wait_for_selector("#app-loading", state="hidden", timeout=10000)
 
+        # Handle Hangar Dialog (Stock Selection)
+        if page.locator("#hangar-dialog-card").is_visible():
+             print("Hangar Dialog visible. Selecting Light Fighter...")
+             # Click 'New Stock' tab
+             page.locator("#hangar-tab-stock").click()
+             page.wait_for_timeout(500)
+             # Click 'Light Fighter' (assuming it's the first or searchable)
+             page.get_by_text("Light Fighter").first.click()
+             page.wait_for_timeout(1000)
+
         # 1. Check initial consumables
         left_drawer = page.locator(".q-drawer--left")
 

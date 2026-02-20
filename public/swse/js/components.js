@@ -231,9 +231,12 @@ const ConfigPanel = {
             <q-select filled dark v-model="store.activeTemplate" :options="templateOptions" :label="$t('ui.template')" emit-value map-options dense options-dense><template v-slot:prepend><q-icon name="layers" /></template></q-select>
         </q-card-section>
 
-        <q-separator dark v-if="store.isAdmin" />
-        <q-card-section v-if="store.isAdmin" class="col-auto">
-             <q-btn outline color="accent" label="Download Data.json" @click="store.downloadDataJson" class="full-width" icon="download" />
+        <q-separator dark v-if="store.isDev" />
+        <q-card-section v-if="store.isDev" class="col-auto">
+             <div class="row q-col-gutter-sm">
+                 <div class="col-6"><q-btn outline color="accent" label="Download Data.json" @click="store.downloadDataJson" class="full-width" icon="download" /></div>
+                 <div class="col-6"><q-btn outline color="negative" label="Factory Reset" @click="store.factoryReset" class="full-width" icon="delete_forever" /></div>
+             </div>
         </q-card-section>
     </q-card>
 
@@ -653,7 +656,7 @@ export const CustomShipDialog = {
                         <div class="col-3">
                             <q-input filled dark v-model.number="newShip.challengeLevel" label="CL" hint="Override" type="number"></q-input>
                         </div>
-                        <div class="col-12" v-if="store.isAdmin">
+                        <div class="col-12" v-if="store.isDev">
                             <q-input filled dark v-model="newShip.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
                         </div>
                     </div>
@@ -803,7 +806,7 @@ export const AddModDialog = {
             <q-card-section>
                 <div class="row items-center justify-between">
                     <div class="text-h6">{{ $t('ui.install_system') }}</div>
-                    <q-btn v-if="store.isAdmin" outline color="primary" label="Create New (Admin)" icon="add" size="sm" @click="createNew" />
+                    <q-btn v-if="store.isDev" outline color="primary" label="Create New (Admin)" icon="add" size="sm" @click="createNew" />
                 </div>
                 <div class="text-caption text-grey">{{ $t('ui.install_caption') }}</div>
             </q-card-section>
@@ -916,8 +919,8 @@ export const AddModDialog = {
                     <div v-if="selectedItemDef.sizeMult && !selectedItemDef.variableCost" class="text-xs text-grey-5 q-mt-xs">* {{ $t('ui.size_mult_msg', { size: store.chassis.size }) }}</div>
                     <div class="row q-gutter-sm q-mt-sm justify-end">
                         <q-btn flat dense icon="open_in_new" label="Wiki" color="info" @click="openWiki"></q-btn>
-                        <q-btn v-if="store.isAdmin" flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
-                        <q-btn v-if="store.isAdmin" flat dense icon="delete" label="Delete" color="negative" @click="deleteComponent"></q-btn>
+                        <q-btn v-if="store.isDev" flat dense icon="code" label="Edit JSON" color="accent" @click="openJsonEditor"></q-btn>
+                        <q-btn v-if="store.isDev" flat dense icon="delete" label="Delete" color="negative" @click="deleteComponent"></q-btn>
                     </div>
                 </q-card>
             </q-card-section>
@@ -1165,7 +1168,7 @@ export const CustomComponentDialog = {
                 <div class="column q-gutter-md">
                     <div><q-select filled dark v-model="store.customDialogState.targetLibraryId" :options="store.libraries.filter(l => l.editable).map(l => ({ label: l.name, value: l.id }))" label="Target Library" emit-value map-options></q-select></div>
                     <div><q-input filled dark v-model="newCustomComponent.name" label="Name"></q-input></div>
-                    <div v-if="store.isAdmin">
+                    <div v-if="store.isDev">
                         <q-input filled dark v-model="newCustomComponent.id" label="ID (Admin)" hint="Leave blank to auto-generate"></q-input>
                         <q-checkbox dark v-model="newCustomComponent.addToCore" label="Save to Core Database" color="accent" class="q-mt-sm"></q-checkbox>
                     </div>
@@ -1331,7 +1334,7 @@ export const CustomComponentDialog = {
                 }
             });
 
-            if (store.isAdmin && newCustomComponent.addToCore) {
+            if (store.isDev && newCustomComponent.addToCore) {
                 store.addEquipment(comp);
                 $q.notify({ type: 'positive', message: 'Saved to Core DB' });
                 store.customDialogState.visible = false;

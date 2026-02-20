@@ -15,7 +15,7 @@ export const useShipStore = defineStore('ship', () => {
     });
 
     // App State
-    const isAdmin = ref(new URLSearchParams(window.location.search).get('admin') === 'true');
+    const isDev = ref(new URLSearchParams(window.location.search).get('dev') === 'true');
     const meta = reactive({ name: 'Untitled Ship', version: '1.0' });
     const chassisId = ref(null);
     const activeTemplate = ref(null);
@@ -1083,6 +1083,13 @@ export const useShipStore = defineStore('ship', () => {
 
     const crewStats = computed(() => CREW_QUALITY_STATS[crewQuality.value] || CREW_QUALITY_STATS['Normal']);
 
+    function factoryReset() {
+        if (confirm("Are you sure you want to clear all local storage? This will delete all your ships and settings.")) {
+            localStorage.clear();
+            window.location.reload();
+        }
+    }
+
     return {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, engineering, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, crewQuality, crewStats, CREW_QUALITY_STATS,
@@ -1093,6 +1100,6 @@ export const useShipStore = defineStore('ship', () => {
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, totalEP, usedEP, remainingEP, epUsagePct, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, sizeMultVal, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity,
         addComponent, addCustomComponent, updateCustomComponent, openCustomDialog, removeComponent, removeCustomComponent, isCustomComponentInstalled, addCustomShip, updateCustomShip, removeCustomShip, openCustomShipDialog, addEquipment, removeEquipment, updateEquipment, downloadDataJson, reset, createNew, loadState, getComponentCost, getComponentEp, getComponentDamage,
         addLibrary, removeLibrary, toggleLibrary, moveLibrary, importLibrary, updateLibrary, damageThreshold, fortitudeDefense, DT_SIZE_MODS,
-        isAdmin, isWeapon, isEngine
+        isDev, factoryReset, isWeapon, isEngine
     };
 });

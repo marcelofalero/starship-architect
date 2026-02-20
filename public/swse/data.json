@@ -150,7 +150,7 @@
         {
             "id": "gunship",
             "name": "Gunship",
-            "name_es": "Cañonera",
+            "name_es": "Ca\u00f1onera",
             "size": "Colossal (transport)",
             "cost": 200000,
             "baseEp": 20,
@@ -492,8 +492,8 @@
     "EQUIPMENT": [
         {
             "id": "laser_light",
-            "name": "Light Laser Cannon",
-            "name_es": "Cañón Láser Ligero",
+            "name": "Laser Cannon, Light",
+            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Ligero",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 1500,
@@ -520,8 +520,8 @@
         },
         {
             "id": "laser_med",
-            "name": "Medium Laser Cannon",
-            "name_es": "Cañón Láser Mediano",
+            "name": "Laser Cannon, Medium",
+            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Mediano",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 4000,
@@ -548,8 +548,8 @@
         },
         {
             "id": "laser_hvy",
-            "name": "Heavy Laser Cannon",
-            "name_es": "Cañón Láser Pesado",
+            "name": "Laser Cannon, Heavy",
+            "name_es": "Ca\u00f1\u00f3n L\u00e1ser Pesado",
             "category": "Weapon Systems",
             "group": "Laser Cannons",
             "baseCost": 6000,
@@ -609,7 +609,7 @@
         {
             "id": "ion_cannon_light",
             "name": "Ion Cannon, Light",
-            "name_es": "Cañón de Iones Ligero",
+            "name_es": "Ca\u00f1\u00f3n de Iones Ligero",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 2000,
@@ -638,7 +638,7 @@
         {
             "id": "ion_cannon",
             "name": "Ion Cannon, Medium",
-            "name_es": "Cañón de Iones Mediano",
+            "name_es": "Ca\u00f1\u00f3n de Iones Mediano",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 3000,
@@ -662,7 +662,7 @@
         {
             "id": "ion_cannon_hvy",
             "name": "Ion Cannon, Heavy",
-            "name_es": "Cañón de Iones Pesado",
+            "name_es": "Ca\u00f1\u00f3n de Iones Pesado",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 6000,
@@ -686,8 +686,8 @@
         },
         {
             "id": "ion_cannon_hapan",
-            "name": "Hapan Triple Ion Cannon",
-            "name_es": "Cañón de Iones Triple Hapan",
+            "name": "Ion Cannon, Hapan Triple",
+            "name_es": "Ca\u00f1\u00f3n de Iones Triple Hapan",
             "category": "Weapon Systems",
             "group": "Ion Weapons",
             "baseCost": 12000,
@@ -706,7 +706,7 @@
         {
             "id": "concussion_missile_light",
             "name": "Concussion Missile Launcher, Light",
-            "name_es": "Lanzador de Misiles de Concusión Ligero",
+            "name_es": "Lanzador de Misiles de Concusi\u00f3n Ligero",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 2000,
@@ -737,8 +737,8 @@
         },
         {
             "id": "concussion_missile",
-            "name": "Medium Concussion Missile Launcher",
-            "name_es": "Lanzador de Misiles de Concusión Mediano",
+            "name": "Concussion Missile Launcher, Medium",
+            "name_es": "Lanzador de Misiles de Concusi\u00f3n Mediano",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 3500,
@@ -769,8 +769,8 @@
         },
         {
             "id": "concussion_missile_hvy",
-            "name": "Heavy Concussion Missile Launcher",
-            "name_es": "Lanzador de Misiles de Concusión Pesado",
+            "name": "Concussion Missile Launcher, Heavy",
+            "name_es": "Lanzador de Misiles de Concusi\u00f3n Pesado",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 30000,
@@ -817,7 +817,7 @@
         {
             "id": "atmos_thrusters",
             "name": "Atmospheric Thrusters",
-            "name_es": "Propulsores Atmosféricos",
+            "name_es": "Propulsores Atmosf\u00e9ricos",
             "category": "Movement Systems",
             "group": "Thrusters",
             "baseCost": 2000,
@@ -833,7 +833,7 @@
         {
             "id": "atmos_thrusters_adv",
             "name": "Atmospheric Thrusters (Advanced)",
-            "name_es": "Propulsores Atmosféricos (Avanzados)",
+            "name_es": "Propulsores Atmosf\u00e9ricos (Avanzados)",
             "category": "Movement Systems",
             "group": "Thrusters",
             "baseCost": 5000,
@@ -1553,7 +1553,7 @@
         {
             "id": "backup_battery",
             "name": "Backup Battery",
-            "name_es": "Batería de Respaldo",
+            "name_es": "Bater\u00eda de Respaldo",
             "category": "Starship Accessories",
             "group": "Power",
             "baseCost": 10000,
@@ -1597,7 +1597,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Tech_Specialist"
+            "wiki": "https://swse.miraheze.org/wiki/Tech_Specialist",
+            "name_es": "Destreza Mejorada (+2 Des)"
         },
         {
             "id": "ts_speed",
@@ -1614,7 +1615,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Tech_Specialist"
+            "wiki": "https://swse.miraheze.org/wiki/Tech_Specialist",
+            "name_es": "Velocidad Mejorada (+25%)"
         },
         {
             "id": "sup_tech_sh",
@@ -1649,7 +1651,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech",
+            "name_es": "Destreza Superior (+4 Des)"
         },
         {
             "id": "st_str",
@@ -1666,7 +1669,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech",
+            "name_es": "Fuerza Superior (+2 Fue)"
         },
         {
             "id": "st_sensors",
@@ -1683,7 +1687,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Tech",
+            "name_es": "Sensores Superiores (+2 Per)"
         },
         {
             "id": "st_speed",
@@ -1700,7 +1705,8 @@
             "availability": "Common",
             "variableCost": true,
             "location": "Installed",
-            "wiki": "https://swse.miraheze.org/wiki/Superior_Speed_(+33%)"
+            "wiki": "https://swse.miraheze.org/wiki/Superior_Speed_(+33%)",
+            "name_es": "Velocidad Superior (+33%)"
         },
         {
             "id": "holo_transceiver",
@@ -1734,7 +1740,7 @@
         {
             "id": "lifeboat_small",
             "name": "Lifeboat, Small",
-            "name_es": "Bote Salvavidas, Pequeño",
+            "name_es": "Bote Salvavidas, Peque\u00f1o",
             "category": "Starship Accessories",
             "group": "Safety",
             "baseCost": 400,
@@ -1749,7 +1755,7 @@
         {
             "id": "droid_repair_team",
             "name": "Droid Repair Team",
-            "name_es": "Equipo de Reparación Droide",
+            "name_es": "Equipo de Reparaci\u00f3n Droide",
             "category": "Starship Accessories",
             "group": "Damage Control",
             "baseCost": 5000,
@@ -1765,7 +1771,7 @@
         {
             "id": "medical_suite",
             "name": "Medical Suite",
-            "name_es": "Suite Médica",
+            "name_es": "Suite M\u00e9dica",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 5000,
@@ -1780,7 +1786,7 @@
         {
             "id": "passenger_conversion_seating",
             "name": "Passenger Conversion, Seating",
-            "name_es": "Conversión a Pasajeros, Asientos",
+            "name_es": "Conversi\u00f3n a Pasajeros, Asientos",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 200,
@@ -1794,7 +1800,7 @@
         {
             "id": "passenger_conversion_quarters",
             "name": "Passenger Conversion, Quarters",
-            "name_es": "Conversión a Pasajeros, Cuartos",
+            "name_es": "Conversi\u00f3n a Pasajeros, Cuartos",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 500,
@@ -1906,7 +1912,7 @@
         {
             "id": "cockpit_ejection",
             "name": "Cockpit Ejection System",
-            "name_es": "Sistema de Eyección de Cabina",
+            "name_es": "Sistema de Eyecci\u00f3n de Cabina",
             "category": "Starship Accessories",
             "group": "Safety",
             "baseCost": 8000,
@@ -1920,7 +1926,7 @@
         {
             "id": "cotterdam",
             "name": "Cotterdam",
-            "name_es": "Túnel de Acoplamiento",
+            "name_es": "T\u00fanel de Acoplamiento",
             "category": "Starship Accessories",
             "group": "Docking",
             "baseCost": 3000,
@@ -1963,7 +1969,7 @@
         {
             "id": "grappler_mag",
             "name": "Grappler Mag",
-            "name_es": "Imán de Agarre",
+            "name_es": "Im\u00e1n de Agarre",
             "category": "Weapon Systems",
             "group": "Tactical",
             "baseCost": 1000,
@@ -1991,7 +1997,7 @@
         {
             "id": "interrogation_chamber",
             "name": "Interrogation Chamber",
-            "name_es": "Cámara de Interrogatorio",
+            "name_es": "C\u00e1mara de Interrogatorio",
             "category": "Starship Accessories",
             "group": "Security",
             "baseCost": 10000,
@@ -2062,7 +2068,7 @@
         {
             "id": "sensor_decoy",
             "name": "Sensor Decoy",
-            "name_es": "Señuelo de Sensores",
+            "name_es": "Se\u00f1uelo de Sensores",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "baseCost": 2000,
@@ -2076,7 +2082,7 @@
         {
             "id": "sensor_mask",
             "name": "Sensor Mask",
-            "name_es": "Máscara de Sensores",
+            "name_es": "M\u00e1scara de Sensores",
             "category": "Defense Systems",
             "group": "Electronic Warfare",
             "baseCost": 150000,
@@ -2188,7 +2194,7 @@
         {
             "id": "slave_circuits",
             "name": "Slave Circuits (Basic)",
-            "name_es": "Circuitos Esclavos (Básicos)",
+            "name_es": "Circuitos Esclavos (B\u00e1sicos)",
             "category": "Starship Accessories",
             "group": "Control",
             "baseCost": 1000,
@@ -2244,7 +2250,7 @@
         {
             "id": "cargo_pod_small",
             "name": "Cargo Pod (Light)",
-            "name_es": "Módulo de Carga (Pequeño)",
+            "name_es": "M\u00f3dulo de Carga (Peque\u00f1o)",
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 500,
@@ -2262,7 +2268,7 @@
         {
             "id": "cargo_pod_med",
             "name": "Cargo Pod (Medium)",
-            "name_es": "Módulo de Carga (Mediano)",
+            "name_es": "M\u00f3dulo de Carga (Mediano)",
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 1000,
@@ -2280,7 +2286,7 @@
         {
             "id": "cargo_pod_large",
             "name": "Cargo Pod (Heavy)",
-            "name_es": "Módulo de Carga (Grande)",
+            "name_es": "M\u00f3dulo de Carga (Grande)",
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 1500,
@@ -2298,7 +2304,7 @@
         {
             "id": "cargo_jettison",
             "name": "Cargo Jettison System",
-            "name_es": "Sistema de Expulsión de Carga",
+            "name_es": "Sistema de Expulsi\u00f3n de Carga",
             "category": "Starship Accessories",
             "group": "Storage",
             "baseCost": 1500,
@@ -2329,7 +2335,7 @@
         {
             "id": "luxury_basic",
             "name": "Luxury Upgrade (Basic)",
-            "name_es": "Mejora de Lujo (Básica)",
+            "name_es": "Mejora de Lujo (B\u00e1sica)",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 10000,
@@ -2374,7 +2380,7 @@
         {
             "id": "hangar_bay",
             "name": "Hangar Bay",
-            "name_es": "Bahía de Hangar",
+            "name_es": "Bah\u00eda de Hangar",
             "category": "Starship Accessories",
             "group": "Hangar",
             "baseCost": 5000,
@@ -2389,7 +2395,7 @@
         {
             "id": "hangar_bay_concealed",
             "name": "Hangar Bay, Concealed",
-            "name_es": "Bahía de Hangar, Oculta",
+            "name_es": "Bah\u00eda de Hangar, Oculta",
             "category": "Starship Accessories",
             "group": "Hangar",
             "baseCost": 25000,
@@ -2404,7 +2410,7 @@
         {
             "id": "cryo_chambers",
             "name": "Cryogenic Chambers",
-            "name_es": "Cámaras Criogénicas",
+            "name_es": "C\u00e1maras Criog\u00e9nicas",
             "category": "Starship Accessories",
             "group": "Accommodations",
             "baseCost": 500,
@@ -2796,8 +2802,8 @@
         },
         {
             "id": "turbolaser_light",
-            "name": "Light Turbolaser",
-            "name_es": "Turboláser Ligero",
+            "name": "Turbolaser, Light",
+            "name_es": "Turbol\u00e1ser Ligero",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 5000,
@@ -2821,8 +2827,8 @@
         },
         {
             "id": "turbolaser_med",
-            "name": "Medium Turbolaser",
-            "name_es": "Turboláser Mediano",
+            "name": "Turbolaser, Medium",
+            "name_es": "Turbol\u00e1ser Mediano",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 10000,
@@ -2846,8 +2852,8 @@
         },
         {
             "id": "turbolaser_hvy",
-            "name": "Heavy Turbolaser",
-            "name_es": "Turboláser Pesado",
+            "name": "Turbolaser, Heavy",
+            "name_es": "Turbol\u00e1ser Pesado",
             "category": "Weapon Systems",
             "group": "Turbolasers",
             "baseCost": 20000,
@@ -2871,8 +2877,8 @@
         },
         {
             "id": "blaster_cannon_light",
-            "name": "Light Blaster Cannon",
-            "name_es": "Cañón Bláster Ligero",
+            "name": "Blaster Cannon, Light",
+            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Ligero",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 1200,
@@ -2899,8 +2905,8 @@
         },
         {
             "id": "blaster_cannon_med",
-            "name": "Medium Blaster Cannon",
-            "name_es": "Cañón Bláster Mediano",
+            "name": "Blaster Cannon, Medium",
+            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Mediano",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 2500,
@@ -2927,8 +2933,8 @@
         },
         {
             "id": "blaster_cannon_hvy",
-            "name": "Heavy Blaster Cannon",
-            "name_es": "Cañón Bláster Pesado",
+            "name": "Blaster Cannon, Heavy",
+            "name_es": "Ca\u00f1\u00f3n Bl\u00e1ster Pesado",
             "category": "Weapon Systems",
             "group": "Blaster Cannons",
             "baseCost": 5500,
@@ -2956,7 +2962,7 @@
         {
             "id": "harpoon_gun",
             "name": "Harpoon Gun",
-            "name_es": "Cañón Arpón",
+            "name_es": "Ca\u00f1\u00f3n Arp\u00f3n",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "baseCost": 2000,
@@ -2970,7 +2976,7 @@
         {
             "id": "docking_gun",
             "name": "Docking Gun(WIP)",
-            "name_es": "Cañón de Atraque",
+            "name_es": "Ca\u00f1\u00f3n de Atraque",
             "category": "Weapon Systems",
             "group": "Exotic Weapons",
             "baseCost": 1000,
@@ -3006,7 +3012,8 @@
             "availability": "Military",
             "description": "A Gravity Well Projector creates an artificial gravity well that prevents Hyperspace travel. Any Starship within 12 squares of an active Gravity Well Projector cannot activate its Hyperdrive. Additionally, any ship traveling through Hyperspace that passes within 12 squares of the active Gravity Well Projector is immediately pulled out of Hyperspace.",
             "location": "Hardpoint",
-            "wiki": "https://swse.miraheze.org/wiki/Gravity_Well_Projector"
+            "wiki": "https://swse.miraheze.org/wiki/Gravity_Well_Projector",
+            "name_es": "Proyector de Pozo de Gravedad"
         },
         {
             "id": "ion_bomb_rack",
@@ -3021,7 +3028,8 @@
             "availability": "Military",
             "description": "Ion Bombs deal 5d10 Ion damage in a 2-square burst area. However, they are unguided weapons and take a -5 penalty on attack rolls against moving targets (speed > 0). A rack Holds up too 4 bombs",
             "location": "",
-            "wiki": "https://swse.miraheze.org/wiki/Ion_Bomb"
+            "wiki": "https://swse.miraheze.org/wiki/Ion_Bomb",
+            "name_es": "Estante de Bombas de Iones"
         },
         {
             "id": "shieldbuster_torp",
@@ -3036,7 +3044,8 @@
             "availability": "Military",
             "description": "A specialized torpedo designed to overload shielding systems. On a hit, it reduces the target's Shield Rating by -10 (instead of the usual -5). Shields damaged in this way can be recharged normally.",
             "location": "Hardpoint",
-            "wiki": "https://swse.miraheze.org/wiki/Shieldbuster_Torpedoes"
+            "wiki": "https://swse.miraheze.org/wiki/Shieldbuster_Torpedoes",
+            "name_es": "Lanzador de Torpedos Rompescudos"
         },
         {
             "id": "space_mine_launcher_standard",
@@ -3058,7 +3067,8 @@
                 "costFactor": 0.25,
                 "unitLabel": "mines"
             },
-            "wiki": "https://swse.miraheze.org/wiki/Space_Mines"
+            "wiki": "https://swse.miraheze.org/wiki/Space_Mines",
+            "name_es": "Lanzador de Minas Espaciales, Est\u00e1ndar"
         },
         {
             "id": "space_mine_launcher_heavy",
@@ -3080,7 +3090,8 @@
                 "costFactor": 0.25,
                 "unitLabel": "mines"
             },
-            "wiki": "https://swse.miraheze.org/wiki/Space_Mines"
+            "wiki": "https://swse.miraheze.org/wiki/Space_Mines",
+            "name_es": "Lanzador de Minas Espaciales, Pesado"
         },
         {
             "id": "discord_missile_launcher",
@@ -3095,7 +3106,8 @@
             "availability": "Military",
             "description": "Deploys a buzz droid swarm on the target ship. The target takes 2d10 damage per turn (ignoring DR and SR) until the droids are removed or destroyed. Requires a successful attack roll to hit.",
             "location": "Hardpoint",
-            "wiki": "https://swse.miraheze.org/wiki/Discord_Missiles"
+            "wiki": "https://swse.miraheze.org/wiki/Discord_Missiles",
+            "name_es": "Lanzador de Misiles Discordia"
         },
         {
             "id": "composite_beam",
@@ -3110,7 +3122,8 @@
             "availability": "Military",
             "description": "A laser weapon that ignores 5 points of the target's Shield Rating (treat SR as 5 lower against this attack).",
             "location": "Hardpoint",
-            "wiki": "https://swse.miraheze.org/wiki/Composite_Beam_Cannon"
+            "wiki": "https://swse.miraheze.org/wiki/Composite_Beam_Cannon",
+            "name_es": "Ca\u00f1\u00f3n de Rayo Compuesto"
         },
         {
             "id": "gravity_mine_launcher",
@@ -3123,7 +3136,8 @@
             "availability": "Military",
             "description": "Detonates when a ship enters the square, creating a temporary gravity well that prevents Hyperspace travel for 1 round and deals 4d10x2 Energy damage.",
             "location": "",
-            "wiki": "https://swse.miraheze.org/wiki/Gravity_Mines"
+            "wiki": "https://swse.miraheze.org/wiki/Gravity_Mines",
+            "name_es": "Lanzador de Minas de Gravedad"
         },
         {
             "id": "chaff_gun",
@@ -3136,7 +3150,8 @@
             "availability": "Restricted",
             "description": "Launches a cloud of sensor-confusing debris. Provides concealment and imposes a -5 penalty on attack rolls and Pilot checks for missiles and sensors attempting to target the ship.",
             "location": "",
-            "wiki": "https://swse.miraheze.org/wiki/Chaff_Gun"
+            "wiki": "https://swse.miraheze.org/wiki/Chaff_Gun",
+            "name_es": "Ca\u00f1\u00f3n de Chaff"
         },
         {
             "id": "aux_gen_2",
@@ -3242,8 +3257,8 @@
         },
         {
             "id": "heavy_ordnance_launcher",
-            "name": "Heavy Ordnance Launcher",
-            "name_es": "Lanzador de Artillería Pesada",
+            "name": "Ordnance Launcher, Heavy",
+            "name_es": "Lanzador de Artiller\u00eda Pesada",
             "category": "Weapon Systems",
             "group": "Launchers",
             "baseCost": 10000,

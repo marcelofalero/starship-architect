@@ -2,12 +2,8 @@ export const initTutorial = (context = {}) => {
     const COMPLETED_KEY = 'swse_tutorial_completed';
     const PART1_KEY = 'swse_tutorial_part1_completed';
 
-    // Check for "noob=true" in the query string
-    const urlParams = new URLSearchParams(window.location.search);
-    const forceTutorial = urlParams.get('noob') === 'true';
-
-    // If not forced and already completed, skip the tutorial
-    if (!forceTutorial && localStorage.getItem(COMPLETED_KEY) === 'true') {
+    // If already completed, skip the tutorial
+    if (localStorage.getItem(COMPLETED_KEY) === 'true') {
         return;
     }
 
@@ -22,7 +18,7 @@ export const initTutorial = (context = {}) => {
 
     if (context.firstRun && !context.hasShip) {
         // Intro Tour
-        if (localStorage.getItem(PART1_KEY) === 'true' && !forceTutorial) return;
+        if (localStorage.getItem(PART1_KEY) === 'true') return;
         isPart1 = true;
         steps = [
             {
