@@ -8,7 +8,7 @@ RUN go mod download
 
 # Copy the source and build the WASM binary
 COPY backend-go/ .
-RUN GOOS=js GOARCH=wasm go build -o /tmp/app.wasm .
+RUN GOOS=js GOARCH=wasm go build -o build/app.wasm .
 
 # ---
 # Stage 2: Stable Runtime (Node 20 LTS + Debian for glibc)
@@ -22,14 +22,15 @@ RUN apt-get update && apt-get install -y \
     && npm install -g wrangler \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app/backend-go
+WORKDIR /app
 
 # Copy the WASM binary from the builder
-COPY --from=builder /tmp/app.wasm /usr/local/bin/app.wasm
+COPY --from=builder /src/build/ ./build/
 
 # Copy the entrypoint and schema
 COPY backend-go/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY backend-go/schema.sql ./schema.sql
+COPY backend-go/wrangler.toml ./wrangler.toml
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Environment flags to prevent Wrangler "phone home" hangs
