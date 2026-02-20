@@ -116,6 +116,11 @@ func createResourceHandler(resourceType string) http.HandlerFunc {
 			return
 		}
 
+		if err := validateResourceData(resourceType, req.Data); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 		req.Type = resourceType
 		resourceID := generateUUID()
 		dataBytes, _ := json.Marshal(req.Data)
@@ -238,10 +243,12 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check permissions
+	// Check permissions and get type
 	var accessRank int
+	var resourceType string
 	query := `
         SELECT
+        s.type,
         MAX(CASE
             WHEN s.owner_id = ? THEN 3
             WHEN p.access_level = 'admin' THEN 3
@@ -258,9 +265,14 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
         )
         GROUP BY s.id
     `
-	err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&accessRank)
+	err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&resourceType, &accessRank)
 	if err == sql.ErrNoRows || accessRank < 2 {
 		http.Error(w, "Not authorized", http.StatusForbidden)
+		return
+	}
+
+	if err := validateResourceData(resourceType, req.Data); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -274,11 +286,7 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Helper to just return the updated resource
-	var sType string
-	db.QueryRow("SELECT type FROM resources WHERE id = ?", resourceID).Scan(&sType)
-
-	basePath := getBasePath(sType)
+	basePath := getBasePath(resourceType)
 	links := map[string]Link{
 		"self": {Href: fmt.Sprintf("%s/%s", basePath, resourceID), Rel: "self", Method: "GET"},
 		"update": {Href: fmt.Sprintf("%s/%s", basePath, resourceID), Rel: "update", Method: "PUT"},
@@ -290,7 +298,7 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 		ID: resourceID,
 		OwnerID: user.ID,
 		Name: req.Name,
-		Type: sType,
+		Type: resourceType,
 		Data: req.Data,
 		Visibility: req.Visibility,
 		UpdatedAt: time.Now().Unix(),
