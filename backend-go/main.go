@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	_ "embed"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -30,9 +32,11 @@ func main() {
 	db = sql.OpenDB(connector)
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(LoggerMiddleware)
 	r.Use(middleware.Recoverer)
 	r.Use(AuthMiddleware)
+
+	fmt.Println("Server starting...")
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"status": "ok"}`))
@@ -85,4 +89,15 @@ func main() {
 	r.Patch("/configurations/{resourceID}/share", shareResourceHandler)
 
 	workers.Serve(r)
+}
+
+func LoggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+		t1 := time.Now()
+		defer func() {
+			fmt.Printf("%s %s %d %v\n", r.Method, r.URL.Path, ww.Status(), time.Since(t1))
+		}()
+		next.ServeHTTP(ww, r)
+	})
 }
