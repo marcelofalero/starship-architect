@@ -13,6 +13,20 @@ services:
       - WRANGLER_LOG=info
       - WRANGLER_SEND_METRICS=false
 
+  backend-debug:
+    build:
+      context: .
+      dockerfile: backend-go/Dockerfile
+      target: debug
+    ports:
+      - "8787:8787"
+      - "40000:40000"
+    volumes:
+      - ./backend-go:/app
+    environment:
+      - GOOGLE_CLIENT_ID=dev-mock-client-id
+      - SESSION_SECRET=dev-mock-secret
+
   frontend:
     image: nginx:alpine
     ports:

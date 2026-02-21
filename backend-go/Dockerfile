@@ -11,7 +11,33 @@ COPY backend-go/ .
 RUN GOOS=js GOARCH=wasm go build -o build/app.wasm .
 
 # ---
-# Stage 2: Stable Runtime (Node 20 LTS + Debian for glibc)
+# Stage 2: Debug (Native with Delve)
+FROM golang:1.24-bookworm AS debug
+
+# Install Delve
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+WORKDIR /app
+COPY backend-go/go.mod backend-go/go.sum* ./
+RUN go mod download
+
+# We don't need to copy source code here because it will be mounted from the host.
+# However, copying it is good practice for initial setup or if volume mount fails.
+COPY backend-go/ .
+
+# Expose ports: 8787 for app, 40000 for debugger
+EXPOSE 8787 40000
+
+# Run with Delve
+# --headless: run without terminal
+# --listen: listen address for debugger client
+# --api-version: API version
+# --accept-multiclient: allow multiple clients
+# "debug" compiles and runs the main package in the current directory
+CMD ["dlv", "debug", "--headless", "--listen=:40000", "--api-version=2", "--accept-multiclient", "."]
+
+# ---
+# Stage 3: Stable Runtime (Node 20 LTS + Debian for glibc)
 FROM node:20-bookworm-slim
 
 # Install Wrangler and basic utilities (Removing su-exec)
