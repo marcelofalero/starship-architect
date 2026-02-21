@@ -255,12 +255,19 @@ func GetCurrentUser(r *http.Request) *User {
 		return nil
 	}
 
-	sub, _ := claims["sub"].(string)
+	var sub string
+	switch v := claims["sub"].(type) {
+	case string:
+		sub = v
+	case float64:
+		sub = fmt.Sprintf("%.0f", v)
+	}
+
 	email, _ := claims["email"].(string)
 	name, _ := claims["name"].(string)
 
 	if sub == "" {
-		fmt.Printf("Missing 'sub' claim in token\n")
+		fmt.Printf("Missing 'sub' claim in token or invalid type: %T\n", claims["sub"])
 		return nil
 	}
 
