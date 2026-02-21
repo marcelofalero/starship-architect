@@ -5,6 +5,12 @@
       <configuration sdkName="Python 3.12 (starship-architect)" />
     </facet>
   </component>
+  <component name="Go" enabled="true">
+    <buildTags>
+      <option name="os" value="js" />
+      <option name="arch" value="wasm" />
+    </buildTags>
+  </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
