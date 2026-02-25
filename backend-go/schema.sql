@@ -22,11 +22,17 @@ CREATE TABLE IF NOT EXISTS group_members (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS resource_types (
+    name TEXT PRIMARY KEY,
+    schema TEXT NOT NULL CHECK(json_valid(schema)),
+    created_at INTEGER DEFAULT (unixepoch())
+);
+
 CREATE TABLE IF NOT EXISTS resources (
     id TEXT PRIMARY KEY,
     owner_id TEXT NOT NULL,
     name TEXT,
-    type TEXT DEFAULT 'ship' CHECK(type IN ('ship', 'library', 'hangar', 'config')),
+    type TEXT NOT NULL,
     data TEXT CHECK(json_valid(data)),
     visibility TEXT DEFAULT 'private' CHECK(visibility IN ('private', 'group', 'public')),
     created_at INTEGER DEFAULT (unixepoch()),

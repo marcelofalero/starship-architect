@@ -1,56 +1,55 @@
 package main
 
 import (
-	"errors"
+	"database/sql"
 	"fmt"
+	"strings"
+	"sync"
+
+	"github.com/santhosh-tekuri/jsonschema/v5"
 )
+
+var schemaCache sync.Map
 
 // validateResourceData checks if the provided data map conforms to the schema for the given resource type.
 func validateResourceData(resourceType string, data map[string]interface{}) error {
-	if data == nil {
-		return errors.New("data payload cannot be empty")
+	// Check cache
+	if val, ok := schemaCache.Load(resourceType); ok {
+		schema := val.(*jsonschema.Schema)
+		if err := schema.Validate(data); err != nil {
+			return fmt.Errorf("validation failed: %v", err)
+		}
+		return nil
 	}
 
-	switch resourceType {
-	case "ship":
-		// A ship must have a configuration (object) and a manifest (array)
-		if _, ok := data["configuration"].(map[string]interface{}); !ok {
-			return errors.New("ship resource requires a 'configuration' object")
-		}
-		if _, ok := data["manifest"].([]interface{}); !ok {
-			return errors.New("ship resource requires a 'manifest' array")
-		}
+	// Load from DB
+	// We rely on the global 'db' variable defined in main.go
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
 
-	case "library":
-		// A library should have components (array) or ships (array) if present
-		if val, ok := data["components"]; ok {
-			if _, isArray := val.([]interface{}); !isArray {
-				return errors.New("library 'components' must be an array")
-			}
-		}
-		if val, ok := data["ships"]; ok {
-			if _, isArray := val.([]interface{}); !isArray {
-				return errors.New("library 'ships' must be an array")
-			}
-		}
-
-	case "hangar":
-		// A hangar resource contains a list of ships in a 'ships' key
-		if val, ok := data["ships"]; ok {
-			if _, isArray := val.([]interface{}); !isArray {
-				return errors.New("hangar 'ships' must be an array")
-			}
-		} else {
-			return errors.New("hangar resource requires a 'ships' array")
-		}
-
-	case "config":
-		// Configuration is flexible, no strict validation for now.
-		// Just ensure it's a valid JSON object (which map[string]interface{} implies).
-
-	default:
+	var schemaStr string
+	err := db.QueryRow("SELECT schema FROM resource_types WHERE name = ?", resourceType).Scan(&schemaStr)
+	if err == sql.ErrNoRows {
 		return fmt.Errorf("unknown resource type: %s", resourceType)
 	}
+	if err != nil {
+		return fmt.Errorf("database error: %v", err)
+	}
 
+	compiler := jsonschema.NewCompiler()
+	if err := compiler.AddResource("schema.json", strings.NewReader(schemaStr)); err != nil {
+		return fmt.Errorf("failed to load schema: %v", err)
+	}
+	schema, err := compiler.Compile("schema.json")
+	if err != nil {
+		return fmt.Errorf("failed to compile schema: %v", err)
+	}
+
+	schemaCache.Store(resourceType, schema)
+
+	if err := schema.Validate(data); err != nil {
+		return fmt.Errorf("validation failed: %v", err)
+	}
 	return nil
 }
