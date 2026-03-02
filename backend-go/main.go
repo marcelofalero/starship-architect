@@ -14,8 +14,6 @@ import (
 	"github.com/syumai/workers/cloudflare/d1"
 )
 
-var db *sql.DB
-
 //go:embed docs/openapi.yaml
 var openAPIContent []byte
 
@@ -30,6 +28,9 @@ func main() {
 		log.Fatal("failed to open d1 connector:", err)
 	}
 	db = sql.OpenDB(connector)
+
+	// Initialize default types
+	initTypes(db)
 
 	r := chi.NewRouter()
 	r.Use(LoggerMiddleware)
@@ -56,37 +57,22 @@ func main() {
 	r.Post("/auth/login", loginHandler)
 	r.Get("/auth/google", authGoogleHandler)
 
-	// Ships
-	r.Get("/ships", listResourcesHandler("ship"))
-	r.Post("/ships", createResourceHandler("ship"))
-	r.Get("/ships/{resourceID}", getResourceHandler)
-	r.Put("/ships/{resourceID}", updateResourceHandler)
-	r.Delete("/ships/{resourceID}", deleteResourceHandler)
-	r.Patch("/ships/{resourceID}/share", shareResourceHandler)
+	// Types API
+	r.Get("/types", listTypesHandler)
+	r.Post("/types", createTypeHandler)
+	r.Get("/types/{typeName}", getTypeHandler)
 
-	// Libraries
-	r.Get("/libraries", listResourcesHandler("library"))
-	r.Post("/libraries", createResourceHandler("library"))
-	r.Get("/libraries/{resourceID}", getResourceHandler)
-	r.Put("/libraries/{resourceID}", updateResourceHandler)
-	r.Delete("/libraries/{resourceID}", deleteResourceHandler)
-	r.Patch("/libraries/{resourceID}/share", shareResourceHandler)
-
-	// Hangars
-	r.Get("/hangars", listResourcesHandler("hangar"))
-	r.Post("/hangars", createResourceHandler("hangar"))
-	r.Get("/hangars/{resourceID}", getResourceHandler)
-	r.Put("/hangars/{resourceID}", updateResourceHandler)
-	r.Delete("/hangars/{resourceID}", deleteResourceHandler)
-	r.Patch("/hangars/{resourceID}/share", shareResourceHandler)
-
-	// Configurations
-	r.Get("/configurations", listResourcesHandler("config"))
-	r.Post("/configurations", createResourceHandler("config"))
-	r.Get("/configurations/{resourceID}", getResourceHandler)
-	r.Put("/configurations/{resourceID}", updateResourceHandler)
-	r.Delete("/configurations/{resourceID}", deleteResourceHandler)
-	r.Patch("/configurations/{resourceID}/share", shareResourceHandler)
+	// Generic Resource API
+	r.Route("/{resourceType}", func(r chi.Router) {
+		r.Get("/", listResourcesHandler)
+		r.Post("/", createResourceHandler)
+		r.Route("/{resourceID}", func(r chi.Router) {
+			r.Get("/", getResourceHandler)
+			r.Put("/", updateResourceHandler)
+			r.Delete("/", deleteResourceHandler)
+			r.Patch("/share", shareResourceHandler)
+		})
+	})
 
 	workers.Serve(r)
 }
