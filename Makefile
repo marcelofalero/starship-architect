@@ -31,5 +31,10 @@ test:
 build:
 	$(COMPOSE) build
 
+
+serve:
+	@echo "Starting simple Python HTTP server for the frontend..."
+	@cd public && python -m http.server 8080
+
 clean:
 	$(COMPOSE) down -v --remove-orphans

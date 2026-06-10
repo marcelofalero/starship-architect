@@ -1,0 +1,754 @@
+{
+  "laser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "ir laser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "x-ray laser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "heavy laser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "neutron gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "fusion laser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "graser": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "heavy neutron gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "hydrogen bore": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "plasma cannon": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "particle beam": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "heavy particle beam": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "heavy plasma beam f": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "matter beam": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "fusion beam": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "quantum cannon": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "boson gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 6"
+  },
+  "heavy matter beam a": {
+    "type": "Beam Weapons",
+    "pl": "PL 7"
+  },
+  "fusion bore": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "maser": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "kinetic lance": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "pulse maser": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "em cannon": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "dark fusion gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "gatling maser": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "weak force gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 8"
+  },
+  "strong force gun": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 8"
+  },
+  "zero bore": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 8"
+  },
+  "blacklaser": {
+    "type": "Beam Weapons",
+    "pl": "PL 9"
+  },
+  "tachyon gun": {
+    "type": "Beam Weapons",
+    "pl": "PL 9"
+  },
+  "string projector": {
+    "type": "Beam Weapons",
+    "pl": "PL 9"
+  },
+  "point defense gun": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "rail cannon": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "needle driver": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "gauss gun": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "hi-velocity rail gun": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "mass cannon": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "heavy mass cannon": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "accelerator": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "tach rifle": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "heavy accelerator": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "antimatter gun": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 7"
+  },
+  "super tach rifle": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "sliver gun": {
+    "type": "Projectile Weapons",
+    "pl": "PL 8"
+  },
+  "neutronium driver": {
+    "type": "Projectile Weapons",
+    "pl": "PL 8"
+  },
+  "bomb projector": {
+    "type": "Projectile Weapons",
+    "pl": "PL 8"
+  },
+  "bomb salvo": {
+    "type": "Projectile Weapons",
+    "pl": "PL 8"
+  },
+  "kinetic converter": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 8"
+  },
+  "tunneling driver": {
+    "type": "Projectile Weapons",
+    "pl": "PL 9"
+  },
+  "black hole gun": {
+    "type": "Projectile Weapons",
+    "pl": "PL 9"
+  },
+  "bomb rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb bay": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "extra capacity": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "minelayer": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "...extra capacity": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile tube": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "magazine": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ordnance cell array": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "extra cells": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb or mine, light": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb or mine, med": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb, or mine, hvy": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "rocket, chem": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile, light": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile, heavy": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile, medium": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile, tachyon": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "aa burst": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "che": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "ke submunition": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "low-yield nuke": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "hi-yield nuke": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "plasma": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 7"
+  },
+  "mrb (mass reaction)": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "matter": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "starload": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "nova burst": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "zero point": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "null bomb": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "active radar": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "em homing": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ir homing": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "command": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "mass homing": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ai probability": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "all launch systems possess a special characteristic called": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "capacity, which indicates how much ordnance the system": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "can carry. obviously, a missile rack can carry a lot of small": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missiles or a few big ones. generally, each hull point devot-": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ed to a launch system provides two to four points of capac-": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ity for ordnance. as the designer, you can choose to buy": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "extra capacity for your launch system by allocating some": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "extra hull space and money to the launch system.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missiles, bombs, and mines come in three sizes\u2014light,": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "medium, and heavy. light weapons take up 1 point of the": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "smp bomb rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "fusion bomb rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "che missile rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile mount": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "smp missiles": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "aa missiles": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "plasma missile rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "matter missile rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "ordnance array": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "plasma missiles": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "matter missiles": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "mrb mines": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "nova array": {
+    "type": "Projectile Weapons",
+    "pl": "PL 8"
+  },
+  "changes or maneuvers for 1d4 hours.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb bays and missile tubes are an exception to this": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "rule; they can be reloaded in space, as long as the ship is": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "carrying extra ordnance in an internal magazine.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "finally, every launch system possesses a basic rate of": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "fire, which indicates how many weapons it can fire, drop,": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "or dispense in a single round. a missile tube must cycle": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "through the process of bringing the next missile from the": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "magazine to the rail and then firing it off, but a simple rack": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "or cell system can torch off a number of missiles at the": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "same time.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb rack (pl 6): as you might expect, this launch sys-": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb bay (pl 6): the bomb bay has a capacity of 40": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "light, 20 medium, or 10 heavy bombs. its capacity can be": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "expanded by 4 points (4 light, 2 medium, or 1 heavy": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "bomb) for each additional hull point assigned to the system": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "beyond the 10 hull points normally required.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "minelayer (pl 6): this system consists of two or more": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "mine rails, low-powered magnetic accelerators designed to": {
+    "type": "Projectile Weapons",
+    "pl": "PL 7"
+  },
+  "deploy a pattern of mines into one hex adjacent to the": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "launching ship in a single phase. unlike other launched": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "weapons, at least ten mines (a single mine pattern) must be": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "deployed to be effective.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "since the minelayer also includes machinery for deploy-": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ing the mines, it has half the capacity of other launch sys-": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "tems of a similar size.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "missile rack (pl 6): this is a system that can hold eight": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "light missiles, four medium missiles, or two heavy missiles.": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "its capacity can\u2019t be increased, but it\u2019s easy enough to buy": {
+    "type": "Projectile Weapons",
+    "pl": "PL 6"
+  },
+  "ke": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "high-yield nuke": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "matter reaction": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "matter bomb": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "null torpedo": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 9"
+  },
+  "create a powerful wave of energy. it\u2019s more concentrated": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "than a nuclear blast, but less likely to cause unwanted col-": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "lateral damage. see table 5\u201311 for details on area-effect": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "weapons.": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "matter (pl 7): the matter warhead is more properly called": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "the antimatter warhead; it contains a kilo or two of antimatter": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "in a magnetic bottle, and detonates simply by shutting down": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "the containment vessel. it\u2019s equivalent to a nuke.": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "starload (pl 8): the most powerful of the purely tactical": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "warheads, the starload is fueled by a dark-matter reaction": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "akin to that of the matter reaction burst of pl 7. however,": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "it\u2019s miniaturized for smaller applications. like most war-": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "nova burst (pl 8): this warhead creates an incredible": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "gravitational force to compress normal matter into an in-": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "credibly dense mass, which then explodes in a colossal det-": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "onation. a single nova burst can cripple a destroyer or": {
+    "type": "Area Effect Weapons",
+    "pl": "PL 6"
+  },
+  "cable gun": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "rf spike": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "thermal inducer": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "thermal nullifier": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "tractor beam": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "mass converter": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 7"
+  },
+  "matter torpedo": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 7"
+  },
+  "plasma torpedo": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "em torpedo": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 8"
+  },
+  "neural inhibitor": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 8"
+  },
+  "fission activator": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 8"
+  },
+  "boarding transporter": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 9"
+  },
+  "code arranger": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 9"
+  },
+  "6x": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "7x": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "8x": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "9x": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "10x": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "for example, a destroyer mounts three tractor beams, so": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "it can affect a target of up to 150 hull points. it encounters": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "a scoutship of 30 hull points and tries to capture it. the": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "tractor capacity is 5 times that needed to hold the scout, so": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "the destroyer can apply an acceleration of 3 mpp to the": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "ship each phase. depending on the power of the scout\u2019s en-": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "gines, this may be enough to slow it down, halt it altogether,": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "and begin to pull it in. ships without acceleration compen-": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "sation can be instantly destroyed by the extreme accelera-": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "tion imparted if the operator is not careful; see \u201cacceleration": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  },
+  "kills\u201d in chapter 4.": {
+    "type": "Torpedoes & Special Weapons",
+    "pl": "PL 6"
+  }
+}

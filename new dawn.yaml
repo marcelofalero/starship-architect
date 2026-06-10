@@ -1,0 +1,570 @@
+apiVersion: '2.0'
+meta:
+  name: ''
+  model: hull_light_cruiser
+  version: '1.0'
+  notes: ''
+configuration:
+  baseChassis: hull_light_cruiser
+  template: null
+  cargoToEpAmount: 0
+  escapePodsToEpPct: 0
+  crewQuality: Normal
+libraries: []
+manifest:
+  - id: 98034399-a6f2-43b1-9e3d-318f6e59289a
+    defId: arm_neutronite_heavy
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: e46faf21-3aef-4a8e-b900-7d91bb8f7d61
+    defId: eng_induction_engine
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 20
+      fireLinkOption: false
+      arcs: []
+  - id: c1b0a987-7f4e-4f0b-baf5-3a90b36ac8b1
+    defId: ftl_drivewave
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 10
+      fireLinkOption: false
+  - id: c6505a6b-104c-48a7-a916-fa1c8ba628a1
+    defId: sys_life_support_pl_7
+    location: Core
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 18
+      fireLinkOption: false
+  - id: 6ffba91b-c62a-40e4-929e-fba15043fa06
+    defId: sys_stateroom
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 8
+      fireLinkOption: false
+  - id: 6335af39-8915-46a4-8a7f-a64d7dbfea14
+    defId: sys_galley
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: ec70c3df-d949-4bd9-b42a-fd480038855f
+    defId: sys_medical_bay
+    location: Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 6e35d8c0-b133-49a5-b26d-323f1cb927c3
+    defId: sys_berthing_6_man
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 3
+      fireLinkOption: false
+      arcs: []
+  - id: 84fbe15b-1c8c-4cf0-8f0b-ac008f7cc5da
+    defId: sys_hydroponics_bay
+    location: Ventral
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 9e79da21-e71c-4e14-90ba-f5a68c68d295
+    defId: cmd_command_deck
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 6
+      fireLinkOption: false
+  - id: 88bc2859-1ad7-4a3c-a0e8-a62e156b5834
+    defId: cmd_mass_transceiver
+    location: Fore
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: a4c94543-b641-43d6-9ccf-3215141ecfe8
+    defId: cmd_command_deck
+    location: Ventral
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 6
+      fireLinkOption: false
+      arcs: []
+      auxiliary: true
+  - id: 86473fce-c07a-4c61-8118-5d5d61ff25c0
+    defId: cmd_flag_bridge
+    location: Core
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 760a2bd5-9b4c-4355-a252-8353cb0624ac
+    defId: cmd_radio_transceiver
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 9c52a505-2a04-4fdb-aa6b-4c06f92fcfa2
+    defId: comp_sensor_control_good
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 175b8aae-befd-4eee-ab23-8e5ab50b9ad8
+    defId: comp_computer_core_good
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: af544aa9-341a-4393-9092-ed58e8154464
+    defId: comp_nav_control_good
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: aa89c7b3-7b52-425d-a665-e65292427fab
+    defId: comp_fire_control_good
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: da1ef825-53f3-4530-857f-0b6c4b0501a3
+    defId: comp_tac_control_good
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 3f98dda7-90c0-4363-82f4-6e1316f1506d
+    defId: sens_mass_detector
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 374f7907-2f85-4fe8-b15c-749cc0ec6280
+    defId: sens_multiband_radar
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: b5b54c25-9d44-472d-b465-2ed53e53f76d
+    defId: sens_spectroanalyzer
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: d282d352-75f8-4f4e-88bb-ebf7e340fd39
+    defId: sens_hi_res_video
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 1e3a02bb-d4d1-4ff8-bb5e-6a9f6477d15c
+    defId: misc_hangar
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 8
+      fireLinkOption: false
+  - id: dee2f8f3-5eaa-48c3-b25f-580ff8c71ef3
+    defId: misc_cargo_hold
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 3
+      fireLinkOption: false
+      arcs: []
+  - id: 151533d9-e21c-4117-bddc-9dd1f14dea85
+    defId: misc_cargo_hold
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 3
+      fireLinkOption: false
+      arcs: []
+  - id: db64f751-0620-453c-a4ed-50ff795099e6
+    defId: misc_airlock
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 66d0abe4-8975-42d8-a9bb-b4cefdca0871
+    defId: misc_airlock
+    location: Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: a529ea94-7302-4ef5-a656-c321d24dfaad
+    defId: misc_brig
+    location: Ventral
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: c617e824-41cb-4c42-8d08-3138f5f11dc3
+    defId: misc_autocargo
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 1bbf35a6-fdc4-4e14-9798-2619c7c7c01f
+    defId: misc_autocargo
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 15862067-8966-447f-b2e5-c2e2813a9c6a
+    defId: misc_evac_system
+    location: Distributed
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 1cb0d24a-83fe-495d-866e-304a90deeb25
+    defId: misc_fabrication_facility
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 8e7c6365-8e03-4166-9de4-dcc9f767a546
+    defId: wpn_dark_fusion_gun
+    location: Fore
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+      emplacement: Fixed Mount
+      weaponMount: Single
+      concealed: false
+      fireControl: Amazing
+  - id: 2992f0a5-8157-41b2-b744-61edb3321dcc
+    defId: wpn_heavy_mass_cannon
+    location: Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Aft
+        - Starboard
+      emplacement: Turret
+      weaponMount: Single
+      concealed: false
+      fireControl: None
+  - id: 09dc29b3-0cea-4f88-9e34-db7927cda533
+    defId: wpn_heavy_mass_cannon
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Port
+        - Aft
+      emplacement: Turret
+      weaponMount: Single
+      concealed: false
+      fireControl: None
+  - id: e8af3070-9ec1-4b88-b6d7-191217a37fda
+    defId: comp_ai_cradle
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 0abd5949-971e-4d6d-a603-9632b7056fbc
+    defId: comp_ai_automation
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: a7ef0d69-a01d-4261-82fc-d7dcf344783f
+    defId: wpn_fusion_beam
+    location: Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Starboard
+        - Aft
+      emplacement: Turret
+      weaponMount: Twin
+      concealed: false
+      fireControl: Good
+  - id: 149ab0aa-dece-4134-8a5f-cb27270e1b5d
+    defId: wpn_fusion_beam
+    location: Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Starboard
+        - Aft
+      emplacement: Turret
+      weaponMount: Twin
+      concealed: false
+      fireControl: Good
+  - id: 3fe1bfcd-fc4e-40f3-9242-4dedca4f3806
+    defId: pow_dynamic_mass_reactor
+    location: Fore
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 15
+      fireLinkOption: false
+      arcs: []
+  - id: a2b2d189-f3fd-4870-ad9e-e3e7410f542d
+    defId: pow_dynamic_mass_reactor
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 15
+      fireLinkOption: false
+      arcs: []
+  - id: e6657158-af66-4133-b740-88d46072eba6
+    defId: pow_dynamic_mass_reactor
+    location: Core
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 15
+      fireLinkOption: false
+      arcs: []
+  - id: 02f50376-4d8e-46cf-ba6d-defc2245d200
+    defId: sens_mass_detector
+    location: Dorsal
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 3c0a0398-573e-4c35-a789-7fe1cbdb7481
+    defId: sens_mass_detector
+    location: ''
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []

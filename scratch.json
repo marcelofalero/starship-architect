@@ -1,0 +1,14 @@
+{
+  "FTL_DRIVES": [
+    {"Engine": "Jump Drive", "Tech": "T", "Pow": "1", "Min Size": "5", "Base Cost.": "$4 M", "Cost/Hull": "$1 M"},
+    {"Engine": "Wormhole Screen", "Tech": "M", "Pow": "2", "Min Size": "1", "Base Cost.": "$1 M", "Cost/Hull": "$200 K"},
+    {"Engine": "Gate Activator", "Tech": "T", "Pow": "2", "Min Size": "1", "Base Cost.": "$500 K", "Cost/Hull": "$100 K"},
+    {"Engine": "Hyperdrive", "Tech": "X", "Pow": "3", "Min Size": "4", "Base Cost.": "$5 M", "Cost/Hull": "$2 M"},
+    {"Engine": "Stardrive", "Tech": "G", "Pow": "0", "Min Size": "3", "Base Cost.": "$2 M", "Cost/Hull": "$1 M"},
+    {"Engine": "Drivewave", "Tech": "G", "Pow": "0", "Min Size": "2", "Base Cost.": "$3 M", "Cost/Hull": "$1.5 M"},
+    {"Engine": "Spacefold Drive", "Tech": "T", "Pow": "4", "Min Size": "4", "Base Cost.": "$8 M", "Cost/Hull": "$2 M"},
+    {"Engine": "Psychoportive Drive", "Tech": "P", "Pow": "1", "Min Size": "10", "Base Cost.": "$6 M", "Cost/Hull": "$200 K"},
+    {"Engine": "Transcendent Drive", "Tech": "P", "Pow": "1", "Min Size": "4", "Base Cost.": "$12 M", "Cost/Hull": "$400 K"},
+    {"Engine": "Warpdrive", "Tech": "X", "Pow": "2", "Min Size": "2", "Base Cost.": "$10 M", "Cost/Hull": "$5 M"}
+  ]
+}
