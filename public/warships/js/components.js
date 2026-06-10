@@ -1826,6 +1826,7 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === defId);
             if (!def) return false;
             if (['Sublight', 'FTL Drives'].includes(def.category)) return true;
+            if (isWeapon(defId) || def.category === 'Weapon Systems') return true;
             const specs = getUpgradeSpecs(defId);
             if (!specs) return false;
             if (specs.componentOptions && specs.componentOptions.includes('weapon.enhancement')) return true;
