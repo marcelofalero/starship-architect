@@ -137,7 +137,7 @@ export const useShipStore = defineStore('ship', () => {
         // 1. Enhancement
         if (advanced) {
             if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-                hullCost = Math.max(1, Math.round(hullCost * 0.75));
+                hullCost = Math.max(1, Math.ceil(hullCost * 0.75));
             } else {
                 hullCost += 2;
             }
@@ -152,23 +152,23 @@ export const useShipStore = defineStore('ship', () => {
                 else if (baseWpnHull === 2) mountHull = 2;
                 else if (baseWpnHull === 3) mountHull = 2;
                 else if (baseWpnHull === 4) mountHull = 3;
-                else mountHull = Math.round(baseWpnHull * 0.75);
+                else mountHull = Math.ceil(baseWpnHull * 0.75);
             } else if (emplacement === 'Turret') {
                 if (baseWpnHull === 1) mountHull = 1;
                 else if (baseWpnHull === 2) mountHull = 3;
                 else if (baseWpnHull === 3) mountHull = 4;
                 else if (baseWpnHull === 4) mountHull = 5;
-                else mountHull = Math.round(baseWpnHull * 1.25);
+                else mountHull = Math.ceil(baseWpnHull * 1.25);
             }
             hullCost = mountHull;
         }
 
         if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-            if (weaponMount === 'Twin') hullCost = Math.round(hullCost * 1.5);
+            if (weaponMount === 'Twin') hullCost = Math.ceil(hullCost * 1.5);
             else if (weaponMount === 'Triple') hullCost = hullCost * 2;
-            else if (weaponMount === 'Quad') hullCost = Math.round(hullCost * 2.5);
+            else if (weaponMount === 'Quad') hullCost = Math.ceil(hullCost * 2.5);
 
-            if (concealed) hullCost = Math.round(hullCost * 1.5);
+            if (concealed) hullCost = Math.ceil(hullCost * 1.5);
             
             if (instance.modifications?.fireControl && instance.modifications.fireControl !== 'None') {
                 hullCost += 1;
