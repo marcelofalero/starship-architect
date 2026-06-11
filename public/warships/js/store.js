@@ -188,7 +188,7 @@ export const useShipStore = defineStore('ship', () => {
         }
 
         if (advanced && (isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Defenses')) {
-            hullCost = Math.max(1, Math.ceil(hullCost * 0.75));
+            hullCost = Math.max(1, Math.ceil(hullCost * 0.6));
         }
 
         if (hullCost > 0) {
