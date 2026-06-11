@@ -109,7 +109,7 @@ export const useShipStore = defineStore('ship', () => {
         let hullCost = 0;
         const batteryCount = instance.modifications?.batteryCount || 1;
         const quantity = instance.modifications?.quantity || 1;
-        const enhancement = instance.modifications?.enhancement || 'normal';
+        const advanced = instance.modifications?.advanced || false;
         const auxiliary = instance.modifications?.auxiliary || false;
         const emplacement = instance.modifications?.emplacement || 'Standard Mount';
         const weaponMount = instance.modifications?.weaponMount || 'Single';
@@ -135,8 +135,7 @@ export const useShipStore = defineStore('ship', () => {
         }
 
         // 1. Enhancement
-        if (enhancement === 'enhanced') hullCost += 1;
-        if (enhancement === 'advanced') {
+        if (advanced) {
             if (isWeapon(def.id) || def.category === 'Weapon Systems') {
                 hullCost = hullCost * 0.8;
             } else {
@@ -234,8 +233,8 @@ export const useShipStore = defineStore('ship', () => {
         }
 
         if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-            const enhancement = instance.modifications?.enhancement || 'normal';
-            if (enhancement === 'advanced') {
+            const advanced = instance.modifications?.advanced || false;
+            if (advanced) {
                 con *= 1.2;
             }
         }
@@ -257,11 +256,10 @@ export const useShipStore = defineStore('ship', () => {
         let prefix = '';
 
         if (instance.modifications) {
-            const enhancement = instance.modifications.enhancement || 'normal';
+            const advanced = instance.modifications.advanced || false;
 
             // 1. Enhancement
-            if (enhancement === 'enhanced') diceCount += 1;
-            if (enhancement === 'advanced') diceCount += 2;
+            if (advanced) diceCount += 2;
         }
 
         // Global Bonuses (Template)
@@ -291,14 +289,13 @@ export const useShipStore = defineStore('ship', () => {
 
         // Modifications (Payload, Battery, Fire-link, Quantity)
         if (instance.modifications) {
-             const enhancement = instance.modifications.enhancement || 'normal';
+             const advanced = instance.modifications.advanced || false;
              const emplacement = instance.modifications.emplacement || 'Standard Mount';
              const weaponMount = instance.modifications.weaponMount || 'Single';
              const concealed = instance.modifications.concealed || false;
 
              // 1. Enhancement (Multiplier)
-             if (enhancement === 'enhanced') cost *= 2;
-             if (enhancement === 'advanced') cost *= 5;
+             if (advanced) cost *= 5;
 
              // Weapon/Sensor Emplacement Modifiers
              if (isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Sensors') {
@@ -456,8 +453,8 @@ export const useShipStore = defineStore('ship', () => {
                 }
                 if (def.stats.speed_map) {
                     let pct = instance.modifications.quantity || 5;
-                    const enhancement = instance.modifications?.enhancement || 'normal';
-                    if (enhancement === 'advanced') {
+                    const advanced = instance.modifications?.advanced || false;
+                    if (advanced) {
                         const steps = [5, 10, 15, 20, 30, 40, 50];
                         const idx = steps.indexOf(pct);
                         if (idx !== -1 && idx < steps.length - 1) {
@@ -480,8 +477,8 @@ export const useShipStore = defineStore('ship', () => {
                     else if (hp <= 900) currentSpeed = '30 Ly';
                     else currentSpeed = '50 Ly';
 
-                    const enhancement = instance.modifications?.enhancement || 'normal';
-                    if (enhancement === 'advanced') {
+                    const advanced = instance.modifications?.advanced || false;
+                    if (advanced) {
                         const idx = steps.indexOf(currentSpeed);
                         if (idx !== -1 && idx < steps.length - 1) {
                             currentSpeed = steps[idx + 1];
@@ -1159,7 +1156,8 @@ export const useShipStore = defineStore('ship', () => {
                 if (modConfig.quantity) mods.quantity = modConfig.quantity;
                 if (modConfig.mount) mods.mount = modConfig.mount;
                 if (modConfig.fireLink) mods.fireLink = modConfig.fireLink;
-                if (modConfig.enhancement) mods.enhancement = modConfig.enhancement;
+                if (modConfig.advanced !== undefined) mods.advanced = modConfig.advanced;
+                if (modConfig.enhancement) mods.advanced = modConfig.enhancement === 'advanced';
                 if (modConfig.payloadCount) mods.payloadCount = modConfig.payloadCount;
                 if (modConfig.payloadOption) mods.payloadOption = modConfig.payloadOption;
                 if (modConfig.fireLinkOption) mods.fireLinkOption = modConfig.fireLinkOption;
@@ -1360,7 +1358,7 @@ export const useShipStore = defineStore('ship', () => {
              if (mods.quantity > 1) entry.quantity = mods.quantity;
              if (mods.mount && mods.mount !== 'single') entry.mount = mods.mount;
              if (mods.fireLink && mods.fireLink > 1) entry.fireLink = mods.fireLink;
-             if (mods.enhancement && mods.enhancement !== 'normal') entry.enhancement = mods.enhancement;
+             if (mods.advanced) entry.advanced = true;
              if (mods.payloadCount > 0) entry.payloadCount = mods.payloadCount;
              if (mods.payloadOption) entry.payloadOption = true;
              if (mods.fireLinkOption) entry.fireLinkOption = true;
