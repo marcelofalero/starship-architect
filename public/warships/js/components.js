@@ -143,7 +143,7 @@ const SystemList = {
                 <q-card-section v-if="editingInstance">
                     <div class="q-mb-md">
                         <div class="text-caption">Location</div>
-                        <q-select dark filled v-model="editingInstance.location" :options="['Fore', 'Aft', 'Port', 'Starboard', 'Core', 'Dorsal', 'Ventral']" new-value-mode="add-unique" use-input hint="Enter a custom location or select from list" />
+                        <q-select dark filled v-model="editingInstance.location" :options="['Fore', 'Aft', 'Port', 'Starboard', 'Core', 'Dorsal', 'Ventral', 'Distributed']" new-value-mode="add-unique" use-input hint="Enter a custom location or select from list" />
                     </div>
                     <div v-if="isWeapon(editingInstance.defId)" class="q-mb-md">
                         <div class="text-caption">Weapon User</div>
@@ -1777,7 +1777,7 @@ export const SystemListWrapper = {
         const canEnhance = (defId) => {
             const def = store.allEquipment.find(e => e.id === defId);
             if (!def) return false;
-            if (['Sublight', 'FTL Drives'].includes(def.category)) return true;
+            if (['Sublight', 'FTL Drives', 'Defenses'].includes(def.category)) return true;
             if (isWeapon(defId) || def.category === 'Weapon Systems') return true;
             const specs = getUpgradeSpecs(defId);
             if (!specs) return false;

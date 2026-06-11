@@ -136,9 +136,7 @@ export const useShipStore = defineStore('ship', () => {
 
         // 1. Enhancement
         if (advanced) {
-            if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-                hullCost = Math.max(1, Math.ceil(hullCost * 0.75));
-            } else {
+            if (!(isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Defenses')) {
                 hullCost += 2;
             }
         }
@@ -187,6 +185,10 @@ export const useShipStore = defineStore('ship', () => {
         // Multiply by quantity if it's not a power plant and not a percentage-based scaling (like armor)
         if (def.minHullPts === undefined && (!def.hullCost || def.hullCost.type !== 'pct') && quantity > 1) {
             hullCost *= quantity;
+        }
+
+        if (advanced && (isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Defenses')) {
+            hullCost = Math.max(1, Math.ceil(hullCost * 0.75));
         }
 
         if (hullCost > 0) {
