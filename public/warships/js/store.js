@@ -195,7 +195,7 @@ export const useShipStore = defineStore('ship', () => {
             if (instance.miniaturization === 1) hullCost = Math.max(1, hullCost - 1);
             else if (instance.miniaturization === 2) hullCost = Math.ceil(hullCost / 2);
         }
-        return Math.ceil(hullCost);
+        return hullCost;
     }
 
     function getComponentHullPts(instance) {
