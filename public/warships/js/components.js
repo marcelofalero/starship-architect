@@ -97,7 +97,7 @@ const SystemList = {
                     <q-item-label>
                         {{ getName(instance) }}
                         <q-badge v-if="isCustom(instance.defId)" color="purple" label="Custom" class="q-ml-xs" />
-                        <q-badge v-if="getDef(instance.defId)?.unique" color="orange" label="Unique" class="q-ml-xs" />
+                        <q-badge v-if="instance.modifications?.advanced || getDef(instance.defId)?.unique" color="orange" label="Unique" class="q-ml-xs" />
                         <q-badge v-if="instance.isStock" color="grey-7" label="Stock" class="q-ml-xs" />
                         <q-badge v-if="instance.isNonStandard" color="warning" text-color="black" :label="$t('ui.ns_tag')" class="q-ml-xs" />
                         <q-badge v-if="getDef(instance.defId)?.category === 'Armor'" color="accent" text-color="black" :label="'Toughness: ' + (store.chassis?.toughness?.replace('(', '').replace(')', '') || '-')" class="q-ml-xs" />
@@ -2013,7 +2013,7 @@ export const ShipSheetWrapper = {
                 return def && !store.isWeapon(def.id) && !store.isEngine(def.id);
             });
             if (nonWeapons.length === 0) return i18n.global.t('ui.installed_systems');
-            return nonWeapons.map(instance => getName(instance.defId)).join(', ');
+            return nonWeapons.map(instance => getName(instance)).join(', ');
         });
 
         const getDmg = (instance) => {

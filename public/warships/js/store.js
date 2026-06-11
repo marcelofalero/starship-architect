@@ -137,7 +137,7 @@ export const useShipStore = defineStore('ship', () => {
         // 1. Enhancement
         if (advanced) {
             if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-                hullCost = hullCost * 0.8;
+                hullCost = Math.max(1, Math.round(hullCost * 0.75));
             } else {
                 hullCost += 2;
             }
@@ -451,42 +451,51 @@ export const useShipStore = defineStore('ship', () => {
                         bestHyperdrive = def.stats.hyperdrive;
                     }
                 }
-                if (def.stats.speed_map) {
-                    let pct = instance.modifications.quantity || 5;
+                // Sublight Engines
+                if (def.category === 'Sublight') {
+                    let engineSpeed = 0;
+                    if (def.stats.speed_map) {
+                        const pct = instance.modifications.quantity || 5;
+                        const pctStr = String(pct);
+                        if (def.stats.speed_map[pctStr] !== undefined) {
+                            engineSpeed = def.stats.speed_map[pctStr];
+                        }
+                    } else if (def.stats.speed !== undefined) {
+                        engineSpeed = def.stats.speed;
+                    }
                     const advanced = instance.modifications?.advanced || false;
                     if (advanced) {
-                        const steps = [5, 10, 15, 20, 30, 40, 50];
-                        const idx = steps.indexOf(pct);
-                        if (idx !== -1 && idx < steps.length - 1) {
-                            pct = steps[idx + 1];
-                        }
+                        engineSpeed += 1;
                     }
-                    const pctStr = String(pct);
-                    if (def.stats.speed_map[pctStr] !== undefined) {
-                        if (def.category === 'Sublight') s.speed = def.stats.speed_map[pctStr];
-                        else if (def.category === 'FTL Drives') s.ftlSpeed = def.stats.speed_map[pctStr];
-                    }
+                    s.speed = engineSpeed;
                 }
-                if (def.category === 'FTL Drives' && (def.name === 'Stardrive' || def.name === 'Drivewave')) {
-                    const hp = chassis.value.baseHull || 0;
-                    const steps = ['5 Ly', '10 Ly', '20 Ly', '30 Ly', '50 Ly'];
-                    let currentSpeed = '5 Ly';
-                    if (hp < 100) currentSpeed = '5 Ly';
-                    else if (hp <= 300) currentSpeed = '10 Ly';
-                    else if (hp <= 600) currentSpeed = '20 Ly';
-                    else if (hp <= 900) currentSpeed = '30 Ly';
-                    else currentSpeed = '50 Ly';
 
-                    const advanced = instance.modifications?.advanced || false;
-                    if (advanced) {
-                        const idx = steps.indexOf(currentSpeed);
-                        if (idx !== -1 && idx < steps.length - 1) {
-                            currentSpeed = steps[idx + 1];
+                // FTL Drives
+                if (def.category === 'FTL Drives') {
+                    if (def.name === 'Stardrive' || def.name === 'Drivewave') {
+                        const hp = chassis.value.baseHull || 0;
+                        let currentSpeed = '5 Ly';
+                        if (hp < 100) currentSpeed = '5 Ly';
+                        else if (hp <= 300) currentSpeed = '10 Ly';
+                        else if (hp <= 600) currentSpeed = '20 Ly';
+                        else if (hp <= 900) currentSpeed = '30 Ly';
+                        else currentSpeed = '50 Ly';
+
+                        const advanced = instance.modifications?.advanced || false;
+                        if (advanced) {
+                            const match = currentSpeed.match(/(\d+)/);
+                            if (match) {
+                                currentSpeed = `${parseInt(match[1]) + 5} Ly`;
+                            }
+                        }
+                        s.ftlSpeed = currentSpeed;
+                    } else if (def.stats.speed_map) {
+                        const pct = instance.modifications.quantity || 5;
+                        const pctStr = String(pct);
+                        if (def.stats.speed_map[pctStr] !== undefined) {
+                            s.ftlSpeed = def.stats.speed_map[pctStr];
                         }
                     }
-                    s.ftlSpeed = currentSpeed;
-                } else if (def.stats.speed !== undefined) {
-                    s.speed = def.stats.speed;
                 }
 
                 if (def.stats.sr_bonus) bonusSR += def.stats.sr_bonus;
