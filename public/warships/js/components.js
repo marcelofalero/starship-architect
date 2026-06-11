@@ -357,48 +357,119 @@ const ConfigPanel = {
 const ShipSheet = {
     template: `
     <div class="warships-block">
-        <div class="warships-header"><span>{{ store.meta.name || 'Untitled Ship' }}</span><span>CL {{ calculateCL }}</span></div>
-        <div class="warships-sub">{{ store.chassis.size }} Starfighter ({{ getLocalizedName(store.chassis) }})</div>
+        <div class="warships-header">
+            <span>{{ store.meta.name || 'Untitled Ship' }}</span>
+            <span style="font-size: 0.8em; text-transform: uppercase;">{{ store.chassis.category }} {{ store.chassis.size }}</span>
+        </div>
+        <div class="warships-sub">
+            Hull Type: {{ getLocalizedName(store.chassis) }}
+        </div>
         <div class="sheet-body">
-            <div><span class="bold">Init</span> +{{ getMod(store.currentStats.dex) + store.crewStats.skill }}; <span class="bold">Senses</span> Perception +{{ getMod(store.currentStats.int) + store.crewStats.skill }}</div>
+            <!-- SECTION 1: Tactical Stats -->
+            <div class="section-title">Tactical Attributes</div>
+            <div class="row q-col-gutter-sm">
+                <div class="col-4">
+                    <span class="bold">Toughness:</span> {{ toughness }}
+                </div>
+                <div class="col-4">
+                    <span class="bold">Maneuver Class:</span> {{ maneuverClass }}
+                </div>
+                <div class="col-4">
+                    <span class="bold">Target Modifier:</span> {{ targetModifier }}
+                </div>
+                <div class="col-6 q-mt-sm">
+                    <span class="bold">Acceleration (Sublight):</span> {{ store.currentStats.speed }}
+                </div>
+                <div class="col-6 q-mt-sm">
+                    <span class="bold">FTL Range:</span> {{ store.currentStats.ftlSpeed || 'None' }}
+                </div>
+            </div>
 
-            <div class="section-title">Defense</div>
-            <div><span class="bold">Ref</span> {{ store.reflexDefense }} (Flat-footed {{ store.reflexDefense - getMod(store.currentStats.dex) }}), <span class="bold">Fort</span> {{ 10 + getMod(store.currentStats.str) }}; <span class="bold">+{{ store.currentStats.armor }} Armor</span></div>
+            <!-- SECTION 2: Defenses & Armor -->
+            <div class="section-title">Armor & Shields</div>
+            <div class="row q-col-gutter-sm text-center">
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">LI:</span> {{ store.currentStats.LI || '-' }}</div></div>
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">HI:</span> {{ store.currentStats.HI || '-' }}</div></div>
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">En:</span> {{ store.currentStats.En || '-' }}</div></div>
+            </div>
+            <div v-if="store.currentStats.sr" class="q-mt-sm text-center">
+                <div class="bg-teal-1 q-pa-xs text-teal-9 text-bold rounded-borders">DEFLECTION INDUCER / SHIELD RATING (SR): {{ store.currentStats.sr }}</div>
+            </div>
 
+            <!-- SECTION 3: Damage Track -->
+            <div class="section-title">Damage Tracks</div>
+            <div class="row q-col-gutter-sm text-center">
+                <div class="col-3"><div class="bg-yellow-1 q-pa-xs text-yellow-9 rounded-borders"><span class="bold">Stun (S):</span> {{ stunTrack }}</div></div>
+                <div class="col-3"><div class="bg-orange-1 q-pa-xs text-orange-9 rounded-borders"><span class="bold">Wound (W):</span> {{ woundTrack }}</div></div>
+                <div class="col-3"><div class="bg-red-1 q-pa-xs text-red-9 rounded-borders"><span class="bold">Mortal (M):</span> {{ mortalTrack }}</div></div>
+                <div class="col-3"><div class="bg-red-3 q-pa-xs text-white rounded-borders"><span class="bold">Critical (C):</span> {{ criticalTrack }}</div></div>
+            </div>
 
-            <div class="section-title">Offense</div>
-            <div><span class="bold">Acceleration</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
+            <!-- SECTION 4: System Metrics -->
+            <div class="section-title">Engineering & Logistics</div>
+            <div class="row q-col-gutter-md">
+                <div class="col-6">
+                    <div><span class="bold">Hull Points:</span> {{ store.usedHull }} / {{ store.totalHull }} HP ({{ store.remainingHull }} remaining)</div>
+                    <div style="font-size: 0.85em; color: #666;" class="q-pl-sm">
+                        Base: {{ store.chassis.baseHull }} | Bonus: {{ store.bonusHull }} | Component Usage: {{ store.hullUsageDetails }}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div><span class="bold">Power Plant:</span> {{ store.totalPowerConsumed }} / {{ store.totalPowerGenerated }} PW used</div>
+                    <div style="font-size: 0.85em; color: #666;" class="q-pl-sm">
+                        Usage: {{ store.powerUsageDetails }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row q-col-gutter-sm q-mt-xs">
+                <div class="col-3"><span class="bold">Crew Quality:</span> {{ store.crewQuality }}</div>
+                <div class="col-3"><span class="bold">Crew Size:</span> {{ store.currentCrew }} (Max {{ store.totalBerthingCapacity || 0 }})</div>
+                <div class="col-3"><span class="bold">Passengers:</span> {{ store.currentPassengers }} (Max {{ store.totalPassengerCapacity || 0 }})</div>
+                <div class="col-3"><span class="bold">Life Support:</span> Max {{ store.totalLifeSupportCapacity || 0 }} Hull</div>
+            </div>
+            
+            <div class="row q-col-gutter-sm q-mt-xs">
+                <div class="col-6"><span class="bold">Cargo Capacity:</span> {{ store.currentCargo }}</div>
+                <div class="col-6"><span class="bold">Consumables / Stores:</span> {{ store.currentConsumables }}</div>
+            </div>
+
+            <!-- SECTION 5: Armament -->
+            <div class="section-title">Armament (Weapon Systems)</div>
+            <div v-if="weaponData.length === 0" class="text-italic text-grey-6">No weapons installed.</div>
             <div v-for="w in weaponData" :key="w.instanceId" class="weapon-line">
-                <span class="bold">Ranged</span> {{ w.name }} +{{ w.attackBonus }} ({{ w.damage }})
-                <div v-if="w.details" class="text-caption text-italic q-ml-md" style="font-size: 0.8em;">{{ w.details }}</div>
+                <span class="bold">{{ w.name }}</span>
+                <div style="font-size: 0.85em;" class="row q-col-gutter-xs q-mt-xs">
+                    <div class="col-4"><strong>Damage:</strong> {{ w.damage }}</div>
+                    <div class="col-4"><strong>Fire:</strong> {{ w.fire }}</div>
+                    <div class="col-4" v-if="w.location"><strong>Location:</strong> {{ w.location }}</div>
+                    <div class="col-12" v-if="w.details"><strong>Details:</strong> {{ w.details }}</div>
+                </div>
             </div>
 
-            <div class="section-title">Statistics</div>
-            <div class="stat-grid">
-                <div><span class="bold">Str</span> {{ store.currentStats.str }}</div>
-                <div><span class="bold">Dex</span> {{ store.currentStats.dex }}</div>
-                <div><span class="bold">Int</span> {{ store.currentStats.int }}</div>
+            <!-- SECTION 6: Damage Diagram & Installed Systems -->
+            <div class="section-title">Installed Systems (By Hit Location Zone)</div>
+            <div v-for="(components, loc) in componentsByLocation" :key="loc" class="q-mb-md q-pa-sm bg-grey-2 rounded-borders" style="border-left: 4px solid #389EBD;">
+                <div class="bold text-uppercase text-primary q-mb-xs">{{ loc }} Zone</div>
+                <div class="row q-col-gutter-xs">
+                    <div v-for="c in components" :key="c.instanceId" class="col-12 col-sm-6">
+                        <span class="bold">• {{ getName(c) }}</span>
+                        <span style="font-size: 0.8em; color: #555;" class="q-ml-sm">
+                            ({{ store.getComponentCost(c) ? formatCreds(store.getComponentCost(c)) : '0 cr' }})
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div><span class="bold">Base Atk</span> +{{ store.crewStats.atk }}; <span class="bold">Grapple</span> +{{ store.crewStats.atk + (getMod(store.currentStats.str)) }}</div>
 
-            <div class="section-title">Systems</div>
-            <div>{{ systemNames }}</div>
-
+            <!-- SECTION 7: Special Rules -->
             <div v-if="componentsWithDescriptions.length > 0">
                 <div class="section-title">Special Equipment Rules</div>
-                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" class="q-mb-sm">
+                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" class="q-mb-sm" style="font-size: 0.9em; line-height: 1.3;">
                     <span class="bold">{{ getName(c.defId) }}:</span> {{ getDescription(c.defId) }}
                 </div>
             </div>
 
-            <div class="section-title">Logistics</div>
-            <div class="stat-grid">
-                <div><span class="bold">Crew</span> {{ store.currentCrew }}</div>
-                <div><span class="bold">Passengers</span> {{ store.currentPassengers }}</div>
-                <div><span class="bold">Cargo</span> {{ store.currentCargo }}</div>
-                <div><span class="bold">Consumables</span> {{ store.currentConsumables }}</div>
-            </div>
-
+            <!-- Total Cost -->
             <div class="cost-line">
                 <span class="bold">Total Cost:</span> {{ formatCreds(store.totalCost) }}
             </div>
@@ -1989,6 +2060,7 @@ export const ShipSheetWrapper = {
     ...ShipSheet,
     setup() {
         const store = useShipStore();
+
         const getName = (instance) => {
             const id = instance.defId || instance;
             const def = store.allEquipment.find(e => e.id === id);
@@ -2003,48 +2075,24 @@ export const ShipSheetWrapper = {
             }
             return name;
         };
-        const getMod = (score) => Math.floor((score - 10) / 2);
+
         const weapons = computed(() => store.installedComponents.filter(instance => {
             const def = store.allEquipment.find(e => e.id === instance.defId);
             return def && store.isWeapon(def.id);
         }));
-        const systemNames = computed(() => {
-            const nonWeapons = store.installedComponents.filter(instance => {
-                const def = store.allEquipment.find(e => e.id === instance.defId);
-                return def && !store.isWeapon(def.id) && !store.isEngine(def.id);
-            });
-            if (nonWeapons.length === 0) return i18n.global.t('ui.installed_systems');
-            return nonWeapons.map(instance => getName(instance)).join(', ');
-        });
 
         const getDmg = (instance) => {
             return store.getComponentDamage(instance) || '-';
-        }
-        const calculateCL = computed(() => {
-            if (store.chassis.challengeLevel !== null && store.chassis.challengeLevel !== undefined) {
-                return store.chassis.challengeLevel;
-            }
-            let cl = 10;
-            if(store.chassis.size.includes('Colossal')) cl += 5;
-            cl += Math.floor(store.installedComponents.length / 2);
-            if(store.template) cl += 2;
-            cl += store.crewStats.cl;
-            return cl;
-        });
+        };
+
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
         const weaponData = computed(() => {
             return weapons.value.map(w => {
                 const def = store.allEquipment.find(e => e.id === w.defId);
-                const name = getName(w); // Uses the existing getName which handles some mods
+                const name = getName(w);
                 const damage = getDmg(w);
-
-                // Calculate Attack Bonus: Crew Atk + Int Mod + Range(0) + Size?
-                // Usually Starship weapons are Int based.
-                // SotG p16: "Attack Bonus" is Base Atk.
-                // We add ship's Int modifier (or Pilot's Dex if we had a pilot, but we assume generic crew).
-                // "Generic crew use the ship's Intelligence modifier for attack rolls with ship weapons."
-                const atk = store.crewStats.atk + getMod(store.currentStats.int);
+                const fire = def ? def.fire || 'N/A' : 'N/A';
 
                 const detailsParts = [];
                 if (w.modifications.batteryCount > 1) detailsParts.push(`Battery (${w.modifications.batteryCount} guns)`);
@@ -2059,19 +2107,89 @@ export const ShipSheetWrapper = {
                 if (w.modifications.autofire) detailsParts.push('Autofire');
                 if (w.modifications.pointBlank) detailsParts.push('Point-Blank');
 
-                // Range isn't easily available in data.json currently without parsing description or adding a field.
-                // We'll skip range for now or infer it? Laser Cannon = Short?
-                // We'll just stick to declarative mods.
-
                 return {
                     instanceId: w.instanceId,
                     name: name,
                     damage: damage,
-                    attackBonus: atk,
+                    fire: fire,
+                    location: w.location || 'Distributed',
                     details: detailsParts.join(', '),
                     defId: w.defId
                 };
             });
+        });
+
+        const toughness = computed(() => {
+            return store.chassis.toughness || '-';
+        });
+
+        const maneuverClass = computed(() => {
+            const mvrVal = store.chassis.mvr;
+            if (mvrVal !== undefined && mvrVal !== null && mvrVal !== '') return mvrVal;
+            // Fallback for custom ships based on baseHull
+            const bh = store.chassis.baseHull || 0;
+            if (bh <= 40) return '4';
+            if (bh <= 160) return '3';
+            if (bh <= 960) return '2';
+            if (bh <= 4000) return '1';
+            return '0';
+        });
+
+        const targetModifier = computed(() => {
+            const targetVal = store.chassis.target;
+            if (targetVal !== undefined && targetVal !== null && targetVal !== '') return targetVal;
+            // Fallback for custom ships based on baseHull
+            const bh = store.chassis.baseHull || 0;
+            if (bh <= 15) return '+3 steps';
+            if (bh <= 80) return '+2 steps';
+            if (bh <= 160) return '+1 step';
+            if (bh <= 480) return '0';
+            if (bh <= 960) return '-1 step';
+            if (bh <= 1600) return '-2 steps';
+            if (bh <= 4000) return '-3 steps';
+            return '-4 steps';
+        });
+
+        const stunTrack = computed(() => {
+            if (store.chassis.s !== undefined && store.chassis.s !== null && store.chassis.s !== '') return store.chassis.s;
+            return Math.floor((store.chassis.baseHull || 0) * 0.1) || 1;
+        });
+
+        const woundTrack = computed(() => {
+            if (store.chassis.w !== undefined && store.chassis.w !== null && store.chassis.w !== '') return store.chassis.w;
+            return Math.floor((store.chassis.baseHull || 0) * 0.1) || 1;
+        });
+
+        const mortalTrack = computed(() => {
+            if (store.chassis.m !== undefined && store.chassis.m !== null && store.chassis.m !== '') return store.chassis.m;
+            return Math.floor((store.chassis.baseHull || 0) * 0.05) || 1;
+        });
+
+        const criticalTrack = computed(() => {
+            if (store.chassis.c !== undefined && store.chassis.c !== null && store.chassis.c !== '') return store.chassis.c;
+            return Math.floor((store.chassis.baseHull || 0) * 0.025) || 1;
+        });
+
+        const componentsByLocation = computed(() => {
+            const locs = {};
+            store.installedComponents.forEach(instance => {
+                const loc = instance.location || 'Distributed';
+                if (!locs[loc]) locs[loc] = [];
+                locs[loc].push(instance);
+            });
+            const locationOrder = ['Fore', 'Aft', 'Port', 'Starboard', 'Core', 'Dorsal', 'Ventral', 'Distributed'];
+            const sorted = {};
+            locationOrder.forEach(l => {
+                if (locs[l]) {
+                    sorted[l] = locs[l];
+                }
+            });
+            Object.keys(locs).forEach(l => {
+                if (!locationOrder.includes(l)) {
+                    sorted[l] = locs[l];
+                }
+            });
+            return sorted;
         });
 
         const componentsWithDescriptions = computed(() => {
@@ -2086,11 +2204,30 @@ export const ShipSheetWrapper = {
             });
             return unique;
         });
+
         const getDescription = (id) => {
              const def = store.allEquipment.find(e => e.id === id);
              return def ? def.description : '';
         };
 
-        return { store, getName, getMod, weapons, weaponData, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName, componentsWithDescriptions, getDescription };
+        return {
+            store,
+            getName,
+            weapons,
+            weaponData,
+            getDmg,
+            formatCreds,
+            getLocalizedName,
+            toughness,
+            maneuverClass,
+            targetModifier,
+            stunTrack,
+            woundTrack,
+            mortalTrack,
+            criticalTrack,
+            componentsByLocation,
+            componentsWithDescriptions,
+            getDescription
+        };
     }
 };

@@ -121,6 +121,13 @@ def main():
             "toughness": h.get("Tough", "Unknown"),
             "baseEp": 0,
             
+            "mvr": h.get("Mvr"),
+            "target": h.get("Target") or h.get("Target Mvr"),
+            "s": h.get("s"),
+            "w": h.get("w"),
+            "m": h.get("m"),
+            "c": h.get("c"),
+            
             "stats": {
                 "hp": hp,
                 "str": 0, "dex": 0, "int": 0, "dr": 0, "armor": 0, "sr": 0
