@@ -261,6 +261,7 @@ const ConfigPanel = {
             <div v-if="store.hullUsageDetails.sensors" class="row justify-between text-grey-4"><span>Sensors</span><span>-{{ store.hullUsageDetails.sensors }}</span></div>
             <div v-if="store.hullUsageDetails.accommodations" class="row justify-between text-grey-4"><span>Accommodations</span><span>-{{ store.hullUsageDetails.accommodations }}</span></div>
             <div v-if="store.hullUsageDetails.miscellaneous" class="row justify-between text-grey-4"><span>Miscellaneous</span><span>-{{ store.hullUsageDetails.miscellaneous }}</span></div>
+            <div v-if="store.hullUsageDetails.rounding" class="row justify-between text-grey-4"><span>Rounding</span><span>-{{ store.hullUsageDetails.rounding }}</span></div>
             <q-separator dark class="q-my-xs" />
             <div class="row justify-between text-h6 items-center">
                 <span>Remaining</span>

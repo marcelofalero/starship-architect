@@ -794,7 +794,11 @@ export const useShipStore = defineStore('ship', () => {
         installedComponents.value.forEach(instance => {
             used += getComponentHullPts(instance);
         });
-        return round(used);
+        const rawUsed = round(used);
+        const exactRemaining = round(totalHull.value - rawUsed);
+        const flooredRemaining = Math.floor(exactRemaining);
+        const diff = round(exactRemaining - flooredRemaining);
+        return round(rawUsed + diff);
     });
 
     const remainingHull = computed(() => {
@@ -841,7 +845,25 @@ export const useShipStore = defineStore('ship', () => {
             else if (def.category === 'Sensors') sensors += pts;
             else miscellaneous += pts; // fallback
         });
-        return { armor: round(armor), power: round(power), sublight: round(sublight), ftl: round(ftl), weapons: round(weapons), accommodations: round(accommodations), miscellaneous: round(miscellaneous), command: round(command), computers: round(computers), sensors: round(sensors) };
+        
+        const rawUsed = round(armor + power + sublight + ftl + weapons + accommodations + miscellaneous + command + computers + sensors);
+        const exactRemaining = round(totalHull.value - rawUsed);
+        const flooredRemaining = Math.floor(exactRemaining);
+        const diff = round(exactRemaining - flooredRemaining);
+
+        return { 
+            armor: round(armor), 
+            power: round(power), 
+            sublight: round(sublight), 
+            ftl: round(ftl), 
+            weapons: round(weapons), 
+            accommodations: round(accommodations), 
+            miscellaneous: round(miscellaneous), 
+            command: round(command), 
+            computers: round(computers), 
+            sensors: round(sensors),
+            rounding: diff > 0 ? round(diff) : 0
+        };
     });
 
     const powerUsageDetails = computed(() => {
