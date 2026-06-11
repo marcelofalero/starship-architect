@@ -1699,7 +1699,7 @@ export const SystemListWrapper = {
         }
         const format = (n) => n === 0 ? '-' : new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
-        const hasUpgrades = (defId) => isWeapon(defId) || !!store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
+        const hasUpgrades = (defId) => isWeapon(defId) || canEnhance(defId) || !!store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
         const getUpgradeSpecs = (defId) => store.allEquipment.find(e => e.id === defId)?.upgradeSpecs;
 
         const emplacementOptions = computed(() => {
