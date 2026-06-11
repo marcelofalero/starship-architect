@@ -1229,7 +1229,8 @@ export const useShipStore = defineStore('ship', () => {
             if (def && isWeapon(def.id) && !mods.weaponUser) mods.weaponUser = 'Pilot';
 
             // Enforce minimum size requirements for backwards compatibility
-            const shipChassis = allShips.value.find(s => s.id === state.chassis) || allShips.value[0];
+            const chassisIdVal = state.configuration?.baseChassis || state.chassis;
+            const shipChassis = allShips.value.find(s => s.id === chassisIdVal) || allShips.value[0];
             const baseHull = shipChassis ? shipChassis.baseHull : 1;
             if (def && (def.category === 'Sublight' || def.category === 'FTL Drives')) {
                 const minPct = Math.ceil(((def.minHullPts || 1) / baseHull) * 100);
