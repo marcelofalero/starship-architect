@@ -1,0 +1,6178 @@
+{
+  "AVAILABILITY_RANK": {},
+  "DEFAULT_OPTION_COSTS": {},
+  "LICENSE_FEES": {},
+  "REFLEX_SIZE_MODS": {},
+  "SIZE_COST_MULTIPLIERS": {},
+  "SIZE_RANK": [
+    "Small Craft",
+    "Light Ships",
+    "Medium Ships",
+    "Heavy Ships",
+    "Super-Heavy Ships",
+    "Fortress Ships"
+  ],
+  "TEMPLATES": [],
+  "STOCK_SHIPS": [
+    {
+      "id": "hull_fighter",
+      "name": "Fighter",
+      "name_es": "Fighter",
+      "size": "Small Craft",
+      "category": "Military",
+      "cost": 350000,
+      "baseHull": 10,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 10,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 1,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_strike_fighter",
+      "name": "Strike fighter",
+      "name_es": "Strike fighter",
+      "size": "Small Craft",
+      "category": "Military",
+      "cost": 500000,
+      "baseHull": 15,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 15,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 2,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_cutter",
+      "name": "Cutter",
+      "name_es": "Cutter",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 600000,
+      "baseHull": 20,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 20,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 4,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_scout",
+      "name": "Scout",
+      "name_es": "Scout",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 800000,
+      "baseHull": 30,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 30,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 6,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_escort",
+      "name": "Escort",
+      "name_es": "Escort",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 1000000,
+      "baseHull": 40,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 40,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 10,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_corvette",
+      "name": "Corvette",
+      "name_es": "Corvette",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 5000000,
+      "baseHull": 80,
+      "bonusHull": 8,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 80,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 20,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_frigate",
+      "name": "Frigate",
+      "name_es": "Frigate",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 15000000,
+      "baseHull": 120,
+      "bonusHull": 12,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 120,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 60,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_destroyer",
+      "name": "Destroyer",
+      "name_es": "Destroyer",
+      "size": "Light Ships",
+      "category": "Military",
+      "cost": 30000000,
+      "baseHull": 160,
+      "bonusHull": 16,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 160,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 80,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_light_cruiser",
+      "name": "Light cruiser",
+      "name_es": "Light cruiser",
+      "size": "Medium Ships",
+      "category": "Military",
+      "cost": 50000000,
+      "baseHull": 320,
+      "bonusHull": 64,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 320,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 240,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_heavy_cruiser",
+      "name": "Heavy cruiser",
+      "name_es": "Heavy cruiser",
+      "size": "Medium Ships",
+      "category": "Military",
+      "cost": 100000000,
+      "baseHull": 400,
+      "bonusHull": 80,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 400,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 300,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_armored_cruiser",
+      "name": "Armored cruiser",
+      "name_es": "Armored cruiser",
+      "size": "Medium Ships",
+      "category": "Military",
+      "cost": 200000000,
+      "baseHull": 480,
+      "bonusHull": 96,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 480,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 360,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_battlecruiser",
+      "name": "Battlecruiser",
+      "name_es": "Battlecruiser",
+      "size": "Heavy Ships",
+      "category": "Military",
+      "cost": 500000000,
+      "baseHull": 960,
+      "bonusHull": 288,
+      "toughness": "Hv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 960,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 960,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_battleship",
+      "name": "Battleship",
+      "name_es": "Battleship",
+      "size": "Heavy Ships",
+      "category": "Military",
+      "cost": 1000000000,
+      "baseHull": 1200,
+      "bonusHull": 360,
+      "toughness": "Hv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 1200,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 1200,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_fleet_carrier",
+      "name": "Fleet carrier",
+      "name_es": "Fleet carrier",
+      "size": "Heavy Ships",
+      "category": "Military",
+      "cost": 1500000000,
+      "baseHull": 1600,
+      "bonusHull": 480,
+      "toughness": "Hv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 1600,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 1600,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_dreadnought",
+      "name": "Dreadnought",
+      "name_es": "Dreadnought",
+      "size": "Super-Heavy Ships",
+      "category": "Military",
+      "cost": 2000000000,
+      "baseHull": 3200,
+      "bonusHull": 1600,
+      "toughness": "SHv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 3200,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 3200,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_super_carrier",
+      "name": "Super-carrier",
+      "name_es": "Super-carrier",
+      "size": "Super-Heavy Ships",
+      "category": "Military",
+      "cost": 4000000000,
+      "baseHull": 4000,
+      "bonusHull": 2000,
+      "toughness": "SHv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 4000,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 4000,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_super_dread",
+      "name": "Super-dread.",
+      "name_es": "Super-dread.",
+      "size": "Super-Heavy Ships",
+      "category": "Military",
+      "cost": 10000000000,
+      "baseHull": 6400,
+      "bonusHull": 3200,
+      "toughness": "SHv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 6400,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 6400,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_fortress_ship",
+      "name": "Fortress ship",
+      "name_es": "Fortress ship",
+      "size": "Super-Heavy Ships",
+      "category": "Military",
+      "cost": 50000000000,
+      "baseHull": 12000,
+      "bonusHull": 6000,
+      "toughness": "SHv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 12000,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 12000,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_launch",
+      "name": "Launch",
+      "name_es": "Launch",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 2,
+      "baseHull": 8,
+      "bonusHull": 0,
+      "toughness": "(Gd)",
+      "baseEp": 0,
+      "stats": {
+        "hp": 8,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 1,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_courier",
+      "name": "Courier",
+      "name_es": "Courier",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 4,
+      "baseHull": 16,
+      "bonusHull": 0,
+      "toughness": "(Gd)",
+      "baseEp": 0,
+      "stats": {
+        "hp": 16,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 2,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_trader",
+      "name": "Trader",
+      "name_es": "Trader",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 6,
+      "baseHull": 24,
+      "bonusHull": 0,
+      "toughness": "(Gd)",
+      "baseEp": 0,
+      "stats": {
+        "hp": 24,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 3,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_fast_freighter",
+      "name": "Fast freighter",
+      "name_es": "Fast freighter",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 8,
+      "baseHull": 32,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 32,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 4,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_fast_transport",
+      "name": "Fast transport",
+      "name_es": "Fast transport",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 10,
+      "baseHull": 40,
+      "bonusHull": 0,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 40,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 5,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_hauler",
+      "name": "Hauler",
+      "name_es": "Hauler",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 18,
+      "baseHull": 72,
+      "bonusHull": 7,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 72,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 5,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_industrial",
+      "name": "Industrial",
+      "name_es": "Industrial",
+      "size": "Small Craft",
+      "category": "Civilian",
+      "cost": 24,
+      "baseHull": 96,
+      "bonusHull": 10,
+      "toughness": "Sm",
+      "baseEp": 0,
+      "stats": {
+        "hp": 96,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 6,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_medium_freighter",
+      "name": "Medium freighter",
+      "name_es": "Medium freighter",
+      "size": "Medium Ships",
+      "category": "Civilian",
+      "cost": 30,
+      "baseHull": 240,
+      "bonusHull": 48,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 240,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 8,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_clipper",
+      "name": "Clipper",
+      "name_es": "Clipper",
+      "size": "Medium Ships",
+      "category": "Civilian",
+      "cost": 360,
+      "baseHull": 360,
+      "bonusHull": 72,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 360,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 12,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_medium_transport",
+      "name": "Medium transport",
+      "name_es": "Medium transport",
+      "size": "Medium Ships",
+      "category": "Civilian",
+      "cost": 60,
+      "baseHull": 480,
+      "bonusHull": 96,
+      "toughness": "Lt",
+      "baseEp": 0,
+      "stats": {
+        "hp": 480,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 15,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_tanker",
+      "name": "Tanker",
+      "name_es": "Tanker",
+      "size": "Medium Ships",
+      "category": "Civilian",
+      "cost": 90,
+      "baseHull": 720,
+      "bonusHull": 216,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 720,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 12,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_liner",
+      "name": "Liner",
+      "name_es": "Liner",
+      "size": "Medium Ships",
+      "category": "Civilian",
+      "cost": 840,
+      "baseHull": 840,
+      "bonusHull": 252,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 840,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 14,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_heavy_transport",
+      "name": "Heavy transport",
+      "name_es": "Heavy transport",
+      "size": "Heavy Ships",
+      "category": "Civilian",
+      "cost": 160,
+      "baseHull": 1280,
+      "bonusHull": 384,
+      "toughness": "Md",
+      "baseEp": 0,
+      "stats": {
+        "hp": 1280,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 20,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_super_freighter",
+      "name": "Super-freighter",
+      "name_es": "Super-freighter",
+      "size": "Heavy Ships",
+      "category": "Civilian",
+      "cost": 300,
+      "baseHull": 2400,
+      "bonusHull": 1200,
+      "toughness": "Hv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 2400,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 19,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    },
+    {
+      "id": "hull_colony_transport",
+      "name": "Colony transport",
+      "name_es": "Colony transport",
+      "size": "Super-Heavy Ships",
+      "category": "Civilian",
+      "cost": 3600,
+      "baseHull": 3600,
+      "bonusHull": 1800,
+      "toughness": "Hv",
+      "baseEp": 0,
+      "stats": {
+        "hp": 3600,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "dr": 0,
+        "armor": 0,
+        "sr": 0
+      },
+      "logistics": {
+        "crew": 29,
+        "pass": 0,
+        "cargo": "0",
+        "cons": "0 days"
+      },
+      "defaultMods": []
+    }
+  ],
+  "EQUIPMENT": [
+    {
+      "id": "eng_planetary_thruster",
+      "name": "Planetary thruster",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 200000,
+      "costPerHull": 50000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 0.1,
+          "10": 0.25,
+          "15": 0.5,
+          "20": 1.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 1.0"
+    },
+    {
+      "id": "eng_photon_sail",
+      "name": "Photon sail",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 500000,
+      "costPerHull": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 5.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "10": 0.02,
+          "15": 0.05,
+          "20": 0.1,
+          "30": 0.15,
+          "40": 0.2,
+          "50": 0.25
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: -"
+    },
+    {
+      "id": "eng_fusion_torch",
+      "name": "Fusion torch",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 500000,
+      "costPerHull": 100000,
+      "powerConsumed": 0.33,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 3.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 0.5,
+          "10": 1.0,
+          "15": 1.5,
+          "20": 2.0,
+          "30": 3.0,
+          "40": 4.0,
+          "50": 5.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 0.33"
+    },
+    {
+      "id": "eng_ion_engine",
+      "name": "Ion engine",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 800000,
+      "costPerHull": 200000,
+      "powerConsumed": 0.5,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "10": 0.5,
+          "15": 1.0,
+          "20": 1.5,
+          "30": 2.0,
+          "40": 3.0,
+          "50": 4.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 0.5"
+    },
+    {
+      "id": "eng_particle_impulse",
+      "name": "Particle impulse",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 7 - Gravity Age",
+      "tech": [],
+      "baseCost": 500000,
+      "costPerHull": 300000,
+      "powerConsumed": 0.75,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 0.5,
+          "10": 1.0,
+          "15": 1.5,
+          "20": 2.0,
+          "30": 2.5,
+          "40": 3.0,
+          "50": 4.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 0.75"
+    },
+    {
+      "id": "eng_induction_engine",
+      "name": "Induction engine",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 500000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 1.0,
+          "10": 2.0,
+          "15": 3.0,
+          "20": 4.0,
+          "30": 5.0,
+          "40": 6.0,
+          "50": 8.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 1.0"
+    },
+    {
+      "id": "eng_inertial_flux_engine",
+      "name": "Inertial flux engine",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 2000000,
+      "costPerHull": 500000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 2.0,
+          "10": 3.0,
+          "15": 4.0,
+          "20": 5.0,
+          "30": 6.0,
+          "40": 8.0,
+          "50": 10.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 1.0"
+    },
+    {
+      "id": "eng_gravitic_redirector",
+      "name": "Gravitic redirector",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 3000000,
+      "costPerHull": 1000000,
+      "powerConsumed": 0.67,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 3.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 2.0,
+          "10": 4.0,
+          "15": 6.0,
+          "20": 8.0,
+          "30": 10.0,
+          "40": 12.0,
+          "50": 16.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 0.67"
+    },
+    {
+      "id": "eng_spatial_compressor",
+      "name": "Spatial compressor",
+      "category": "Sublight",
+      "exclusiveGroup": "Sublight",
+      "group": "PL 9 - Matter Age",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 1500000,
+      "costPerHull": 200000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {
+          "5": 3.0,
+          "10": 6.0,
+          "15": 9.0,
+          "20": 12.0,
+          "30": 15.0,
+          "40": 18.0,
+          "50": 20.0
+        }
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Pow: 2.0"
+    },
+    {
+      "id": "pow_solar_cell",
+      "name": "Solar Cell",
+      "category": "Power",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 200000,
+      "powerPerHull": 1.5,
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 1.5"
+    },
+    {
+      "id": "pow_fission_generator",
+      "name": "Fission Generator",
+      "category": "Power",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 1000000,
+      "costPerHull": 100000,
+      "powerPerHull": 1.5,
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 1.5"
+    },
+    {
+      "id": "pow_fusion_generator",
+      "name": "Fusion Generator",
+      "category": "Power",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 200000,
+      "powerPerHull": 2.0,
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 2.0"
+    },
+    {
+      "id": "pow_grav_fusion_cell",
+      "name": "Grav-fusion Cell",
+      "category": "Power",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 2000000,
+      "costPerHull": 200000,
+      "powerPerHull": 2.5,
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 2.5"
+    },
+    {
+      "id": "pow_fuel_tank",
+      "name": "Fuel Tank",
+      "category": "Power",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 50000,
+      "costPerHull": 10000,
+      "powerPerHull": 0.0,
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: -"
+    },
+    {
+      "id": "pow_tachyonic_collider",
+      "name": "Tachyonic Collider",
+      "category": "Power",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 100000,
+      "powerPerHull": 2.5,
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 2.5"
+    },
+    {
+      "id": "pow_antimatter_reactor",
+      "name": "Antimatter Reactor",
+      "category": "Power",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "A"
+      ],
+      "baseCost": 4000000,
+      "costPerHull": 400000,
+      "powerPerHull": 3.0,
+      "minHullPts": 3.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 3.0"
+    },
+    {
+      "id": "pow_mass_reactor",
+      "name": "Mass Reactor",
+      "category": "Power",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "D"
+      ],
+      "baseCost": 2000000,
+      "costPerHull": 250000,
+      "powerPerHull": 3.5,
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 3.5"
+    },
+    {
+      "id": "pow_dynamic_mass_reactor",
+      "name": "Dynamic Mass Reactor",
+      "category": "Power",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "D"
+      ],
+      "baseCost": 3000000,
+      "costPerHull": 200000,
+      "powerPerHull": 4.0,
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 4.0"
+    },
+    {
+      "id": "pow_matter_converter",
+      "name": "Matter Converter",
+      "category": "Power",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "M",
+        "X"
+      ],
+      "baseCost": 4000000,
+      "costPerHull": 200000,
+      "powerPerHull": 4.5,
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 4.5"
+    },
+    {
+      "id": "pow_quantum_cell",
+      "name": "Quantum Cell",
+      "category": "Power",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 5000000,
+      "costPerHull": 400000,
+      "powerPerHull": 5.0,
+      "minHullPts": 3.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 5.0"
+    },
+    {
+      "id": "pow_singularity_generator",
+      "name": "Singularity Generator",
+      "category": "Power",
+      "group": "PL 9 - Matter Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 10000000,
+      "costPerHull": 500000,
+      "powerPerHull": 6.0,
+      "minHullPts": 20.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "En: 6.0"
+    },
+    {
+      "id": "ftl_jump_drive",
+      "name": "Jump Drive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 4000000,
+      "costPerHull": 1000000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 5.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 5 | Pow: 1"
+    },
+    {
+      "id": "ftl_wormhole_screen",
+      "name": "Wormhole Screen",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 200000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 1 | Pow: 2"
+    },
+    {
+      "id": "ftl_gate_activator",
+      "name": "Gate Activator",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 100000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 1.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 1 | Pow: 2"
+    },
+    {
+      "id": "ftl_hyperdrive",
+      "name": "Hyperdrive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 5000000,
+      "costPerHull": 2000000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 4 | Pow: 3"
+    },
+    {
+      "id": "ftl_stardrive",
+      "name": "Stardrive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 2000000,
+      "costPerHull": 1000000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 3.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 3 | Pow: 0"
+    },
+    {
+      "id": "ftl_drivewave",
+      "name": "Drivewave",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 3000000,
+      "costPerHull": 1500000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 2 | Pow: 0"
+    },
+    {
+      "id": "ftl_spacefold_drive",
+      "name": "Spacefold Drive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 8000000,
+      "costPerHull": 2000000,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 4 | Pow: 4"
+    },
+    {
+      "id": "ftl_psychoportive_drive",
+      "name": "Psychoportive Drive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "P"
+      ],
+      "baseCost": 6000000,
+      "costPerHull": 200000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 10.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 10 | Pow: 1"
+    },
+    {
+      "id": "ftl_transcendent_drive",
+      "name": "Transcendent Drive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 9 - Matter Age",
+      "tech": [
+        "P"
+      ],
+      "baseCost": 12000000,
+      "costPerHull": 400000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 4.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 4 | Pow: 1"
+    },
+    {
+      "id": "ftl_warpdrive",
+      "name": "Warpdrive",
+      "category": "FTL Drives",
+      "exclusiveGroup": "FTL",
+      "group": "PL 9 - Matter Age",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 10000000,
+      "costPerHull": 5000000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0
+      },
+      "minHullPts": 2.0,
+      "baseEp": 0,
+      "stats": {
+        "speed_map": {}
+      },
+      "sizeMult": false,
+      "description": "Min Size: 2 | Pow: 2"
+    },
+    {
+      "id": "sys_life_support",
+      "name": "Life support",
+      "category": "Accommodations",
+      "group": "Life support",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "life_support_hull": 20
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Life support for 20 hull points"
+    },
+    {
+      "id": "sys_berthing_standard",
+      "name": "Berthing, standard",
+      "category": "Accommodations",
+      "group": "Berthing",
+      "tech": [],
+      "baseCost": 40000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "berthing_capacity": 20,
+        "stores_days": 500
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Berthing for 20 crewmen"
+    },
+    {
+      "id": "sys_berthing_2_man",
+      "name": "Berthing, 2-man",
+      "category": "Accommodations",
+      "group": "Berthing",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "berthing_capacity": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Berthing for 2 crewmen"
+    },
+    {
+      "id": "sys_berthing_6_man",
+      "name": "Berthing, 6-man",
+      "category": "Accommodations",
+      "group": "Berthing",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "berthing_capacity": 6
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Berthing for 6 crewmen"
+    },
+    {
+      "id": "sys_passenger_seating",
+      "name": "Passenger seating",
+      "category": "Accommodations",
+      "group": "Berthing",
+      "tech": [],
+      "baseCost": 10000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "passenger_capacity": 20
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Short-term seating for 20 passengers"
+    },
+    {
+      "id": "sys_stateroom",
+      "name": "Stateroom",
+      "category": "Accommodations",
+      "group": "Berthing",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "berthing_capacity": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Staterooms for 2 passengers"
+    },
+    {
+      "id": "sys_galley",
+      "name": "Galley",
+      "category": "Accommodations",
+      "group": "Miscellaneous",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "facility_capacity": 50
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Capacity of 50 people"
+    },
+    {
+      "id": "sys_medical_bay",
+      "name": "Medical bay",
+      "category": "Accommodations",
+      "group": "Miscellaneous",
+      "tech": [],
+      "baseCost": 75000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "facility_capacity": 10
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Feeds 10 people"
+    },
+    {
+      "id": "sys_recycler_unit",
+      "name": "Recycler unit",
+      "category": "Accommodations",
+      "group": "Life support",
+      "tech": [],
+      "baseCost": 300000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "recycler_capacity": 20
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Reduces consumption to 10% normal for 20 people"
+    },
+    {
+      "id": "sys_cargo_hold_stores",
+      "name": "Cargo hold (stores)",
+      "category": "Accommodations",
+      "group": "Miscellaneous",
+      "tech": [],
+      "baseCost": 5000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "stores_days": 1000
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Increases stores by 1,000 days"
+    },
+    {
+      "id": "sys_life_support_pl_7",
+      "name": "Life support (PL 7)",
+      "category": "Accommodations",
+      "group": "Life support",
+      "tech": [],
+      "baseCost": 200000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "life_support_hull": 40
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Life support for 40 hull points"
+    },
+    {
+      "id": "sys_hydroponics_bay",
+      "name": "Hydroponics bay",
+      "category": "Accommodations",
+      "group": "Life support",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 250000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "hydroponics_reduction": 20
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Reduces stores consumption by 20 days/day"
+    },
+    {
+      "id": "sys_bioconservancy",
+      "name": "Bioconservancy",
+      "category": "Accommodations",
+      "group": "Life support",
+      "tech": [
+        "P",
+        "M"
+      ],
+      "baseCost": 250000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "life_support_hull": 100,
+        "recycler_capacity": 20
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Life support for 100 hull pts, recycling for 20 people"
+    },
+    {
+      "id": "cmd_cockpit",
+      "name": "Cockpit",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 100000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per station (max 3 stations)"
+    },
+    {
+      "id": "cmd_command_deck",
+      "name": "Command Deck",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "pct",
+        "base": 2,
+        "val": 0.01,
+        "max": 10
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "auxiliary": true
+      },
+      "description": "+1 hull point per 100 hull (max 10)"
+    },
+    {
+      "id": "cmd_flag_bridge",
+      "name": "Flag Bridge",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 50000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_launch_tower",
+      "name": "Launch Tower",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 50000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_laser_transceiver",
+      "name": "Laser Transceiver",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 50000,
+      "costPerHull": 0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_radio_transceiver",
+      "name": "Radio Transceiver",
+      "category": "Command & Comms",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 25000,
+      "costPerHull": 0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_mass_transceiver",
+      "name": "Mass Transceiver",
+      "category": "Command & Comms",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 100000,
+      "costPerHull": 0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_drivesat_comm_array",
+      "name": "Drivesat Comm Array",
+      "category": "Command & Comms",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G",
+        "C"
+      ],
+      "baseCost": 2000000000,
+      "costPerHull": 0,
+      "powerConsumed": 300.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 150.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "interstellar comms"
+    },
+    {
+      "id": "cmd_drive_transceiver",
+      "name": "Drive Transceiver",
+      "category": "Command & Comms",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 200000,
+      "costPerHull": 0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_psionic_transceiver",
+      "name": "Psionic Transceiver",
+      "category": "Command & Comms",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "P"
+      ],
+      "baseCost": 150000,
+      "costPerHull": 0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "cmd_ansible",
+      "name": "Ansible",
+      "category": "Command & Comms",
+      "group": "PL 9 - Matter Age",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 0,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "instantaneous interstellar comms"
+    },
+    {
+      "id": "comp_computer_core_ordinary",
+      "name": "Computer Core, Ordinary",
+      "category": "Computers",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 500000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "1 required per 200 hull points"
+    },
+    {
+      "id": "comp_fire_control_ordinary",
+      "name": "Fire Control, Ordinary",
+      "category": "Computers",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 200000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "skill_bonus": 1
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-1 step bonus to dedicated weapon"
+    },
+    {
+      "id": "comp_sensor_control_ordinary",
+      "name": "Sensor Control, Ordinary",
+      "category": "Computers",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 200000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "skill_bonus": 1
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-1 step bonus to dedicated sensor"
+    },
+    {
+      "id": "comp_tac_control_ordinary",
+      "name": "Tac Control, Ordinary",
+      "category": "Computers",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 100000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "skill_bonus": 1
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-1 step bonus to Tactics skill checks"
+    },
+    {
+      "id": "comp_nav_control_ordinary",
+      "name": "Nav Control, Ordinary",
+      "category": "Computers",
+      "group": "PL 6 - Fusion Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "skill_bonus": 1
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-1 step bonus to Maneuver checks"
+    },
+    {
+      "id": "comp_attack_computer",
+      "name": "Attack Computer",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 200000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "skill_bonus": 1
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-1 step bonus to attack rolls"
+    },
+    {
+      "id": "comp_computer_core_good",
+      "name": "Computer Core, Good",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 1000000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "1 required per 200 hull points"
+    },
+    {
+      "id": "comp_fire_control_good",
+      "name": "Fire Control, Good",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "skill_bonus": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-2 step bonus to dedicated weapon"
+    },
+    {
+      "id": "comp_sensor_control_good",
+      "name": "Sensor Control, Good",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "skill_bonus": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-2 step bonus to dedicated sensor"
+    },
+    {
+      "id": "comp_tac_control_good",
+      "name": "Tac Control, Good",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 200000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "skill_bonus": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-2 step bonus to Tactics skill checks"
+    },
+    {
+      "id": "comp_nav_control_good",
+      "name": "Nav Control, Good",
+      "category": "Computers",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 750000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "skill_bonus": 2
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-2 step bonus to Maneuver checks"
+    },
+    {
+      "id": "comp_computer_core_amazing",
+      "name": "Computer Core, Amazing",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 2000000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "1 required per 200 hull points"
+    },
+    {
+      "id": "comp_fire_control_amazing",
+      "name": "Fire Control, Amazing",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "skill_bonus": 3
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-3 step bonus to dedicated weapon"
+    },
+    {
+      "id": "comp_sensor_control_amazing",
+      "name": "Sensor Control, Amazing",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "skill_bonus": 3
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-3 step bonus to dedicated sensor"
+    },
+    {
+      "id": "comp_tac_control_amazing",
+      "name": "Tac Control, Amazing",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 400000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "skill_bonus": 3
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-3 step bonus to Tactics skill checks"
+    },
+    {
+      "id": "comp_nav_control_amazing",
+      "name": "Nav Control, Amazing",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "skill_bonus": 3
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-3 step bonus to Maneuver checks"
+    },
+    {
+      "id": "sens_air_space_radar",
+      "name": "Air/space Radar",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Active",
+        "sensor_range": "5/10/20 Mm",
+        "sensor_arcs": "1",
+        "sensor_targeting": "Normal"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_em_detector",
+      "name": "EM Detector",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Passive",
+        "sensor_range": "10/20/60 Mm",
+        "sensor_arcs": "2",
+        "sensor_targeting": "+3 step penalty"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_hi_res_video",
+      "name": "Hi-Res Video",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 10000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Passive",
+        "sensor_range": "1/2/10 Mm",
+        "sensor_arcs": "1",
+        "sensor_targeting": "+2 step penalty"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_ir_detector",
+      "name": "IR Detector",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Passive",
+        "sensor_range": "2/4/8 Mm",
+        "sensor_arcs": "1",
+        "sensor_targeting": "+2 step penalty"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_ladar",
+      "name": "Ladar",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Active",
+        "sensor_range": "5/10/30 Mm",
+        "sensor_arcs": "1",
+        "sensor_targeting": "Normal"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_probe",
+      "name": "Probe",
+      "category": "Sensors",
+      "group": "PL 6 - Fusion Age",
+      "tech": [],
+      "baseCost": 200000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6",
+        "sensor_type": "Remote",
+        "sensor_range": "Special",
+        "sensor_arcs": "4",
+        "sensor_targeting": "-"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_mass_detector",
+      "name": "Mass Detector",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 100000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Passive",
+        "sensor_range": "10/30/50 Mm",
+        "sensor_arcs": "2",
+        "sensor_targeting": "+1 step penalty"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_multiband_radar",
+      "name": "Multiband Radar",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Active",
+        "sensor_range": "10/20/40 Mm",
+        "sensor_arcs": "1",
+        "sensor_targeting": "Normal"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_probe_advanced",
+      "name": "Probe, advanced",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 500000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Remote",
+        "sensor_range": "Special",
+        "sensor_arcs": "4",
+        "sensor_targeting": "-"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_remote_network",
+      "name": "Remote Network",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 750000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Remote",
+        "sensor_range": "Special",
+        "sensor_arcs": "4",
+        "sensor_targeting": "-"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_spectroanalyzer",
+      "name": "Spectroanalyzer",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Active",
+        "sensor_range": "Special",
+        "sensor_arcs": "1",
+        "sensor_targeting": "None"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_drive_detection_array",
+      "name": "Drive Detection Array",
+      "category": "Sensors",
+      "group": "PL 7 - Gravity Age",
+      "tech": [
+        "G",
+        "C"
+      ],
+      "baseCost": 1000000000,
+      "powerConsumed": 120.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 80.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7",
+        "sensor_type": "Passive",
+        "sensor_range": "Special",
+        "sensor_arcs": "4",
+        "sensor_targeting": "None"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_drive_detector",
+      "name": "Drive Detector",
+      "category": "Sensors",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 500000,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "sensor_type": "Passive",
+        "sensor_range": "Special",
+        "sensor_arcs": "4",
+        "sensor_targeting": "None"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "sens_omniscience_sphere",
+      "name": "Omniscience Sphere",
+      "category": "Sensors",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "P"
+      ],
+      "baseCost": 2000000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8",
+        "sensor_type": "Passive",
+        "sensor_range": "50 Mm",
+        "sensor_arcs": "4",
+        "sensor_targeting": "Normal"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": ""
+    },
+    {
+      "id": "misc_airlock",
+      "name": "Airlock",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 10000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Free with command deck or crew quarters"
+    },
+    {
+      "id": "misc_brig",
+      "name": "Brig",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 4 prisoners"
+    },
+    {
+      "id": "misc_cargo_space",
+      "name": "Cargo Space",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 10000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "cargo_tons_bonus": 24
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 24m3"
+    },
+    {
+      "id": "misc_cargo_bay",
+      "name": "Cargo Bay",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "cargo_tons_bonus": 50
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 50m3"
+    },
+    {
+      "id": "misc_cargo_hold",
+      "name": "Cargo Hold",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "cargo_tons_bonus": 100
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 100m3"
+    },
+    {
+      "id": "misc_docking_clamps",
+      "name": "Docking Clamps",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 10 hull point capacity"
+    },
+    {
+      "id": "misc_escape_pod",
+      "name": "Escape Pod",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "10 man capacity"
+    },
+    {
+      "id": "misc_fuel_collectors",
+      "name": "Fuel Collectors",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "misc_hangar",
+      "name": "Hangar",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per hull point capacity"
+    },
+    {
+      "id": "misc_lab_section",
+      "name": "Lab Section",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "misc_magazine",
+      "name": "Magazine",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 4 size points of carried ordnance"
+    },
+    {
+      "id": "misc_reentry_capsule",
+      "name": "Reentry Capsule",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 5000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 0.5
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "2 crewmen"
+    },
+    {
+      "id": "misc_sick_bay",
+      "name": "Sick Bay",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 150000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "4 beds"
+    },
+    {
+      "id": "misc_workshop",
+      "name": "Workshop",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 20000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "misc_accumulator",
+      "name": "Accumulator",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 40000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "stores 10 power points"
+    },
+    {
+      "id": "misc_autocargo",
+      "name": "Autocargo",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 30000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 6 hull points of cargo serviced"
+    },
+    {
+      "id": "misc_boarding_pod",
+      "name": "Boarding Pod",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 200000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "10 troop capacity"
+    },
+    {
+      "id": "misc_evac_system",
+      "name": "Evac System",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 250000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "4 10-man lifeboats"
+    },
+    {
+      "id": "misc_extra_pods",
+      "name": "Extra pods",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 50000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "2 10-man lifeboats"
+    },
+    {
+      "id": "misc_fabrication_facility",
+      "name": "Fabrication Facility",
+      "category": "Miscellaneous",
+      "group": "Cargo & Misc",
+      "tech": [],
+      "baseCost": 200000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-"
+    },
+    {
+      "id": "wpn_laser",
+      "name": "Laser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d4s/d4w/d4+2w",
+      "fire": "En/S",
+      "description": "Damage: d4s/d4w/d4+2w | Mode: F* | Pow: 2"
+    },
+    {
+      "id": "wpn_ir_laser",
+      "name": "IR Laser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 250000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d4+1s/d4+1w/d6+1w",
+      "fire": "En/S",
+      "description": "Damage: d4+1s/d4+1w/d6+1w | Mode: F* | Pow: 2"
+    },
+    {
+      "id": "wpn_x_ray_laser",
+      "name": "X-ray Laser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 350000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+1s/d4+2w/d4m",
+      "fire": "En/S",
+      "description": "Damage: d6+1s/d4+2w/d4m | Mode: F* | Pow: 2"
+    },
+    {
+      "id": "wpn_heavy_laser",
+      "name": "Heavy Laser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 2000000,
+      "powerConsumed": 5.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 5.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+2s/d6+2w/d6m",
+      "fire": "En/L",
+      "description": "Damage: d6+2s/d6+2w/d6m | Mode: F/G | Pow: 5"
+    },
+    {
+      "id": "wpn_neutron_gun",
+      "name": "Neutron Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 10000000,
+      "powerConsumed": 7.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 7.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d4w/2d4+2w/2d4m",
+      "fire": "En/L",
+      "description": "Damage: 2d4w/2d4+2w/2d4m | Mode: F/G | Pow: 7"
+    },
+    {
+      "id": "wpn_fusion_laser",
+      "name": "Fusion Laser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 20000000,
+      "powerConsumed": 12.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 12.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d6w/2d6+2w/2d6m",
+      "fire": "En/M",
+      "description": "Damage: 2d6w/2d6+2w/2d6m | Mode: F/G | Pow: 12"
+    },
+    {
+      "id": "wpn_graser",
+      "name": "Graser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 40000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 15.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d4s/2d4m/3d4m",
+      "fire": "En/M",
+      "description": "Damage: 3d4s/2d4m/3d4m | Mode: F/G | Pow: 15"
+    },
+    {
+      "id": "wpn_heavy_neutron_gun",
+      "name": "Heavy Neutron Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 60000000,
+      "powerConsumed": 22.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 22.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d6w/2d6m/2d6+2m",
+      "fire": "En/H",
+      "description": "Damage: 2d6w/2d6m/2d6+2m | Mode: F/G | Pow: 22"
+    },
+    {
+      "id": "wpn_hydrogen_bore",
+      "name": "Hydrogen Bore**",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 100000000,
+      "powerConsumed": 60.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 50.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d4w/3d4m/3d4c",
+      "fire": "En/SH",
+      "description": "Damage: 3d4w/3d4m/3d4c | Mode: F | Pow: 60"
+    },
+    {
+      "id": "wpn_plasma_cannon",
+      "name": "Plasma Cannon",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 400000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d6+2w/d8+2w/d6+1m",
+      "fire": "En/S",
+      "description": "Damage: d6+2w/d8+2w/d6+1m | Mode: F* | Pow: 3"
+    },
+    {
+      "id": "wpn_particle_beam",
+      "name": "Particle Beam",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 500000,
+      "powerConsumed": 5.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d6+3s/d4+1m/d4+3m",
+      "fire": "En/S",
+      "description": "Damage: d6+3s/d4+1m/d4+3m | Mode: F | Pow: 5"
+    },
+    {
+      "id": "wpn_heavy_particle_beam",
+      "name": "Heavy Particle Beam",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 4000000,
+      "powerConsumed": 8.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 6.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d12+3s/d6+1m/d6+3m",
+      "fire": "En/L",
+      "description": "Damage: d12+3s/d6+1m/d6+3m | Mode: F/G | Pow: 8"
+    },
+    {
+      "id": "wpn_heavy_plasma_beam",
+      "name": "Heavy Plasma Beam",
+      "category": "Weapon Systems",
+      "group": "Other Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 12000000,
+      "powerConsumed": 8.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 8.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d8+2w/d12+2w/d8+2m",
+      "fire": "En/L",
+      "description": "Damage: d8+2w/d12+2w/d8+2m | Mode: F/G | Pow: 8"
+    },
+    {
+      "id": "wpn_matter_beam",
+      "name": "Matter Beam",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "A"
+      ],
+      "baseCost": 20000000,
+      "powerConsumed": 11.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 11.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d6+1w/2d8+1w/2d8m",
+      "fire": "En/M",
+      "description": "Damage: 2d6+1w/2d8+1w/2d8m | Mode: F/G | Pow: 11"
+    },
+    {
+      "id": "wpn_fusion_beam",
+      "name": "Fusion Beam",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 25000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 15.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d12+2w/d12+4w/d8+5m",
+      "fire": "En/M",
+      "description": "Damage: d12+2w/d12+4w/d8+5m | Mode: F/G | Pow: 15"
+    },
+    {
+      "id": "wpn_quantum_cannon",
+      "name": "Quantum Cannon",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 50000000,
+      "powerConsumed": 18.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 18.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d8w/2d6m/2d4c",
+      "fire": "En/M",
+      "description": "Damage: 2d8w/2d6m/2d4c | Mode: F/G | Pow: 18"
+    },
+    {
+      "id": "wpn_boson_gun",
+      "name": "Boson Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 80000000,
+      "powerConsumed": 20.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 20.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d6w/3d6m/4d6m",
+      "fire": "En/H",
+      "description": "Damage: 3d6w/3d6m/4d6m | Mode: F/G | Pow: 20"
+    },
+    {
+      "id": "wpn_heavy_matter_beam",
+      "name": "Heavy Matter Beam",
+      "category": "Weapon Systems",
+      "group": "Other Weapons",
+      "tech": [
+        "A"
+      ],
+      "baseCost": 100000000,
+      "powerConsumed": 24.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 24.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d6+1m/2d8+1m/2d8c",
+      "fire": "En/H",
+      "description": "Damage: 2d6+1m/2d8+1m/2d8c | Mode: F/G | Pow: 24"
+    },
+    {
+      "id": "wpn_fusion_bore",
+      "name": "Fusion Bore**",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 200000000,
+      "powerConsumed": 75.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 60.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d6m/3d4c/3d6c",
+      "fire": "En/SH",
+      "description": "Damage: 3d6m/3d4c/3d6c | Mode: F | Pow: 75"
+    },
+    {
+      "id": "wpn_maser",
+      "name": "Maser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 400000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d6+2w/d4+1m/d6+2m",
+      "fire": "En/S",
+      "description": "Damage: d6+2w/d4+1m/d6+2m | Mode: F* | Pow: 3"
+    },
+    {
+      "id": "wpn_kinetic_lance",
+      "name": "Kinetic Lance",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 750000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d4+1w/2d4w/d4+3m",
+      "fire": "HI/S",
+      "description": "Damage: d4+1w/2d4w/d4+3m | Mode: F* | Pow: 1"
+    },
+    {
+      "id": "wpn_pulse_maser",
+      "name": "Pulse Maser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 4000000,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 6.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d8+4w/d8+2m/d12+2m",
+      "fire": "En/L",
+      "description": "Damage: d8+4w/d8+2m/d12+2m | Mode: F/G | Pow: 4"
+    },
+    {
+      "id": "wpn_em_cannon",
+      "name": "EM Cannon",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 10000000,
+      "powerConsumed": 8.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 8.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "3d6s/4d6s/4d8s",
+      "fire": "En/L",
+      "description": "Damage: 3d6s/4d6s/4d8s | Mode: F/G | Pow: 8"
+    },
+    {
+      "id": "wpn_dark_fusion_gun",
+      "name": "Dark Fusion Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "D"
+      ],
+      "baseCost": 40000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 15.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "2d6w/3d4m/2d4+1c",
+      "fire": "En/M",
+      "description": "Damage: 2d6w/3d4m/2d4+1c | Mode: F/G | Pow: 15"
+    },
+    {
+      "id": "wpn_gatling_maser",
+      "name": "Gatling Maser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [],
+      "baseCost": 50000000,
+      "powerConsumed": 36.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 18.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d8+4w/d8+2m/d12+2m",
+      "fire": "En/M",
+      "description": "Damage: d8+4w/d8+2m/d12+2m | Mode: F/G/B/A | Pow: 36"
+    },
+    {
+      "id": "wpn_weak_force_gun",
+      "name": "Weak Force Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 120000000,
+      "powerConsumed": 25.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 25.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "4d4w/4d4m/4d4c",
+      "fire": "En/H",
+      "description": "Damage: 4d4w/4d4m/4d4c | Mode: F/G | Pow: 25"
+    },
+    {
+      "id": "wpn_strong_force_gun",
+      "name": "Strong Force Gun**",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 150000000,
+      "powerConsumed": 32.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 32.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "3d6+2m/3d4c/4d6c",
+      "fire": "En/H",
+      "description": "Damage: 3d6+2m/3d4c/4d6c | Mode: F/G | Pow: 32"
+    },
+    {
+      "id": "wpn_zero_bore",
+      "name": "Zero Bore**",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 300000000,
+      "powerConsumed": 120.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 100.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "4d6m/3d6c/3d8c",
+      "fire": "En/SH",
+      "description": "Damage: 4d6m/3d6c/3d8c | Mode: F | Pow: 120"
+    },
+    {
+      "id": "wpn_blacklaser",
+      "name": "Blacklaser",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "D"
+      ],
+      "baseCost": 1000000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "d8w/d12w/d8m",
+      "fire": "En/S",
+      "description": "Damage: d8w/d12w/d8m | Mode: F/B/A/G | Pow: 3"
+    },
+    {
+      "id": "wpn_tachyon_gun",
+      "name": "Tachyon Gun",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 40000000,
+      "powerConsumed": 12.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 12.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "2d8+2w/2d8m/d8+1c",
+      "fire": "En/M",
+      "description": "Damage: 2d8+2w/2d8m/d8+1c | Mode: F/G | Pow: 12"
+    },
+    {
+      "id": "wpn_string_projector",
+      "name": "String Projector",
+      "category": "Weapon Systems",
+      "group": "Beam Weapons",
+      "tech": [
+        "Q",
+        "G"
+      ],
+      "baseCost": 200000000,
+      "powerConsumed": 30.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 24.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "4d8w/3d8m/3d8c",
+      "fire": "LI/H",
+      "description": "Damage: 4d8w/3d8m/3d8c | Mode: F/G | Pow: 30"
+    },
+    {
+      "id": "wpn_point_defense_gun",
+      "name": "Point Defense Gun",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 200000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d4s/d4w/d4+2w",
+      "fire": "HI/Gd",
+      "description": "Damage: d4s/d4w/d4+2w | Mode: F/B/A | Pow: 0"
+    },
+    {
+      "id": "wpn_rail_cannon",
+      "name": "Rail Cannon",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 500000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d4s/d6+2w/d4+1m",
+      "fire": "HI/S",
+      "description": "Damage: 2d4s/d6+2w/d4+1m | Mode: F/G | Pow: 3"
+    },
+    {
+      "id": "wpn_needle_driver",
+      "name": "Needle Driver",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 2000000,
+      "powerConsumed": 6.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 6.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+1w/d6+3w/d4+3m",
+      "fire": "HI/L",
+      "description": "Damage: d6+1w/d6+3w/d4+3m | Mode: B/A | Pow: 6"
+    },
+    {
+      "id": "wpn_gauss_gun",
+      "name": "Gauss Gun",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 5000000,
+      "powerConsumed": 6.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 8.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+1w/d6+2m/d4+1c",
+      "fire": "HI/M",
+      "description": "Damage: d6+1w/d6+2m/d4+1c | Mode: F/G | Pow: 6"
+    },
+    {
+      "id": "wpn_hi_velocity_rail_gun",
+      "name": "Hi-Velocity Rail Gun",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 50000000,
+      "powerConsumed": 16.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 20.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d8+2w/d8+2m/d6+2c",
+      "fire": "HI/H",
+      "description": "Damage: d8+2w/d8+2m/d6+2c | Mode: F/G | Pow: 16"
+    },
+    {
+      "id": "wpn_mass_cannon",
+      "name": "Mass Cannon",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 300000,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d6+2s/d6+1w/d6+3w",
+      "fire": "LI/S",
+      "description": "Damage: d6+2s/d6+1w/d6+3w | Mode: F/G | Pow: 3"
+    },
+    {
+      "id": "wpn_heavy_mass_cannon",
+      "name": "Heavy Mass Cannon",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 2000000,
+      "powerConsumed": 6.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 5.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/3d6w",
+      "fire": "LI/L",
+      "description": "Damage: 2d6s/2d6w/3d6w | Mode: F/G | Pow: 6"
+    },
+    {
+      "id": "wpn_accelerator",
+      "name": "Accelerator*",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 10000000,
+      "powerConsumed": 7.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 9.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/2d6m",
+      "fire": "En/M",
+      "description": "Damage: 2d6s/2d6w/2d6m | Mode: F/G | Pow: 7"
+    },
+    {
+      "id": "wpn_tach_rifle",
+      "name": "Tach Rifle",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 30000000,
+      "powerConsumed": 8.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 12.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d12w/d8m/d12m",
+      "fire": "HI/M",
+      "description": "Damage: d12w/d8m/d12m | Mode: F/G | Pow: 8"
+    },
+    {
+      "id": "wpn_heavy_accelerator",
+      "name": "Heavy Accelerator*",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 40000000,
+      "powerConsumed": 14.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 18.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d6w/2d6m/2d6c",
+      "fire": "En/H",
+      "description": "Damage: 2d6w/2d6m/2d6c | Mode: F/G | Pow: 14"
+    },
+    {
+      "id": "wpn_antimatter_gun",
+      "name": "Antimatter Gun*",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "A"
+      ],
+      "baseCost": 80000000,
+      "powerConsumed": 18.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 25.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "3d6w/3d4m/3d4c",
+      "fire": "En/H",
+      "description": "Damage: 3d6w/3d4m/3d4c | Mode: F/G | Pow: 18"
+    },
+    {
+      "id": "wpn_super_tach_rifle",
+      "name": "Super Tach Rifle",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 120000000,
+      "powerConsumed": 30.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 40.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d8m/2d12m/2d8c",
+      "fire": "HI/SH",
+      "description": "Damage: 2d8m/2d12m/2d8c | Mode: F | Pow: 30"
+    },
+    {
+      "id": "wpn_sliver_gun",
+      "name": "Sliver Gun",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 250000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d6+1w/d6+3w/d4+2m",
+      "fire": "HI/S",
+      "description": "Damage: d6+1w/d6+3w/d4+2m | Mode: F/B/A | Pow: 2"
+    },
+    {
+      "id": "wpn_neutronium_driver",
+      "name": "Neutronium Driver",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 4000000,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 8.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d6+3w/d6+1m/d6c",
+      "fire": "HI/L",
+      "description": "Damage: d6+3w/d6+1m/d6c | Mode: F/G | Pow: 4"
+    },
+    {
+      "id": "wpn_bomb_projector",
+      "name": "Bomb Projector*",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 15000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 10.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/2d6m",
+      "fire": "En/M",
+      "description": "Damage: 2d6s/2d6w/2d6m | Mode: F | Pow: 15"
+    },
+    {
+      "id": "wpn_bomb_salvo",
+      "name": "Bomb Salvo*",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 20000000,
+      "powerConsumed": 18.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 12.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/2d6m",
+      "fire": "En/M",
+      "description": "Damage: 2d6s/2d6w/2d6m | Mode: F | Pow: 18"
+    },
+    {
+      "id": "wpn_kinetic_converter",
+      "name": "Kinetic Converter*",
+      "category": "Weapon Systems",
+      "group": "Area Effect Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 50000000,
+      "powerConsumed": 10.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 20.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d12+3w/d12+3m/d12+1c",
+      "fire": "LI/H",
+      "description": "Damage: d12+3w/d12+3m/d12+1c | Mode: F/G | Pow: 10"
+    },
+    {
+      "id": "wpn_tunneling_driver",
+      "name": "Tunneling Driver*",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 90000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 30.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/2d6m",
+      "fire": "En/M**",
+      "description": "Damage: 2d6s/2d6w/2d6m | Mode: F/G | Pow: 15"
+    },
+    {
+      "id": "wpn_black_hole_gun",
+      "name": "Black Hole Gun",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 200000000,
+      "powerConsumed": 40.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 75.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "3d6m/4d6m/3d8c",
+      "fire": "LI/SH",
+      "description": "Damage: 3d6m/4d6m/3d8c | Mode: S | Pow: 40"
+    },
+    {
+      "id": "wpn_minelayer",
+      "name": "Minelayer",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 100000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 5.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "Deploys one mine pattern",
+      "fire": "10/rd",
+      "description": "Damage: Deploys one mine pattern | Mode:  | Pow: 2"
+    },
+    {
+      "id": "wpn_ordnance_cell_array",
+      "name": "Ordnance Cell Array",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 1000000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 10.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "Carries missiles, bombs, or mines",
+      "fire": "All",
+      "description": "Damage: Carries missiles, bombs, or mines | Mode:  | Pow: 2"
+    },
+    {
+      "id": "wpn_missile_tachyon",
+      "name": "Missile, tachyon",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 500000,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "Hits target in same phase",
+      "fire": "-",
+      "description": "Damage: Hits target in same phase | Mode:  | Pow: 4"
+    },
+    {
+      "id": "wpn_smp_bomb_rack",
+      "name": "SMP Bomb Rack",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 70000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+2s/d6+2w/d6+4w",
+      "fire": "HI/L",
+      "description": "Damage: d6+2s/d6+2w/d6+4w | Mode: F (2) | Pow: 0"
+    },
+    {
+      "id": "wpn_fusion_bomb_rack",
+      "name": "Fusion Bomb Rack",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [],
+      "baseCost": 1000000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "2d6w/2d8m/2d6c",
+      "fire": "En/H",
+      "description": "Damage: 2d6w/2d8m/2d6c | Mode: F (1) | Pow: 0"
+    },
+    {
+      "id": "wpn_che_missile_rack",
+      "name": "CHE Missile Rack",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 270000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+1s/d6+1w/d4+2m",
+      "fire": "En/L",
+      "description": "Damage: d6+1s/d6+1w/d4+2m | Mode: F (4) | Pow: 1"
+    },
+    {
+      "id": "wpn_missile_mount",
+      "name": "Missile Mount",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 1600000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 10.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "-",
+      "fire": "-",
+      "description": "Damage: - | Mode: F | Pow: 1"
+    },
+    {
+      "id": "wpn_plasma_missile_rack",
+      "name": "Plasma Missile Rack",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "F",
+        "G"
+      ],
+      "baseCost": 850000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d6+3w/d8+3w/d6+2m",
+      "fire": "En/L",
+      "description": "Damage: d6+3w/d8+3w/d6+2m | Mode: F (8) | Pow: 1"
+    },
+    {
+      "id": "wpn_matter_missile_rack",
+      "name": "Matter Missile Rack",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "A",
+        "G"
+      ],
+      "baseCost": 4200000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "3d6m/2d6c/2d6+2c",
+      "fire": "En/SH",
+      "description": "Damage: 3d6m/2d6c/2d6+2c | Mode: F (2) | Pow: 1"
+    },
+    {
+      "id": "wpn_ordnance_array",
+      "name": "Ordnance Array",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "!"
+      ],
+      "baseCost": 16000000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 20.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "-",
+      "fire": "-",
+      "description": "Damage: - | Mode: F | Pow: 2"
+    },
+    {
+      "id": "wpn_nova_array",
+      "name": "Nova Array",
+      "category": "Weapon Systems",
+      "group": "Projectile Weapons",
+      "tech": [
+        "G",
+        "C"
+      ],
+      "baseCost": 23800000,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 10.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "2d8w/2d6m/2d4c",
+      "fire": "LI/H",
+      "description": "Damage: 2d8w/2d6m/2d4c | Mode: (40) | Pow: 2"
+    },
+    {
+      "id": "wpn_cable_gun",
+      "name": "Cable Gun",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 150000,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "Special",
+      "fire": "--",
+      "description": "Damage: Special | Mode: F | Pow: 1"
+    },
+    {
+      "id": "wpn_rf_spike",
+      "name": "RF Spike",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [],
+      "baseCost": 500000,
+      "powerConsumed": 6.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d4s/3d6s/2d4w",
+      "fire": "En/SH",
+      "description": "Damage: 3d4s/3d6s/2d4w | Mode: F | Pow: 6"
+    },
+    {
+      "id": "wpn_thermal_inducer",
+      "name": "Thermal Inducer",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 4000000,
+      "powerConsumed": 12.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 8.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6w/d6+1w/d6m",
+      "fire": "En/M",
+      "description": "Damage: d6w/d6+1w/d6m | Mode: F | Pow: 12"
+    },
+    {
+      "id": "wpn_thermal_nullifier",
+      "name": "Thermal Nullifier",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 35000000,
+      "powerConsumed": 20.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 15.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "d6+3w/d6+4w/d6+2m",
+      "fire": "En/M",
+      "description": "Damage: d6+3w/d6+4w/d6+2m | Mode: F | Pow: 20"
+    },
+    {
+      "id": "wpn_tractor_beam",
+      "name": "Tractor Beam",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 500000,
+      "powerConsumed": 5.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "Special",
+      "fire": "--",
+      "description": "Damage: Special | Mode: F | Pow: 5"
+    },
+    {
+      "id": "wpn_mass_converter",
+      "name": "Mass Converter",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 1000000,
+      "powerConsumed": 6.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "d6+3s/d6+3w/d6+2m",
+      "fire": "En/S",
+      "description": "Damage: d6+3s/d6+3w/d6+2m | Mode: F | Pow: 6"
+    },
+    {
+      "id": "wpn_matter_torpedo",
+      "name": "Matter Torpedo",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "D"
+      ],
+      "baseCost": 600000,
+      "powerConsumed": 7.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 5.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "damage": "2d6s/2d6w/d6+3m",
+      "fire": "En/M",
+      "description": "Damage: 2d6s/2d6w/d6+3m | Mode: F | Pow: 7"
+    },
+    {
+      "id": "wpn_plasma_torpedo",
+      "name": "Plasma Torpedo",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "F"
+      ],
+      "baseCost": 10000000,
+      "powerConsumed": 15.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 10.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 6"
+      },
+      "sizeMult": false,
+      "damage": "3d6s/3d6w/d8+3m",
+      "fire": "En/H",
+      "description": "Damage: 3d6s/3d6w/d8+3m | Mode: F | Pow: 15"
+    },
+    {
+      "id": "wpn_em_torpedo",
+      "name": "EM Torpedo",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 450000,
+      "powerConsumed": 5.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 3.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "d6+3s/2d8s/d4+2w",
+      "fire": "En/M",
+      "description": "Damage: d6+3s/2d8s/d4+2w | Mode: F | Pow: 5"
+    },
+    {
+      "id": "wpn_neural_inhibitor",
+      "name": "Neural Inhibitor",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "P"
+      ],
+      "baseCost": 40000000,
+      "powerConsumed": 20.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 12.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "1d12s/1d12w/1d20w",
+      "fire": "**",
+      "description": "Damage: 1d12s/1d12w/1d20w | Mode: F | Pow: 20"
+    },
+    {
+      "id": "wpn_fission_activator",
+      "name": "Fission Activator",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 80000000,
+      "powerConsumed": 75.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 25.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "damage": "2d4m/2d4+2m/3d4+2c",
+      "fire": "En/H",
+      "description": "Damage: 2d4m/2d4+2m/3d4+2c | Mode: F | Pow: 75"
+    },
+    {
+      "id": "wpn_boarding_transporter",
+      "name": "Boarding Transporter",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 10000000,
+      "powerConsumed": 9.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 6.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "Special",
+      "fire": "--",
+      "description": "Damage: Special | Mode: F | Pow: 9"
+    },
+    {
+      "id": "wpn_null_torpedo",
+      "name": "Null Torpedo",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 50000000,
+      "powerConsumed": 25.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 18.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "2d8w/2d8m/2d8c",
+      "fire": "En/SH",
+      "description": "Damage: 2d8w/2d8m/2d8c | Mode: F | Pow: 25"
+    },
+    {
+      "id": "wpn_code_arranger",
+      "name": "Code Arranger",
+      "category": "Weapon Systems",
+      "group": "Torpedoes & Special Weapons",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 100000000,
+      "powerConsumed": 50.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 25.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 9"
+      },
+      "sizeMult": false,
+      "damage": "d8m/d8+4m/d8c",
+      "fire": "***/H",
+      "description": "Damage: d8m/d8+4m/d8c | Mode: F | Pow: 50"
+    },
+    {
+      "id": "def_chaff",
+      "name": "Chaff",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [],
+      "baseCost": 50000,
+      "costPerHull": 0.0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | +1 step to missiles, sensors"
+    },
+    {
+      "id": "def_damage_control",
+      "name": "Damage Control",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [],
+      "baseCost": 0.0,
+      "costPerHull": 100000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-2 step bonus to Damage Checks",
+      "powerConsumedPerHull": 1.0
+    },
+    {
+      "id": "def_decoy_drone",
+      "name": "Decoy Drone",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 600000,
+      "costPerHull": 0.0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | 3 drones"
+    },
+    {
+      "id": "def_jammer",
+      "name": "Jammer",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [],
+      "baseCost": 100000,
+      "costPerHull": 0.0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | +2 steps to missiles, sensors"
+    },
+    {
+      "id": "def_magnetic_screen",
+      "name": "Magnetic Screen",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 400000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 20 hull pts | +2 steps to missiles, projectiles"
+    },
+    {
+      "id": "def_stealth_hull",
+      "name": "Stealth Hull",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0.0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 50 hull pts | +2 steps to enemy Sensor Checks"
+    },
+    {
+      "id": "def_defense_network",
+      "name": "Defense Network",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "C",
+        "F"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | Special"
+    },
+    {
+      "id": "def_deflection_inducer",
+      "name": "Deflection Inducer",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 20 hull pts | +2 step penalty to enemy attacks"
+    },
+    {
+      "id": "def_particle_screen",
+      "name": "Particle Screen",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "Q"
+      ],
+      "baseCost": 750000,
+      "costPerHull": 0.0,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 20 hull pts | Adds d4 (LI), d4 (HI), d6 (En) armor"
+    },
+    {
+      "id": "def_stealth_shield",
+      "name": "Stealth Shield",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 2000000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | +3 steps to missiles, sensors"
+    },
+    {
+      "id": "def_stardrive_scrambler",
+      "name": "Stardrive Scrambler",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "G"
+      ],
+      "baseCost": 200000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull pts | +4 step penalty to drive detectors"
+    },
+    {
+      "id": "def_repair_bots",
+      "name": "Repair Bots",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0.0,
+      "costPerHull": 500000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-3 step bonus to Damage Checks",
+      "powerConsumedPerHull": 1.0
+    },
+    {
+      "id": "def_generator",
+      "name": "Generator",
+      "category": "Defenses",
+      "group": "Energy Shields",
+      "tech": [],
+      "baseCost": 500000,
+      "costPerHull": 0.0,
+      "powerConsumed": 2.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 20 hull pts | capacitor or compiler required"
+    },
+    {
+      "id": "def_capacitor",
+      "name": "Capacitor",
+      "category": "Defenses",
+      "group": "Energy Shields",
+      "tech": [],
+      "baseCost": 100000,
+      "costPerHull": 0.0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "10 shield points"
+    },
+    {
+      "id": "def_energy_compiler",
+      "name": "Energy Compiler",
+      "category": "Defenses",
+      "group": "Energy Shields",
+      "tech": [
+        "X"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0.0,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "20 shield points"
+    },
+    {
+      "id": "def_cloaking_unit",
+      "name": "Cloaking Unit",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "M"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 0.0,
+      "powerConsumed": 5.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 100 hull points | +4 steps to missiles, sensors"
+    },
+    {
+      "id": "def_displacer",
+      "name": "Displacer",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "T"
+      ],
+      "baseCost": 1000000,
+      "costPerHull": 0.0,
+      "powerConsumed": 3.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 2.0
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "Coverage: 20 hull points | +3 step penalty to enemy attacks"
+    },
+    {
+      "id": "def_nanite_repair_array",
+      "name": "Nanite Repair Array",
+      "category": "Defenses",
+      "group": "Defenses",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 0.0,
+      "costPerHull": 1000000,
+      "powerConsumed": 0.0,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "baseEp": 0,
+      "stats": {},
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "-5 step bonus to Damage Checks",
+      "powerConsumedPerHull": 2.0
+    },
+    {
+      "id": "arm_polymeric_light",
+      "name": "Polymeric, Light (PL 6)",
+      "category": "Armor",
+      "group": "Polymeric",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 50000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.025
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4-1 | HI: d4-1 | En: d4-2 | Hull: 2.5%",
+      "stats": {
+        "LI": "d4-1",
+        "HI": "d4-1",
+        "En": "d4-2"
+      }
+    },
+    {
+      "id": "arm_reflective_light",
+      "name": "Reflective, Light (PL 6)",
+      "category": "Armor",
+      "group": "Reflective",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 50000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.025
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4-3 | HI: d4-2 | En: d6-1 | Hull: 2.5%",
+      "stats": {
+        "LI": "d4-3",
+        "HI": "d4-2",
+        "En": "d6-1"
+      }
+    },
+    {
+      "id": "arm_alloy_medium",
+      "name": "Alloy, Medium (PL 6)",
+      "category": "Armor",
+      "group": "Alloy",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 150000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4+1 | HI: d4+1 | En: d4 | Hull: 5%",
+      "stats": {
+        "LI": "d4+1",
+        "HI": "d4+1",
+        "En": "d4"
+      }
+    },
+    {
+      "id": "arm_polymeric_medium",
+      "name": "Polymeric, Medium (PL 6)",
+      "category": "Armor",
+      "group": "Polymeric",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 100000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4 | HI: d4 | En: d4-1 | Hull: 5%",
+      "stats": {
+        "LI": "d4",
+        "HI": "d4",
+        "En": "d4-1"
+      }
+    },
+    {
+      "id": "arm_reflective_medium",
+      "name": "Reflective, Medium (PL 6)",
+      "category": "Armor",
+      "group": "Reflective",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 100000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4-2 | HI: d4-1 | En: d6 | Hull: 5%",
+      "stats": {
+        "LI": "d4-2",
+        "HI": "d4-1",
+        "En": "d6"
+      }
+    },
+    {
+      "id": "arm_alloy_heavy",
+      "name": "Alloy, Heavy (PL 6)",
+      "category": "Armor",
+      "group": "Alloy",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: d6+1 | HI: d6+1 | En: d6 | Hull: 10%",
+      "stats": {
+        "LI": "d6+1",
+        "HI": "d6+1",
+        "En": "d6"
+      }
+    },
+    {
+      "id": "arm_reflective_heavy",
+      "name": "Reflective, Heavy (PL 6)",
+      "category": "Armor",
+      "group": "Reflective",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 200000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: d4 | HI: d4 | En: d8+1 | Hull: 10%",
+      "stats": {
+        "LI": "d4",
+        "HI": "d4",
+        "En": "d8+1"
+      }
+    },
+    {
+      "id": "arm_alloy_super_heavy",
+      "name": "Alloy, Super-Heavy (PL 6)",
+      "category": "Armor",
+      "group": "Alloy",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 600000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.2
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Medium Ships",
+      "description": "LI: d6+3 | HI: d6+3 | En: d6+2 | Hull: 20%",
+      "stats": {
+        "LI": "d6+3",
+        "HI": "d6+3",
+        "En": "d6+2"
+      }
+    },
+    {
+      "id": "arm_cerametal_light",
+      "name": "Cerametal, Light (PL 7)",
+      "category": "Armor",
+      "group": "Cerametal",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 100000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.025
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d6-1 | HI: d6-1 | En: d6-1 | Hull: 2.5%",
+      "stats": {
+        "LI": "d6-1",
+        "HI": "d6-1",
+        "En": "d6-1"
+      }
+    },
+    {
+      "id": "arm_cerametal_medium",
+      "name": "Cerametal, Medium (PL 7)",
+      "category": "Armor",
+      "group": "Cerametal",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 200000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4+1 | HI: d4+1 | En: d4+1 | Hull: 5%",
+      "stats": {
+        "LI": "d4+1",
+        "HI": "d4+1",
+        "En": "d4+1"
+      }
+    },
+    {
+      "id": "arm_neutronite_medium",
+      "name": "Neutronite, Medium (PL 7)",
+      "category": "Armor",
+      "group": "Neutronite",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 0,
+      "costPerHull": 500000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d6+1 | HI: d6+1 | En: d6+1 | Hull: 5%",
+      "stats": {
+        "LI": "d6+1",
+        "HI": "d6+1",
+        "En": "d6+1"
+      }
+    },
+    {
+      "id": "arm_reactive_medium",
+      "name": "Reactive, Medium (PL 7)",
+      "category": "Armor",
+      "group": "Reactive",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 150000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d4+2 | HI: d6 | En: d4 | Hull: 5%",
+      "stats": {
+        "LI": "d4+2",
+        "HI": "d6",
+        "En": "d4"
+      }
+    },
+    {
+      "id": "arm_cerametal_heavy",
+      "name": "Cerametal, Heavy (PL 7)",
+      "category": "Armor",
+      "group": "Cerametal",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 400000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: d8 | HI: d8 | En: d8 | Hull: 10%",
+      "stats": {
+        "LI": "d8",
+        "HI": "d8",
+        "En": "d8"
+      }
+    },
+    {
+      "id": "arm_neutronite_heavy",
+      "name": "Neutronite, Heavy (PL 7)",
+      "category": "Armor",
+      "group": "Neutronite",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 0,
+      "costPerHull": 1000000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: d8+1 | HI: d8+1 | En: d8+1 | Hull: 10%",
+      "stats": {
+        "LI": "d8+1",
+        "HI": "d8+1",
+        "En": "d8+1"
+      }
+    },
+    {
+      "id": "arm_reactive_heavy",
+      "name": "Reactive, Heavy (PL 7)",
+      "category": "Armor",
+      "group": "Reactive",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 300000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: 2d4+1 | HI: d8 | En: d4+1 | Hull: 10%",
+      "stats": {
+        "LI": "2d4+1",
+        "HI": "d8",
+        "En": "d4+1"
+      }
+    },
+    {
+      "id": "arm_neutronite_super_heavy",
+      "name": "Neutronite, Super-Heavy (PL 7)",
+      "category": "Armor",
+      "group": "Neutronite",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S"
+      ],
+      "baseCost": 0,
+      "costPerHull": 2000000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.2
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Medium Ships",
+      "description": "LI: d8+3 | HI: d8+3 | En: d8+3 | Hull: 20%",
+      "stats": {
+        "LI": "d8+3",
+        "HI": "d8+3",
+        "En": "d8+3"
+      }
+    },
+    {
+      "id": "arm_reactive_super_heavy",
+      "name": "Reactive, Super-Heavy (PL 7)",
+      "category": "Armor",
+      "group": "Reactive",
+      "exclusiveGroup": "Armor",
+      "tech": [],
+      "baseCost": 0,
+      "costPerHull": 600000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.2
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Medium Ships",
+      "description": "LI: 2d4+3 | HI: d8+2 | En: d4+3 | Hull: 20%",
+      "stats": {
+        "LI": "2d4+3",
+        "HI": "d8+2",
+        "En": "d4+3"
+      }
+    },
+    {
+      "id": "arm_crystallis_light",
+      "name": "Crystallis, Light (PL 8)",
+      "category": "Armor",
+      "group": "Crystallis",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "P",
+        "X"
+      ],
+      "baseCost": 0,
+      "costPerHull": 250000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.025
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d6-1 | HI: d6 | En: d6+2 | Hull: 2.5%",
+      "stats": {
+        "LI": "d6-1",
+        "HI": "d6",
+        "En": "d6+2"
+      }
+    },
+    {
+      "id": "arm_nanofluidic_light",
+      "name": "Nanofluidic, Light (PL 8)",
+      "category": "Armor",
+      "group": "Nanofluidic",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S",
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 500000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.025
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d8-1 | HI: d8-1 | En: d8 | Hull: 2.5%",
+      "stats": {
+        "LI": "d8-1",
+        "HI": "d8-1",
+        "En": "d8"
+      }
+    },
+    {
+      "id": "arm_crystallis_medium",
+      "name": "Crystallis, Medium (PL 8)",
+      "category": "Armor",
+      "group": "Crystallis",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "P",
+        "X"
+      ],
+      "baseCost": 0,
+      "costPerHull": 500000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: d6 | HI: d6+1 | En: 2d4+1 | Hull: 5%",
+      "stats": {
+        "LI": "d6",
+        "HI": "d6+1",
+        "En": "2d4+1"
+      }
+    },
+    {
+      "id": "arm_nanofluidic_medium",
+      "name": "Nanofluidic, Medium (PL 8)",
+      "category": "Armor",
+      "group": "Nanofluidic",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S",
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 1000000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": null,
+      "description": "LI: 2d4 | HI: 2d4 | En: 2d4 | Hull: 5%",
+      "stats": {
+        "LI": "2d4",
+        "HI": "2d4",
+        "En": "2d4"
+      }
+    },
+    {
+      "id": "arm_nanofluidic_heavy",
+      "name": "Nanofluidic, Heavy (PL 8)",
+      "category": "Armor",
+      "group": "Nanofluidic",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S",
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 2000000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.1
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Light Ships",
+      "description": "LI: 2d4+1 | HI: 2d4+2 | En: 2d4+1 | Hull: 10%",
+      "stats": {
+        "LI": "2d4+1",
+        "HI": "2d4+2",
+        "En": "2d4+1"
+      }
+    },
+    {
+      "id": "arm_nanofluidic_super_heavy",
+      "name": "Nanofluidic, Super-Heavy (PL 8)",
+      "category": "Armor",
+      "group": "Nanofluidic",
+      "exclusiveGroup": "Armor",
+      "tech": [
+        "S",
+        "C"
+      ],
+      "baseCost": 0,
+      "costPerHull": 4000000,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.2
+      },
+      "powerConsumed": 0.0,
+      "baseEp": 0,
+      "sizeMult": false,
+      "minShipSize": "Medium Ships",
+      "description": "LI: 2d4+3 | HI: 2d4+4 | En: 2d4+3 | Hull: 20%",
+      "stats": {
+        "LI": "2d4+3",
+        "HI": "2d4+4",
+        "En": "2d4+3"
+      }
+    },
+    {
+      "id": "comp_ai_cradle",
+      "name": "AI Cradle",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 200000,
+      "costPerHull": 0,
+      "powerConsumed": 4.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 4.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "description": "Hardware matrix designed to host advanced synthetic intelligence."
+    },
+    {
+      "id": "comp_ai_automation",
+      "name": "AI Automation",
+      "category": "Computers",
+      "group": "PL 8 - Energy Age",
+      "tech": [
+        "C"
+      ],
+      "baseCost": 500000,
+      "costPerHull": 0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "pct",
+        "val": 0.05
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 8"
+      },
+      "sizeMult": false,
+      "requires": [
+        "comp_ai_cradle"
+      ],
+      "description": "Allows ship systems to operate autonomously. Requires an AI Cradle."
+    }
+  ]
+}

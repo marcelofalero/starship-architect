@@ -1,0 +1,270 @@
+/* Print Styles */
+@media print {
+    body { background-color: white !important; color: black !important; }
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    .q-header, .q-footer, .q-drawer { display: none !important; }
+    .q-page-container { padding: 0 !important; }
+    .q-layout { min-height: auto !important; }
+}
+
+@media screen {
+    .print-only { display: none !important; }
+}
+
+/* Global Font Overrides for Rebels Vibe */
+body {
+    font-family: 'Chakra Petch', 'Roboto', sans-serif;
+}
+
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+.q-toolbar__title, .q-card__section--vert > .text-h6 {
+    font-family: 'Russo One', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+:root {
+    --q-primary: #389EBD;
+    --q-secondary: #4BB5C1;
+    --q-accent: #59B7C7;
+    --q-dark: #001A33;
+    --q-dark-page: #001A33;
+}
+
+/* AAA Theme Colors & Textures */
+.bg-grey-10 {
+    background-color: #001A33 !important; /* Dark Datapad base */
+    background-image: radial-gradient(circle at 50% 50%, #0A3D54 0%, #001A33 100%) !important;
+}
+
+.bg-grey-9 {
+    background-color: #001A33 !important;
+}
+
+.bg-grey-8 {
+    background-color: #0A3D54 !important;
+}
+
+.q-card {
+    border: 1px solid #4BB5C1;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.q-card__section {
+    border-bottom: 1px solid #0A3D54;
+}
+
+/* Look for dialogs and cards */
+.q-dialog .q-card {
+    border: 2px solid #4BB5C1;
+    border-radius: 2px;
+}
+
+/* Driver.js tour style overrides */
+.driver-active-element {
+    pointer-events: none !important;
+}
+
+/* Previous placeholder classes */
+.stat-block {
+    font-family: 'Chakra Petch', sans-serif;
+    border: 2px solid #333;
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.stat-header {
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+.stat-row {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0;
+}
+.stat-label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+.stat-section {
+    margin-top: 10px;
+    border-top: 2px solid #333;
+    padding-top: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.text-strike {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Warships Ship Sheet Styles - Datapad Style */
+.warships-block {
+    font-family: 'Chakra Petch', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    border: 4px solid #001A33;
+    background-color: #fdfcf5; /* Slightly aged paper/screen look */
+    color: #1E2A3A;
+    padding: 0;
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.warships-header {
+    background-color: #001A33;
+    color: #4BB5C1; /* Cyan Accent */
+    padding: 15px 20px;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.6em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #4BB5C1;
+}
+
+.warships-sub {
+    font-style: italic;
+    padding: 8px 20px;
+    border-bottom: 2px solid #001A33;
+    margin-bottom: 15px;
+    background-color: #eceff1;
+    color: #001A33;
+    font-weight: 500;
+}
+
+.sheet-body {
+    padding: 0 20px 20px 20px;
+}
+
+.section-title {
+    color: #001A33;
+    font-family: 'Russo One', sans-serif;
+    font-weight: 400;
+    border-bottom: 2px solid #4BB5C1;
+    margin: 15px 0 8px 0;
+    text-transform: uppercase;
+    font-size: 1.2em;
+    letter-spacing: 1px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 5px 0;
+}
+
+.bold {
+    font-weight: 700;
+    color: #001A33;
+}
+
+.weapon-line {
+    padding: 6px 10px;
+    border-left: 5px solid #4BB5C1;
+    background-color: #e0f2f1;
+    margin-bottom: 6px;
+    border-radius: 0 4px 4px 0;
+}
+
+.cost-line {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 2px solid #001A33;
+    text-align: right;
+    font-size: 1.2em;
+    font-family: 'Russo One', sans-serif;
+    color: #389EBD;
+}
+
+/* Print Overrides */
+@media print {
+    .warships-block {
+        border: 2px solid #000;
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        background-color: white;
+    }
+    .warships-header {
+        background-color: #333 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        border-bottom-color: #000;
+    }
+    .warships-sub {
+        background-color: #eee !important;
+        border-bottom-color: #000;
+        -webkit-print-color-adjust: exact;
+    }
+    .section-title {
+        color: #000;
+        border-bottom-color: #000;
+        font-family: sans-serif; /* Fallback for print */
+    }
+    .weapon-line {
+        border-left-color: #000;
+        background-color: #eee !important;
+        -webkit-print-color-adjust: exact;
+    }
+    .cost-line {
+        border-top-color: #000;
+        color: #000;
+    }
+    .bold {
+        color: #000;
+    }
+    /* Reset body font for print legibility */
+    body {
+        font-family: sans-serif;
+    }
+    .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+        font-family: sans-serif;
+    }
+}
+
+/* Quasar Flexbox Fixes */
+.q-tab-panels.column > .q-panel {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fix for QScrollArea in Flex Column where parent flex height doesn't propagate to percentage height children */
+.q-scrollarea.col {
+    display: flex;
+    flex-direction: column;
+}
+.q-scrollarea.col .q-scrollarea__container {
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 0;
+}
+
+.border-bottom-grey {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tour Active State - Disable interactions */
+body.tour-active * {
+    pointer-events: none !important;
+}
+
+body.tour-active .driver-popover,
+body.tour-active .driver-popover * {
+    pointer-events: auto !important;
+}
+
+/* Allow closing by clicking the overlay if desired, though usually driver handles this */
+body.tour-active .driver-overlay,
+body.tour-active svg.driver-overlay-path {
+    pointer-events: auto !important;
+}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"syscall/js"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -22,6 +23,7 @@ var apiHTMLContent []byte
 
 func main() {
 	var err error
+
 	// Initialize D1
 	connector, err := d1.OpenConnector("DB")
 	if err != nil {
@@ -81,9 +83,14 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 		t1 := time.Now()
+
 		defer func() {
-			fmt.Printf("%s %s %d %v\n", r.Method, r.URL.Path, ww.Status(), time.Since(t1))
+			// Use the helper instead of fmt.Printf
+			msg := fmt.Sprintf("%s %s %d %v", r.Method, r.URL.Path, ww.Status(), time.Since(t1))
+			// js.ValueOf(msg) creates the JS string primitive
+			js.Global().Get("console").Call("log", js.ValueOf(msg))
 		}()
+
 		next.ServeHTTP(ww, r)
 	})
 }
