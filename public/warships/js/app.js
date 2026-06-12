@@ -1,7 +1,7 @@
-import { useShipStore } from './store.js?v=2.2';
-import { i18n, getLocalizedName } from './i18n.js?v=2.1';
-import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog, CustomShipDialog } from './components.js?v=2.3';
-import { initTutorial } from './tutorial.js?v=2.1';
+import { useShipStore } from './store.js?v=3.0';
+import { i18n, getLocalizedName } from './i18n.js?v=3.0';
+import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog, CustomShipDialog } from './components.js?v=3.0';
+import { initTutorial } from './tutorial.js?v=3.0';
 
 const { createApp, ref, onMounted, watch } = Vue;
 const { createPinia } = Pinia;

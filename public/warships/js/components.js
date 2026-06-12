@@ -1,5 +1,5 @@
-import { useShipStore } from './store.js?v=2.1';
-import { getLocalizedName, i18n } from './i18n.js?v=2.1';
+import { useShipStore } from './store.js?v=3.0';
+import { getLocalizedName, i18n } from './i18n.js?v=3.0';
 
 const { computed, ref, reactive, watch } = Vue;
 const { useI18n } = VueI18n;
@@ -26,7 +26,7 @@ const StatPanel = {
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
-            <div class="q-mt-xs text-caption text-grey">{{ store.chassis.size }} Starship</div>
+            <div class="q-mt-xs text-caption text-grey">{{ getLocalizedSize(store.chassis.size) }}</div>
             <div class="row items-center q-mt-sm">
                 <div v-if="!editingName" class="text-h6 col-grow">{{ store.meta.name || 'Untitled Ship' }}</div>
                 <q-input v-else dark dense v-model="store.meta.name" class="col-grow" autofocus @blur="editingName = false" @keyup.enter="editingName = false" />
@@ -362,7 +362,7 @@ const ShipSheet = {
             <span style="font-size: 0.8em; text-transform: uppercase;">{{ store.chassis.category }} {{ store.chassis.size }}</span>
         </div>
         <div class="warships-sub">
-            Hull Type: {{ getLocalizedName(store.chassis) }}
+            {{ formattedSub }}
         </div>
         <div class="sheet-body">
             <!-- SECTION 1: Tactical Stats -->
@@ -374,26 +374,39 @@ const ShipSheet = {
                 <div class="col-4">
                     <span class="bold">Maneuver Class:</span> {{ maneuverClass }}
                 </div>
-                <div class="col-4">
-                    <span class="bold">Target Modifier:</span> {{ targetModifier }}
-                </div>
-                <div class="col-6 q-mt-sm">
-                    <span class="bold">Acceleration (Sublight):</span> {{ store.currentStats.speed }}
-                </div>
+
                 <div class="col-6 q-mt-sm">
                     <span class="bold">FTL Range:</span> {{ store.currentStats.ftlSpeed || 'None' }}
                 </div>
             </div>
 
             <!-- SECTION 2: Defenses & Armor -->
-            <div class="section-title">Armor & Shields</div>
+            <div class="section-title">Defenses</div>
             <div class="row q-col-gutter-sm text-center">
                 <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">LI:</span> {{ store.currentStats.LI || '-' }}</div></div>
                 <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">HI:</span> {{ store.currentStats.HI || '-' }}</div></div>
                 <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">En:</span> {{ store.currentStats.En || '-' }}</div></div>
             </div>
+            <div class="q-mt-sm text-center">
+                <div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">Target Modifier:</span> {{ targetModifier }}</div>
+            </div>
             <div v-if="store.currentStats.sr" class="q-mt-sm text-center">
-                <div class="bg-teal-1 q-pa-xs text-teal-9 text-bold rounded-borders">DEFLECTION INDUCER / SHIELD RATING (SR): {{ store.currentStats.sr }}</div>
+                <div class="bg-teal-1 q-pa-xs text-teal-9 text-bold rounded-borders">SHIELD RATING (SR): {{ store.currentStats.sr }}</div>
+            </div>
+            <!-- Defensive Modifiers List -->
+            <div v-if="defensiveModifiers && defensiveModifiers.length > 0" class="q-mt-sm">
+                <div class="text-caption text-bold text-grey-8 q-mb-xs">Active Defensive Modifiers:</div>
+                <div v-for="mod in defensiveModifiers" :key="mod.name" class="q-mb-xs rounded-borders q-pa-xs text-caption row items-center justify-between" :class="mod.isFullyCovered ? 'bg-green-1 text-green-9' : 'bg-orange-1 text-orange-9'" style="border: 1px solid currentColor;">
+                    <div class="col-12">
+                        <span v-if="getDescription(mod.defId)">
+                            <a :href="'#rule-' + mod.defId" class="rules-link">{{ mod.name }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                        </span>
+                        <span v-else class="bold text-uppercase" style="color: inherit;">{{ mod.name }}</span> 
+                        <span class="text-weight-bold">[{{ mod.status }}]</span> 
+                        <span class="text-grey-8" style="font-size: 0.9em;">{{ mod.coverageInfo }}</span>: 
+                        {{ mod.effect }}
+                    </div>
+                </div>
             </div>
 
             <!-- SECTION 3: Damage Track -->
@@ -438,11 +451,18 @@ const ShipSheet = {
             <div class="section-title">Armament (Weapon Systems)</div>
             <div v-if="weaponData.length === 0" class="text-italic text-grey-6">No weapons installed.</div>
             <div v-for="w in weaponData" :key="w.instanceId" class="weapon-line">
-                <span class="bold">{{ w.name }}</span>
+                <span class="bold">
+                    <span v-if="getDescription(w.defId)">
+                        <a :href="'#rule-' + w.defId" class="rules-link">{{ w.name }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                    </span>
+                    <span v-else>{{ w.name }}</span>
+                </span>
                 <div style="font-size: 0.85em;" class="row q-col-gutter-xs q-mt-xs">
                     <div class="col-4"><strong>Damage:</strong> {{ w.damage }}</div>
                     <div class="col-4"><strong>Fire:</strong> {{ w.fire }}</div>
-                    <div class="col-4" v-if="w.location"><strong>Location:</strong> {{ w.location }}</div>
+                    <div class="col-4"><strong>Range:</strong> {{ w.range }}</div>
+                    <div class="col-12"><strong>Attack Modifier:</strong> {{ w.attackModifier }}</div>
+                    <div class="col-12" v-if="w.location"><strong>Location:</strong> {{ w.location }}</div>
                     <div class="col-12" v-if="w.details"><strong>Details:</strong> {{ w.details }}</div>
                 </div>
             </div>
@@ -453,7 +473,13 @@ const ShipSheet = {
                 <div class="bold text-uppercase text-primary q-mb-xs">{{ loc }} Zone</div>
                 <div class="row q-col-gutter-xs">
                     <div v-for="c in components" :key="c.instanceId" class="col-12 col-sm-6">
-                        <span class="bold">• {{ getName(c) }}</span>
+                        <span class="bold">
+                            • 
+                            <span v-if="getDescription(c.defId)">
+                                <a :href="'#rule-' + c.defId" class="rules-link">{{ getName(c) }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                            </span>
+                            <span v-else>{{ getName(c) }}</span>
+                        </span>
                         <span style="font-size: 0.8em; color: #555;" class="q-ml-sm">
                             ({{ store.getComponentCost(c) ? formatCreds(store.getComponentCost(c)) : '0 cr' }})
                         </span>
@@ -461,17 +487,18 @@ const ShipSheet = {
                 </div>
             </div>
 
-            <!-- SECTION 7: Special Rules -->
-            <div v-if="componentsWithDescriptions.length > 0">
-                <div class="section-title">Special Equipment Rules</div>
-                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" class="q-mb-sm" style="font-size: 0.9em; line-height: 1.3;">
-                    <span class="bold">{{ getName(c.defId) }}:</span> {{ getDescription(c.defId) }}
-                </div>
-            </div>
-
             <!-- Total Cost -->
             <div class="cost-line">
                 <span class="bold">Total Cost:</span> {{ formatCreds(store.totalCost) }}
+            </div>
+
+            <!-- SECTION 7: Special Rules -->
+            <div v-if="componentsWithDescriptions.length > 0" class="page-break">
+                <div class="section-title">{{ $t('ui.system_descriptions') }}</div>
+                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" :id="'rule-' + c.defId" class="q-mb-md" style="font-size: 0.9em; line-height: 1.4; scroll-margin-top: 50px;">
+                    <div class="bold text-subtitle2 text-primary" style="font-size: 1.1em; border-bottom: 1px solid #ddd; margin-bottom: 4px;">{{ getName(c.defId) }}</div>
+                    <div class="text-justify" style="white-space: pre-wrap;">{{ getDescription(c.defId) }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -590,7 +617,7 @@ export const HangarDialog = {
         };
 
         const deleteShip = (shipId) => {
-             $q.dialog({
+            $q.dialog({
                 dark: true,
                 title: 'Confirm Deletion',
                 message: 'Delete this ship from the hangar?',
@@ -603,7 +630,7 @@ export const HangarDialog = {
         };
 
         const triggerFileSelect = () => {
-             if(fileInput.value) fileInput.value.click();
+            if (fileInput.value) fileInput.value.click();
         };
 
         const handleFileUpload = (event) => {
@@ -725,7 +752,7 @@ export const CustomManagerDialog = {
         const $q = useQuasar();
         const libraryInput = ref(null);
 
-        const triggerLibraryImport = () => { if(libraryInput.value) libraryInput.value.click(); };
+        const triggerLibraryImport = () => { if (libraryInput.value) libraryInput.value.click(); };
 
         const handleLibraryImport = (event) => {
             const file = event.target.files[0];
@@ -740,11 +767,11 @@ export const CustomManagerDialog = {
                             name: file.name.replace('.json', ''),
                             components: data
                         });
-                         $q.notify({ type: 'positive', message: 'Legacy library imported successfully.' });
+                        $q.notify({ type: 'positive', message: 'Legacy library imported successfully.' });
                     } else if (data.components || data.ships) {
-                         // Standard Library Import
-                         store.importLibrary(data);
-                         $q.notify({ type: 'positive', message: 'Library imported successfully.' });
+                        // Standard Library Import
+                        store.importLibrary(data);
+                        $q.notify({ type: 'positive', message: 'Library imported successfully.' });
                     } else {
                         $q.notify({ type: 'negative', message: 'Invalid file format.' });
                     }
@@ -765,7 +792,7 @@ export const CustomManagerDialog = {
                 ships: lib.ships
             };
             const jsonStr = JSON.stringify(exportObj, null, 2);
-            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const blob = new Blob([jsonStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -787,7 +814,7 @@ export const CustomManagerDialog = {
         };
 
         const editLibraryName = (lib) => {
-             $q.dialog({
+            $q.dialog({
                 dark: true,
                 title: 'Edit Library Name',
                 prompt: {
@@ -907,7 +934,7 @@ export const CustomShipDialog = {
 
             let id = newShip.id;
             if (!id) {
-                 id = isEdit ? store.customShipDialogState.shipId : 'custom_ship_' + crypto.randomUUID();
+                id = isEdit ? store.customShipDialogState.shipId : 'custom_ship_' + crypto.randomUUID();
             }
 
             const ship = {
@@ -1133,7 +1160,7 @@ export const AddModDialog = {
         const allAvailableTags = computed(() => {
             const tags = new Set();
             const activeCats = (searchTags.value || []).filter(t => t.startsWith("Category: ")).map(t => t.replace("Category: ", ""));
-            
+
             for (const e of store.allEquipment) {
                 if (e.category) tags.add(`Category: ${e.category}`);
                 if (e.stats?.pl) tags.add(`PL: ${e.stats.pl}`);
@@ -1177,13 +1204,13 @@ export const AddModDialog = {
             let newCats = newTags.filter(t => t.startsWith("Category: ")).map(t => t.replace("Category: ", ""));
             let categoriesToKeep = newCats;
             let tagsToFilterOut = new Set();
-            
+
             // Enforce single category: if there are multiple categories, keep only the most recently added one
             if (newCats.length > 1) {
                 const latestCat = newCats[newCats.length - 1];
                 const removedCats = newCats.filter(c => c !== latestCat);
                 categoriesToKeep = [latestCat];
-                
+
                 removedCats.forEach(c => tagsToFilterOut.add(`Category: ${c}`));
                 for (const cat of removedCats) {
                     store.allEquipment.filter(e => e.category === cat && e.group).forEach(e => tagsToFilterOut.add(`Type: ${e.group}`));
@@ -1195,7 +1222,7 @@ export const AddModDialog = {
             for (const cat of removedCatsNormal) {
                 store.allEquipment.filter(e => e.category === cat && e.group).forEach(e => tagsToFilterOut.add(`Type: ${e.group}`));
             }
-            
+
             if (tagsToFilterOut.size > 0) {
                 const filteredTags = searchTags.value.filter(t => !tagsToFilterOut.has(t));
                 if (filteredTags.length !== searchTags.value.length) {
@@ -1204,7 +1231,7 @@ export const AddModDialog = {
                     }, 10);
                 }
             }
-            
+
             activeCategories.value = categoriesToKeep;
         };
 
@@ -1245,7 +1272,7 @@ export const AddModDialog = {
         const itemOptions = computed(() => {
             // Require at least one filter to show items (to avoid showing the entire DB at once)
             if (!searchTags.value.length) return [];
-            
+
             return filteredEquipmentPool.value.map(e => ({
                 ...e,
                 label: getLocalizedName(e)
@@ -1319,7 +1346,7 @@ export const AddModDialog = {
                 window.open(def.wiki, '_blank');
                 return;
             }
-            
+
             let url = 'https://aaa.dimble.net/warships/ship-construction/';
             if (def.category === 'Armor') url += 'armor/';
             else if (def.category === 'Sublight') url += 'engines/';
@@ -1327,7 +1354,7 @@ export const AddModDialog = {
             else if (def.category === 'Power') url += 'power-plant/';
             else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
             else url += 'systems-crew/';
-            
+
             window.open(url, '_blank');
         };
 
@@ -1377,7 +1404,7 @@ export const AddModDialog = {
         };
 
         const installComponent = () => {
-            if(newComponentSelection.value) {
+            if (newComponentSelection.value) {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
 
                 const doInstall = () => {
@@ -1408,7 +1435,8 @@ export const AddModDialog = {
             }
         };
 
-        return { store, searchTags, searchTagOptions, filterSearchTags, onSearchTagsUpdated, newComponentSelection, itemOptions, selectedItemDef, isSizeValid, checkRequirements, previewCost, previewHullPts, resetSelections, formatCreds, installComponent, getLocalizedName,
+        return {
+            store, searchTags, searchTagOptions, filterSearchTags, onSearchTagsUpdated, newComponentSelection, itemOptions, selectedItemDef, isSizeValid, checkRequirements, previewCost, previewHullPts, resetSelections, formatCreds, installComponent, getLocalizedName,
             showJsonEditor, jsonContent, openWiki, openJsonEditor, saveJson, createNew, deleteComponent
         };
     }
@@ -1566,7 +1594,7 @@ export const CustomComponentDialog = {
 
             let id = newCustomComponent.id;
             if (!id) {
-                 id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+                id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
             }
 
             const comp = {
@@ -1631,7 +1659,7 @@ export const CustomComponentDialog = {
                     activeProperties.value = [];
                 }
             } else {
-                 store.customDialogState.componentId = null;
+                store.customDialogState.componentId = null;
             }
         });
 
@@ -1645,7 +1673,12 @@ export const StatPanelWrapper = {
     setup() {
         const store = useShipStore();
         const editingName = ref(false);
-        return { store, getLocalizedName, editingName };
+        const getLocalizedSize = (size) => {
+            if (!size) return '';
+            const key = `size.${size}`;
+            return i18n.global.te(key) ? i18n.global.t(key) : size;
+        };
+        return { store, getLocalizedName, editingName, getLocalizedSize };
     }
 };
 
@@ -1692,7 +1725,7 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === instance.defId);
             if (!def) return instance.location || '';
             let parts = [];
-            
+
             if (instance.modifications?.auxiliary) {
                 parts.push("Auxiliary");
             }
@@ -1805,46 +1838,46 @@ export const SystemListWrapper = {
         });
 
         const getEffectiveArcLimit = (assumingArc = null) => {
-             const emp = editingInstance.value?.modifications?.emplacement || 'Standard Mount';
-             const arcs = editingInstance.value?.modifications?.arcs || [];
-             let limit = maxArcsAllowed.value;
-             let hasZeroSpecial = arcs.includes('Zero-Port') || arcs.includes('Zero-Starboard');
-             if (assumingArc === 'Zero-Port' || assumingArc === 'Zero-Starboard') hasZeroSpecial = true;
-             if (emp === 'Standard Mount' && hasZeroSpecial) {
-                 limit = 2;
-             }
-             return limit;
+            const emp = editingInstance.value?.modifications?.emplacement || 'Standard Mount';
+            const arcs = editingInstance.value?.modifications?.arcs || [];
+            let limit = maxArcsAllowed.value;
+            let hasZeroSpecial = arcs.includes('Zero-Port') || arcs.includes('Zero-Starboard');
+            if (assumingArc === 'Zero-Port' || assumingArc === 'Zero-Starboard') hasZeroSpecial = true;
+            if (emp === 'Standard Mount' && hasZeroSpecial) {
+                limit = 2;
+            }
+            return limit;
         };
 
         const isArcDisabled = (arc) => {
             if (!editingInstance.value?.modifications) return false;
             let arcs = editingInstance.value.modifications.arcs || [];
-            
+
             // Standard Mount zero-port/zero-stbd rules
             if (arc === 'Zero-Port' || arc === 'Zero-Starboard') {
-                 if (store.chassis.value?.size === 'Small Craft') return true;
-                 const emp = editingInstance.value.modifications.emplacement || 'Standard Mount';
-                 if (emp === 'Fixed Mount' || emp === 'Sponson' || emp === 'Bank') return true; // Only Standard/Turret
-                 if (arc === 'Zero-Port' && arcs.includes('Zero-Starboard')) return true; // Can't have both
-                 if (arc === 'Zero-Starboard' && arcs.includes('Zero-Port')) return true;
+                if (store.chassis.value?.size === 'Small Craft') return true;
+                const emp = editingInstance.value.modifications.emplacement || 'Standard Mount';
+                if (emp === 'Fixed Mount' || emp === 'Sponson' || emp === 'Bank') return true; // Only Standard/Turret
+                if (arc === 'Zero-Port' && arcs.includes('Zero-Starboard')) return true; // Can't have both
+                if (arc === 'Zero-Starboard' && arcs.includes('Zero-Port')) return true;
             }
 
             if (arcs.includes(arc)) return false;
 
             let totalSelected = arcs.length;
             if (arcs.includes('Zero')) totalSelected--; // Zero is free and automatic for small weapons
-            
+
             return totalSelected >= getEffectiveArcLimit(arc);
         };
 
         const onEmplacementChanged = () => {
-             if (!editingInstance.value?.modifications) return;
-             let arcs = editingInstance.value.modifications.arcs || [];
-             const limit = getEffectiveArcLimit();
-             let nonZeroArcs = arcs.filter(a => a !== 'Zero');
-             if (nonZeroArcs.length > limit) {
-                 editingInstance.value.modifications.arcs = arcs.filter(a => a === 'Zero').concat(nonZeroArcs.slice(0, limit));
-             }
+            if (!editingInstance.value?.modifications) return;
+            let arcs = editingInstance.value.modifications.arcs || [];
+            const limit = getEffectiveArcLimit();
+            let nonZeroArcs = arcs.filter(a => a !== 'Zero');
+            if (nonZeroArcs.length > limit) {
+                editingInstance.value.modifications.arcs = arcs.filter(a => a === 'Zero').concat(nonZeroArcs.slice(0, limit));
+            }
         };
         const canEnhance = (defId) => {
             const def = store.allEquipment.find(e => e.id === defId);
@@ -1917,7 +1950,7 @@ export const SystemListWrapper = {
                 if (!instance.modifications.weaponMount) instance.modifications.weaponMount = 'Single';
                 if (!instance.modifications.concealed) instance.modifications.concealed = false;
                 if (!instance.modifications.fireControl) instance.modifications.fireControl = 'None';
-                
+
                 const isSmallCraft = store.chassis.value?.size === 'Small Craft';
                 if (isSmallCraft) {
                     if (!instance.modifications.arcs.includes('Zero')) {
@@ -1928,28 +1961,28 @@ export const SystemListWrapper = {
                     instance.modifications.arcs = instance.modifications.arcs.filter(a => a !== 'Zero');
                 }
             }
-            editingInstance.value = instance; 
-            showConfigDialog.value = true; 
+            editingInstance.value = instance;
+            showConfigDialog.value = true;
         };
 
         const openWiki = (defId) => {
-             const def = store.allEquipment.find(e => e.id === defId);
-             if (!def) return;
+            const def = store.allEquipment.find(e => e.id === defId);
+            if (!def) return;
 
-             if (def.wiki) {
-                 window.open(def.wiki, '_blank');
-                 return;
-             }
-             
-             let url = 'https://aaa.dimble.net/warships/ship-construction/';
-             if (def.category === 'Armor') url += 'armor/';
-             else if (def.category === 'Sublight') url += 'engines/';
-             else if (def.category === 'FTL Drives') url += 'ftl-drive/';
-             else if (def.category === 'Power') url += 'power-plant/';
-             else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
-             else url += 'systems-crew/';
-             
-             window.open(url, '_blank');
+            if (def.wiki) {
+                window.open(def.wiki, '_blank');
+                return;
+            }
+
+            let url = 'https://aaa.dimble.net/warships/ship-construction/';
+            if (def.category === 'Armor') url += 'armor/';
+            else if (def.category === 'Sublight') url += 'engines/';
+            else if (def.category === 'FTL Drives') url += 'ftl-drive/';
+            else if (def.category === 'Power') url += 'power-plant/';
+            else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
+            else url += 'systems-crew/';
+
+            window.open(url, '_blank');
         };
 
         const checkValidity = (instance) => {
@@ -1969,29 +2002,29 @@ export const SystemListWrapper = {
         };
 
         const getOptionCost = (defId, key) => {
-             const def = store.allEquipment.find(e => e.id === defId);
-             if (!def) return 0;
-             let costDef = null;
-             if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
-                 costDef = def.upgradeSpecs.optionCosts[key];
-             } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
-                 costDef = def.upgradeSpecs[key].cost;
-             }
-             if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
-                 costDef = store.db.DEFAULT_OPTION_COSTS[key];
-             }
-             if (costDef === null) return 0;
-             if (typeof costDef === 'number') {
-                 return costDef;
-             } else if (typeof costDef === 'object') {
-                 if (costDef.multiplier) return def.baseCost * costDef.multiplier;
-                 if (costDef.cost) {
-                     let val = costDef.cost;
-                     if (costDef.sizeMult) val *= store.sizeMultVal;
-                     return val;
-                 }
-             }
-             return 0;
+            const def = store.allEquipment.find(e => e.id === defId);
+            if (!def) return 0;
+            let costDef = null;
+            if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
+                costDef = def.upgradeSpecs.optionCosts[key];
+            } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
+                costDef = def.upgradeSpecs[key].cost;
+            }
+            if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
+                costDef = store.db.DEFAULT_OPTION_COSTS[key];
+            }
+            if (costDef === null) return 0;
+            if (typeof costDef === 'number') {
+                return costDef;
+            } else if (typeof costDef === 'object') {
+                if (costDef.multiplier) return def.baseCost * costDef.multiplier;
+                if (costDef.cost) {
+                    let val = costDef.cost;
+                    if (costDef.sizeMult) val *= store.sizeMultVal;
+                    return val;
+                }
+            }
+            return 0;
         };
 
         const configModel = computed(() => {
@@ -2002,7 +2035,7 @@ export const SystemListWrapper = {
 
             return {
 
-                get sublightPctIndex() { 
+                get sublightPctIndex() {
                     let val = mods.quantity || 10;
                     if (val < 5) val = 5;
                     let closest = 0;
@@ -2013,8 +2046,8 @@ export const SystemListWrapper = {
                     }
                     return closest;
                 },
-                set sublightPctIndex(idx) { 
-                    mods.quantity = enginePctMap[idx]; 
+                set sublightPctIndex(idx) {
+                    mods.quantity = enginePctMap[idx];
                 },
                 get sublightPctLabel() { return enginePctMap[this.sublightPctIndex] + '%'; },
                 get sublightPctMinIndex() {
@@ -2061,6 +2094,18 @@ export const ShipSheetWrapper = {
     setup() {
         const store = useShipStore();
 
+        const formattedSub = computed(() => {
+            if (!store.chassis) return '';
+            let name = getLocalizedName(store.chassis) || '';
+            if (i18n.global.locale.value === 'en') {
+                name = name.replace(/\b\w/g, c => c.toUpperCase());
+            }
+            const size = store.chassis.size || '';
+            const key = `size.${size}`;
+            const localizedSize = i18n.global.te(key) ? i18n.global.t(key) : size;
+            return `${name} (${localizedSize})`;
+        });
+
         const getName = (instance) => {
             const id = instance.defId || instance;
             const def = store.allEquipment.find(e => e.id === id);
@@ -2087,23 +2132,190 @@ export const ShipSheetWrapper = {
 
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
 
+        const weaponAccuracies = {
+            "wpn_laser": -2,
+            "wpn_ir_laser": -2,
+            "wpn_x_ray_laser": -2,
+            "wpn_heavy_laser": -1,
+            "wpn_neutron_gun": 0,
+            "wpn_fusion_laser": 1,
+            "wpn_graser": 2,
+            "wpn_heavy_neutron_gun": 3,
+            "wpn_hydrogen_bore": 3,
+            "wpn_plasma_cannon": -2,
+            "wpn_particle_beam": -2,
+            "wpn_heavy_particle_beam": -1,
+            "wpn_heavy_plasma_beam": 0,
+            "wpn_matter_beam": 0,
+            "wpn_fusion_beam": 1,
+            "wpn_quantum_cannon": 2,
+            "wpn_boson_gun": 3,
+            "wpn_heavy_matter_beam": 3,
+            "wpn_fusion_bore": 3,
+            "wpn_maser": -3,
+            "wpn_kinetic_lance": -3,
+            "wpn_pulse_maser": -1,
+            "wpn_em_cannon": -1,
+            "wpn_dark_fusion_gun": 0,
+            "wpn_gatling_maser": 1,
+            "wpn_weak_force_gun": 2,
+            "wpn_strong_force_gun": 3,
+            "wpn_zero_bore": 3,
+            "wpn_blacklaser": -3,
+            "wpn_tachyon_gun": 0,
+            "wpn_string_projector": 2,
+            "wpn_point_defense_gun": -1,
+            "wpn_rail_cannon": 0,
+            "wpn_needle_driver": 1,
+            "wpn_gauss_gun": 2,
+            "wpn_hi_velocity_rail_gun": 4,
+            "wpn_mass_cannon": -1,
+            "wpn_heavy_mass_cannon": 0,
+            "wpn_accelerator": 1,
+            "wpn_tach_rifle": 1,
+            "wpn_heavy_accelerator": 3,
+            "wpn_antimatter_gun": 4,
+            "wpn_super_tach_rifle": 4,
+            "wpn_sliver_gun": -2,
+            "wpn_neutronium_driver": 0,
+            "wpn_bomb_projector": -1,
+            "wpn_bomb_salvo": -1,
+            "wpn_kinetic_converter": 2,
+            "wpn_tunneling_driver": 3,
+            "wpn_black_hole_gun": 1,
+            "wpn_cable_gun": 1,
+            "wpn_rf_spike": -2,
+            "wpn_thermal_inducer": 3,
+            "wpn_thermal_nullifier": 3,
+            "wpn_tractor_beam": -1,
+            "wpn_mass_converter": -4,
+            "wpn_matter_torpedo": 0,
+            "wpn_plasma_torpedo": 1,
+            "wpn_em_torpedo": -2,
+            "wpn_neural_inhibitor": 0,
+            "wpn_fission_activator": 0,
+            "wpn_boarding_transporter": null,
+            "wpn_null_torpedo": 2,
+            "wpn_code_arranger": 1
+        };
+
+        const weaponRanges = {
+            "wpn_laser": "1/2/3",
+            "wpn_ir_laser": "1/2/3",
+            "wpn_x_ray_laser": "1/2/3",
+            "wpn_heavy_laser": "1/3/5",
+            "wpn_neutron_gun": "1/3/5",
+            "wpn_fusion_laser": "2/4/6",
+            "wpn_graser": "3/6/9",
+            "wpn_heavy_neutron_gun": "3/6/9",
+            "wpn_hydrogen_bore": "4/8/12",
+            "wpn_plasma_cannon": "1/2/4",
+            "wpn_particle_beam": "2/4/6",
+            "wpn_heavy_particle_beam": "2/4/6",
+            "wpn_heavy_plasma_beam": "2/4/8",
+            "wpn_matter_beam": "2/5/10",
+            "wpn_fusion_beam": "3/6/12",
+            "wpn_quantum_cannon": "4/8/12",
+            "wpn_boson_gun": "4/8/12",
+            "wpn_heavy_matter_beam": "4/8/16",
+            "wpn_fusion_bore": "5/10/15",
+            "wpn_maser": "1/3/5",
+            "wpn_kinetic_lance": "2/4/6",
+            "wpn_pulse_maser": "2/5/10",
+            "wpn_em_cannon": "3/6/12",
+            "wpn_dark_fusion_gun": "4/8/12",
+            "wpn_gatling_maser": "3/7/14",
+            "wpn_weak_force_gun": "5/10/15",
+            "wpn_strong_force_gun": "5/10/20",
+            "wpn_zero_bore": "6/12/18",
+            "wpn_blacklaser": "2/4/6",
+            "wpn_tachyon_gun": "4/8/12",
+            "wpn_string_projector": "6/12/24",
+            "wpn_point_defense_gun": "1/2/3",
+            "wpn_rail_cannon": "1/2/5",
+            "wpn_needle_driver": "1/3/5",
+            "wpn_gauss_gun": "2/4/6",
+            "wpn_hi_velocity_rail_gun": "3/6/12",
+            "wpn_mass_cannon": "1/3/5",
+            "wpn_heavy_mass_cannon": "2/4/6",
+            "wpn_accelerator": "3/5/7",
+            "wpn_tach_rifle": "6/8/10",
+            "wpn_heavy_accelerator": "4/8/10",
+            "wpn_antimatter_gun": "4/8/12",
+            "wpn_super_tach_rifle": "8/10/14",
+            "wpn_sliver_gun": "1/2/4",
+            "wpn_neutronium_driver": "2/4/8",
+            "wpn_bomb_projector": "4/6/8",
+            "wpn_bomb_salvo": "5/7/10",
+            "wpn_kinetic_converter": "4/8/16",
+            "wpn_tunneling_driver": "5/10/20",
+            "wpn_black_hole_gun": "6/12/24",
+            "wpn_cable_gun": "0",
+            "wpn_rf_spike": "1/2/3",
+            "wpn_thermal_inducer": "2/4/6",
+            "wpn_thermal_nullifier": "2/4/6",
+            "wpn_tractor_beam": "2/4/8",
+            "wpn_mass_converter": "2/4/6",
+            "wpn_matter_torpedo": "2/4/8",
+            "wpn_plasma_torpedo": "3/6/9",
+            "wpn_em_torpedo": "2/5/10",
+            "wpn_neural_inhibitor": "1/2/3",
+            "wpn_fission_activator": "4/8/12",
+            "wpn_boarding_transporter": "4/6/8",
+            "wpn_null_torpedo": "3/6/15",
+            "wpn_code_arranger": "4/8/12"
+        };
+
+        const formatSteps = (val) => {
+            if (val === 0) return '0 steps';
+            const sign = val > 0 ? '+' : '';
+            const steps = Math.abs(val) === 1 ? 'step' : 'steps';
+            return `${sign}${val} ${steps}`;
+        };
+
+        const getFcModValue = (fc) => {
+            if (fc === 'Ordinary') return -1;
+            if (fc === 'Good') return -2;
+            if (fc === 'Amazing') return -3;
+            return 0;
+        };
+
         const weaponData = computed(() => {
             return weapons.value.map(w => {
                 const def = store.allEquipment.find(e => e.id === w.defId);
                 const name = getName(w);
                 const damage = getDmg(w);
                 const fire = def ? def.fire || 'N/A' : 'N/A';
+                const range = def ? (weaponRanges[w.defId] || 'N/A') : 'N/A';
+                
+                const baseAccRaw = weaponAccuracies[w.defId];
+                const fcModValue = getFcModValue(w.modifications.fireControl);
+                
+                let mountModValue = 0;
+                if (w.modifications.weaponMount === 'Twin') mountModValue = -1;
+                else if (w.modifications.weaponMount === 'Triple') mountModValue = -2;
+                else if (w.modifications.weaponMount === 'Quad') mountModValue = -3;
+
+                let attackModifierStr = '--';
+                if (baseAccRaw !== null && baseAccRaw !== undefined) {
+                    const totalMod = baseAccRaw + fcModValue + mountModValue;
+                    const totalFormatted = formatSteps(totalMod);
+                    const fcFormatted = formatSteps(fcModValue);
+                    const accFormatted = formatSteps(baseAccRaw);
+                    
+                    let breakdown = `Fire Control: ${fcFormatted}, Accuracy: ${accFormatted}`;
+                    if (mountModValue !== 0) {
+                        const mountFormatted = formatSteps(mountModValue);
+                        breakdown += `, Battery: ${mountFormatted}`;
+                    }
+                    
+                    attackModifierStr = `${totalFormatted} (${breakdown})`;
+                }
 
                 const detailsParts = [];
                 if (w.modifications.batteryCount > 1) detailsParts.push(`Battery (${w.modifications.batteryCount} guns)`);
                 if (w.modifications.weaponMount && w.modifications.weaponMount !== 'Single') detailsParts.push(`${w.modifications.weaponMount} Battery`);
-                
-                if (w.modifications.fireControl) {
-                    if (w.modifications.fireControl === 'Ordinary') detailsParts.push('Ordinary FC (-1 step)');
-                    if (w.modifications.fireControl === 'Good') detailsParts.push('Good FC (-2 step)');
-                    if (w.modifications.fireControl === 'Amazing') detailsParts.push('Amazing FC (-3 step)');
-                }
-                
+
                 if (w.modifications.autofire) detailsParts.push('Autofire');
                 if (w.modifications.pointBlank) detailsParts.push('Point-Blank');
 
@@ -2112,6 +2324,8 @@ export const ShipSheetWrapper = {
                     name: name,
                     damage: damage,
                     fire: fire,
+                    range: range,
+                    attackModifier: attackModifierStr,
                     location: w.location || 'Distributed',
                     details: detailsParts.join(', '),
                     defId: w.defId
@@ -2197,17 +2411,94 @@ export const ShipSheetWrapper = {
             const unique = [];
             store.installedComponents.forEach(instance => {
                 const def = store.allEquipment.find(e => e.id === instance.defId);
-                if (def && def.description && !seen.has(instance.defId)) {
-                    unique.push(instance);
-                    seen.add(instance.defId);
+                if (def && !seen.has(instance.defId)) {
+                    const desc = i18n.global.locale.value === 'es'
+                        ? (def.detailedDescription_es || def.detailedDescription || def.description)
+                        : (def.detailedDescription || def.description);
+                    if (desc) {
+                        unique.push(instance);
+                        seen.add(instance.defId);
+                    }
                 }
+            });
+            unique.sort((a, b) => {
+                const nameA = getName(a.defId).toLowerCase();
+                const nameB = getName(b.defId).toLowerCase();
+                return nameA.localeCompare(nameB);
             });
             return unique;
         });
 
+        const defensiveModifiers = computed(() => {
+            const list = [];
+            const defenseGroups = {};
+            store.installedComponents.forEach(instance => {
+                const def = store.allEquipment.find(e => e.id === instance.defId);
+                if (def && def.category === 'Defenses') {
+                    if (!defenseGroups[instance.defId]) {
+                        defenseGroups[instance.defId] = {
+                            def,
+                            instances: []
+                        };
+                    }
+                    defenseGroups[instance.defId].instances.push(instance);
+                }
+            });
+
+            for (const [defId, group] of Object.entries(defenseGroups)) {
+                const def = group.def;
+                let totalQuantity = 0;
+                group.instances.forEach(inst => {
+                    totalQuantity += (inst.modifications?.quantity || 1);
+                });
+
+                let coverageMatch = def.description.match(/Coverage:\s*(\d+)\s*hull\s*pt/i);
+                let effect = def.description;
+                let status = 'Active';
+                let coverageInfo = '';
+                let isFullyCovered = true;
+
+                if (coverageMatch) {
+                    const coveragePerUnit = parseInt(coverageMatch[1]);
+                    const shipHull = store.chassis.baseHull || 0;
+                    const requiredQuantity = Math.ceil(shipHull / coveragePerUnit);
+                    
+                    if (totalQuantity >= requiredQuantity) {
+                        status = 'Full Coverage';
+                        isFullyCovered = true;
+                    } else {
+                        status = 'Partial Coverage';
+                        isFullyCovered = false;
+                    }
+                    coverageInfo = `(Installed: ${totalQuantity}/${requiredQuantity} needed for ${shipHull} HP)`;
+                    
+                    const parts = def.description.split('|');
+                    if (parts.length > 1) {
+                        effect = parts.slice(1).join('|').trim();
+                    }
+                } else {
+                    coverageInfo = `(Installed: ${totalQuantity})`;
+                }
+
+                list.push({
+                    name: def.name,
+                    effect: effect,
+                    status: status,
+                    coverageInfo: coverageInfo,
+                    isFullyCovered: isFullyCovered,
+                    defId: defId
+                });
+            }
+            return list;
+        });
+
         const getDescription = (id) => {
-             const def = store.allEquipment.find(e => e.id === id);
-             return def ? def.description : '';
+            const def = store.allEquipment.find(e => e.id === id);
+            if (!def) return '';
+            if (i18n.global.locale.value === 'es') {
+                return def.detailedDescription_es || def.detailedDescription || def.description || '';
+            }
+            return def.detailedDescription || def.description || '';
         };
 
         return {
@@ -2218,6 +2509,7 @@ export const ShipSheetWrapper = {
             getDmg,
             formatCreds,
             getLocalizedName,
+            formattedSub,
             toughness,
             maneuverClass,
             targetModifier,
@@ -2227,7 +2519,8 @@ export const ShipSheetWrapper = {
             criticalTrack,
             componentsByLocation,
             componentsWithDescriptions,
-            getDescription
+            getDescription,
+            defensiveModifiers
         };
     }
 };

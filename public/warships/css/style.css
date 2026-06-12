@@ -222,12 +222,51 @@ body {
     .bold {
         color: #000;
     }
+    .warships-block a {
+        color: inherit !important;
+        text-decoration: none !important;
+        border-bottom: none !important;
+    }
     /* Reset body font for print legibility */
     body {
         font-family: sans-serif;
     }
     .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
         font-family: sans-serif;
+    }
+    .page-break {
+        border-top: none !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        page-break-before: always;
+        break-before: page;
+    }
+}
+
+.page-break {
+    border-top: 2px dashed #389EBD;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.rules-link {
+    color: inherit !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+.rules-icon {
+    color: #389EBD !important;
+    font-size: 1.1em;
+    margin-left: 4px;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+}
+
+@media print {
+    .rules-icon {
+        color: #555 !important;
     }
 }
 

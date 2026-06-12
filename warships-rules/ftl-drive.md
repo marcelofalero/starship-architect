@@ -32,6 +32,30 @@ weight = 32
 **Cost/Hull**: The cost per hull point assigned to this drive; cumulative with the base cost.
 **Acceleration rating at...**: The ship’s FTL speed for an installation comprising 5-50% of its overall hull. For example, a ship of 100 hull points with 20 hull points of hyperdrive travels at 4 light-years per day of hyperspace travel.
 
+**Jump Drive (PL 6)**
+The jump drive relies on a fairly rare technology type, the technology of matter transmission. It requires an enormous amount of power, so much so that the jump drive itself is a colossal fusion device that derives the power for its jump by annihilating massive amounts of hydrogen fuel for a single jump. Thus, the jump drive only requires 5 percent of the ship’s hull points, but it must be built with a fuel tank that may account for anywhere from another 5 to 50 percent of the ship’s hull. A small amount of shipboard power (1 power point per hull point devoted to the jump drive machinery) is also required to control the machinery and direct the jump.
+
+The distance a jump drive can teleport in one jump depends on how much of the ship’s mass (i.e., hull points) is annihilated for the jump. For example, a jump ship of 200 hull points might have fuel tanks with a capacity of 60 hull points of fuel—30 percent of the ship’s hull. It could eliminate 10 hull points of fuel (5 percent of the hull) for a jump of 1 light-year, or it could eliminate all 60 fuel points for a jump of 6 light-years.
+
+Since most jump ships use most or all of their available fuel in a jump, they need to jump to a point at which they can refuel their tanks. Obviously, a civilized system will have fueling capability, but if fuel can’t be purchased, the jump ship must improvise. Hydrogen can be skimmed from gas giants, separated from water, or mined in the form of ice. Assuming that a suitable source of hydrogen is available, you can assume that a ship requires 1 full day of fueling per 10 hull points of fuel collected. See “Miscellaneous Installations.”
+
+The jump drive can execute a jump anytime it has enough fuel to do so. It takes 1d4 hours to cycle the engine and plot the next jump point, so there’s usually a small delay between jumps even if fuel is immediately available.
+
+**Wormhole Screen (PL 6)**
+It’s theoretically possible for an object such as a ship to pass through a wormhole—a tunnel in space produced by a spectacular event such as the creation of a black hole—and emerge dozens, hundreds, or thousands of light-years from its previous location. However, the simple act of passing through a wormhole triggers its collapse, which makes it difficult to use a wormhole as a means of interstellar travel. The wormhole screen masks the starship’s mass from the wormhole, thus keeping the conduit open long enough for the ship to pass from one end to the other. It also protects the ship from the extreme conditions in the vicinity of the wormhole.
+
+The wormhole screen only allows transit along a naturally occurring wormhole, which means that a ship can’t pick its destination; it has to go wherever the wormhole takes it. (In some campaigns, networks of pre-existing artificial wormholes may make it possible to reach a great number of stars in this fashion.) The screen device requires 5 percent of the ship’s hull points, and 2 power points per hull point devoted to the system.
+
+A ship of 800 hull points must spend 40 hull points on the screen, and a total of 80 power points to energize the device. Entering a wormhole is a dicey proposition at best, so it takes 2d4 hours to perform the course calculations and maneuvering necessary to initiate a wormhole transit once the ship is in the vicinity of the next wormhole it intends to jump through.
+
+**Gate Activator (PL 7)**
+This device simply keys a gate device of some kind, which functions as a huge teleporter to another gate somewhere else. It doesn’t require very much power compared to other FTL drives because most of the work is done by the gate itself. The gate activator requires 1 percent of the ship’s hull points (1 hull point per 100 hull points of the ship), and 2 power points per hull point allocated to the system.
+
+The ship transiting the gate automatically arrives at the other terminus and cannot jump to a place where no gate exists. The length of the transit may be instantaneous, or it could last for several hours; it depends on the GM’s campaign. A gate device usually requires some cycle time to amass the incredible energies needed to fling a ship across interstellar distances. Again, this is up to the GM, but a period of 2d4 hours as a minimum cycle time is reasonable.
+
+**Hyperdrive (PL 7)**
+This drive system hurls the ship into an alternate dimension or reality in which the lightspeed limit is meaningless. As with the jump drive, it’s necessary to calculate a destination before entering hyperspace. This requires 1d4 (x) 10 minutes, or a Navigation skill check (complex skill check of 4 successes at no penalty, 10 minutes per check). Once the ship is engaged in a hyperspace jump, it can’t change course. It can drop out of hyperspace at any time simply by disengaging the hyperdrive, and there may be devices or natural phenomena that bar hyperspace travel and interdict any ship passing through the vicinity.
+
 A ship’s FTL speed depends on how much of the hull is devoted to the hyperdrive system, with a minimum of 10 percent. Each hull point spent on the hyperdrive requires 3 power points to activate the system. For example, a ship of 300 hull points has a hyperdrive of 45 hull points, or 15 percent of the hull; this requires 135 power points to activate, and provides the ship with a speed of 2 light-years per day of hyperdrive travel. There’s no limit on the length of a jump other than the simple question of how long a ship can remain in hyperspace without refreshing its stores. (The GM may impose a limit of 1000 light-years per hyperjump at his discretion.)
 
 **Psychoportive Drive (PL 7)**

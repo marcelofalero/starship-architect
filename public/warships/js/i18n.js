@@ -20,6 +20,7 @@ export const messages = {
             template: "Template", none: "None", chassis: "Chassis", market_avail: "Market Availability",
             starship_designer_tip: "Waives Non-standard penalties. Enables custom components.",
             installed_systems: "Installed Systems", print_btn: "Print to PDF / Paper",
+            system_descriptions: "System Descriptions",
             convert_cargo_ep: "Convert Cargo to EP", cargo_to_ep_hint: "{sizeMult} tons = 1 EP",
             max_cargo: "Max Cargo", cargo_converted: "Cargo Converted", close: "Close",
             ship_name: "Ship Name", import: "Load Ship", search_component: "Search Component",
@@ -47,6 +48,14 @@ export const messages = {
         avail: {
             Common: "Common", Licensed: "Licensed", Restricted: "Restricted",
             Military: "Military", Illegal: "Illegal"
+        },
+        size: {
+            "Small Craft": "Small Craft",
+            "Light Ships": "Light Ship",
+            "Medium Ships": "Medium Ship",
+            "Heavy Ships": "Heavy Ship",
+            "Super-Heavy Ships": "Super-Heavy Ship",
+            "Fortress Ships": "Fortress Ship"
         }
     },
     es: {
@@ -68,6 +77,7 @@ export const messages = {
             template: "Plantilla", none: "Ninguno", chassis: "Chasis", market_avail: "Disponibilidad de Mercado",
             starship_designer_tip: "Anula penalizaciones No Estándar. Permite componentes personalizados.",
             installed_systems: "Sistemas Instalados", print_btn: "Imprimir en PDF / Papel",
+            system_descriptions: "Descripciones de los Sistemas",
             convert_cargo_ep: "Convertir Carga a PE", cargo_to_ep_hint: "{sizeMult} tons = 1 PE",
             max_cargo: "Carga Máx", cargo_converted: "Carga Convertida", close: "Cerrar",
             ship_name: "Nombre de Nave", import: "Importar", search_component: "Buscar Componente",
@@ -95,6 +105,14 @@ export const messages = {
         avail: {
             Common: "Común", Licensed: "Licenciado", Restricted: "Restringido",
             Military: "Militar", Illegal: "Ilegal"
+        },
+        size: {
+            "Small Craft": "Nave Pequeña",
+            "Light Ships": "Nave Ligera",
+            "Medium Ships": "Nave Mediana",
+            "Heavy Ships": "Nave Pesada",
+            "Super-Heavy Ships": "Nave Súper Pesada",
+            "Fortress Ships": "Nave Fortaleza"
         }
     }
 };

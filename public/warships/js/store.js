@@ -248,28 +248,27 @@ export const useShipStore = defineStore('ship', () => {
         const def = allEquipment.value.find(e => e.id === instance.defId);
         if (!def || !def.damage) return null;
 
-        const match = def.damage.match(/(\d+)d(\d+)(x\d+)?/);
-        if (!match) return def.damage;
-
-        let diceCount = parseInt(match[1]);
-        const dieType = parseInt(match[2]);
-        const multiplier = match[3] || '';
-
-        let prefix = '';
-
-        if (instance.modifications) {
-            const advanced = instance.modifications.advanced || false;
-
-            // 1. Enhancement
-            if (advanced) diceCount += 2;
+        let extraDice = 0;
+        if (instance.modifications && instance.modifications.advanced) {
+            extraDice += 2;
         }
-
-        // Global Bonuses (Template)
         if (currentStats.value.weapon_damage_dice) {
-            diceCount += currentStats.value.weapon_damage_dice;
+            extraDice += currentStats.value.weapon_damage_dice;
         }
 
-        return `${prefix}${diceCount}d${dieType}${multiplier}`;
+        if (extraDice === 0) return def.damage;
+
+        const parts = def.damage.split('/');
+        const updatedParts = parts.map(part => {
+            const match = part.match(/^(\d*)d(\d+)(.*)$/);
+            if (!match) return part;
+            const count = match[1] === '' ? 1 : parseInt(match[1]);
+            const dieType = match[2];
+            const suffix = match[3];
+            return `${count + extraDice}d${dieType}${suffix}`;
+        });
+
+        return updatedParts.join('/');
     }
 
     function calculateComponentCost(instance, ignoreStock = false) {
