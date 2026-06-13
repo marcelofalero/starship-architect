@@ -480,16 +480,8 @@ const ShipSheet = {
                             </span>
                             <span v-else>{{ getName(c) }}</span>
                         </span>
-                        <span style="font-size: 0.8em; color: #555;" class="q-ml-sm">
-                            ({{ store.getComponentCost(c) ? formatCreds(store.getComponentCost(c)) : '0 cr' }})
-                        </span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Total Cost -->
-            <div class="cost-line">
-                <span class="bold">Total Cost:</span> {{ formatCreds(store.totalCost) }}
             </div>
 
             <!-- SECTION 7: Special Rules -->
