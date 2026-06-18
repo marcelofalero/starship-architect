@@ -1,5 +1,5 @@
-import { useShipStore } from './store.js?v=2.1';
-import { getLocalizedName, i18n } from './i18n.js?v=2.1';
+import { useShipStore } from './store.js?v=3.0';
+import { getLocalizedName, i18n } from './i18n.js?v=3.0';
 
 const { computed, ref, reactive, watch } = Vue;
 const { useI18n } = VueI18n;
@@ -26,11 +26,13 @@ const StatPanel = {
         <q-card-section>
             <div class="text-caption text-grey">{{ $t('ui.chassis') }}</div>
             <div class="text-h5 text-primary">{{ getLocalizedName(store.chassis) }}</div>
-            <div class="q-mt-xs text-caption text-grey">{{ store.chassis.size }} Starship</div>
+            <div class="q-mt-xs text-caption text-grey">{{ getLocalizedSize(store.chassis.size) }}</div>
             <div class="row items-center q-mt-sm">
-                <div v-if="!editingName" class="text-h6 col-grow">{{ store.meta.name || 'Untitled Ship' }}</div>
-                <q-input v-else dark dense v-model="store.meta.name" class="col-grow" autofocus @blur="editingName = false" @keyup.enter="editingName = false" />
-                <q-btn flat round :icon="editingName ? 'check' : 'edit'" size="sm" @click="editingName = !editingName" />
+                <div class="text-h6 col-grow">{{ store.meta.name || 'Untitled Ship' }}</div>
+                <q-btn flat round icon="collections" size="sm" @click="store.showImageManager = true" title="Manage Images">
+                    <q-badge v-if="store.shipImages && store.shipImages.length" color="primary" floating>{{ store.shipImages.length }}</q-badge>
+                </q-btn>
+                <q-btn flat round icon="edit" size="sm" @click="showEditDialog = true" title="Edit Ship Details" />
             </div>
         </q-card-section>
         <q-separator dark />
@@ -62,8 +64,12 @@ const StatPanel = {
                     <div :class="store.totalPassengerCapacity < store.currentPassengers ? 'text-negative text-bold' : ''">{{ store.currentPassengers }} / {{ store.totalPassengerCapacity || 0 }} <q-tooltip v-if="store.totalPassengerCapacity < store.currentPassengers" class="bg-negative">Insufficient Seating</q-tooltip></div>
                 </div>
                 <div class="row justify-between q-py-xs border-bottom-grey">
+                    <div class="text-grey">Hull Points</div>
+                    <div>{{ store.chassis?.baseHull || 0 }}<span v-if="store.bonusHull > 0" class="text-positive"> (+{{ store.bonusHull }})</span></div>
+                </div>
+                <div class="row justify-between q-py-xs border-bottom-grey">
                     <div class="text-grey">Life Support Cover (Hull Pts)</div>
-                    <div :class="store.totalLifeSupportCapacity < store.totalHull ? 'text-negative text-bold' : ''">{{ store.totalLifeSupportCapacity || 0 }} / {{ store.totalHull }} <q-tooltip v-if="store.totalLifeSupportCapacity < store.totalHull" class="bg-negative">Insufficient Life Support</q-tooltip></div>
+                    <div :class="store.totalLifeSupportCapacity < (store.chassis?.baseHull || 0) ? 'text-negative text-bold' : ''">{{ store.totalLifeSupportCapacity || 0 }} / {{ store.chassis?.baseHull || 0 }} <q-tooltip v-if="store.totalLifeSupportCapacity < (store.chassis?.baseHull || 0)" class="bg-negative">Insufficient Life Support</q-tooltip></div>
                 </div>
                 <div class="row justify-between q-py-xs border-bottom-grey">
                     <div class="text-grey">Escape Pods for </div>
@@ -73,12 +79,49 @@ const StatPanel = {
                     <div class="text-grey">Cargo Capacity</div>
                     <div>{{ store.currentCargo }}</div>
                 </div>
-                <div class="row justify-between q-py-xs">
-                    <div class="text-grey">Consumables</div>
-                    <div>{{ store.currentConsumables }}</div>
+                <div class="row justify-between items-start q-py-xs border-bottom-grey">
+                    <div class="text-grey q-mr-sm">Consumables</div>
+                    <div class="text-right col">{{ store.currentConsumables }}</div>
+                </div>
+                <div class="row justify-between items-start q-py-xs border-bottom-grey" v-if="store.meta.length || store.chassis?.logistics?.length || store.meta.width || store.chassis?.logistics?.width || store.meta.height || store.chassis?.logistics?.height">
+                    <div class="text-grey q-mr-sm">Dimensions</div>
+                    <div class="text-right col">
+                        <span v-if="store.meta.length || store.chassis?.logistics?.length">L: {{ store.meta.length || store.chassis?.logistics?.length }}</span>
+                        <span v-if="store.meta.width || store.chassis?.logistics?.width"> &nbsp;W: {{ store.meta.width || store.chassis?.logistics?.width }}</span>
+                        <span v-if="store.meta.height || store.chassis?.logistics?.height"> &nbsp;H: {{ store.meta.height || store.chassis?.logistics?.height }}</span>
+                    </div>
                 </div>
             </div>
+
+            <div v-if="store.meta.notes || store.chassis?.notes" class="q-mt-sm q-pa-xs bg-grey-8 rounded-borders text-caption text-grey-4 text-italic" style="border-left: 3px solid #f2c037; white-space: pre-wrap; max-height: 80px; overflow-y: auto;">
+                {{ store.meta.notes || store.chassis?.notes }}
+            </div>
         </q-card-section>
+
+        <!-- Edit Details Dialog -->
+        <q-dialog v-model="showEditDialog" persistent>
+            <q-card class="bg-grey-9 text-white" style="min-width: 400px; border: 1px solid #389ebd;">
+                <q-card-section class="row items-center q-pb-none">
+                    <div class="text-h6 text-primary">Edit Ship Details</div>
+                    <q-space />
+                    <q-btn icon="close" flat round dense v-close-popup />
+                </q-card-section>
+                <q-card-section>
+                    <div class="column q-gutter-md">
+                        <q-input filled dark v-model="store.meta.name" label="Ship Name" class="q-mb-sm" />
+                        <div class="row q-col-gutter-sm">
+                            <div class="col-4"><q-input filled dark v-model="store.meta.length" label="Length" /></div>
+                            <div class="col-4"><q-input filled dark v-model="store.meta.width" label="Width" /></div>
+                            <div class="col-4"><q-input filled dark v-model="store.meta.height" label="Height" /></div>
+                        </div>
+                        <q-input filled dark v-model="store.meta.notes" label="Notes" type="textarea" autogrow />
+                    </div>
+                </q-card-section>
+                <q-card-actions align="right" class="q-pa-md">
+                    <q-btn unelevated label="Done" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
     </q-card>
     `,
     setup() { return {}; }
@@ -143,7 +186,7 @@ const SystemList = {
                 <q-card-section v-if="editingInstance">
                     <div class="q-mb-md">
                         <div class="text-caption">Location</div>
-                        <q-select dark filled v-model="editingInstance.location" :options="['Fore', 'Aft', 'Port', 'Starboard', 'Core', 'Dorsal', 'Ventral', 'Distributed']" new-value-mode="add-unique" use-input hint="Enter a custom location or select from list" />
+                        <q-select dark filled v-model="editingInstance.location" :options="availableLocations" new-value-mode="add-unique" use-input hint="Enter a custom location or select from list" />
                     </div>
                     <div v-if="isWeapon(editingInstance.defId)" class="q-mb-md">
                         <div class="text-caption">Weapon User</div>
@@ -205,14 +248,12 @@ const SystemList = {
                         <q-slider dark v-model="editingInstance.modifications.batteryCount" :min="1" :max="6" :step="1" snap markers label />
                     </div>
                     <div v-if="getUpgradeSpecs(editingInstance.defId)?.quantity" class="q-mb-md">
-                        <template v-if="['Sublight', 'FTL Drives'].includes(getDef(editingInstance.defId)?.category)">
-                            <template v-if="getDef(editingInstance.defId)?.category === 'FTL Drives' && ['Jump Drive', 'Stardrive', 'Drivewave', 'Psychoportive Drive', 'Transcendent Drive'].includes(getDef(editingInstance.defId)?.name)">
-                                <div class="text-caption q-mb-xs">Size (% of Hull): <span class="text-white">10% (Fixed)</span></div>
-                            </template>
-                            <template v-else>
-                                <div class="text-caption q-mb-xs">Size (% of Hull): <span class="text-white">{{ configModel.sublightPctLabel }}</span></div>
-                                <q-slider dark v-model="configModel.sublightPctIndex" :min="configModel.sublightPctMinIndex" :max="6" :step="1" snap markers label />
-                            </template>
+                        <template v-if="getDef(editingInstance.defId)?.category === 'FTL Drives'">
+                            <div class="text-caption q-mb-xs">Size (% of Hull): <span class="text-white">10% (Fixed)</span></div>
+                        </template>
+                        <template v-else-if="getDef(editingInstance.defId)?.category === 'Sublight'">
+                            <div class="text-caption q-mb-xs">Size (% of Hull): <span class="text-white">{{ configModel.sublightPctLabel }}</span></div>
+                            <q-slider dark v-model="configModel.sublightPctIndex" :min="configModel.sublightPctMinIndex" :max="6" :step="1" snap markers label />
                         </template>
                         <template v-else>
                             <div class="text-caption">Size</div>
@@ -225,9 +266,7 @@ const SystemList = {
                     <div v-if="canPointBlank(editingInstance.defId)" class="q-mb-md">
                         <q-checkbox dark v-model="editingInstance.modifications.pointBlank" :label="'Point Blank (+' + format(getOptionCost(editingInstance.defId, 'pointBlank')) + ')'" />
                     </div>
-                    <div v-if="getUpgradeSpecs(editingInstance.defId)?.auxiliary" class="q-mb-md">
-                        <q-checkbox dark v-model="editingInstance.modifications.auxiliary" label="Auxiliary Command Deck (x2 Cost and Hull Points)" />
-                    </div>
+
                     <div v-for="opt in getGenericOptions(editingInstance.defId)" :key="opt.value" class="q-mb-md">
                          <q-checkbox dark v-model="editingInstance.modifications[opt.value]" :label="opt.label" />
                     </div>
@@ -319,8 +358,8 @@ const ConfigPanel = {
             <q-card-section>
                 <div class="q-mb-sm">
                     <div class="row justify-between text-caption">
-                        <span>{{ $t('ui.cargo_converted') }}: {{ store.cargoToEpAmount }} tons</span>
-                        <span>{{ $t('ui.max_cargo') }}: {{ new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(store.maxCargoCapacity) }} tons</span>
+                        <span>{{ $t('ui.cargo_converted') }}: {{ store.cargoToEpAmount }} units</span>
+                        <span>{{ $t('ui.max_cargo') }}: {{ new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(store.maxCargoCapacity) }} units</span>
                     </div>
                 </div>
                 <q-slider dark v-model="store.cargoToEpAmount" :min="0" :max="store.maxCargoCapacity" :step="1" label color="accent" />
@@ -357,51 +396,242 @@ const ConfigPanel = {
 const ShipSheet = {
     template: `
     <div class="warships-block">
-        <div class="warships-header"><span>{{ store.meta.name || 'Untitled Ship' }}</span><span>CL {{ calculateCL }}</span></div>
-        <div class="warships-sub">{{ store.chassis.size }} Starfighter ({{ getLocalizedName(store.chassis) }})</div>
+        <div class="warships-header">
+            <span>{{ store.meta.name || 'Untitled Ship' }}</span>
+            <span style="font-size: 0.8em; text-transform: uppercase;">{{ store.chassis.category }} {{ store.chassis.size }}</span>
+        </div>
+        <div class="warships-sub">
+            {{ formattedSub }}
+        </div>
+        <div v-if="headerImage" class="q-my-md text-center">
+            <img :src="headerImage.data" style="max-width: 100%; max-height: 400px; border: 2px solid #ccc; border-radius: 4px;" alt="Ship Header Image" />
+            <div v-if="headerImage.caption" class="text-caption text-grey-8 q-mt-xs" style="font-style: italic;">{{ headerImage.caption }}</div>
+        </div>
         <div class="sheet-body">
-            <div><span class="bold">Init</span> +{{ getMod(store.currentStats.dex) + store.crewStats.skill }}; <span class="bold">Senses</span> Perception +{{ getMod(store.currentStats.int) + store.crewStats.skill }}</div>
+            <!-- SECTION 1: Tactical Stats -->
+            <div class="section-title">Tactical Attributes</div>
+            <div class="row q-col-gutter-sm">
+                <div class="col-4">
+                    <span class="bold">Toughness:</span> {{ toughness }}
+                </div>
+                <div class="col-4">
+                    <span class="bold">Maneuver Class:</span> {{ maneuverClass }}
+                </div>
 
-            <div class="section-title">Defense</div>
-            <div><span class="bold">Ref</span> {{ store.reflexDefense }} (Flat-footed {{ store.reflexDefense - getMod(store.currentStats.dex) }}), <span class="bold">Fort</span> {{ 10 + getMod(store.currentStats.str) }}; <span class="bold">+{{ store.currentStats.armor }} Armor</span></div>
-
-
-            <div class="section-title">Offense</div>
-            <div><span class="bold">Acceleration</span> fly {{ store.currentStats.speed }} squares (starship scale)</div>
-            <div v-for="w in weaponData" :key="w.instanceId" class="weapon-line">
-                <span class="bold">Ranged</span> {{ w.name }} +{{ w.attackBonus }} ({{ w.damage }})
-                <div v-if="w.details" class="text-caption text-italic q-ml-md" style="font-size: 0.8em;">{{ w.details }}</div>
-            </div>
-
-            <div class="section-title">Statistics</div>
-            <div class="stat-grid">
-                <div><span class="bold">Str</span> {{ store.currentStats.str }}</div>
-                <div><span class="bold">Dex</span> {{ store.currentStats.dex }}</div>
-                <div><span class="bold">Int</span> {{ store.currentStats.int }}</div>
-            </div>
-            <div><span class="bold">Base Atk</span> +{{ store.crewStats.atk }}; <span class="bold">Grapple</span> +{{ store.crewStats.atk + (getMod(store.currentStats.str)) }}</div>
-
-            <div class="section-title">Systems</div>
-            <div>{{ systemNames }}</div>
-
-            <div v-if="componentsWithDescriptions.length > 0">
-                <div class="section-title">Special Equipment Rules</div>
-                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" class="q-mb-sm">
-                    <span class="bold">{{ getName(c.defId) }}:</span> {{ getDescription(c.defId) }}
+                <div class="col-6 q-mt-sm">
+                    <span class="bold">FTL Range:</span> {{ store.currentStats.ftlSpeed || 'None' }}
                 </div>
             </div>
 
-            <div class="section-title">Logistics</div>
-            <div class="stat-grid">
-                <div><span class="bold">Crew</span> {{ store.currentCrew }}</div>
-                <div><span class="bold">Passengers</span> {{ store.currentPassengers }}</div>
-                <div><span class="bold">Cargo</span> {{ store.currentCargo }}</div>
-                <div><span class="bold">Consumables</span> {{ store.currentConsumables }}</div>
+            <!-- SECTION 2: Defenses & Armor -->
+            <div class="section-title">Defenses</div>
+            <div class="row q-col-gutter-sm text-center">
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">LI:</span> {{ store.currentStats.LI || '-' }}</div></div>
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">HI:</span> {{ store.currentStats.HI || '-' }}</div></div>
+                <div class="col-4"><div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">En:</span> {{ store.currentStats.En || '-' }}</div></div>
+            </div>
+            <div class="q-mt-sm text-center">
+                <div class="bg-grey-3 q-pa-xs rounded-borders"><span class="bold">Target Modifier:</span> {{ targetModifier }}</div>
+            </div>
+            <div v-if="store.currentStats.sr" class="q-mt-sm text-center">
+                <div class="bg-teal-1 q-pa-xs text-teal-9 text-bold rounded-borders">SHIELD RATING (SR): {{ store.currentStats.sr }}</div>
+            </div>
+            <!-- Defensive Modifiers List -->
+            <div v-if="defensiveModifiers && defensiveModifiers.length > 0" class="q-mt-sm">
+                <div class="text-caption text-bold text-grey-8 q-mb-xs">Active Defensive Modifiers:</div>
+                <div v-for="mod in defensiveModifiers" :key="mod.name" class="q-mb-xs rounded-borders q-pa-xs text-caption row items-center justify-between" :class="mod.isFullyCovered ? 'bg-green-1 text-green-9' : 'bg-orange-1 text-orange-9'" style="border: 1px solid currentColor;">
+                    <div class="col-12">
+                        <span v-if="getDescription(mod.defId)">
+                            <a :href="'#rule-' + mod.defId" class="rules-link">{{ mod.name }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                        </span>
+                        <span v-else class="bold text-uppercase" style="color: inherit;">{{ mod.name }}</span> 
+                        <span class="text-weight-bold">[{{ mod.status }}]</span> 
+                        <span class="text-grey-8" style="font-size: 0.9em;">{{ mod.coverageInfo }}</span>: 
+                        {{ mod.effect }}
+                    </div>
+                </div>
             </div>
 
-            <div class="cost-line">
-                <span class="bold">Total Cost:</span> {{ formatCreds(store.totalCost) }}
+            <!-- SECTION 3: Damage Track -->
+            <div class="section-title">Damage Tracks</div>
+            <div class="row q-col-gutter-sm text-center">
+                <div class="col-3"><div class="bg-yellow-1 q-pa-xs text-yellow-9 rounded-borders"><span class="bold">Stun (S):</span> {{ stunTrack }}</div></div>
+                <div class="col-3"><div class="bg-orange-1 q-pa-xs text-orange-9 rounded-borders"><span class="bold">Wound (W):</span> {{ woundTrack }}</div></div>
+                <div class="col-3"><div class="bg-red-1 q-pa-xs text-red-9 rounded-borders"><span class="bold">Mortal (M):</span> {{ mortalTrack }}</div></div>
+                <div class="col-3"><div class="bg-red-3 q-pa-xs text-white rounded-borders"><span class="bold">Critical (C):</span> {{ criticalTrack }}</div></div>
             </div>
+
+            <!-- SECTION 4: System Metrics -->
+            <div class="section-title">Engineering & Logistics</div>
+            <div class="row q-col-gutter-md">
+                <div class="col-6">
+                    <div><span class="bold">Hull Points:</span> {{ store.usedHull }} / {{ store.totalHull }} HP ({{ store.remainingHull }} remaining)</div>
+                    <div style="font-size: 0.85em; color: #666;" class="q-pl-sm">
+                        Base: {{ store.chassis.baseHull }} | Bonus: {{ store.bonusHull }} | Component Usage: {{ store.hullUsageDetails }}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div><span class="bold">Power Plant:</span> {{ store.totalPowerConsumed }} / {{ store.totalPowerGenerated }} PW used</div>
+                    <div style="font-size: 0.85em; color: #666;" class="q-pl-sm">
+                        Usage: {{ store.powerUsageDetails }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row q-col-gutter-sm q-mt-xs">
+                <div class="col-3"><span class="bold">Crew Quality:</span> {{ store.crewQuality }}</div>
+                <div class="col-3"><span class="bold">Crew Size:</span> {{ store.currentCrew }} (Max {{ store.totalBerthingCapacity || 0 }})</div>
+                <div class="col-3"><span class="bold">Passengers:</span> {{ store.currentPassengers }} (Max {{ store.totalPassengerCapacity || 0 }})</div>
+                <div class="col-3"><span class="bold">Life Support:</span> Max {{ store.totalLifeSupportCapacity || 0 }} Hull</div>
+            </div>
+            
+            <div class="row q-col-gutter-sm q-mt-xs">
+                <div class="col-6"><span class="bold">Cargo Capacity:</span> {{ store.currentCargo }}</div>
+                <div class="col-6"><span class="bold">Consumables / Stores:</span> {{ store.currentConsumables }}</div>
+            </div>
+            
+            <div class="row q-col-gutter-sm q-mt-xs" v-if="store.meta.length || store.chassis.logistics?.length || store.meta.width || store.chassis.logistics?.width || store.meta.height || store.chassis.logistics?.height">
+                <div class="col-12"><span class="bold text-grey-8">Dimensions:</span> 
+                    <span v-if="store.meta.length || store.chassis.logistics?.length">Length: {{ store.meta.length || store.chassis.logistics?.length }} &nbsp; </span>
+                    <span v-if="store.meta.width || store.chassis.logistics?.width">Width: {{ store.meta.width || store.chassis.logistics?.width }} &nbsp; </span>
+                    <span v-if="store.meta.height || store.chassis.logistics?.height">Height: {{ store.meta.height || store.chassis.logistics?.height }}</span>
+                </div>
+            </div>
+
+            <div v-if="store.meta.notes || store.chassis.notes || store.chassis.description" class="q-mt-md bg-grey-2 q-pa-sm rounded-borders" style="border-left: 4px solid #f2c037;">
+                <div v-if="store.chassis.description" class="q-mb-xs">
+                    <span class="bold text-grey-9">Description:</span> {{ store.chassis.description }}
+                </div>
+                <div v-if="store.meta.notes || store.chassis.notes">
+                    <span class="bold text-grey-9">Notes:</span> {{ store.meta.notes || store.chassis.notes }}
+                </div>
+            </div>
+
+            <!-- SECTION 5: Armament -->
+            <div class="section-title">Armament (Weapon Systems)</div>
+            <div v-if="weaponData.length === 0" class="text-italic text-grey-6">No weapons installed.</div>
+            <div v-for="w in weaponData" :key="w.instanceId" class="weapon-line">
+                <span class="bold">
+                    <span v-if="getDescription(w.defId)">
+                        <a :href="'#rule-' + w.defId" class="rules-link">{{ w.name }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                    </span>
+                    <span v-else>{{ w.name }}</span>
+                </span>
+                <div style="font-size: 0.85em;" class="row q-col-gutter-xs q-mt-xs">
+                    <div class="col-4"><strong>Damage:</strong> {{ w.damage }}</div>
+                    <div class="col-4"><strong>Fire:</strong> {{ w.fire }}</div>
+                    <div class="col-4"><strong>Range:</strong> {{ w.range }}</div>
+                    <div class="col-12"><strong>Attack Modifier:</strong> {{ w.attackModifier }}</div>
+                    <div class="col-12" v-if="w.location"><strong>Location:</strong> {{ w.location }}</div>
+                    <div class="col-12" v-if="w.arcs"><strong>Arcs:</strong> {{ w.arcs }}</div>
+                    <div class="col-12" v-if="w.details"><strong>Details:</strong> {{ w.details }}</div>
+                </div>
+            </div>
+
+            <!-- SECTION 6: Damage Diagram & Installed Systems -->
+            <div class="section-title q-mt-md">Installed Systems (By Hit Location Zone)</div>
+            <div v-for="(components, loc) in componentsByLocation" :key="loc" class="q-mb-md q-pa-sm bg-grey-2 rounded-borders" style="border-left: 4px solid #389EBD;">
+                <div class="bold text-uppercase text-primary q-mb-xs">{{ loc }} Zone</div>
+                <div class="row q-col-gutter-xs">
+                    <div v-for="c in components" :key="c.instanceId" class="col-12 col-sm-6">
+                        <span class="bold">
+                            • 
+                            <span v-if="getDescription(c.defId)">
+                                <a :href="'#rule-' + c.defId" class="rules-link">{{ getName(c) }}<q-icon name="menu_book" class="rules-icon"></q-icon></a>
+                            </span>
+                            <span v-else>{{ getName(c) }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: Hit Location & Diagram -->
+            <div class="row q-col-gutter-lg q-mt-md page-break">
+                <div class="col-12 col-md-5">
+                    <div class="section-title">Hit Location Diagram</div>
+                    <div style="border: 1px solid #ccc; border-radius: 4px; padding: 16px; background: white; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                        <hit-location-diagram />
+                    </div>
+                </div>
+                <div class="col-12 col-md-7" v-if="hitLocationTable">
+                    <div class="section-title">Hit Locations ({{ hitLocationTable.die }})</div>
+                    <div class="q-markup-table q-table__container q-table--dense q-table--bordered q-table--no-wrap bg-white text-black" style="width: 100%; text-align: center; overflow: hidden; border-radius: 4px;">
+                        <table class="q-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr class="bg-grey-3 text-bold" style="border-bottom: 2px solid #ccc;">
+                                    <th style="padding: 4px; border-right: 1px solid #ccc;">Forward</th>
+                                    <th style="padding: 4px; border-right: 1px solid #ccc;">Port</th>
+                                    <th style="padding: 4px; border-right: 1px solid #ccc;">Starboard</th>
+                                    <th style="padding: 4px; border-right: 1px solid #ccc;">Aft</th>
+                                    <th style="padding: 4px;">High/Low</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 4px; border-right: 1px solid #ccc; vertical-align: top;">
+                                        <div v-for="item in sortRolls(hitLocationTable.Forward)" :key="item.roll">{{ item.roll }}: <strong>{{ item.loc }}</strong></div>
+                                    </td>
+                                    <td style="padding: 4px; border-right: 1px solid #ccc; vertical-align: top;">
+                                        <div v-for="item in sortRolls(hitLocationTable.Port)" :key="item.roll">{{ item.roll }}: <strong>{{ item.loc }}</strong></div>
+                                    </td>
+                                    <td style="padding: 4px; border-right: 1px solid #ccc; vertical-align: top;">
+                                        <div v-for="item in sortRolls(hitLocationTable.Starboard)" :key="item.roll">{{ item.roll }}: <strong>{{ item.loc }}</strong></div>
+                                    </td>
+                                    <td style="padding: 4px; border-right: 1px solid #ccc; vertical-align: top;">
+                                        <div v-for="item in sortRolls(hitLocationTable.Aft)" :key="item.roll">{{ item.roll }}: <strong>{{ item.loc }}</strong></div>
+                                    </td>
+                                    <td style="padding: 4px; vertical-align: top;">
+                                        <div v-for="item in sortRolls(hitLocationTable['High/Low'])" :key="item.roll">{{ item.roll }}: <strong>{{ item.loc }}</strong></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-caption text-grey-8 q-mt-sm" style="font-size: 0.8em; line-height: 1.2;">
+                        <strong>Legend:</strong> F = Forward, A = Aft, P = Port, S = Starboard, C = Center, 
+                        FC = Forward Center, FP = Forward Port, FS = Forward Starboard, AC = Aft Center, AP = Aft Port, AS = Aft Starboard, 
+                        FFC = Far Forward Center, FFP = Far Forward Port, FFS = Far Forward Starboard, CF = Center Forward, 
+                        PC = Port Center, SC = Starboard Center, CA = Center Aft, AAP = Aft Aft Port, AAC = Aft Aft Center, AAS = Aft Aft Starboard
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7.5: Weapon Firing Arcs -->
+            <div v-if="weaponData.length > 0" class="q-mt-xl page-break">
+                <div class="section-title">Weapon Firing Arcs Diagram</div>
+                <div style="border: 1px solid #ccc; border-radius: 4px; padding: 16px; background: white;">
+                    <arc-diagram></arc-diagram>
+                </div>
+            </div>
+
+            <!-- SECTION 8: Component Location -->
+            <div class="q-mt-xl page-break">
+                <div class="section-title">Component Location</div>
+                <div style="border: 1px solid #ccc; border-radius: 4px; padding: 16px; background: white;">
+                    <location-diagram readonly />
+                </div>
+            </div>
+
+            <!-- SECTION 9: Special Rules -->
+            <div v-if="componentsWithDescriptions.length > 0" class="page-break">
+                <div class="section-title">{{ $t('ui.system_descriptions') }}</div>
+                <div v-for="c in componentsWithDescriptions" :key="c.instanceId" :id="'rule-' + c.defId" class="q-mb-md" style="font-size: 0.9em; line-height: 1.4; scroll-margin-top: 50px;">
+                    <div class="bold text-subtitle2 text-primary" style="font-size: 1.1em; border-bottom: 1px solid #ddd; margin-bottom: 4px;">{{ getName(c.defId) }}</div>
+                    <div class="text-justify" style="white-space: pre-wrap;">{{ getDescription(c.defId) }}</div>
+                </div>
+            </div>
+
+            <!-- SECTION 9: Gallery -->
+            <div v-if="galleryImages.length > 0" class="q-mt-xl">
+                <div class="section-title">Gallery</div>
+                <div class="row q-col-gutter-md justify-center">
+                    <div v-for="img in galleryImages" :key="img.id" class="col-12 text-center q-mb-lg">
+                        <img :src="img.data" style="max-width: 100%; border: 1px solid #ccc; border-radius: 4px;" alt="Gallery Image" />
+                        <div v-if="img.caption" class="text-caption text-grey-8 q-mt-xs" style="font-style: italic;">{{ img.caption }}</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     `,
@@ -428,7 +658,7 @@ export const HangarDialog = {
                         <q-list separator dark>
                             <q-item v-for="ship in store.hangar" :key="ship.id" clickable v-ripple @click="loadShip(ship.id)">
                                 <q-item-section>
-                                    <q-item-label>{{ ship.meta.name || 'Untitled Ship' }}</q-item-label>
+                                    <q-item-label>{{ ship.meta?.name || ship.name || 'Untitled Ship' }}</q-item-label>
                                     <q-item-label caption class="text-grey-6">
                                         {{ getLocalizedName(store.allShips.find(s => s.id === ship.configuration.baseChassis) || {name: ship.configuration.baseChassis}) }}
                                         <span v-if="ship.activeShipId === store.activeShipId" class="text-positive q-ml-sm">(Active)</span>
@@ -519,7 +749,7 @@ export const HangarDialog = {
         };
 
         const deleteShip = (shipId) => {
-             $q.dialog({
+            $q.dialog({
                 dark: true,
                 title: 'Confirm Deletion',
                 message: 'Delete this ship from the hangar?',
@@ -532,25 +762,71 @@ export const HangarDialog = {
         };
 
         const triggerFileSelect = () => {
-             if(fileInput.value) fileInput.value.click();
+            if (fileInput.value) fileInput.value.click();
         };
 
         const handleFileUpload = (event) => {
             const file = event.target.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
+
+            const processYaml = (yamlString) => {
                 try {
-                    const data = jsyaml.load(e.target.result);
+                    const data = jsyaml.load(yamlString);
                     store.loadState(data);
                     emit('update:modelValue', false);
                     $q.notify({ type: 'positive', message: 'Ship loaded successfully' });
                 } catch (error) {
                     console.error(error);
-                    $q.notify({ type: 'negative', message: 'Failed to parse file' });
+                    $q.notify({ type: 'negative', message: 'Failed to parse ship data' });
                 }
             };
-            reader.readAsText(file);
+
+            if (file.name.endsWith('.ship') || file.name.endsWith('.zip')) {
+                JSZip.loadAsync(file).then(zip => {
+                    const yamlFile = zip.file("ship.yaml");
+                    if (yamlFile) {
+                        yamlFile.async("string").then(async yamlString => {
+                            let data;
+                            try { data = jsyaml.load(yamlString); } catch (e) { return $q.notify({ type: 'negative', message: 'Failed to parse ship.yaml' }); }
+
+                            if (data.shipImages && Array.isArray(data.shipImages)) {
+                                for (let img of data.shipImages) {
+                                    if (img.file) {
+                                        const imgFile = zip.file(img.file);
+                                        if (imgFile) {
+                                            const base64 = await imgFile.async("base64");
+                                            const ext = img.file.split('.').pop();
+                                            img.data = `data:image/${ext};base64,${base64}`;
+                                        }
+                                        delete img.file;
+                                    }
+                                }
+                            } else {
+                                // Backwards compatibility for single image
+                                const oldImg = zip.file("image.jpg") || zip.file("image.png");
+                                if (oldImg) {
+                                    const base64 = await oldImg.async("base64");
+                                    const ext = oldImg.name.split('.').pop();
+                                    data.shipImages = [{ id: crypto.randomUUID(), data: `data:image/${ext};base64,${base64}`, caption: '', isHeader: true }];
+                                }
+                            }
+
+                            store.loadState(data);
+                            emit('update:modelValue', false);
+                            $q.notify({ type: 'positive', message: 'Ship loaded successfully' });
+                        });
+                    } else {
+                        $q.notify({ type: 'negative', message: 'Invalid .ship archive (missing ship.yaml)' });
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    $q.notify({ type: 'negative', message: 'Failed to read .ship archive' });
+                });
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => processYaml(e.target.result);
+                reader.readAsText(file);
+            }
         };
 
         return { store, hangarTab, groupedMilitaryShips, groupedCivilianShips, selectStockShip, loadShip, deleteShip, handleFileUpload, fileInput, triggerFileSelect, getLocalizedName };
@@ -654,7 +930,7 @@ export const CustomManagerDialog = {
         const $q = useQuasar();
         const libraryInput = ref(null);
 
-        const triggerLibraryImport = () => { if(libraryInput.value) libraryInput.value.click(); };
+        const triggerLibraryImport = () => { if (libraryInput.value) libraryInput.value.click(); };
 
         const handleLibraryImport = (event) => {
             const file = event.target.files[0];
@@ -669,11 +945,11 @@ export const CustomManagerDialog = {
                             name: file.name.replace('.json', ''),
                             components: data
                         });
-                         $q.notify({ type: 'positive', message: 'Legacy library imported successfully.' });
+                        $q.notify({ type: 'positive', message: 'Legacy library imported successfully.' });
                     } else if (data.components || data.ships) {
-                         // Standard Library Import
-                         store.importLibrary(data);
-                         $q.notify({ type: 'positive', message: 'Library imported successfully.' });
+                        // Standard Library Import
+                        store.importLibrary(data);
+                        $q.notify({ type: 'positive', message: 'Library imported successfully.' });
                     } else {
                         $q.notify({ type: 'negative', message: 'Invalid file format.' });
                     }
@@ -694,7 +970,7 @@ export const CustomManagerDialog = {
                 ships: lib.ships
             };
             const jsonStr = JSON.stringify(exportObj, null, 2);
-            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const blob = new Blob([jsonStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -716,7 +992,7 @@ export const CustomManagerDialog = {
         };
 
         const editLibraryName = (lib) => {
-             $q.dialog({
+            $q.dialog({
                 dark: true,
                 title: 'Edit Library Name',
                 prompt: {
@@ -796,11 +1072,22 @@ export const CustomShipDialog = {
                         <div class="col-6"><q-input filled dark v-model.number="newShip.logistics.pass" label="Passengers" type="number"></q-input></div>
                     </div>
                     <div class="row q-col-gutter-sm">
-                        <div class="col-6"><q-input filled dark v-model="newShip.logistics.cargo" label="Cargo Capacity" hint="e.g. '100 tons'"></q-input></div>
+                        <div class="col-6"><q-input filled dark v-model="newShip.logistics.cargo" label="Cargo Capacity" hint="e.g. '100 units'"></q-input></div>
                         <div class="col-6"><q-input filled dark v-model="newShip.logistics.cons" label="Consumables" hint="e.g. '1 month'"></q-input></div>
                     </div>
-                    <div>
-                <q-input filled dark v-model="newShip.description" label="Description" type="textarea" autogrow></q-input>
+                    
+                    <!-- Dimensions & Notes -->
+                    <div class="text-subtitle2 text-primary q-mt-md">Dimensions & Notes</div>
+                    <div class="row q-col-gutter-sm">
+                        <div class="col-4"><q-input filled dark v-model="newShip.logistics.length" label="Length"></q-input></div>
+                        <div class="col-4"><q-input filled dark v-model="newShip.logistics.width" label="Width"></q-input></div>
+                        <div class="col-4"><q-input filled dark v-model="newShip.logistics.height" label="Height"></q-input></div>
+                    </div>
+                    <div class="q-mt-sm">
+                        <q-input filled dark v-model="newShip.description" label="Description" type="textarea" autogrow></q-input>
+                    </div>
+                    <div class="q-mt-sm">
+                        <q-input filled dark v-model="newShip.notes" label="Notes" type="textarea" autogrow></q-input>
                     </div>
 
                 </div>
@@ -826,8 +1113,9 @@ export const CustomShipDialog = {
             availability: 'Common',
             usedCost: 0,
             description: '',
+            notes: '',
             stats: { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0 },
-            logistics: { crew: 0, pass: 0, cargo: '', cons: '' }
+            logistics: { crew: 0, pass: 0, cargo: '', cons: '', length: '', width: '', height: '' }
         });
 
         const createCustomShip = () => {
@@ -836,7 +1124,7 @@ export const CustomShipDialog = {
 
             let id = newShip.id;
             if (!id) {
-                 id = isEdit ? store.customShipDialogState.shipId : 'custom_ship_' + crypto.randomUUID();
+                id = isEdit ? store.customShipDialogState.shipId : 'custom_ship_' + crypto.randomUUID();
             }
 
             const ship = {
@@ -849,6 +1137,7 @@ export const CustomShipDialog = {
                 availability: newShip.availability,
                 usedCost: Number(newShip.usedCost),
                 description: newShip.description,
+                notes: newShip.notes,
                 stats: { ...newShip.stats },
                 logistics: { ...newShip.logistics }
             };
@@ -875,9 +1164,10 @@ export const CustomShipDialog = {
                         newShip.availability = existing.availability || 'Common';
                         newShip.usedCost = existing.usedCost || 0;
                         newShip.description = existing.description || '';
+                        newShip.notes = existing.notes || '';
 
                         newShip.stats = { str: 0, dex: 0, int: 0, hp: 0, armor: 0, dr: 0, ...existing.stats };
-                        newShip.logistics = { crew: 0, pass: 0, cargo: '', cons: '', ...existing.logistics };
+                        newShip.logistics = { crew: 0, pass: 0, cargo: '', cons: '', length: '', width: '', height: '', ...existing.logistics };
                     }
                 } else {
                     // Reset
@@ -890,8 +1180,9 @@ export const CustomShipDialog = {
                     newShip.availability = 'Common';
                     newShip.usedCost = 0;
                     newShip.description = '';
+                    newShip.notes = '';
                     newShip.stats = { str: 40, dex: 10, int: 10, hp: 120, armor: 5, dr: 10 };
-                    newShip.logistics = { crew: 1, pass: 0, cargo: '0 tons', cons: '1 day' };
+                    newShip.logistics = { crew: 1, pass: 0, cargo: '0 units', cons: '1 day', length: '', width: '', height: '' };
                 }
             } else {
                 store.customShipDialogState.shipId = null;
@@ -1062,7 +1353,7 @@ export const AddModDialog = {
         const allAvailableTags = computed(() => {
             const tags = new Set();
             const activeCats = (searchTags.value || []).filter(t => t.startsWith("Category: ")).map(t => t.replace("Category: ", ""));
-            
+
             for (const e of store.allEquipment) {
                 if (e.category) tags.add(`Category: ${e.category}`);
                 if (e.stats?.pl) tags.add(`PL: ${e.stats.pl}`);
@@ -1106,13 +1397,13 @@ export const AddModDialog = {
             let newCats = newTags.filter(t => t.startsWith("Category: ")).map(t => t.replace("Category: ", ""));
             let categoriesToKeep = newCats;
             let tagsToFilterOut = new Set();
-            
+
             // Enforce single category: if there are multiple categories, keep only the most recently added one
             if (newCats.length > 1) {
                 const latestCat = newCats[newCats.length - 1];
                 const removedCats = newCats.filter(c => c !== latestCat);
                 categoriesToKeep = [latestCat];
-                
+
                 removedCats.forEach(c => tagsToFilterOut.add(`Category: ${c}`));
                 for (const cat of removedCats) {
                     store.allEquipment.filter(e => e.category === cat && e.group).forEach(e => tagsToFilterOut.add(`Type: ${e.group}`));
@@ -1124,7 +1415,7 @@ export const AddModDialog = {
             for (const cat of removedCatsNormal) {
                 store.allEquipment.filter(e => e.category === cat && e.group).forEach(e => tagsToFilterOut.add(`Type: ${e.group}`));
             }
-            
+
             if (tagsToFilterOut.size > 0) {
                 const filteredTags = searchTags.value.filter(t => !tagsToFilterOut.has(t));
                 if (filteredTags.length !== searchTags.value.length) {
@@ -1133,7 +1424,7 @@ export const AddModDialog = {
                     }, 10);
                 }
             }
-            
+
             activeCategories.value = categoriesToKeep;
         };
 
@@ -1174,7 +1465,7 @@ export const AddModDialog = {
         const itemOptions = computed(() => {
             // Require at least one filter to show items (to avoid showing the entire DB at once)
             if (!searchTags.value.length) return [];
-            
+
             return filteredEquipmentPool.value.map(e => ({
                 ...e,
                 label: getLocalizedName(e)
@@ -1248,7 +1539,7 @@ export const AddModDialog = {
                 window.open(def.wiki, '_blank');
                 return;
             }
-            
+
             let url = 'https://aaa.dimble.net/warships/ship-construction/';
             if (def.category === 'Armor') url += 'armor/';
             else if (def.category === 'Sublight') url += 'engines/';
@@ -1256,7 +1547,7 @@ export const AddModDialog = {
             else if (def.category === 'Power') url += 'power-plant/';
             else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
             else url += 'systems-crew/';
-            
+
             window.open(url, '_blank');
         };
 
@@ -1306,7 +1597,7 @@ export const AddModDialog = {
         };
 
         const installComponent = () => {
-            if(newComponentSelection.value) {
+            if (newComponentSelection.value) {
                 const def = store.allEquipment.find(e => e.id === newComponentSelection.value);
 
                 const doInstall = () => {
@@ -1337,7 +1628,8 @@ export const AddModDialog = {
             }
         };
 
-        return { store, searchTags, searchTagOptions, filterSearchTags, onSearchTagsUpdated, newComponentSelection, itemOptions, selectedItemDef, isSizeValid, checkRequirements, previewCost, previewHullPts, resetSelections, formatCreds, installComponent, getLocalizedName,
+        return {
+            store, searchTags, searchTagOptions, filterSearchTags, onSearchTagsUpdated, newComponentSelection, itemOptions, selectedItemDef, isSizeValid, checkRequirements, previewCost, previewHullPts, resetSelections, formatCreds, installComponent, getLocalizedName,
             showJsonEditor, jsonContent, openWiki, openJsonEditor, saveJson, createNew, deleteComponent
         };
     }
@@ -1495,7 +1787,7 @@ export const CustomComponentDialog = {
 
             let id = newCustomComponent.id;
             if (!id) {
-                 id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
+                id = isEdit ? store.customDialogState.componentId : 'custom_' + crypto.randomUUID();
             }
 
             const comp = {
@@ -1560,7 +1852,7 @@ export const CustomComponentDialog = {
                     activeProperties.value = [];
                 }
             } else {
-                 store.customDialogState.componentId = null;
+                store.customDialogState.componentId = null;
             }
         });
 
@@ -1573,8 +1865,13 @@ export const StatPanelWrapper = {
     ...StatPanel,
     setup() {
         const store = useShipStore();
-        const editingName = ref(false);
-        return { store, getLocalizedName, editingName };
+        const showEditDialog = ref(false);
+        const getLocalizedSize = (size) => {
+            if (!size) return '';
+            const key = `size.${size}`;
+            return i18n.global.te(key) ? i18n.global.t(key) : size;
+        };
+        return { store, getLocalizedName, showEditDialog, getLocalizedSize };
     }
 };
 
@@ -1585,10 +1882,38 @@ export const SystemListWrapper = {
         const showConfigDialog = ref(false);
         const editingInstance = ref(null);
 
+        const availableLocations = computed(() => {
+            const baseHull = store.chassis.baseHull || 0;
+            const size = store.chassis.size || '';
+            const alwaysAvailable = ['Distributed'];
+
+            if (size.startsWith('Small')) {
+                if (baseHull <= 20) return ['Fore', 'Aft', ...alwaysAvailable];
+                return ['Fore', 'Fore Center', 'Aft Center', 'Aft', ...alwaysAvailable];
+            }
+            if (size.startsWith('Light')) {
+                return ['Fore', 'Fore Center', 'Port', 'Starboard', 'Aft Center', 'Aft', ...alwaysAvailable];
+            }
+            if (size.startsWith('Medium')) {
+                return ['Fore', 'Fore Center', 'Fore Port', 'Fore Starboard', 'Aft Center', 'Aft Port', 'Aft Starboard', 'Aft', ...alwaysAvailable];
+            }
+            if (size.startsWith('Heavy')) {
+                return ['Fore', 'Fore Center', 'Fore Port', 'Fore Starboard', 'Center Fore', 'Center Aft', 'Port', 'Starboard', 'Aft Center', 'Aft Port', 'Aft Starboard', 'Aft', ...alwaysAvailable];
+            }
+            if (size.startsWith('Super-Heavy') || size.startsWith('Colossal')) {
+                return ['Fore', 'Far Fore Center', 'Far Fore Port', 'Far Fore Starboard', 'Fore Center', 'Fore Port', 'Fore Starboard', 'Center Fore', 'Port Center', 'Starboard Center', 'Port', 'Starboard', 'Center Aft', 'Aft Center', 'Aft Port', 'Aft Starboard', 'Far Aft Center', 'Far Aft Port', 'Far Aft Starboard', 'Aft', ...alwaysAvailable];
+            }
+            return ['Fore', 'Aft', 'Port', 'Starboard', 'Fore Center', 'Aft Center', 'Fore Port', 'Fore Starboard', 'Aft Port', 'Aft Starboard', 'Center Fore', 'Center Aft', 'Far Fore Center', 'Far Fore Port', 'Far Fore Starboard', 'Port Center', 'Starboard Center', 'Far Aft Center', 'Far Aft Port', 'Far Aft Starboard', ...alwaysAvailable];
+        });
+
         const getName = (instance) => {
             const id = instance.defId || instance;
             const def = store.allEquipment.find(e => e.id === id);
             let name = getLocalizedName(def);
+
+            if (instance && instance.modifications && instance.modifications.auxiliary) {
+                name = `Backup ${name}`;
+            }
 
             if (instance && instance.defId) {
                 const calcDmg = store.getComponentDamage(instance);
@@ -1621,10 +1946,8 @@ export const SystemListWrapper = {
             const def = store.allEquipment.find(e => e.id === instance.defId);
             if (!def) return instance.location || '';
             let parts = [];
-            
-            if (instance.modifications?.auxiliary) {
-                parts.push("Auxiliary");
-            }
+
+
             if (def.stats?.pl) {
                 parts.push(def.stats.pl);
             }
@@ -1660,7 +1983,7 @@ export const SystemListWrapper = {
                 else if (def.stats?.stores_days) parts.push(`Stores: +${def.stats.stores_days * qty} days`);
                 else if (def.stats?.hydroponics_reduction) parts.push(`Hydroponics: -${def.stats.hydroponics_reduction * qty} Cons./day`);
                 else if (def.stats?.recycler_capacity) parts.push(`Recycles: ${def.stats.recycler_capacity * qty} people (10%)`);
-                else if (def.stats?.cargo_tons_bonus) parts.push(`Cargo: +${def.stats.cargo_tons_bonus * qty} tons`);
+                else if (def.stats?.cargo_tons_bonus) parts.push(`Cargo: +${def.stats.cargo_tons_bonus * qty} units`);
             } else if (def.category === 'Sensors') {
                 if (def.stats?.sensor_type) parts.push(`Type: ${def.stats.sensor_type}`);
                 if (def.stats?.sensor_range) parts.push(`Range: ${def.stats.sensor_range}`);
@@ -1734,51 +2057,51 @@ export const SystemListWrapper = {
         });
 
         const getEffectiveArcLimit = (assumingArc = null) => {
-             const emp = editingInstance.value?.modifications?.emplacement || 'Standard Mount';
-             const arcs = editingInstance.value?.modifications?.arcs || [];
-             let limit = maxArcsAllowed.value;
-             let hasZeroSpecial = arcs.includes('Zero-Port') || arcs.includes('Zero-Starboard');
-             if (assumingArc === 'Zero-Port' || assumingArc === 'Zero-Starboard') hasZeroSpecial = true;
-             if (emp === 'Standard Mount' && hasZeroSpecial) {
-                 limit = 2;
-             }
-             return limit;
+            const emp = editingInstance.value?.modifications?.emplacement || 'Standard Mount';
+            const arcs = editingInstance.value?.modifications?.arcs || [];
+            let limit = maxArcsAllowed.value;
+            let hasZeroSpecial = arcs.includes('Zero-Port') || arcs.includes('Zero-Starboard');
+            if (assumingArc === 'Zero-Port' || assumingArc === 'Zero-Starboard') hasZeroSpecial = true;
+            if (emp === 'Standard Mount' && hasZeroSpecial) {
+                limit = 2;
+            }
+            return limit;
         };
 
         const isArcDisabled = (arc) => {
             if (!editingInstance.value?.modifications) return false;
             let arcs = editingInstance.value.modifications.arcs || [];
-            
+
             // Standard Mount zero-port/zero-stbd rules
             if (arc === 'Zero-Port' || arc === 'Zero-Starboard') {
-                 if (store.chassis.value?.size === 'Small Craft') return true;
-                 const emp = editingInstance.value.modifications.emplacement || 'Standard Mount';
-                 if (emp === 'Fixed Mount' || emp === 'Sponson' || emp === 'Bank') return true; // Only Standard/Turret
-                 if (arc === 'Zero-Port' && arcs.includes('Zero-Starboard')) return true; // Can't have both
-                 if (arc === 'Zero-Starboard' && arcs.includes('Zero-Port')) return true;
+                if (store.chassis.value?.size === 'Small Craft') return true;
+                const emp = editingInstance.value.modifications.emplacement || 'Standard Mount';
+                if (emp === 'Fixed Mount' || emp === 'Sponson' || emp === 'Bank') return true; // Only Standard/Turret
+                if (arc === 'Zero-Port' && arcs.includes('Zero-Starboard')) return true; // Can't have both
+                if (arc === 'Zero-Starboard' && arcs.includes('Zero-Port')) return true;
             }
 
             if (arcs.includes(arc)) return false;
 
             let totalSelected = arcs.length;
             if (arcs.includes('Zero')) totalSelected--; // Zero is free and automatic for small weapons
-            
+
             return totalSelected >= getEffectiveArcLimit(arc);
         };
 
         const onEmplacementChanged = () => {
-             if (!editingInstance.value?.modifications) return;
-             let arcs = editingInstance.value.modifications.arcs || [];
-             const limit = getEffectiveArcLimit();
-             let nonZeroArcs = arcs.filter(a => a !== 'Zero');
-             if (nonZeroArcs.length > limit) {
-                 editingInstance.value.modifications.arcs = arcs.filter(a => a === 'Zero').concat(nonZeroArcs.slice(0, limit));
-             }
+            if (!editingInstance.value?.modifications) return;
+            let arcs = editingInstance.value.modifications.arcs || [];
+            const limit = getEffectiveArcLimit();
+            let nonZeroArcs = arcs.filter(a => a !== 'Zero');
+            if (nonZeroArcs.length > limit) {
+                editingInstance.value.modifications.arcs = arcs.filter(a => a === 'Zero').concat(nonZeroArcs.slice(0, limit));
+            }
         };
         const canEnhance = (defId) => {
             const def = store.allEquipment.find(e => e.id === defId);
             if (!def) return false;
-            if (['Sublight', 'FTL Drives', 'Defenses'].includes(def.category)) return true;
+            if (['Sublight', 'FTL Drives', 'Defenses', 'Sensors'].includes(def.category)) return true;
             if (isWeapon(defId) || def.category === 'Weapon Systems') return true;
             const specs = getUpgradeSpecs(defId);
             if (!specs) return false;
@@ -1846,7 +2169,7 @@ export const SystemListWrapper = {
                 if (!instance.modifications.weaponMount) instance.modifications.weaponMount = 'Single';
                 if (!instance.modifications.concealed) instance.modifications.concealed = false;
                 if (!instance.modifications.fireControl) instance.modifications.fireControl = 'None';
-                
+
                 const isSmallCraft = store.chassis.value?.size === 'Small Craft';
                 if (isSmallCraft) {
                     if (!instance.modifications.arcs.includes('Zero')) {
@@ -1857,28 +2180,28 @@ export const SystemListWrapper = {
                     instance.modifications.arcs = instance.modifications.arcs.filter(a => a !== 'Zero');
                 }
             }
-            editingInstance.value = instance; 
-            showConfigDialog.value = true; 
+            editingInstance.value = instance;
+            showConfigDialog.value = true;
         };
 
         const openWiki = (defId) => {
-             const def = store.allEquipment.find(e => e.id === defId);
-             if (!def) return;
+            const def = store.allEquipment.find(e => e.id === defId);
+            if (!def) return;
 
-             if (def.wiki) {
-                 window.open(def.wiki, '_blank');
-                 return;
-             }
-             
-             let url = 'https://aaa.dimble.net/warships/ship-construction/';
-             if (def.category === 'Armor') url += 'armor/';
-             else if (def.category === 'Sublight') url += 'engines/';
-             else if (def.category === 'FTL Drives') url += 'ftl-drive/';
-             else if (def.category === 'Power') url += 'power-plant/';
-             else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
-             else url += 'systems-crew/';
-             
-             window.open(url, '_blank');
+            if (def.wiki) {
+                window.open(def.wiki, '_blank');
+                return;
+            }
+
+            let url = 'https://aaa.dimble.net/warships/ship-construction/';
+            if (def.category === 'Armor') url += 'armor/';
+            else if (def.category === 'Sublight') url += 'engines/';
+            else if (def.category === 'FTL Drives') url += 'ftl-drive/';
+            else if (def.category === 'Power') url += 'power-plant/';
+            else if (def.category === 'Weapon Systems') url += 'weapons-defenses/';
+            else url += 'systems-crew/';
+
+            window.open(url, '_blank');
         };
 
         const checkValidity = (instance) => {
@@ -1898,29 +2221,29 @@ export const SystemListWrapper = {
         };
 
         const getOptionCost = (defId, key) => {
-             const def = store.allEquipment.find(e => e.id === defId);
-             if (!def) return 0;
-             let costDef = null;
-             if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
-                 costDef = def.upgradeSpecs.optionCosts[key];
-             } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
-                 costDef = def.upgradeSpecs[key].cost;
-             }
-             if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
-                 costDef = store.db.DEFAULT_OPTION_COSTS[key];
-             }
-             if (costDef === null) return 0;
-             if (typeof costDef === 'number') {
-                 return costDef;
-             } else if (typeof costDef === 'object') {
-                 if (costDef.multiplier) return def.baseCost * costDef.multiplier;
-                 if (costDef.cost) {
-                     let val = costDef.cost;
-                     if (costDef.sizeMult) val *= store.sizeMultVal;
-                     return val;
-                 }
-             }
-             return 0;
+            const def = store.allEquipment.find(e => e.id === defId);
+            if (!def) return 0;
+            let costDef = null;
+            if (def.upgradeSpecs && def.upgradeSpecs.optionCosts && def.upgradeSpecs.optionCosts[key] !== undefined) {
+                costDef = def.upgradeSpecs.optionCosts[key];
+            } else if (def.upgradeSpecs && def.upgradeSpecs[key] && typeof def.upgradeSpecs[key] === 'object' && def.upgradeSpecs[key].cost !== undefined) {
+                costDef = def.upgradeSpecs[key].cost;
+            }
+            if (costDef === null && store.db.DEFAULT_OPTION_COSTS && store.db.DEFAULT_OPTION_COSTS[key] !== undefined) {
+                costDef = store.db.DEFAULT_OPTION_COSTS[key];
+            }
+            if (costDef === null) return 0;
+            if (typeof costDef === 'number') {
+                return costDef;
+            } else if (typeof costDef === 'object') {
+                if (costDef.multiplier) return def.baseCost * costDef.multiplier;
+                if (costDef.cost) {
+                    let val = costDef.cost;
+                    if (costDef.sizeMult) val *= store.sizeMultVal;
+                    return val;
+                }
+            }
+            return 0;
         };
 
         const configModel = computed(() => {
@@ -1931,7 +2254,7 @@ export const SystemListWrapper = {
 
             return {
 
-                get sublightPctIndex() { 
+                get sublightPctIndex() {
                     let val = mods.quantity || 10;
                     if (val < 5) val = 5;
                     let closest = 0;
@@ -1942,8 +2265,8 @@ export const SystemListWrapper = {
                     }
                     return closest;
                 },
-                set sublightPctIndex(idx) { 
-                    mods.quantity = enginePctMap[idx]; 
+                set sublightPctIndex(idx) {
+                    mods.quantity = enginePctMap[idx];
                 },
                 get sublightPctLabel() { return enginePctMap[this.sublightPctIndex] + '%'; },
                 get sublightPctMinIndex() {
@@ -1959,7 +2282,644 @@ export const SystemListWrapper = {
             };
         });
 
-        return { store, getName, getDef, getIcon, getEpDynamic, getDescriptionLine, getBaseEp, isVariableCost, isModification, isWeapon, isSensor, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, openWiki, checkValidity, configModel, getOptionCost, emplacementOptions, weaponMountOptions, maxArcsAllowed, isArcDisabled, onEmplacementChanged };
+        return { store, getName, getDef, getIcon, getEpDynamic, getDescriptionLine, getBaseEp, isVariableCost, isModification, isWeapon, isSensor, isLauncher, isCustom, format, showConfigDialog, editingInstance, hasUpgrades, getUpgradeSpecs, canEnhance, canBattery, canPointBlank, getGenericOptions, openConfig, openWiki, checkValidity, configModel, getOptionCost, emplacementOptions, weaponMountOptions, maxArcsAllowed, isArcDisabled, onEmplacementChanged, availableLocations };
+    }
+};
+
+export const LocationDiagram = {
+    props: {
+        readonly: {
+            type: Boolean,
+            default: false
+        }
+    },
+    template: `
+    <div class="row fit q-pa-sm">
+        <!-- Diagram Side -->
+        <div :class="readonly ? 'col-12' : 'col-12 col-md-8 q-pr-md'">
+            <div v-if="!readonly" class="text-h6 q-mb-md text-primary">Hit Location Diagram</div>
+            
+            <div :class="['diagram-grid', gridClass, readonly ? 'readonly-diagram' : '']">
+                <div v-for="loc in hullLocations" :key="loc" 
+                     :class="['diagram-zone', 'zone-' + loc.toLowerCase().replace(/ /g, '-')]"
+                     @dragover.prevent="!readonly && onDragOver($event)"
+                     @dragleave.prevent="!readonly && onDragLeave($event)"
+                     @drop="!readonly && onDrop($event, loc)">
+                    <div class="diagram-zone-title">{{ loc }}</div>
+                    <div v-for="c in getComponentsInLoc(loc)" :key="c.instanceId" 
+                         :class="['draggable-item', readonly ? 'no-pointer-events' : '']" 
+                         :draggable="!readonly" 
+                         @dragstart.stop="!readonly && onDragStart($event, c)"
+                         @dragover.prevent.stop="!readonly && onDragOverItem($event)"
+                         @dragleave.prevent.stop="!readonly && onDragLeaveItem($event)"
+                         @drop.stop="!readonly && onDropItem($event, loc, c.instanceId)">
+                        {{ getName(c) }} <span class="text-caption text-weight-bold" v-if="getArcsString(c)">{{ getArcsString(c) }}</span>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div v-if="customLocations && customLocations.length > 0" class="q-mt-md">
+                <div class="text-subtitle1 text-primary q-mb-sm">Custom Locations</div>
+                <div class="row q-col-gutter-sm">
+                    <div v-for="loc in customLocations" :key="loc" class="col-12 col-sm-6 col-md-4">
+                        <div class="diagram-zone" style="min-height: 100px; border-color: #389ebd;"
+                             @dragover.prevent="!readonly && onDragOver($event)"
+                             @dragleave.prevent="!readonly && onDragLeave($event)"
+                             @drop="!readonly && onDrop($event, loc)">
+                            <div class="diagram-zone-title text-info">{{ loc }}</div>
+                            <div v-for="c in getComponentsInLoc(loc)" :key="c.instanceId" 
+                                 :class="['draggable-item', readonly ? 'no-pointer-events' : '']" 
+                                 :draggable="!readonly" 
+                                 @dragstart.stop="!readonly && onDragStart($event, c)"
+                                 @dragover.prevent.stop="!readonly && onDragOverItem($event)"
+                                 @dragleave.prevent.stop="!readonly && onDragLeaveItem($event)"
+                                 @drop.stop="!readonly && onDropItem($event, loc, c.instanceId)">
+                                {{ getName(c) }} <span class="text-caption text-weight-bold" v-if="getArcsString(c)">{{ getArcsString(c) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- List Side -->
+        <div v-if="!readonly" class="col-12 col-md-4">
+            <div class="text-h6 q-mb-md text-primary">Unassigned / Distributed</div>
+            <q-scroll-area style="height: calc(100vh - 200px);">
+                <div class="diagram-zone" style="min-height: 200px; border-color: #f2c037;"
+                     @dragover.prevent="onDragOver($event)"
+                     @dragleave.prevent="onDragLeave($event)"
+                     @drop="onDrop($event, 'Distributed')">
+                    <div class="diagram-zone-title text-warning">Distributed Pool</div>
+                    <div class="text-caption text-grey q-mb-sm text-center">Drag items to the diagram to assign them to specific hit locations.</div>
+                    
+                    <div v-for="c in getComponentsInLoc('Distributed')" :key="c.instanceId" 
+                         class="draggable-item" style="background-color: #555; border-color: #f2c037;"
+                         draggable="true" 
+                         @dragstart.stop="onDragStart($event, c)"
+                         @dragover.prevent.stop="onDragOverItem($event)"
+                         @dragleave.prevent.stop="onDragLeaveItem($event)"
+                         @drop.stop="onDropItem($event, 'Distributed', c.instanceId)">
+                        {{ getName(c) }} <span class="text-caption text-weight-bold" v-if="getArcsString(c)">{{ getArcsString(c) }}</span>
+                    </div>
+                </div>
+            </q-scroll-area>
+        </div>
+    </div>
+    `,
+    setup() { return {}; }
+};
+
+export const HitLocationDiagramWrapper = {
+    template: `<div class="hit-location-diagram text-center" v-html="htmlContent"></div>`,
+    setup() {
+        const store = useShipStore();
+
+        const htmlContent = Vue.computed(() => {
+            if (!store.chassis) return '';
+            const size = store.chassis.size;
+            const hull = store.chassis.baseHull;
+
+            let type = 'Small2';
+            if (size === "Small Craft") {
+                type = hull <= 20 ? 'Small2' : 'Small4';
+            } else if (size === "Light Ships") {
+                type = 'Light';
+            } else if (size === "Medium Ships") {
+                type = 'Medium';
+            } else if (size === "Heavy Ships") {
+                type = 'Heavy';
+            } else if (size === "Super-Heavy Ships" || size === "Fortress Ships") {
+                type = 'SuperHeavy';
+            }
+
+            const DIAGRAM_HTML = {
+                Small2: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `,
+                Small4: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FC</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">AC</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `,
+                Light: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">P</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">FC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">S</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">AC</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `,
+                Medium: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">FC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">FS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">AP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">AC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">AS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `,
+                Heavy: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FC</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">CF</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">FS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">P</div><div class="hl-ar hl-ar-h hl-ar-long">→</div><div class="hl-box">CA</div><div class="hl-ar hl-ar-h hl-ar-long">←</div><div class="hl-box">S</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">AP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">AC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">AS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `,
+                SuperHeavy: `
+                <div class="hl-col">
+                  <div class="hl-row"><div class="hl-box">F</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FFC</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FFP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">FC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">FFS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↓</div></div>
+                  <div class="hl-row"><div class="hl-box">FP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">CF</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">FS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↕</div></div>
+                  <div class="hl-row"><div class="hl-box">P</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">PC</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">CA</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">SC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">S</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">AP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">AC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">AS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">AAP</div><div class="hl-ar hl-ar-h">→</div><div class="hl-box">AAC</div><div class="hl-ar hl-ar-h">←</div><div class="hl-box">AAS</div></div>
+                  <div class="hl-row"><div class="hl-ar hl-ar-v">↑</div></div>
+                  <div class="hl-row"><div class="hl-box">A</div></div>
+                </div>
+              `
+            };
+            return DIAGRAM_HTML[type];
+        });
+
+        return { htmlContent };
+    }
+};
+
+export const ArcDiagramWrapper = {
+    template: `
+    <div>
+        <div v-if="hasPlacedWeapons" class="arc-diagram-container" style="padding: 20px;">
+            <div style="display: flex; flex-direction: row; justify-content: center; align-items: flex-end; gap: 20px; flex-wrap: nowrap;">
+                <!-- Contour Map -->
+                <div>
+                    <table style="border-spacing: 0; border-collapse: collapse; margin: 0 auto;">
+                        <tr v-for="(row, rIdx) in contourLayout" :key="'row'+rIdx">
+                            <td v-for="(secId, sIdx) in row" :key="'sec'+sIdx" style="vertical-align: top; text-align: center; padding: 0; border: none;">
+                                <template v-if="secId">
+                                    <div v-if="getSection(secId)" 
+                                         style="position: relative; border: 2px solid #59B7C7; margin: -1px auto; background-color: rgba(75, 181, 193, 0.1);"
+                                         :style="{ width: (getSection(secId).width * 10 * contourZoom) + 'px', height: (getSection(secId).height * 10 * contourZoom) + 'px' }">
+                                        
+                                         <template v-for="w in getWeaponsInSection(secId)" :key="w.item.id">
+                                            <div style="position: absolute; background-color: #f2c037; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10;"
+                                                 :style="{ width: (6 * Math.max(0.6, contourZoom)) + 'px', height: (6 * Math.max(0.6, contourZoom)) + 'px', left: ((w.item.x + (w.item.w || 1)/2) * 10 * contourZoom) + 'px', top: ((w.item.y + (w.item.h || 1)/2) * 10 * contourZoom) + 'px' }">
+                                                 
+                                                 <q-tooltip>{{ getName(w.comp) }}</q-tooltip>
+                                                 
+                                                 <svg style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; opacity: 0.85;" 
+                                                      :style="{ width: (140 * contourZoom) + 'px', height: (140 * contourZoom) + 'px' }" 
+                                                      viewBox="0 0 140 140">
+                                                     <g v-if="w.arcs.includes('Forward')">
+                                                        <line x1="70" y1="70" x2="70" :y2="w.isFixed ? 15 : 20" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/>
+                                                        <polygon v-if="w.isFixed" points="70,5 65,15 75,15" fill="rgba(89, 183, 199, 1)"/>
+                                                        <polygon v-else points="70,10 60,30 80,30" fill="rgba(89, 183, 199, 0.8)"/>
+                                                     </g>
+                                                     <g v-if="w.arcs.includes('Aft')">
+                                                        <line x1="70" y1="70" x2="70" :y2="w.isFixed ? 125 : 120" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/>
+                                                        <polygon v-if="w.isFixed" points="70,135 65,125 75,125" fill="rgba(89, 183, 199, 1)"/>
+                                                        <polygon v-else points="70,130 60,110 80,110" fill="rgba(89, 183, 199, 0.8)"/>
+                                                     </g>
+                                                     <g v-if="w.arcs.includes('Port')">
+                                                        <line x1="70" y1="70" :x2="w.isFixed ? 15 : 20" y2="70" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/>
+                                                        <polygon v-if="w.isFixed" points="5,70 15,65 15,75" fill="rgba(89, 183, 199, 1)"/>
+                                                        <polygon v-else points="10,70 30,60 30,80" fill="rgba(89, 183, 199, 0.8)"/>
+                                                     </g>
+                                                     <g v-if="w.arcs.includes('Starboard')">
+                                                        <line x1="70" y1="70" :x2="w.isFixed ? 125 : 120" y2="70" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/>
+                                                        <polygon v-if="w.isFixed" points="135,70 125,65 125,75" fill="rgba(89, 183, 199, 1)"/>
+                                                        <polygon v-else points="130,70 110,60 110,80" fill="rgba(89, 183, 199, 0.8)"/>
+                                                     </g>
+                                                     <g v-if="w.arcs.includes('Zero')">
+                                                        <circle cx="70" cy="70" r="30" fill="none" stroke="rgba(89, 183, 199, 0.9)" stroke-width="1.5" stroke-dasharray="4,3"/>
+                                                     </g>
+                                                 </svg>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Legend -->
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; border: 1px solid #4BB5C1; width: 140px; min-width: 140px; text-align: left;">
+                    <div class="text-bold text-caption q-mb-xs" style="border-bottom: 1px solid rgba(255,255,255,0.2);">Legend</div>
+                    <div class="row items-center q-mb-xs">
+                        <svg width="20" height="20" class="q-mr-xs"><polygon points="10,2 5,12 15,12" fill="rgba(89, 183, 199, 0.8)"/><line x1="10" y1="12" x2="10" y2="20" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/></svg>
+                        <span style="font-size: 0.75em;">Standard Arc</span>
+                    </div>
+                    <div class="row items-center q-mb-xs">
+                        <svg width="20" height="20" class="q-mr-xs"><polygon points="10,2 7,8 13,8" fill="rgba(89, 183, 199, 1)"/><line x1="10" y1="8" x2="10" y2="20" stroke="rgba(89, 183, 199, 0.9)" stroke-width="2"/></svg>
+                        <span style="font-size: 0.75em;">Fixed Mount</span>
+                    </div>
+                    <div class="row items-center">
+                        <svg width="20" height="20" class="q-mr-xs"><circle cx="10" cy="10" r="8" fill="none" stroke="rgba(89, 183, 199, 0.9)" stroke-width="1.5" stroke-dasharray="2,2"/></svg>
+                        <span style="font-size: 0.75em;">Turret (Zero)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-caption text-grey-8 q-mt-md">Weapon Placements (Deck Contour Map)</div>
+        </div>
+        
+        <div v-else class="arc-diagram-container">
+            <!-- Forward Row -->
+            <div class="row justify-center q-mb-md">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="arc-zone arc-forward" style="height: 100%;">
+                        <div class="arc-title">FORWARD <q-icon name="arrow_upward"></q-icon></div>
+                        <div class="arc-weapons">
+                            <div v-for="w in arcWeapons['Forward']" :key="w.instanceId" class="arc-weapon-item">{{ getName(w) }}</div>
+                            <div v-if="!arcWeapons['Forward']?.length" class="arc-empty">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Middle Row: Port / Zero / Starboard -->
+            <div class="row items-stretch q-col-gutter-md q-mb-md">
+                <div class="col-4">
+                    <div class="arc-zone arc-port" style="height: 100%;">
+                        <div class="arc-title"><q-icon name="arrow_back"></q-icon> PORT</div>
+                        <div class="arc-weapons">
+                            <div v-for="w in arcWeapons['Port']" :key="w.instanceId" class="arc-weapon-item">{{ getName(w) }}</div>
+                            <div v-if="!arcWeapons['Port']?.length" class="arc-empty">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="arc-zone arc-zero arc-ship-core" style="height: 100%;">
+                        <div class="arc-title"><q-icon name="gps_fixed"></q-icon> TURRET / ZERO</div>
+                        <div class="arc-weapons">
+                            <div v-for="w in arcWeapons['Zero']" :key="w.instanceId" class="arc-weapon-item">{{ getName(w) }}</div>
+                            <div v-if="!arcWeapons['Zero']?.length" class="arc-empty">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="arc-zone arc-starboard" style="height: 100%;">
+                        <div class="arc-title">STARBOARD <q-icon name="arrow_forward"></q-icon></div>
+                        <div class="arc-weapons">
+                            <div v-for="w in arcWeapons['Starboard']" :key="w.instanceId" class="arc-weapon-item">{{ getName(w) }}</div>
+                            <div v-if="!arcWeapons['Starboard']?.length" class="arc-empty">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Aft Row -->
+            <div class="row justify-center">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="arc-zone arc-aft" style="height: 100%;">
+                        <div class="arc-title">AFT <q-icon name="arrow_downward"></q-icon></div>
+                        <div class="arc-weapons">
+                            <div v-for="w in arcWeapons['Aft']" :key="w.instanceId" class="arc-weapon-item">{{ getName(w) }}</div>
+                            <div v-if="!arcWeapons['Aft']?.length" class="arc-empty">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `,
+    setup() {
+        const store = useShipStore();
+
+        const getName = (instance) => {
+            const id = instance.defId || instance;
+            const def = store.allEquipment.find(e => e.id === id);
+            let name = def ? (getLocalizedName(def) || def.id) : (id || 'Unknown');
+            if (instance?.modifications?.weaponMount && instance.modifications.weaponMount !== 'Single') {
+                name = `${instance.modifications.weaponMount} ${name}`;
+            }
+            if (instance?.modifications?.batteryCount > 1) {
+                name = `${instance.modifications.batteryCount}x ${name}`;
+            }
+            return name;
+        };
+
+        const hasPlacedWeapons = Vue.computed(() => {
+            let hasWeap = false;
+            if (!store.deckPlan || !store.deckPlan.decks) return false;
+            store.deckPlan.decks.forEach(d => {
+                d.sections.forEach(s => {
+                    if (s.items) {
+                        s.items.forEach(i => {
+                            if (i.type === 'component') {
+                                const c = store.installedComponents.find(comp => comp.instanceId === i.instanceId);
+                                if (c && store.isWeapon(c.defId)) hasWeap = true;
+                            }
+                        })
+                    }
+                })
+            });
+            return hasWeap;
+        });
+
+        const contourLayout = Vue.computed(() => {
+            const size = store.chassis.size || '';
+            const baseHull = store.chassis.baseHull || 0;
+            let rows = [];
+            if (size.startsWith('Small')) {
+                if (baseHull <= 20) rows = [[null, 'Fore', null], [null, 'Aft', null]];
+                else rows = [[null, 'Fore', null], [null, 'Fore Center', null], [null, 'Aft Center', null], [null, 'Aft', null]];
+            } else if (size.startsWith('Light')) {
+                rows = [[null, 'Fore', null], ['Port', 'Fore Center', 'Starboard'], [null, 'Aft Center', null], [null, 'Aft', null]];
+            } else if (size.startsWith('Medium')) {
+                rows = [[null, 'Fore', null], ['Fore Port', 'Fore Center', 'Fore Starboard'], ['Aft Port', 'Aft Center', 'Aft Starboard'], [null, 'Aft', null]];
+            } else if (size.startsWith('Heavy')) {
+                rows = [[null, 'Fore', null], ['Fore Port', 'Fore Center', 'Fore Starboard'], ['Port', 'Center Fore', 'Starboard'], ['Aft Port', 'Center Aft', 'Aft Starboard'], [null, 'Aft', null]];
+            } else if (size.startsWith('Super') || size.startsWith('Colossal')) {
+                rows = [
+                    [null, 'Fore', null],
+                    ['Far Fore Port', 'Far Fore Center', 'Far Fore Starboard'],
+                    ['Fore Port', 'Fore Center', 'Fore Starboard'],
+                    ['Port Center', 'Center Fore', 'Starboard Center'],
+                    ['Port', 'Center Aft', 'Starboard'],
+                    ['Aft Port', 'Aft Center', 'Aft Starboard'],
+                    ['Far Aft Port', 'Far Aft Center', 'Far Aft Starboard'],
+                    [null, 'Aft', null]
+                ];
+            } else {
+                rows = [[null, 'Fore', null], [null, 'Aft', null]];
+            }
+            return rows;
+        });
+
+        const getSection = (secId) => {
+            if (!store.deckPlan || !store.deckPlan.decks) return null;
+            for (let d of store.deckPlan.decks) {
+                const s = d.sections.find(sec => sec.id === secId);
+                if (s) return s;
+            }
+            return null;
+        };
+
+        const mappedWeapons = Vue.computed(() => {
+            const mapped = [];
+            if (!store.deckPlan || !store.deckPlan.decks) return mapped;
+
+            store.deckPlan.decks.forEach(d => {
+                d.sections.forEach(s => {
+                    if (s.items) {
+                        s.items.forEach(item => {
+                            if (item.type === 'component') {
+                                const comp = store.installedComponents.find(c => c.instanceId === item.instanceId);
+                                if (comp && store.isWeapon(comp.defId)) {
+                                    let arcs = comp.modifications?.arcs || [];
+                                    if (arcs.includes('Zero-Port')) arcs = [...arcs, 'Zero', 'Port'];
+                                    if (arcs.includes('Zero-Starboard')) arcs = [...arcs, 'Zero', 'Starboard'];
+                                    const isFixed = ['Fixed Mount', 'Spinal Mount'].includes(comp.modifications?.emplacement);
+                                    mapped.push({ item, comp, arcs, isFixed, secId: s.id });
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            return mapped;
+        });
+
+        const getWeaponsInSection = (secId) => {
+            return mappedWeapons.value.filter(w => w.secId === secId);
+        };
+
+        const contourZoom = Vue.computed(() => {
+            if (!store.deckPlan || !store.deckPlan.decks) return 1;
+            let maxWidth = 0;
+            contourLayout.value.forEach(row => {
+                let rowW = 0;
+                row.forEach(s => { if (s && getSection(s)) rowW += getSection(s).width * 10; });
+                if (rowW > maxWidth) maxWidth = rowW;
+            });
+            // If the max width is greater than 250px, scale it down to fit within ~250px
+            if (maxWidth > 250) return 250 / maxWidth;
+            return 1;
+        });
+
+        const arcWeapons = Vue.computed(() => {
+            const arcs = {
+                'Forward': [],
+                'Port': [],
+                'Starboard': [],
+                'Aft': [],
+                'Zero': []
+            };
+
+            const weapons = store.installedComponents.filter(instance => {
+                const def = store.allEquipment.find(e => e.id === instance.defId);
+                return def && store.isWeapon(def.id);
+            });
+
+            weapons.forEach(w => {
+                const wArcs = w.modifications?.arcs || [];
+                // Handle standard arcs
+                wArcs.forEach(arc => {
+                    if (arcs[arc] !== undefined) {
+                        arcs[arc].push(w);
+                        // Prevent duplicates for multi-arcs mapped here if needed
+                    } else if (arc === 'Zero-Port') {
+                        if (!arcs['Port'].includes(w)) arcs['Port'].push(w);
+                        if (!arcs['Zero'].includes(w)) arcs['Zero'].push(w);
+                    } else if (arc === 'Zero-Starboard') {
+                        if (!arcs['Starboard'].includes(w)) arcs['Starboard'].push(w);
+                        if (!arcs['Zero'].includes(w)) arcs['Zero'].push(w);
+                    }
+                });
+            });
+
+            return arcs;
+        });
+
+        return {
+            arcWeapons,
+            getName,
+            hasPlacedWeapons,
+            contourLayout,
+            contourZoom,
+            getSection,
+            getWeaponsInSection
+        };
+    }
+};
+
+export const LocationDiagramWrapper = {
+    ...LocationDiagram,
+    props: LocationDiagram.props,
+    setup(props) {
+        const store = useShipStore();
+
+        const getName = (instance) => {
+            const id = instance.defId || instance;
+            const def = store.allEquipment.find(e => e.id === id);
+            let name = def ? (getLocalizedName(def) || def.id) : (id || 'Unknown');
+
+            if (instance?.modifications?.auxiliary) {
+                name = `Backup ${name}`;
+            }
+
+            if (instance?.modifications?.weaponMount && instance.modifications.weaponMount !== 'Single') {
+                name = `${instance.modifications.weaponMount} ${name}`;
+            }
+            if (instance?.modifications?.emplacement && !['Standard Mount', 'Fixed Mount'].includes(instance.modifications.emplacement)) {
+                name = `${instance.modifications.emplacement} ${name}`;
+            }
+
+            return name;
+        };
+
+        const getArcsString = (instance) => {
+            const arcs = instance?.modifications?.arcs;
+            if (!arcs || !Array.isArray(arcs) || arcs.length === 0) return '';
+
+            const map = {
+                'Forward': '↑',
+                'Aft': '↓',
+                'Port': '←',
+                'Starboard': '→',
+                'Zero-Port': '←',
+                'Zero-Starboard': '→',
+                'Zero': '⟳'
+            };
+
+            return '[' + arcs.map(a => map[a] || '').join('') + ']';
+        };
+
+        const gridClass = computed(() => {
+            const size = store.chassis.size || '';
+            const baseHull = store.chassis.baseHull || 0;
+            if (size.startsWith('Small')) return 'grid-small';
+            if (size.startsWith('Light')) return 'grid-light';
+            if (size.startsWith('Medium')) return 'grid-medium';
+            if (size.startsWith('Heavy')) return 'grid-heavy';
+            if (size.startsWith('Super') || size.startsWith('Colossal')) return 'grid-super';
+            return 'grid-medium';
+        });
+
+        const hullLocations = computed(() => {
+            const size = store.chassis.size || '';
+            const baseHull = store.chassis.baseHull || 0;
+            if (size.startsWith('Small')) {
+                if (baseHull <= 20) return ['Fore', 'Aft'];
+                return ['Fore', 'Fore Center', 'Aft Center', 'Aft'];
+            }
+            if (size.startsWith('Light')) return ['Fore', 'Port', 'Fore Center', 'Starboard', 'Aft Center', 'Aft'];
+            if (size.startsWith('Medium')) return ['Fore', 'Fore Port', 'Fore Center', 'Fore Starboard', 'Aft Port', 'Aft Center', 'Aft Starboard', 'Aft'];
+            if (size.startsWith('Heavy')) return ['Fore', 'Fore Port', 'Fore Center', 'Fore Starboard', 'Center Fore', 'Port', 'Starboard', 'Center Aft', 'Aft Port', 'Aft Center', 'Aft Starboard', 'Aft'];
+            if (size.startsWith('Super') || size.startsWith('Colossal')) return ['Fore', 'Far Fore Port', 'Far Fore Center', 'Far Fore Starboard', 'Fore Port', 'Fore Center', 'Fore Starboard', 'Center Fore', 'Port Center', 'Port', 'Starboard', 'Starboard Center', 'Center Aft', 'Aft Port', 'Aft Center', 'Aft Starboard', 'Far Aft Port', 'Far Aft Center', 'Far Aft Starboard', 'Aft'];
+            return ['Fore', 'Aft'];
+        });
+
+
+        const customLocations = computed(() => {
+            const predefined = new Set(['Distributed', ...hullLocations.value]);
+            const custom = new Set();
+            store.installedComponents.forEach(c => {
+                if (c.location && !predefined.has(c.location)) {
+                    custom.add(c.location);
+                }
+            });
+            return Array.from(custom).sort();
+        });
+
+        const getComponentsInLoc = (loc) => {
+            return store.installedComponents.filter(c => (c.location || 'Distributed') === loc);
+        };
+
+        const onDragStart = (evt, component) => {
+            evt.dataTransfer.dropEffect = 'move';
+            evt.dataTransfer.effectAllowed = 'move';
+            evt.dataTransfer.setData('instanceId', component.instanceId);
+        };
+
+        const onDragOver = (evt) => {
+            evt.currentTarget.classList.add('drag-over');
+        };
+
+        const onDragLeave = (evt) => {
+            evt.currentTarget.classList.remove('drag-over');
+        };
+
+        const onDrop = (evt, loc) => {
+            evt.currentTarget.classList.remove('drag-over');
+            const instanceId = evt.dataTransfer.getData('instanceId');
+            if (instanceId) {
+                const currentIndex = store.installedComponents.findIndex(c => c.instanceId === instanceId);
+                if (currentIndex !== -1) {
+                    const comp = store.installedComponents[currentIndex];
+                    comp.location = loc;
+                    // move to end
+                    store.installedComponents.splice(currentIndex, 1);
+                    store.installedComponents.push(comp);
+                }
+            }
+        };
+
+        const onDragOverItem = (evt) => {
+            evt.currentTarget.classList.add('drag-over-item');
+        };
+
+        const onDragLeaveItem = (evt) => {
+            evt.currentTarget.classList.remove('drag-over-item');
+        };
+
+        const onDropItem = (evt, loc, targetId) => {
+            evt.currentTarget.classList.remove('drag-over-item');
+            const instanceId = evt.dataTransfer.getData('instanceId');
+            if (!instanceId || instanceId === targetId) return;
+
+            const currentIndex = store.installedComponents.findIndex(c => c.instanceId === instanceId);
+            if (currentIndex === -1) return;
+
+            const comp = store.installedComponents[currentIndex];
+            comp.location = loc;
+
+            // Remove from old position
+            store.installedComponents.splice(currentIndex, 1);
+
+            // Find new position of target
+            const newTargetIndex = store.installedComponents.findIndex(c => c.instanceId === targetId);
+            if (newTargetIndex === -1) {
+                store.installedComponents.push(comp);
+            } else {
+                store.installedComponents.splice(newTargetIndex, 0, comp);
+            }
+        };
+
+        return { store, getName, getArcsString, gridClass, hullLocations, customLocations, getComponentsInLoc, onDragStart, onDragOver, onDragLeave, onDrop, onDragOverItem, onDragLeaveItem, onDropItem };
     }
 };
 
@@ -1985,16 +2945,98 @@ export const ConfigPanelWrapper = {
     }
 };
 
+const HIT_LOCATION_TABLES = {
+    "Small (2)": {
+        die: "d6",
+        Forward: { "1-5": "F", "6": "A" },
+        Port: { "1-3": "F", "4-6": "A" },
+        Starboard: { "1-3": "F", "4-6": "A" },
+        Aft: { "1": "F", "2-6": "A" },
+        "High/Low": { "1-3": "F", "4-6": "A" }
+    },
+    "Small (4)": {
+        die: "d8",
+        Forward: { "1-3": "F", "4-6": "FC", "7-8": "AC" },
+        Port: { "1-2": "F", "3-4": "FC", "5-6": "AC", "7-8": "A" },
+        Starboard: { "1-2": "F", "3-4": "FC", "5-6": "AC", "7-8": "A" },
+        Aft: { "1-2": "FC", "3-5": "AC", "6-8": "A" },
+        "High/Low": { "1-2": "F", "3-4": "FC", "5-6": "AC", "7-8": "A" }
+    },
+    "Light Ships": {
+        die: "d8",
+        Forward: { "1-2": "F", "3-4": "FC", "5-6": "P", "7-8": "S" },
+        Port: { "1-2": "F", "3": "FC", "4-5": "P", "6": "AC", "7-8": "A" },
+        Starboard: { "1-2": "F", "3": "FC", "4-5": "S", "6": "AC", "7-8": "A" },
+        Aft: { "1-2": "P", "3-4": "S", "5-6": "AC", "7-8": "A" },
+        "High/Low": { "1": "F", "2-3": "FC", "4": "P", "5": "S", "6-7": "AC", "8": "A" }
+    },
+    "Medium Ships": {
+        die: "d12",
+        Forward: { "1-3": "F", "4-5": "FP", "6-7": "FC", "8-9": "FS", "10": "AP", "11": "AC", "12": "AS" },
+        Port: { "1-2": "F", "3-5": "FP", "6": "FC", "7-9": "AP", "10": "AC", "11-12": "A" },
+        Starboard: { "1-2": "F", "3": "FC", "4-6": "FS", "7": "AC", "8-10": "AS", "11-12": "A" },
+        Aft: { "1": "FP", "2": "FC", "3": "FS", "4-5": "AP", "6-7": "AC", "8-9": "AS", "10-12": "A" },
+        "High/Low": { "1-2": "F", "3": "FP", "4-5": "FC", "6": "FS", "7": "AP", "8-9": "AC", "10": "AS", "11-12": "A" }
+    },
+    "Heavy Ships": {
+        die: "d20",
+        Forward: { "1-5": "F", "6-7": "FC", "8-11": "FP", "12-13": "CF", "14-17": "FS", "18": "P", "19": "CA", "20": "S" },
+        Port: { "1-2": "F", "3-4": "FC", "5-7": "FP", "8": "CF", "9-12": "P", "13": "CA", "14-16": "AP", "17-18": "AC", "19-20": "A" },
+        Starboard: { "1-2": "F", "3-4": "FC", "5": "CF", "6-8": "FS", "9": "CA", "10-13": "S", "14-15": "AC", "16-18": "AS", "19-20": "A" },
+        Aft: { "1": "CF", "2": "P", "3-4": "CA", "5": "S", "6-9": "AP", "10-11": "AC", "12-15": "AS", "16-20": "A" },
+        "High/Low": { "1": "F", "2-3": "FC", "4-5": "FP", "6-7": "CF", "8-9": "FS", "10": "P", "11-12": "CA", "13": "S", "14-15": "AP", "16-17": "AC", "18-19": "AS", "20": "A" }
+    },
+    "Super-Heavy Ships": {
+        die: "d20",
+        Forward: { "1-3": "F", "4-5": "FFC", "6-8": "FFP", "9": "FC", "10-12": "FFS", "13-14": "FP", "15-16": "FS", "17-18": "P", "19-20": "S" },
+        Port: { "1": "F", "2": "FFC", "3-4": "FFP", "5": "FC", "6-7": "FP", "8": "CF", "9-10": "P", "11-12": "PC", "13": "CA", "14-15": "AP", "16": "AC", "17-18": "AAP", "19": "AAC", "20": "A" },
+        Starboard: { "1": "F", "2": "FFC", "3": "FC", "4-5": "FFS", "6": "CF", "7-8": "FS", "9": "CA", "10-11": "SC", "12-13": "S", "14": "AC", "15-16": "AS", "17": "AAC", "18-19": "AAS", "20": "A" },
+        Aft: { "1-2": "P", "3-4": "S", "5-6": "AP", "7": "AC", "8-9": "AS", "10-12": "AAP", "13-14": "AAC", "15-17": "AAS", "18-20": "A" },
+        "High/Low": { "1": "F", "2": "FFC", "3": "FFP", "4": "FC", "5": "FFS", "6": "FP", "7": "CF", "8": "FS", "9": "P", "10": "PC", "11": "CA", "12": "SC", "13": "S", "14": "AP", "15": "AC", "16": "AS", "17": "AAP", "18": "AAC", "19": "AAS", "20": "A" }
+    }
+};
+
 export const ShipSheetWrapper = {
     ...ShipSheet,
     setup() {
         const store = useShipStore();
+
+        const hitLocationTable = computed(() => {
+            if (!store.chassis) return null;
+            let size = store.chassis.size;
+            if (size === "Small Craft") {
+                return store.chassis.baseHull <= 10 ? HIT_LOCATION_TABLES["Small (2)"] : HIT_LOCATION_TABLES["Small (4)"];
+            } else if (size === "Fortress Ships") {
+                return HIT_LOCATION_TABLES["Super-Heavy Ships"];
+            } else {
+                return HIT_LOCATION_TABLES[size] || null;
+            }
+        });
+
+        const headerImage = Vue.computed(() => store.shipImages.find(i => i.isHeader));
+        const galleryImages = Vue.computed(() => store.shipImages.filter(i => !i.isHeader));
+
+        const formattedSub = computed(() => {
+            if (!store.chassis) return '';
+            let name = getLocalizedName(store.chassis) || '';
+            if (i18n.global.locale.value === 'en') {
+                name = name.replace(/\b\w/g, c => c.toUpperCase());
+            }
+            const size = store.chassis.size || '';
+            const key = `size.${size}`;
+            const localizedSize = i18n.global.te(key) ? i18n.global.t(key) : size;
+            return `${name} (${localizedSize})`;
+        });
+
         const getName = (instance) => {
             const id = instance.defId || instance;
             const def = store.allEquipment.find(e => e.id === id);
             let name = getLocalizedName(def);
 
             if (instance.modifications) {
+                if (instance.modifications.auxiliary) {
+                    name = `Backup ${name}`;
+                }
                 const parts = [];
                 if (instance.modifications.fireLink > 1) parts.push(`Fire-Linked (${instance.modifications.fireLink})`);
                 if (instance.modifications.advanced) parts.push('Advanced');
@@ -2003,75 +3045,293 @@ export const ShipSheetWrapper = {
             }
             return name;
         };
-        const getMod = (score) => Math.floor((score - 10) / 2);
+
         const weapons = computed(() => store.installedComponents.filter(instance => {
             const def = store.allEquipment.find(e => e.id === instance.defId);
             return def && store.isWeapon(def.id);
         }));
-        const systemNames = computed(() => {
-            const nonWeapons = store.installedComponents.filter(instance => {
-                const def = store.allEquipment.find(e => e.id === instance.defId);
-                return def && !store.isWeapon(def.id) && !store.isEngine(def.id);
-            });
-            if (nonWeapons.length === 0) return i18n.global.t('ui.installed_systems');
-            return nonWeapons.map(instance => getName(instance)).join(', ');
-        });
 
         const getDmg = (instance) => {
             return store.getComponentDamage(instance) || '-';
-        }
-        const calculateCL = computed(() => {
-            if (store.chassis.challengeLevel !== null && store.chassis.challengeLevel !== undefined) {
-                return store.chassis.challengeLevel;
-            }
-            let cl = 10;
-            if(store.chassis.size.includes('Colossal')) cl += 5;
-            cl += Math.floor(store.installedComponents.length / 2);
-            if(store.template) cl += 2;
-            cl += store.crewStats.cl;
-            return cl;
-        });
+        };
+
         const formatCreds = (n) => new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(n) + ' cr';
+
+        const weaponAccuracies = {
+            "wpn_laser": -2,
+            "wpn_ir_laser": -2,
+            "wpn_x_ray_laser": -2,
+            "wpn_heavy_laser": -1,
+            "wpn_neutron_gun": 0,
+            "wpn_fusion_laser": 1,
+            "wpn_graser": 2,
+            "wpn_heavy_neutron_gun": 3,
+            "wpn_hydrogen_bore": 3,
+            "wpn_plasma_cannon": -2,
+            "wpn_particle_beam": -2,
+            "wpn_heavy_particle_beam": -1,
+            "wpn_heavy_plasma_beam": 0,
+            "wpn_matter_beam": 0,
+            "wpn_fusion_beam": 1,
+            "wpn_quantum_cannon": 2,
+            "wpn_boson_gun": 3,
+            "wpn_heavy_matter_beam": 3,
+            "wpn_fusion_bore": 3,
+            "wpn_maser": -3,
+            "wpn_kinetic_lance": -3,
+            "wpn_pulse_maser": -1,
+            "wpn_em_cannon": -1,
+            "wpn_dark_fusion_gun": 0,
+            "wpn_gatling_maser": 1,
+            "wpn_weak_force_gun": 2,
+            "wpn_strong_force_gun": 3,
+            "wpn_zero_bore": 3,
+            "wpn_blacklaser": -3,
+            "wpn_tachyon_gun": 0,
+            "wpn_string_projector": 2,
+            "wpn_point_defense_gun": -1,
+            "wpn_rail_cannon": 0,
+            "wpn_needle_driver": 1,
+            "wpn_gauss_gun": 2,
+            "wpn_hi_velocity_rail_gun": 4,
+            "wpn_mass_cannon": -1,
+            "wpn_heavy_mass_cannon": 0,
+            "wpn_accelerator": 1,
+            "wpn_tach_rifle": 1,
+            "wpn_heavy_accelerator": 3,
+            "wpn_antimatter_gun": 4,
+            "wpn_super_tach_rifle": 4,
+            "wpn_sliver_gun": -2,
+            "wpn_neutronium_driver": 0,
+            "wpn_bomb_projector": -1,
+            "wpn_bomb_salvo": -1,
+            "wpn_kinetic_converter": 2,
+            "wpn_tunneling_driver": 3,
+            "wpn_black_hole_gun": 1,
+            "wpn_cable_gun": 1,
+            "wpn_rf_spike": -2,
+            "wpn_thermal_inducer": 3,
+            "wpn_thermal_nullifier": 3,
+            "wpn_tractor_beam": -1,
+            "wpn_mass_converter": -4,
+            "wpn_matter_torpedo": 0,
+            "wpn_plasma_torpedo": 1,
+            "wpn_em_torpedo": -2,
+            "wpn_neural_inhibitor": 0,
+            "wpn_fission_activator": 0,
+            "wpn_boarding_transporter": null,
+            "wpn_null_torpedo": 2,
+            "wpn_code_arranger": 1
+        };
+
+        const weaponRanges = {
+            "wpn_laser": "1/2/3",
+            "wpn_ir_laser": "1/2/3",
+            "wpn_x_ray_laser": "1/2/3",
+            "wpn_heavy_laser": "1/3/5",
+            "wpn_neutron_gun": "1/3/5",
+            "wpn_fusion_laser": "2/4/6",
+            "wpn_graser": "3/6/9",
+            "wpn_heavy_neutron_gun": "3/6/9",
+            "wpn_hydrogen_bore": "4/8/12",
+            "wpn_plasma_cannon": "1/2/4",
+            "wpn_particle_beam": "2/4/6",
+            "wpn_heavy_particle_beam": "2/4/6",
+            "wpn_heavy_plasma_beam": "2/4/8",
+            "wpn_matter_beam": "2/5/10",
+            "wpn_fusion_beam": "3/6/12",
+            "wpn_quantum_cannon": "4/8/12",
+            "wpn_boson_gun": "4/8/12",
+            "wpn_heavy_matter_beam": "4/8/16",
+            "wpn_fusion_bore": "5/10/15",
+            "wpn_maser": "1/3/5",
+            "wpn_kinetic_lance": "2/4/6",
+            "wpn_pulse_maser": "2/5/10",
+            "wpn_em_cannon": "3/6/12",
+            "wpn_dark_fusion_gun": "4/8/12",
+            "wpn_gatling_maser": "3/7/14",
+            "wpn_weak_force_gun": "5/10/15",
+            "wpn_strong_force_gun": "5/10/20",
+            "wpn_zero_bore": "6/12/18",
+            "wpn_blacklaser": "2/4/6",
+            "wpn_tachyon_gun": "4/8/12",
+            "wpn_string_projector": "6/12/24",
+            "wpn_point_defense_gun": "1/2/3",
+            "wpn_rail_cannon": "1/2/5",
+            "wpn_needle_driver": "1/3/5",
+            "wpn_gauss_gun": "2/4/6",
+            "wpn_hi_velocity_rail_gun": "3/6/12",
+            "wpn_mass_cannon": "1/3/5",
+            "wpn_heavy_mass_cannon": "2/4/6",
+            "wpn_accelerator": "3/5/7",
+            "wpn_tach_rifle": "6/8/10",
+            "wpn_heavy_accelerator": "4/8/10",
+            "wpn_antimatter_gun": "4/8/12",
+            "wpn_super_tach_rifle": "8/10/14",
+            "wpn_sliver_gun": "1/2/4",
+            "wpn_neutronium_driver": "2/4/8",
+            "wpn_bomb_projector": "4/6/8",
+            "wpn_bomb_salvo": "5/7/10",
+            "wpn_kinetic_converter": "4/8/16",
+            "wpn_tunneling_driver": "5/10/20",
+            "wpn_black_hole_gun": "6/12/24",
+            "wpn_cable_gun": "0",
+            "wpn_rf_spike": "1/2/3",
+            "wpn_thermal_inducer": "2/4/6",
+            "wpn_thermal_nullifier": "2/4/6",
+            "wpn_tractor_beam": "2/4/8",
+            "wpn_mass_converter": "2/4/6",
+            "wpn_matter_torpedo": "2/4/8",
+            "wpn_plasma_torpedo": "3/6/9",
+            "wpn_em_torpedo": "2/5/10",
+            "wpn_neural_inhibitor": "1/2/3",
+            "wpn_fission_activator": "4/8/12",
+            "wpn_boarding_transporter": "4/6/8",
+            "wpn_null_torpedo": "3/6/15",
+            "wpn_code_arranger": "4/8/12"
+        };
+
+        const formatSteps = (val) => {
+            if (val === 0) return '0 steps';
+            const sign = val > 0 ? '+' : '';
+            const steps = Math.abs(val) === 1 ? 'step' : 'steps';
+            return `${sign}${val} ${steps}`;
+        };
+
+        const getFcModValue = (fc) => {
+            if (fc === 'Ordinary') return -1;
+            if (fc === 'Good') return -2;
+            if (fc === 'Amazing') return -3;
+            return 0;
+        };
 
         const weaponData = computed(() => {
             return weapons.value.map(w => {
                 const def = store.allEquipment.find(e => e.id === w.defId);
-                const name = getName(w); // Uses the existing getName which handles some mods
+                const name = getName(w);
                 const damage = getDmg(w);
+                const fire = def ? def.fire || 'N/A' : 'N/A';
+                const range = def ? (weaponRanges[w.defId] || 'N/A') : 'N/A';
 
-                // Calculate Attack Bonus: Crew Atk + Int Mod + Range(0) + Size?
-                // Usually Starship weapons are Int based.
-                // SotG p16: "Attack Bonus" is Base Atk.
-                // We add ship's Int modifier (or Pilot's Dex if we had a pilot, but we assume generic crew).
-                // "Generic crew use the ship's Intelligence modifier for attack rolls with ship weapons."
-                const atk = store.crewStats.atk + getMod(store.currentStats.int);
+                const baseAccRaw = weaponAccuracies[w.defId];
+                const fcModValue = getFcModValue(w.modifications.fireControl);
+
+                let mountModValue = 0;
+                if (w.modifications.weaponMount === 'Twin') mountModValue = -1;
+                else if (w.modifications.weaponMount === 'Triple') mountModValue = -2;
+                else if (w.modifications.weaponMount === 'Quad') mountModValue = -3;
+
+                let attackModifierStr = '--';
+                if (baseAccRaw !== null && baseAccRaw !== undefined) {
+                    const totalMod = baseAccRaw + fcModValue + mountModValue;
+                    const totalFormatted = formatSteps(totalMod);
+                    const fcFormatted = formatSteps(fcModValue);
+                    const accFormatted = formatSteps(baseAccRaw);
+
+                    let breakdown = `Fire Control: ${fcFormatted}, Accuracy: ${accFormatted}`;
+                    if (mountModValue !== 0) {
+                        const mountFormatted = formatSteps(mountModValue);
+                        breakdown += `, Battery: ${mountFormatted}`;
+                    }
+
+                    attackModifierStr = `${totalFormatted} (${breakdown})`;
+                }
 
                 const detailsParts = [];
                 if (w.modifications.batteryCount > 1) detailsParts.push(`Battery (${w.modifications.batteryCount} guns)`);
                 if (w.modifications.weaponMount && w.modifications.weaponMount !== 'Single') detailsParts.push(`${w.modifications.weaponMount} Battery`);
-                
-                if (w.modifications.fireControl) {
-                    if (w.modifications.fireControl === 'Ordinary') detailsParts.push('Ordinary FC (-1 step)');
-                    if (w.modifications.fireControl === 'Good') detailsParts.push('Good FC (-2 step)');
-                    if (w.modifications.fireControl === 'Amazing') detailsParts.push('Amazing FC (-3 step)');
-                }
-                
+
                 if (w.modifications.autofire) detailsParts.push('Autofire');
                 if (w.modifications.pointBlank) detailsParts.push('Point-Blank');
 
-                // Range isn't easily available in data.json currently without parsing description or adding a field.
-                // We'll skip range for now or infer it? Laser Cannon = Short?
-                // We'll just stick to declarative mods.
+                const arcsStr = w.modifications.arcs && w.modifications.arcs.length > 0 ? w.modifications.arcs.join(', ') : '';
 
                 return {
                     instanceId: w.instanceId,
                     name: name,
                     damage: damage,
-                    attackBonus: atk,
+                    fire: fire,
+                    range: range,
+                    attackModifier: attackModifierStr,
+                    location: w.location || 'Distributed',
+                    arcs: arcsStr,
                     details: detailsParts.join(', '),
                     defId: w.defId
                 };
             });
+        });
+
+        const toughness = computed(() => {
+            return store.chassis.toughness || '-';
+        });
+
+        const maneuverClass = computed(() => {
+            const mvrVal = store.chassis.mvr;
+            if (mvrVal !== undefined && mvrVal !== null && mvrVal !== '') return mvrVal;
+            // Fallback for custom ships based on baseHull
+            const bh = store.chassis.baseHull || 0;
+            if (bh <= 40) return '4';
+            if (bh <= 160) return '3';
+            if (bh <= 960) return '2';
+            if (bh <= 4000) return '1';
+            return '0';
+        });
+
+        const targetModifier = computed(() => {
+            const targetVal = store.chassis.target;
+            if (targetVal !== undefined && targetVal !== null && targetVal !== '') return targetVal;
+            // Fallback for custom ships based on baseHull
+            const bh = store.chassis.baseHull || 0;
+            if (bh <= 15) return '+3 steps';
+            if (bh <= 80) return '+2 steps';
+            if (bh <= 160) return '+1 step';
+            if (bh <= 480) return '0';
+            if (bh <= 960) return '-1 step';
+            if (bh <= 1600) return '-2 steps';
+            if (bh <= 4000) return '-3 steps';
+            return '-4 steps';
+        });
+
+        const stunTrack = computed(() => {
+            if (store.chassis.s !== undefined && store.chassis.s !== null && store.chassis.s !== '') return store.chassis.s;
+            return Math.floor((store.chassis.baseHull || 0) * 0.1) || 1;
+        });
+
+        const woundTrack = computed(() => {
+            if (store.chassis.w !== undefined && store.chassis.w !== null && store.chassis.w !== '') return store.chassis.w;
+            return Math.floor((store.chassis.baseHull || 0) * 0.1) || 1;
+        });
+
+        const mortalTrack = computed(() => {
+            if (store.chassis.m !== undefined && store.chassis.m !== null && store.chassis.m !== '') return store.chassis.m;
+            return Math.floor((store.chassis.baseHull || 0) * 0.05) || 1;
+        });
+
+        const criticalTrack = computed(() => {
+            if (store.chassis.c !== undefined && store.chassis.c !== null && store.chassis.c !== '') return store.chassis.c;
+            return Math.floor((store.chassis.baseHull || 0) * 0.025) || 1;
+        });
+
+        const componentsByLocation = computed(() => {
+            const locs = {};
+            store.installedComponents.forEach(instance => {
+                const loc = instance.location || 'Distributed';
+                if (!locs[loc]) locs[loc] = [];
+                locs[loc].push(instance);
+            });
+            const locationOrder = ['Fore', 'Aft', 'Port', 'Starboard', 'Core', 'Dorsal', 'Ventral', 'Distributed'];
+            const sorted = {};
+            locationOrder.forEach(l => {
+                if (locs[l]) {
+                    sorted[l] = locs[l];
+                }
+            });
+            Object.keys(locs).forEach(l => {
+                if (!locationOrder.includes(l)) {
+                    sorted[l] = locs[l];
+                }
+            });
+            return sorted;
         });
 
         const componentsWithDescriptions = computed(() => {
@@ -2079,18 +3339,235 @@ export const ShipSheetWrapper = {
             const unique = [];
             store.installedComponents.forEach(instance => {
                 const def = store.allEquipment.find(e => e.id === instance.defId);
-                if (def && def.description && !seen.has(instance.defId)) {
-                    unique.push(instance);
-                    seen.add(instance.defId);
+                if (def && !seen.has(instance.defId)) {
+                    const desc = i18n.global.locale.value === 'es'
+                        ? (def.detailedDescription_es || def.detailedDescription || def.description)
+                        : (def.detailedDescription || def.description);
+                    if (desc) {
+                        unique.push(instance);
+                        seen.add(instance.defId);
+                    }
                 }
+            });
+            unique.sort((a, b) => {
+                const nameA = getName(a.defId).toLowerCase();
+                const nameB = getName(b.defId).toLowerCase();
+                return nameA.localeCompare(nameB);
             });
             return unique;
         });
+
+        const defensiveModifiers = computed(() => {
+            const list = [];
+            const defenseGroups = {};
+            store.installedComponents.forEach(instance => {
+                const def = store.allEquipment.find(e => e.id === instance.defId);
+                if (def && def.category === 'Defenses') {
+                    if (!defenseGroups[instance.defId]) {
+                        defenseGroups[instance.defId] = {
+                            def,
+                            instances: []
+                        };
+                    }
+                    defenseGroups[instance.defId].instances.push(instance);
+                }
+            });
+
+            for (const [defId, group] of Object.entries(defenseGroups)) {
+                const def = group.def;
+                let totalQuantity = 0;
+                group.instances.forEach(inst => {
+                    totalQuantity += (inst.modifications?.quantity || 1);
+                });
+
+                let coverageMatch = def.description.match(/Coverage:\s*(\d+)\s*hull\s*pt/i);
+                let effect = def.description;
+                let status = 'Active';
+                let coverageInfo = '';
+                let isFullyCovered = true;
+
+                if (coverageMatch) {
+                    const coveragePerUnit = parseInt(coverageMatch[1]);
+                    const shipHull = store.chassis.baseHull || 0;
+                    const requiredQuantity = Math.ceil(shipHull / coveragePerUnit);
+
+                    if (totalQuantity >= requiredQuantity) {
+                        status = 'Full Coverage';
+                        isFullyCovered = true;
+                    } else {
+                        status = 'Partial Coverage';
+                        isFullyCovered = false;
+                    }
+                    coverageInfo = `(Installed: ${totalQuantity}/${requiredQuantity} needed for ${shipHull} HP)`;
+
+                    const parts = def.description.split('|');
+                    if (parts.length > 1) {
+                        effect = parts.slice(1).join('|').trim();
+                    }
+                } else {
+                    coverageInfo = `(Installed: ${totalQuantity})`;
+                }
+
+                list.push({
+                    name: def.name,
+                    effect: effect,
+                    status: status,
+                    coverageInfo: coverageInfo,
+                    isFullyCovered: isFullyCovered,
+                    defId: defId
+                });
+            }
+            return list;
+        });
+
         const getDescription = (id) => {
-             const def = store.allEquipment.find(e => e.id === id);
-             return def ? def.description : '';
+            const def = store.allEquipment.find(e => e.id === id);
+            if (!def) return '';
+            if (i18n.global.locale.value === 'es') {
+                return def.detailedDescription_es || def.detailedDescription || def.description || '';
+            }
+            return def.detailedDescription || def.description || '';
         };
 
-        return { store, getName, getMod, weapons, weaponData, systemNames, getDmg, calculateCL, formatCreds, getLocalizedName, componentsWithDescriptions, getDescription };
+        const sortRolls = (rolls) => {
+            if (!rolls) return [];
+            return Object.keys(rolls).sort((a, b) => {
+                const valA = parseInt(a.split('-')[0]) || 0;
+                const valB = parseInt(b.split('-')[0]) || 0;
+                return valA - valB;
+            }).map(k => ({ roll: k, loc: rolls[k] }));
+        };
+
+        return {
+            store,
+            getName,
+            weapons,
+            weaponData,
+            getDmg,
+            formatCreds,
+            getLocalizedName,
+            formattedSub,
+            toughness,
+            maneuverClass,
+            targetModifier,
+            stunTrack,
+            woundTrack,
+            mortalTrack,
+            criticalTrack,
+            componentsByLocation,
+            componentsWithDescriptions,
+            getDescription,
+            defensiveModifiers,
+            headerImage,
+            galleryImages,
+            hitLocationTable,
+            sortRolls
+        };
+    }
+};
+
+export const ImageManagerDialog = {
+    template: `
+    <q-dialog v-model="store.showImageManager">
+        <q-card class="bg-grey-9 text-white" style="min-width: 400px; max-width: 80vw;">
+            <q-card-section class="row items-center q-pb-none">
+                <div class="text-h6">Image Manager</div>
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+            </q-card-section>
+            <q-card-section>
+                <div v-if="store.shipImages.length === 0" class="text-grey text-center q-pa-md">
+                    No images uploaded yet.
+                </div>
+                <q-list separator dark>
+                    <q-item v-for="(img, idx) in store.shipImages" :key="img.id" class="q-py-md">
+                        <q-item-section avatar>
+                            <q-img :src="img.data" style="width: 80px; height: 80px; border-radius: 4px;" fit="cover" />
+                        </q-item-section>
+                        <q-item-section>
+                            <q-input dark dense v-model="img.caption" label="Caption" class="q-mb-sm" />
+                            <q-radio dark dense v-model="headerIndex" :val="idx" label="Primary Header" color="primary" @update:model-value="setHeader" />
+                        </q-item-section>
+                        <q-item-section side>
+                            <q-btn flat round dense icon="delete" color="negative" @click="removeImage(idx)" />
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+                
+                <div class="row justify-center q-mt-md">
+                    <input type="file" accept="image/*" ref="fileInput" style="display: none" @change="handleUpload" multiple />
+                    <q-btn color="primary" icon="add_a_photo" label="Add Image" @click="$refs.fileInput.click()" />
+                </div>
+            </q-card-section>
+        </q-card>
+    </q-dialog>
+    `,
+    setup() {
+        const store = useShipStore();
+        const headerIndex = Vue.ref(store.shipImages.findIndex(img => img.isHeader));
+        if (headerIndex.value === -1 && store.shipImages.length > 0) {
+            headerIndex.value = 0;
+            store.shipImages[0].isHeader = true;
+        }
+
+        Vue.watch(() => store.shipImages.length, () => {
+            headerIndex.value = store.shipImages.findIndex(img => img.isHeader);
+            if (headerIndex.value === -1 && store.shipImages.length > 0) {
+                headerIndex.value = 0;
+                store.shipImages[0].isHeader = true;
+            }
+        });
+
+        const setHeader = (idx) => {
+            store.shipImages.forEach((img, i) => img.isHeader = (i === idx));
+        };
+
+        const removeImage = (idx) => {
+            store.shipImages.splice(idx, 1);
+            if (store.shipImages.length > 0 && !store.shipImages.some(img => img.isHeader)) {
+                store.shipImages[0].isHeader = true;
+            }
+        };
+
+        const handleUpload = (e) => {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        } else {
+                            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const isHeader = store.shipImages.length === 0;
+                        store.shipImages.push({
+                            id: crypto.randomUUID(),
+                            data: canvas.toDataURL('image/jpeg', 0.8),
+                            caption: '',
+                            isHeader: isHeader
+                        });
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        };
+
+        return { store, headerIndex, setHeader, removeImage, handleUpload };
     }
 };

@@ -3,7 +3,7 @@ import collections
 
 def main():
     try:
-        with open('public/swse/data.json', 'r') as f:
+        with open('public/warships/data.json', 'r') as f:
             data = json.load(f)
     except FileNotFoundError:
         print("Error: public/swse/data.json not found.")

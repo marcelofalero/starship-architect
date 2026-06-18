@@ -25,6 +25,9 @@ Consisting of dense, highly polished plates of metal, reflective armor is effect
 > **Design Tip: Armor**
 > Your ship design should devote about 10 to 20 percent of its hull points to defenses—armor and shields. Of course, you can maximize protection, but you’ll have to give up firepower or maneuverability. Similarly, going light on the armor leaves you more room for weapons and engines. It’s your call.
 
+### Cerametal
+A composite material consisting of ceramics and metals, cerametal is designed to withstand both intense kinetic impacts and high-energy thermal blasts. It is the standard armor of the Gravity Age.
+
 ### Neutronite
 Advanced materials technologies lead to the creation of artificially dense materials that can withstand enormous forces. Neutronite is a tough steel alloy into which a “weave” of free neutrons has been pressed. It is incredibly massive, weighing about five times more than a similar volume of lead.
 

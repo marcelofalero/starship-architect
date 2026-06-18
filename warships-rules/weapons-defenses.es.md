@@ -353,21 +353,29 @@ If you don’t want to go to the trouble of customizing your ship’s ordnance, 
 
 78   Launch Systems
 
-### Weapon
+### Bomb Rack (PL 6)
 
-or cell system can torch off a number of missiles at the same time. Bomb Rack (PL 6): As you might expect, this launch system is designed to carry bombs. Its capacity can’t be expanded, but a ship could buy and mount multiple bomb racks.
+As you might expect, this launch system is designed to carry bombs. Its capacity can’t be expanded, but a ship could buy and mount multiple bomb racks.
 
-Bomb Bay (PL 6): The bomb bay has a capacity of 40 light, 20 medium, or 10 heavy bombs. Its capacity can be expanded by 4 points (4 light, 2 medium, or 1 heavy bomb) for each additional hull point assigned to the system beyond the 10 hull points normally required. Minelayer (PL 6): This system consists of two or more mine rails, low-powered magnetic accelerators designed to deploy a pattern of mines into one hex adjacent to the launching ship in a single phase.
+### Bomb Bay (PL 6)
 
-Unlike other launched weapons, at least ten mines (a single mine pattern) must be deployed to be effective. Since the minelayer also includes machinery for deploying the mines, it has half the capacity of other launch systems of a similar size. Missile Rack (PL 6): This is a system that can hold eight light missiles, four medium missiles, or two heavy missiles.
+The bomb bay has a capacity of 40 light, 20 medium, or 10 heavy bombs. Its capacity can be expanded by 4 points (4 light, 2 medium, or 1 heavy bomb) for each additional hull point assigned to the system beyond the 10 hull points normally required.
 
-Its capacity can’t be increased, but it’s easy enough to buy
+### Minelayer (PL 6)
 
-multiple missile racks. Missile Tube (PL 6): This is an internal missile storage and launch facility. Its basic capacity is twelve, and it can fire one missile per round.
+This system consists of two or more mine rails, low-powered magnetic accelerators designed to deploy a pattern of mines into one hex adjacent to the launching ship in a single phase. Unlike other launched weapons, at least ten mines (a single mine pattern) must be deployed to be effective. Since the minelayer also includes machinery for deploying the mines, it has half the capacity of other launch systems of a similar size.
 
-While its rate of fire is inferior to the missile rack, the missile tube enjoys one advantage; it can be reloaded in space. Ordnance Cell Array (PL 7): This system is similar to the vertical launch cells of today’s naval vessels. Each missile is pre-loaded into a single cell or canister; the array consists of dozens of these canisters.
+### Missile Rack (PL 6)
 
-Bombs, mines, and missiles of various sizes and warheads can be carried as the shipbuilder sees fit, offering a great deal of tactical flexibility.
+This is a system that can hold eight light missiles, four medium missiles, or two heavy missiles. Its capacity can’t be increased, but it’s easy enough to buy multiple missile racks.
+
+### Missile Tube (PL 6)
+
+This is an internal missile storage and launch facility. Its basic capacity is twelve, and it can fire one missile per round. While its rate of fire is inferior to the missile rack, the missile tube enjoys one advantage; it can be reloaded in space.
+
+### Ordnance Cell Array (PL 7)
+
+This system is similar to the vertical launch cells of today’s naval vessels. Each missile is pre-loaded into a single cell or canister; the array consists of dozens of these canisters. Bombs, mines, and missiles of various sizes and warheads can be carried as the shipbuilder sees fit, offering a great deal of tactical flexibility.
 
 ### Propulsion Systems
 
@@ -379,13 +387,25 @@ The weapon’s propulsion system also provides a basic accuracy rating. This ref
 
 Endurance is the number of rounds in which the missile can accelerate. After the missile’s endurance runs out, it must maintain its last course and speed and can no longer maneuver. (Bombs and mines don’t accelerate, so they don’t have an endurance rating of any kind.) Acceleration measures the missile’s ability to change its course and speed each phase. If you prefer to play with simpler missile rules, refer to Chapter 1 for details on light, medium, or heavy missile speeds.
 
-Bombs (PL 6): A bomb is basically nothing more than a warhead delivered through the deft maneuvering of some ship. Light, medium, and heavy versions exist to accommodate warheads of various sizes. Mines (PL 6): Again, a mine doesn’t require much in the way of propulsion.
+### Bombs (PL 6)
 
-Light, medium, and heavy versions are available. Chemical Rocket (PL 6): In the absence of any better technology, a simple chemical rocket works as a propulsion system. It has no chance of catching any ship equipped with a decent engine, but it’s dangerous to low-speed ships such as sailships.
+A bomb is basically nothing more than a warhead delivered through the deft maneuvering of some ship. Light, medium, and heavy versions exist to accommodate warheads of various sizes.
 
-Missile (PL 6, 7, 8): As different engines become available, missile capacity and speed increase. It’s important to make a note of exactly what Progress Level missile a ship carries, since the PL 7 and 8 missiles are hundreds of times faster than the PL 6 missile engines. The PL 6 missiles are built around ion engines; PL 7 missiles are built around particle impulse drives or gravity induction engines; and the PL 8 missiles are built around inertial flux drives or gravitic redirectors.
+### Mines (PL 6)
 
-Tachyon missile (PL 8): This is a special missile propulsion system that uses an FTL drive to deliver the warhead to the target instantaneously. A ship firing a tachyon missile ignores the penalties for firing at targets moving at extremely high velocity. In fact, the tachyon missile can be fired even while a ship is traveling FTL against another FTL target within range. (See “FTL Combat” in Chapter 1.)
+Again, a mine doesn’t require much in the way of propulsion. Light, medium, and heavy versions are available.
+
+### Chemical Rocket (PL 6)
+
+In the absence of any better technology, a simple chemical rocket works as a propulsion system. It has no chance of catching any ship equipped with a decent engine, but it’s dangerous to low-speed ships such as sailships.
+
+### Missile (PL 6, 7, 8)
+
+As different engines become available, missile capacity and speed increase. It’s important to make a note of exactly what Progress Level missile a ship carries, since the PL 7 and 8 missiles are hundreds of times faster than the PL 6 missile engines. The PL 6 missiles are built around ion engines; PL 7 missiles are built around particle impulse drives or gravity induction engines; and the PL 8 missiles are built around inertial flux drives or gravitic redirectors.
+
+### Tachyon Missile (PL 8)
+
+This is a special missile propulsion system that uses an FTL drive to deliver the warhead to the target instantaneously. A ship firing a tachyon missile ignores the penalties for firing at targets moving at extremely high velocity. In fact, the tachyon missile can be fired even while a ship is traveling FTL against another FTL target within range. (See “FTL Combat” in Chapter 1.)
 
 ### Warheads
 
@@ -572,6 +592,8 @@ The cable gun mount and winch includes one spare cable per cable gun, which can 
 Also known as the HERF gun (High Energy Radio Frequency), this weapon consists of a powerful capacitor and a simple linear antenna. It generates a one-shot electromagnetic pulse that burns out the capacitor and its antenna, but it can cause serious EMP damage to the target. The RF spike has super-heavy firepower, but it never upgrades its damage against any target, regardless of toughness.
 
 In other words, it has the same effect on a dreadnought that it does on a fighter (although the dreadnought probably has a lot more boxes on its damage track).
+
+### Tractor Beam (PL 7)
 
 An application of advanced gravity tech, the tractor beam works a lot like the cable gun of PL 6, except that it’s much better. It can be used at range, and against targets whose course and speed differ wildly from the firing ship. Each tractor beam mount is capable of capturing up to 50 hull points.
 
