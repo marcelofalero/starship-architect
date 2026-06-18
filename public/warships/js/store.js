@@ -18,7 +18,7 @@ export const useShipStore = defineStore('ship', () => {
 
     // App State
     const isDev = ref(new URLSearchParams(window.location.search).get('dev') === 'true');
-    const meta = reactive({ name: 'Untitled Ship', version: '1.0' });
+    const meta = reactive({ name: 'Untitled Ship', version: '1.0', length: '', width: '', height: '', notes: '' });
     const chassisId = ref(null);
     const activeTemplate = ref(null);
     const installedComponents = ref([]);
@@ -27,6 +27,8 @@ export const useShipStore = defineStore('ship', () => {
     const cargoToEpAmount = ref(0);
     const escapePodsToEpPct = ref(0);
     const crewQuality = ref('Normal');
+    const shipImages = ref([]); // Array of { id, data, caption, isHeader }
+    const showImageManager = ref(false);
 
     // Hangar State
     const hangar = ref([]);
@@ -43,6 +45,7 @@ export const useShipStore = defineStore('ship', () => {
     const customDialogState = reactive({ visible: false, componentId: null });
     const customShipDialogState = reactive({ visible: false, shipId: null });
     const showCustomManager = ref(false);
+    const deckPlan = ref({ decks: [] });
 
     // Initialize DB Action
     function initDb(data) {
@@ -110,7 +113,6 @@ export const useShipStore = defineStore('ship', () => {
         const batteryCount = instance.modifications?.batteryCount || 1;
         const quantity = instance.modifications?.quantity || 1;
         const advanced = instance.modifications?.advanced || false;
-        const auxiliary = instance.modifications?.auxiliary || false;
         const emplacement = instance.modifications?.emplacement || 'Standard Mount';
         const weaponMount = instance.modifications?.weaponMount || 'Single';
         const concealed = instance.modifications?.concealed || false;
@@ -126,8 +128,11 @@ export const useShipStore = defineStore('ship', () => {
             }
         }
 
-        if (def.category === 'Sublight' || def.category === 'FTL Drives') {
+        if (def.category === 'Sublight') {
             const pctHull = Math.ceil((chassis.value.baseHull || 0) * (quantity / 100));
+            hullCost = Math.max(def.minHullPts || 1, pctHull);
+        } else if (def.category === 'FTL Drives') {
+            const pctHull = Math.ceil((chassis.value.baseHull || 0) * 0.10);
             hullCost = Math.max(def.minHullPts || 1, pctHull);
         } else if (def.minHullPts !== undefined) {
             // Power plants use quantity as Allocated Hull Points
@@ -136,7 +141,7 @@ export const useShipStore = defineStore('ship', () => {
 
         // 1. Enhancement
         if (advanced) {
-            if (!(isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Defenses')) {
+            if (!(isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Defenses' || def.category === 'FTL Drives' || def.category === 'Sublight')) {
                 hullCost += 2;
             }
         }
@@ -171,11 +176,6 @@ export const useShipStore = defineStore('ship', () => {
             if (instance.modifications?.fireControl && instance.modifications.fireControl !== 'None') {
                 hullCost += 1;
             }
-        }
-
-        // 4. Auxiliary Command Deck
-        if (auxiliary) {
-            hullCost *= 2;
         }
 
         if (batteryCount > 1) {
@@ -234,12 +234,6 @@ export const useShipStore = defineStore('ship', () => {
             con += def.powerConsumedPerHull * getComponentHullPts(instance);
         }
 
-        if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-            const advanced = instance.modifications?.advanced || false;
-            if (advanced) {
-                con *= 1.2;
-            }
-        }
         
         return { generated: gen, consumed: con };
     }
@@ -296,7 +290,7 @@ export const useShipStore = defineStore('ship', () => {
              const concealed = instance.modifications.concealed || false;
 
              // 1. Enhancement (Multiplier)
-             if (advanced) cost *= 5;
+             if (advanced) cost *= 2;
 
              // Weapon/Sensor Emplacement Modifiers
              if (isWeapon(def.id) || def.category === 'Weapon Systems' || def.category === 'Sensors') {
@@ -324,9 +318,6 @@ export const useShipStore = defineStore('ship', () => {
                      if (instance.modifications.fireControl === 'Amazing') cost += baseWeaponHull * 300000;
                  }
              }
-
-             // 4. Auxiliary
-             if (instance.modifications?.auxiliary) cost *= 2;
 
              if (def.upgradeSpecs && def.upgradeSpecs.payload) {
                  if (def.upgradeSpecs.payload.type === 'capacity' && instance.modifications.payloadCount > 0) {
@@ -572,13 +563,14 @@ export const useShipStore = defineStore('ship', () => {
         return 10 + dexMod + armor;
     });
     const maxCargoCapacity = computed(() => {
-        const baseStr = chassis.value.logistics.cargo;
-        if (!baseStr) return 0;
-        const match = baseStr.match(/([\d,]+)\s*(tons|kg)/i);
-        if (!match) return 0;
-        let val = parseFloat(match[1].replace(/,/g, ''));
-        const unit = match[2].toLowerCase();
-        if (unit === 'kg') val /= 1000;
+        const baseStr = chassis.value?.logistics?.cargo || '0';
+        let val = 0;
+        const match = baseStr.match(/([\d,\.]+)\s*(tons|kg|units)/i);
+        if (match) {
+            val = parseFloat(match[1].replace(/,/g, ''));
+            const unit = match[2].toLowerCase();
+            if (unit === 'kg') val /= 1000;
+        }
 
         let multiplier = 1.0;
         let adder = 0;
@@ -603,7 +595,7 @@ export const useShipStore = defineStore('ship', () => {
         if (val > 0 && val < 1) {
              return new Intl.NumberFormat('en-US').format(Math.floor(val * 1000)) + ' kg';
         }
-        return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(val) + ' tons';
+        return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(val) + ' units';
     });
 
     const stockConfigurationEp = computed(() => {
@@ -711,7 +703,11 @@ export const useShipStore = defineStore('ship', () => {
         installedComponents.value.forEach(instance => {
             const def = allEquipment.value.find(e => e.id === instance.defId);
             if (def && def.stats) {
-                if (def.stats.stores_days) bonusStores += def.stats.stores_days * (instance.modifications?.quantity || 1);
+                if (def.stats.berthing_capacity) {
+                    bonusStores += def.stats.berthing_capacity * 500 * (instance.modifications?.quantity || 1);
+                } else if (def.stats.stores_days) {
+                    bonusStores += def.stats.stores_days * (instance.modifications?.quantity || 1);
+                }
                 if (def.stats.hydroponics_reduction) hydroponicsReduction += def.stats.hydroponics_reduction * (instance.modifications?.quantity || 1);
                 if (def.stats.recycler_capacity) recyclerCapacity += def.stats.recycler_capacity * (instance.modifications?.quantity || 1);
             }
@@ -737,22 +733,30 @@ export const useShipStore = defineStore('ship', () => {
             dailyConsumption = (recycledPop * 0.1) + unrecycledPop;
         }
         
-        if (dailyConsumption === 0) return "Self-Sustaining";
+        const formatDuration = (daysTotal) => {
+            const years = Math.floor(daysTotal / 360);
+            const remYear = daysTotal % 360;
+            const months = Math.floor(remYear / 30);
+            const days = remYear % 30;
+
+            const parts = [];
+            if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
+            if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
+            if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
+
+            if (parts.length === 0) return "0 days";
+            return parts.join(' ');
+        };
+
+        const popLabel = currentPassengers.value > 0 ? `${population} crew & passengers` : `${population} crew`;
+
+        if (dailyConsumption === 0) {
+            const reserveDays = Math.floor(totalStores / population);
+            return `Self-Sustaining (${formatDuration(reserveDays)} stores for ${popLabel})`;
+        }
 
         const totalDays = Math.floor(totalStores / dailyConsumption);
-
-        const years = Math.floor(totalDays / 360);
-        const remYear = totalDays % 360;
-        const months = Math.floor(remYear / 30);
-        const days = remYear % 30;
-
-        const parts = [];
-        if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
-        if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
-        if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-
-        if (parts.length === 0) return "0 days";
-        return parts.join(' ');
+        return `${formatDuration(totalDays)} for ${popLabel}`;
     });
 
     const totalPopulation = computed(() => currentCrew.value + currentPassengers.value);
@@ -767,11 +771,23 @@ export const useShipStore = defineStore('ship', () => {
     });
 
     const escapePodCapacity = computed(() => {
-        let pop = totalPopulation.value;
-        if (hasEscapePods.value && escapePodsToEpPct.value > 0) {
-            pop = Math.ceil(pop * (100 - escapePodsToEpPct.value) / 100);
+        let pop = 0;
+        if (hasEscapePods.value) {
+            pop = totalPopulation.value;
+            if (escapePodsToEpPct.value > 0) {
+                pop = Math.ceil(pop * (100 - escapePodsToEpPct.value) / 100);
+            }
         }
-        return pop;
+        
+        let bonus = 0;
+        installedComponents.value.forEach(instance => {
+            const def = allEquipment.value.find(e => e.id === instance.defId);
+            if (def && def.stats && def.stats.escape_pod_capacity) {
+                bonus += def.stats.escape_pod_capacity * (instance.modifications?.quantity || 1);
+            }
+        });
+
+        return pop + bonus;
     });
 
     const bonusHull = computed(() => {
@@ -945,7 +961,7 @@ export const useShipStore = defineStore('ship', () => {
         
         if (['Accommodations', 'Miscellaneous'].includes(def.category)) {
             if (def.stats?.life_support_hull) {
-                minSize = Math.max(1, Math.ceil(totalHull.value / def.stats.life_support_hull));
+                minSize = Math.max(1, Math.ceil((chassis.value?.baseHull || 0) / def.stats.life_support_hull));
             } else if (def.stats?.berthing_capacity) {
                 let currentBerthingCap = totalBerthingCapacity.value;
                 let needed = currentCrew.value - currentBerthingCap;
@@ -1166,8 +1182,13 @@ export const useShipStore = defineStore('ship', () => {
         installedComponents.value = [];
         crewQuality.value = 'Normal';
         meta.name = "";
+        meta.length = "";
+        meta.width = "";
+        meta.height = "";
+        meta.notes = "";
         cargoToEpAmount.value = 0;
         escapePodsToEpPct.value = 0;
+        shipImages.value = [];
     }
     function createNew(newChassisId) {
         if (!isTemplateEditMode.value) {
@@ -1208,12 +1229,30 @@ export const useShipStore = defineStore('ship', () => {
         });
     }
     function loadState(state) {
-        if(!state) return; meta.name = state.meta.name; chassisId.value = state.configuration.baseChassis;
-        if(Array.isArray(state.configuration.templates)) activeTemplate.value = state.configuration.templates[0] || null;
+        if(!state) return; 
+        if (!activeShipId.value) activeShipId.value = state.id || crypto.randomUUID();
+        meta.name = state.meta?.name || state.name || 'Untitled Ship'; 
+        meta.length = state.meta?.length || '';
+        meta.width = state.meta?.width || '';
+        meta.height = state.meta?.height || '';
+        meta.notes = state.meta?.notes || ''; 
+        chassisId.value = state.configuration?.baseChassis;
+        if(state.configuration?.templates && Array.isArray(state.configuration.templates)) activeTemplate.value = state.configuration.templates[0] || null;
         else activeTemplate.value = state.configuration.template;
         cargoToEpAmount.value = state.configuration.cargoToEpAmount || 0;
         escapePodsToEpPct.value = state.configuration.escapePodsToEpPct || 0;
         crewQuality.value = state.configuration.crewQuality || 'Normal';
+        
+        if (state.shipImages && Array.isArray(state.shipImages)) {
+            shipImages.value = state.shipImages;
+        } else if (state.shipImage) {
+            // Migrate old single image format
+            shipImages.value = [{ id: crypto.randomUUID(), data: state.shipImage, caption: '', isHeader: true }];
+        } else {
+            shipImages.value = [];
+        }
+        
+        deckPlan.value = state.deckPlan || { decks: [] };
 
         // Migration Logic
         if (state.libraries) {
@@ -1232,6 +1271,8 @@ export const useShipStore = defineStore('ship', () => {
             libraries.value = [];
         }
 
+        let hasAuxiliaryCommandDeck = false;
+
         installedComponents.value = state.manifest.map(m => {
             const mods = m.modifications || { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false };
             if (!mods.quantity) mods.quantity = 1;
@@ -1247,6 +1288,11 @@ export const useShipStore = defineStore('ship', () => {
                     return e.category === 'Power' && normalizedEId.endsWith(normalizedDefId);
                 });
                 if (def) defId = def.id;
+            }
+
+            if (mods.auxiliary) {
+                hasAuxiliaryCommandDeck = true;
+                mods.auxiliary = false;
             }
 
             if (def && isWeapon(def.id) && !mods.weaponUser) mods.weaponUser = 'Pilot';
@@ -1268,6 +1314,20 @@ export const useShipStore = defineStore('ship', () => {
 
             return { instanceId: m.id, defId: defId, location: m.location, miniaturization: m.miniaturizationRank, isStock: m.isStock || false, modifications: mods };
         });
+
+        if (hasAuxiliaryCommandDeck) {
+            const backupDef = allEquipment.value.find(e => e.id === 'cmd_backup_command_deck');
+            if (backupDef) {
+                installedComponents.value.push({
+                    instanceId: crypto.randomUUID(),
+                    defId: backupDef.id,
+                    location: 'Unspecified',
+                    miniaturization: 0,
+                    isStock: false,
+                    modifications: { payloadCount: 0, payloadOption: false, batteryCount: 1, quantity: 1, fireLinkOption: false }
+                });
+            }
+        }
     }
 
     // Hangar Actions
@@ -1295,9 +1355,19 @@ export const useShipStore = defineStore('ship', () => {
             id: activeShipId.value,
             lastModified: Date.now(),
             apiVersion: "2.0",
-            meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
+            meta: { 
+                name: meta.name, 
+                model: chassisId.value, 
+                version: "1.0", 
+                length: meta.length || "", 
+                width: meta.width || "", 
+                height: meta.height || "", 
+                notes: meta.notes || "" 
+            },
             configuration: { baseChassis: chassisId.value, template: activeTemplate.value, cargoToEpAmount: cargoToEpAmount.value, escapePodsToEpPct: escapePodsToEpPct.value, crewQuality: crewQuality.value },
             libraries: libraries.value,
+            shipImages: shipImages.value,
+            deckPlan: deckPlan.value,
             manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, modifications: { ...m.modifications } }))
         };
 
@@ -1425,12 +1495,23 @@ export const useShipStore = defineStore('ship', () => {
     }
 
     // Watch libraries instead of customComponents
-    watch([meta, chassisId, activeTemplate, installedComponents, cargoToEpAmount, escapePodsToEpPct, libraries, crewQuality], () => {
+    watch([meta, chassisId, activeTemplate, installedComponents, cargoToEpAmount, escapePodsToEpPct, libraries, crewQuality, shipImages, deckPlan], () => {
         const saveObj = {
+            id: activeShipId.value,
             apiVersion: "2.0", // Bumped version
-            meta: { name: meta.name, model: chassisId.value, version: "1.0", notes: "" },
+            meta: { 
+                name: meta.name, 
+                model: chassisId.value, 
+                version: "1.0", 
+                length: meta.length || "", 
+                width: meta.width || "", 
+                height: meta.height || "", 
+                notes: meta.notes || "" 
+            },
             configuration: { baseChassis: chassisId.value, template: activeTemplate.value, cargoToEpAmount: cargoToEpAmount.value, escapePodsToEpPct: escapePodsToEpPct.value, crewQuality: crewQuality.value },
             libraries: libraries.value, // Save libraries
+            shipImages: shipImages.value,
+            deckPlan: deckPlan.value,
             manifest: installedComponents.value.map(m => ({ id: m.instanceId, defId: m.defId, location: m.location, miniaturizationRank: m.miniaturization, isStock: m.isStock, modifications: m.modifications }))
         };
         localStorage.setItem('warships_architect_current_build', JSON.stringify(saveObj));
@@ -1460,7 +1541,8 @@ export const useShipStore = defineStore('ship', () => {
         db, initDb,
         meta, chassisId, activeTemplate, installedComponents, showAddComponentDialog, cargoToEpAmount, escapePodsToEpPct, crewQuality, crewStats, CREW_QUALITY_STATS,
         libraries, allEquipment, allShips, customComponents, // Exported for components.js
-        customDialogState, customShipDialogState, showCustomManager,
+        customDialogState, customShipDialogState, showCustomManager, deckPlan,
+        shipImages, showImageManager,
         hangar, activeShipId, initHangar, loadFromHangar, removeFromHangar, unloadShip, // Hangar Exports
         isTemplateEditMode, startTemplateEdit, saveTemplateEdit, cancelTemplateEdit, // Template Exports
         chassis, template, currentStats, currentCargo, maxCargoCapacity, reflexDefense, bonusHull, totalHull, usedHull, remainingHull, hullUsagePct, hullUsageDetails, totalPowerGenerated, totalPowerConsumed, powerUsagePct, powerUsageDetails, totalCost, hullCost, componentsCost, licensingCost, shipAvailability, hasEscapePods, escapePodsEpGain, currentCrew, currentPassengers, currentConsumables, totalPopulation, escapePodCapacity, totalBerthingCapacity, totalPassengerCapacity, totalLifeSupportCapacity,

@@ -1,5 +1,6 @@
 /* Print Styles */
 @media print {
+    @page { margin: 0; }
     body { background-color: white !important; color: black !important; }
     .no-print { display: none !important; }
     .print-only { display: block !important; }
@@ -227,9 +228,10 @@ body {
         text-decoration: none !important;
         border-bottom: none !important;
     }
-    /* Reset body font for print legibility */
+    /* Reset body font and add safety padding for print legibility */
     body {
         font-family: sans-serif;
+        padding: 1.6cm !important;
     }
     .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
         font-family: sans-serif;
@@ -241,6 +243,108 @@ body {
         page-break-before: always;
         break-before: page;
     }
+    /* Fix Quasar layout clipping pages */
+    body, html, #q-app, .q-layout, .q-page-container, .q-page {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+    
+    /* Fix Dialogs and Quasar prevent-scroll classes clipping to one page */
+    body, html, body.q-body--dialog, body.q-body--prevent-scroll, html.q-body--prevent-scroll {
+        position: static !important;
+        width: auto !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+    
+    .q-dialog, .q-dialog--maximized, .fullscreen {
+        position: static !important;
+        display: block !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        top: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+    }
+    
+    .q-dialog__backdrop {
+        display: none !important;
+    }
+    
+    .q-dialog__inner, .q-dialog__inner--maximized {
+        position: static !important;
+        display: block !important;
+        transform: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    
+    .print-only-sheet {
+        display: block !important;
+        position: static !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        width: 100% !important;
+    }
+    
+    /* NUCLEAR OPTION: Force all elements to allow overflow during print to guarantee pagination */
+    body * {
+        overflow: visible !important;
+    }
+    
+    /* Prevent section titles from being orphaned on a page alone */
+    .section-title {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    /* Prevent breaking inside tables and diagram wrappers */
+    .diagram-grid, .arc-diagram-container, .hit-location-diagram, .q-table__container {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Make Component Location diagram compact and print-friendly */
+    .diagram-grid {
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .diagram-zone {
+        min-height: auto !important;
+        padding: 4px !important;
+        border: 1px solid #000 !important;
+        background-color: #f5f5f5 !important;
+    }
+    
+    .diagram-zone-title {
+        color: #000 !important;
+        font-size: 0.8em !important;
+        margin-bottom: 4px !important;
+    }
+    
+    .draggable-item {
+        background-color: #eef2f7 !important;
+        color: #000 !important;
+        border: 1px solid #777 !important;
+        padding: 2px 4px !important;
+        margin-bottom: 2px !important;
+        font-size: 0.8em !important;
+    }
+    
+    /* Hide everything else in the app while printing */
+    #q-app > *:not(.print-only-sheet), .q-dialog, .q-dialog__backdrop, .print-hide { display: none !important; }
 }
 
 .page-break {
@@ -306,4 +410,255 @@ body.tour-active .driver-popover * {
 body.tour-active .driver-overlay,
 body.tour-active svg.driver-overlay-path {
     pointer-events: auto !important;
+}
+
+/* Drag and Drop Diagram Styles */
+.diagram-zone {
+    border: 2px dashed #4BB5C1;
+    border-radius: 4px;
+    background-color: rgba(75, 181, 193, 0.1);
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    transition: all 0.2s ease;
+}
+
+.diagram-zone.drag-over {
+    background-color: rgba(75, 181, 193, 0.4);
+    border-color: #59B7C7;
+    transform: scale(1.02);
+}
+
+.diagram-zone-title {
+    font-family: 'Russo One', sans-serif;
+    color: #4BB5C1;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.draggable-item {
+    cursor: grab;
+    background-color: #0A3D54;
+    border: 1px solid #4BB5C1;
+    border-radius: 4px;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    font-size: 0.75em;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    user-select: none;
+}
+
+.draggable-item:active {
+    cursor: grabbing;
+}
+
+.draggable-item.drag-over-item {
+    border-top: 3px solid #f2c037;
+    opacity: 0.8;
+}
+
+.diagram-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Grid Layouts based on Size */
+.grid-small {
+    grid-template-columns: 1fr;
+}
+.grid-light {
+    grid-template-columns: 1fr 1.5fr 1fr;
+    grid-template-areas: 
+        ". f ."
+        "p fc s"
+        ". ac ."
+        ". a .";
+}
+.grid-medium {
+    grid-template-columns: 1fr 1.5fr 1fr;
+    grid-template-areas: 
+        ". f ."
+        "fp fc fs"
+        "ap ac as"
+        ". a .";
+}
+.grid-heavy {
+    grid-template-columns: 1fr 1.5fr 1fr;
+    grid-template-areas: 
+        ". f ."
+        "fp fc fs"
+        "p cf s"
+        "p ca s"
+        "ap ac as"
+        ". a .";
+}
+.grid-super {
+    grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr;
+    grid-template-areas: 
+        ". . f . ."
+        ". ffp ffc ffs ."
+        ". fp fc fs ."
+        "pc p cf s sc"
+        "pc p ca s sc"
+        ". ap ac as ."
+        ". aap aac aas ."
+        ". . a . .";
+}
+
+/* Map areas */
+.zone-fore { grid-area: f; }
+.zone-aft { grid-area: a; }
+.zone-port { grid-area: p; }
+.zone-starboard { grid-area: s; }
+.zone-fore-center { grid-area: fc; }
+.zone-aft-center { grid-area: ac; }
+.zone-fore-port { grid-area: fp; }
+.zone-fore-starboard { grid-area: fs; }
+.zone-aft-port { grid-area: ap; }
+.zone-aft-starboard { grid-area: as; }
+.zone-center-fore { grid-area: cf; }
+.zone-center-aft { grid-area: ca; }
+.zone-far-fore-center { grid-area: ffc; }
+.zone-far-fore-port { grid-area: ffp; }
+.zone-far-fore-starboard { grid-area: ffs; }
+.zone-port-center { grid-area: pc; }
+.zone-starboard-center { grid-area: sc; }
+.zone-far-aft-center { grid-area: aac; }
+.zone-far-aft-port { grid-area: aap; }
+.zone-far-aft-starboard { grid-area: aas; }
+
+/* Hit Location Diagram Styles */
+.hl-col { display: flex; flex-direction: column; align-items: center; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+.hl-row { display: flex; flex-direction: row; align-items: center; }
+.hl-box { 
+    background-color: #1a7a1a; color: white; width: 36px; height: 36px; 
+    display: flex; align-items: center; justify-content: center; 
+    border: 1px solid #0d3d0d; border-radius: 2px;
+}
+.hl-ar { color: #d32f2f; font-size: 18px; display: flex; justify-content: center; align-items: center; }
+.hl-ar-v { height: 20px; width: 36px; }
+.hl-ar-h { width: 20px; height: 36px; }
+.hl-ar-long { width: 76px; }
+
+/* Deck Plan Styles */
+.deck-tile {
+    width: 30px; height: 30px; box-sizing: border-box; border: 1px solid rgba(75, 181, 193, 0.2);
+    position: relative; display: flex; align-items: center; justify-content: center;
+}
+.tile-empty { background-color: transparent; }
+.tile-floor { background-color: rgba(75, 181, 193, 0.4); }
+.tile-wall { background-color: #4BB5C1; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+.tile-door { background-color: #F2C037; border: 2px solid #26A69A; }
+.tile-elevator { background-color: #9C27B0; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+.tile-stairs { background: repeating-linear-gradient(45deg, #FF9800, #FF9800 5px, #E65100 5px, #E65100 10px); }
+.tile-ladder { background: repeating-linear-gradient(90deg, #795548, #795548 4px, transparent 4px, transparent 10px, #795548 10px, #795548 14px); background-color: #3e2723; }
+.tile-tunnel { background-color: #607D8B; border-radius: 50%; box-shadow: inset 0 0 8px rgba(0,0,0,0.8); }
+
+.placed-item {
+    position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
+    background-color: rgba(0,0,0,0.8); border: 1px solid #FFF; border-radius: 2px;
+    display: flex; align-items: center; justify-content: center; z-index: 10;
+}
+.placed-item-label {
+    font-size: 8px; color: white; text-align: center; line-height: 1; overflow: hidden;
+    white-space: nowrap; text-overflow: ellipsis; max-width: 100%;
+}
+
+/* Weapon Firing Arcs Diagram Styles */
+.arc-diagram-container {
+    background-color: #f8f9fa;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.arc-zone {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    min-height: 100px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.arc-forward { border-top: 5px solid #4CAF50; }
+.arc-port { border-left: 5px solid #F44336; }
+.arc-zero { border: 3px dashed #2196F3; }
+.arc-starboard { border-right: 5px solid #FF9800; }
+.arc-aft { border-bottom: 5px solid #9C27B0; }
+
+.arc-title {
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #333;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.arc-weapons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.arc-weapon-item {
+    font-size: 0.85em;
+    color: #222;
+    padding: 3px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.arc-weapon-item:last-child {
+    border-bottom: none;
+}
+
+.arc-empty {
+    color: #aaa;
+    font-style: italic;
+}
+
+.arc-ship-core {
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+@media print {
+    .arc-diagram-container, .arc-zone, .arc-ship-core {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .arc-diagram-container {
+        border-color: #999;
+        background-color: #f8f9fa !important;
+    }
+    .arc-zone {
+        background-color: #ffffff !important;
+        border-color: #999;
+    }
 }

@@ -2806,6 +2806,22 @@
       "Power": "0",
       "Cost": "$1 M",
       "Notes": "-3 step bonus to Maneuver checks"
+    },
+    {
+      "Computer": "AI Cradle",
+      "Tech": "Energy",
+      "Cost": "200000",
+      "Pow": 4,
+      "Hull": 4,
+      "Notes": "Hardware matrix designed to host advanced synthetic intelligence."
+    },
+    {
+      "Computer": "AI Automation",
+      "Tech": "Energy",
+      "Cost": "500000",
+      "Pow": 1,
+      "Hull": 0,
+      "Notes": "Allows ship systems to operate autonomously. Requires an AI Cradle."
     }
   ],
   "SENSORS": [
@@ -3238,5 +3254,6 @@
       "Base Cost.": "$10 M",
       "Cost/Hull": "$5 M"
     }
-  ]
+  ],
+  "COMMAND": []
 }

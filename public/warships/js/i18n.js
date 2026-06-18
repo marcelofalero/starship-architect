@@ -21,7 +21,7 @@ export const messages = {
             starship_designer_tip: "Waives Non-standard penalties. Enables custom components.",
             installed_systems: "Installed Systems", print_btn: "Print to PDF / Paper",
             system_descriptions: "System Descriptions",
-            convert_cargo_ep: "Convert Cargo to EP", cargo_to_ep_hint: "{sizeMult} tons = 1 EP",
+            convert_cargo_ep: "Convert Cargo to EP", cargo_to_ep_hint: "{sizeMult} units = 1 EP",
             max_cargo: "Max Cargo", cargo_converted: "Cargo Converted", close: "Close",
             ship_name: "Ship Name", import: "Load Ship", search_component: "Search Component",
             type_weapon_help: "Logic: Uses Hardpoint slots. Enables Fire-Link, Battery, and Autofire options.",
@@ -35,8 +35,8 @@ export const messages = {
             template_help: "Apply a base template to modify the ship's stats (e.g. Refitted, Cheater)."
         },
         stats: {
-            str: "STR", dex: "DEX", int: "INT", ref: "Reflex", fort: "Fortitude", armor: "Armor",
-            hp: "HP", shields: "Shields", dr: "DR", dt: "DT", speed: "Acceleration"
+            armor: "Armor",
+            shields: "Shields", speed: "Acceleration"
         },
         cat: {
             fighters: "Fighters", freighters: "Freighters", capitals: "Capital Ships",
@@ -44,10 +44,6 @@ export const messages = {
             components: "Components", accessories: "Starship Accessories",
             weapon_systems: "Weapon Systems", movement_systems: "Movement Systems", defense_systems: "Defense Systems",
             modifications: "Modifications", starship_accessories: "Starship Accessories", weapon_upgrades: "Weapon Upgrades"
-        },
-        avail: {
-            Common: "Common", Licensed: "Licensed", Restricted: "Restricted",
-            Military: "Military", Illegal: "Illegal"
         },
         size: {
             "Small Craft": "Small Craft",
@@ -78,7 +74,7 @@ export const messages = {
             starship_designer_tip: "Anula penalizaciones No Estándar. Permite componentes personalizados.",
             installed_systems: "Sistemas Instalados", print_btn: "Imprimir en PDF / Papel",
             system_descriptions: "Descripciones de los Sistemas",
-            convert_cargo_ep: "Convertir Carga a PE", cargo_to_ep_hint: "{sizeMult} tons = 1 PE",
+            convert_cargo_ep: "Convertir Carga a PE", cargo_to_ep_hint: "{sizeMult} units = 1 PE",
             max_cargo: "Carga Máx", cargo_converted: "Carga Convertida", close: "Cerrar",
             ship_name: "Nombre de Nave", import: "Importar", search_component: "Buscar Componente",
             type_weapon_help: "Lógica: Usa Puntos de Anclaje. Habilita opciones de Enlace de Fuego y Baterías.",
@@ -101,10 +97,6 @@ export const messages = {
             components: "Componentes", accessories: "Accesorios",
             weapon_systems: "Sistemas de Armas", movement_systems: "Sistemas de Movimiento", defense_systems: "Sistemas Defensivos",
             modifications: "Modificaciones", starship_accessories: "Accesorios de Nave", weapon_upgrades: "Mejoras de Armas"
-        },
-        avail: {
-            Common: "Común", Licensed: "Licenciado", Restricted: "Restringido",
-            Military: "Militar", Illegal: "Ilegal"
         },
         size: {
             "Small Craft": "Nave Pequeña",

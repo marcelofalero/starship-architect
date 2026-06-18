@@ -1,6 +1,7 @@
-import { useShipStore } from './store.js?v=3.0';
-import { i18n, getLocalizedName } from './i18n.js?v=3.0';
-import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog, CustomShipDialog } from './components.js?v=3.0';
+import { useShipStore } from './store.js?v=4.16';
+import { i18n, getLocalizedName } from './i18n.js?v=3.1';
+import { StatPanelWrapper, SystemListWrapper, ConfigPanelWrapper, ShipSheetWrapper, HangarDialog, AddModDialog, CustomManagerDialog, CustomComponentDialog, CustomShipDialog, LocationDiagramWrapper, HitLocationDiagramWrapper, ArcDiagramWrapper, ImageManagerDialog } from './components.js?v=4.15';
+import { DeckPlanWrapper } from './deckplan.js?v=1.0';
 import { initTutorial } from './tutorial.js?v=3.0';
 
 const { createApp, ref, onMounted, watch } = Vue;
@@ -23,6 +24,16 @@ const setup = () => {
     const leftDrawerOpen = ref(false);
     const rightDrawerOpen = ref(false);
     const showSheetDialog = ref(false);
+
+    watch(centerTab, (newVal) => {
+        if (newVal === 'deckplan') {
+            leftDrawerOpen.value = false;
+            rightDrawerOpen.value = false;
+        } else {
+            leftDrawerOpen.value = true;
+            rightDrawerOpen.value = true;
+        }
+    });
 
     onMounted(() => {
         shipStore.initHangar();
@@ -75,29 +86,93 @@ const setup = () => {
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
+
+        const processYaml = (yamlString) => {
             try {
-                const data = jsyaml.load(e.target.result);
+                const data = jsyaml.load(yamlString);
                 shipStore.loadState(data);
                 showHangarDialog.value = false;
                 $q.notify({ type: 'positive', message: 'Ship loaded successfully' });
             } catch (error) {
                 console.error(error);
-                $q.notify({ type: 'negative', message: 'Failed to parse file' });
+                $q.notify({ type: 'negative', message: 'Failed to parse ship data' });
             }
         };
-        reader.readAsText(file);
+
+        if (file.name.endsWith('.ship') || file.name.endsWith('.zip')) {
+            JSZip.loadAsync(file).then(zip => {
+                const yamlFile = zip.file("ship.yaml");
+                if (yamlFile) {
+                    yamlFile.async("string").then(async yamlString => {
+                        let data;
+                        try { data = jsyaml.load(yamlString); } catch(e) { return $q.notify({ type: 'negative', message: 'Failed to parse ship.yaml' }); }
+                        
+                        if (data.shipImages && Array.isArray(data.shipImages)) {
+                            for (let img of data.shipImages) {
+                                if (img.file) {
+                                    const imgFile = zip.file(img.file);
+                                    if (imgFile) {
+                                        const base64 = await imgFile.async("base64");
+                                        const ext = img.file.split('.').pop();
+                                        img.data = `data:image/${ext};base64,${base64}`;
+                                    }
+                                    delete img.file;
+                                }
+                            }
+                        } else {
+                            // Backwards compatibility for single image
+                            const oldImg = zip.file("image.jpg") || zip.file("image.png");
+                            if (oldImg) {
+                                const base64 = await oldImg.async("base64");
+                                const ext = oldImg.name.split('.').pop();
+                                data.shipImages = [{ id: crypto.randomUUID(), data: `data:image/${ext};base64,${base64}`, caption: '', isHeader: true }];
+                            }
+                        }
+                        
+                        shipStore.loadState(data);
+                        showHangarDialog.value = false;
+                        $q.notify({ type: 'positive', message: 'Ship loaded successfully' });
+                    });
+                } else {
+                    $q.notify({ type: 'negative', message: 'Invalid .ship archive (missing ship.yaml)' });
+                }
+            }).catch(err => {
+                console.error(err);
+                $q.notify({ type: 'negative', message: 'Failed to read .ship archive' });
+            });
+        } else {
+            const reader = new FileReader();
+            reader.onload = (e) => processYaml(e.target.result);
+            reader.readAsText(file);
+        }
     };
 
-    const exportYaml = () => {
+    const exportYaml = async () => {
         const obj = JSON.parse(localStorage.getItem('warships_architect_current_build'));
+        const zip = new JSZip();
+
+        if (obj.shipImages && Array.isArray(obj.shipImages)) {
+            obj.shipImages.forEach((img, i) => {
+                if (img.data) {
+                    const base64Data = img.data.split(',')[1];
+                    const mimeType = img.data.split(';')[0].split(':')[1];
+                    const ext = mimeType.split('/')[1] || 'jpg';
+                    const filename = `image_${i}.${ext}`;
+                    zip.file(filename, base64Data, {base64: true});
+                    img.file = filename;
+                    delete img.data; // Remove base64 string from YAML
+                }
+            });
+        }
+
         const yamlStr = jsyaml.dump(obj);
-        const blob = new Blob([yamlStr], {type: 'text/yaml'});
+        zip.file("ship.yaml", yamlStr);
+
+        const blob = await zip.generateAsync({type:"blob"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `ship_${obj.meta.name || 'untitled'}.yaml`;
+        a.download = `ship_${obj.meta.name || 'untitled'}.ship`;
         a.click();
     };
 
@@ -160,6 +235,11 @@ fetch('data.json?v=' + Date.now())
         app.component('custom-manager-dialog', CustomManagerDialog);
         app.component('custom-component-dialog', CustomComponentDialog);
         app.component('custom-ship-dialog', CustomShipDialog);
+        app.component('location-diagram', LocationDiagramWrapper);
+        app.component('hit-location-diagram', HitLocationDiagramWrapper);
+        app.component('arc-diagram', ArcDiagramWrapper);
+        app.component('image-manager-dialog', ImageManagerDialog);
+        app.component('deck-plan', DeckPlanWrapper);
 
         // Initialize Store with Data
         const store = useShipStore();

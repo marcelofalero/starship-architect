@@ -1,6 +1,6 @@
 apiVersion: '2.0'
 meta:
-  name: ''
+  name: New Dawn
   model: hull_light_cruiser
   version: '1.0'
   notes: ''
@@ -14,7 +14,7 @@ libraries: []
 manifest:
   - id: 98034399-a6f2-43b1-9e3d-318f6e59289a
     defId: arm_neutronite_heavy
-    location: ''
+    location: Distributed
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -23,6 +23,7 @@ manifest:
       batteryCount: 1
       quantity: 1
       fireLinkOption: false
+      arcs: []
   - id: e46faf21-3aef-4a8e-b900-7d91bb8f7d61
     defId: eng_induction_engine
     location: Aft
@@ -32,12 +33,13 @@ manifest:
       payloadCount: 0
       payloadOption: false
       batteryCount: 1
-      quantity: 20
+      quantity: 15
       fireLinkOption: false
       arcs: []
+      advanced: true
   - id: c1b0a987-7f4e-4f0b-baf5-3a90b36ac8b1
     defId: ftl_drivewave
-    location: Dorsal
+    location: Aft Center
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -46,17 +48,19 @@ manifest:
       batteryCount: 1
       quantity: 10
       fireLinkOption: false
+      arcs: []
   - id: c6505a6b-104c-48a7-a916-fa1c8ba628a1
     defId: sys_life_support_pl_7
-    location: Core
+    location: Aft Port
     miniaturizationRank: 0
     isStock: false
     modifications:
       payloadCount: 0
       payloadOption: false
       batteryCount: 1
-      quantity: 18
+      quantity: 1
       fireLinkOption: false
+      arcs: []
   - id: 6ffba91b-c62a-40e4-929e-fba15043fa06
     defId: sys_stateroom
     location: Port
@@ -79,6 +83,7 @@ manifest:
       batteryCount: 1
       quantity: 1
       fireLinkOption: false
+      arcs: []
   - id: ec70c3df-d949-4bd9-b42a-fd480038855f
     defId: sys_medical_bay
     location: Starboard
@@ -105,7 +110,7 @@ manifest:
       arcs: []
   - id: 84fbe15b-1c8c-4cf0-8f0b-ac008f7cc5da
     defId: sys_hydroponics_bay
-    location: Ventral
+    location: Fore Port
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -116,7 +121,7 @@ manifest:
       fireLinkOption: false
   - id: 9e79da21-e71c-4e14-90ba-f5a68c68d295
     defId: cmd_command_deck
-    location: Dorsal
+    location: Aft Center
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -127,7 +132,7 @@ manifest:
       fireLinkOption: false
   - id: 88bc2859-1ad7-4a3c-a0e8-a62e156b5834
     defId: cmd_mass_transceiver
-    location: Fore
+    location: Aft Starboard
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -138,7 +143,7 @@ manifest:
       fireLinkOption: false
   - id: a4c94543-b641-43d6-9ccf-3215141ecfe8
     defId: cmd_command_deck
-    location: Ventral
+    location: Fore Center
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -148,10 +153,10 @@ manifest:
       quantity: 6
       fireLinkOption: false
       arcs: []
-      auxiliary: true
+      auxiliary: false
   - id: 86473fce-c07a-4c61-8118-5d5d61ff25c0
     defId: cmd_flag_bridge
-    location: Core
+    location: Fore Starboard
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -162,73 +167,7 @@ manifest:
       fireLinkOption: false
   - id: 760a2bd5-9b4c-4355-a252-8353cb0624ac
     defId: cmd_radio_transceiver
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: 9c52a505-2a04-4fdb-aa6b-4c06f92fcfa2
-    defId: comp_sensor_control_good
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: 175b8aae-befd-4eee-ab23-8e5ab50b9ad8
-    defId: comp_computer_core_good
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: af544aa9-341a-4393-9092-ed58e8154464
-    defId: comp_nav_control_good
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: aa89c7b3-7b52-425d-a665-e65292427fab
-    defId: comp_fire_control_good
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: da1ef825-53f3-4530-857f-0b6c4b0501a3
-    defId: comp_tac_control_good
-    location: ''
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-  - id: 3f98dda7-90c0-4363-82f4-6e1316f1506d
-    defId: sens_mass_detector
-    location: Dorsal
+    location: Aft Port
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -240,7 +179,7 @@ manifest:
       arcs: []
   - id: 374f7907-2f85-4fe8-b15c-749cc0ec6280
     defId: sens_multiband_radar
-    location: Dorsal
+    location: Aft Starboard
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -252,7 +191,7 @@ manifest:
       arcs: []
   - id: b5b54c25-9d44-472d-b465-2ed53e53f76d
     defId: sens_spectroanalyzer
-    location: Dorsal
+    location: Aft Port
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -264,7 +203,7 @@ manifest:
       arcs: []
   - id: d282d352-75f8-4f4e-88bb-ebf7e340fd39
     defId: sens_hi_res_video
-    location: Dorsal
+    location: Fore
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -276,7 +215,7 @@ manifest:
       arcs: []
   - id: 1e3a02bb-d4d1-4ff8-bb5e-6a9f6477d15c
     defId: misc_hangar
-    location: ''
+    location: Aft
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -333,7 +272,7 @@ manifest:
       fireLinkOption: false
   - id: a529ea94-7302-4ef5-a656-c321d24dfaad
     defId: misc_brig
-    location: Ventral
+    location: Fore Starboard
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -379,7 +318,7 @@ manifest:
       arcs: []
   - id: 1cb0d24a-83fe-495d-866e-304a90deeb25
     defId: misc_fabrication_facility
-    location: ''
+    location: Aft Center
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -388,24 +327,6 @@ manifest:
       batteryCount: 1
       quantity: 1
       fireLinkOption: false
-  - id: 8e7c6365-8e03-4166-9de4-dcc9f767a546
-    defId: wpn_dark_fusion_gun
-    location: Fore
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 1
-      fireLinkOption: false
-      weaponUser: Gunner
-      arcs:
-        - Forward
-      emplacement: Fixed Mount
-      weaponMount: Single
-      concealed: false
-      fireControl: Amazing
   - id: 2992f0a5-8157-41b2-b744-61edb3321dcc
     defId: wpn_heavy_mass_cannon
     location: Starboard
@@ -425,7 +346,8 @@ manifest:
       emplacement: Turret
       weaponMount: Single
       concealed: false
-      fireControl: None
+      fireControl: Amazing
+      advanced: false
   - id: 09dc29b3-0cea-4f88-9e34-db7927cda533
     defId: wpn_heavy_mass_cannon
     location: Port
@@ -445,10 +367,11 @@ manifest:
       emplacement: Turret
       weaponMount: Single
       concealed: false
-      fireControl: None
+      fireControl: Amazing
+      advanced: false
   - id: e8af3070-9ec1-4b88-b6d7-191217a37fda
     defId: comp_ai_cradle
-    location: ''
+    location: Fore Center
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -459,7 +382,7 @@ manifest:
       fireLinkOption: false
   - id: 0abd5949-971e-4d6d-a603-9632b7056fbc
     defId: comp_ai_automation
-    location: ''
+    location: Distributed
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -487,7 +410,8 @@ manifest:
       emplacement: Turret
       weaponMount: Twin
       concealed: false
-      fireControl: Good
+      fireControl: Amazing
+      advanced: true
   - id: 149ab0aa-dece-4134-8a5f-cb27270e1b5d
     defId: wpn_fusion_beam
     location: Starboard
@@ -507,7 +431,8 @@ manifest:
       emplacement: Turret
       weaponMount: Twin
       concealed: false
-      fireControl: Good
+      fireControl: Amazing
+      advanced: true
   - id: 3fe1bfcd-fc4e-40f3-9242-4dedca4f3806
     defId: pow_dynamic_mass_reactor
     location: Fore
@@ -517,10 +442,22 @@ manifest:
       payloadCount: 0
       payloadOption: false
       batteryCount: 1
-      quantity: 15
+      quantity: 16
       fireLinkOption: false
       arcs: []
   - id: a2b2d189-f3fd-4870-ad9e-e3e7410f542d
+    defId: pow_dynamic_mass_reactor
+    location: Fore Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 16
+      fireLinkOption: false
+      arcs: []
+  - id: e6657158-af66-4133-b740-88d46072eba6
     defId: pow_dynamic_mass_reactor
     location: Aft
     miniaturizationRank: 0
@@ -529,24 +466,12 @@ manifest:
       payloadCount: 0
       payloadOption: false
       batteryCount: 1
-      quantity: 15
-      fireLinkOption: false
-      arcs: []
-  - id: e6657158-af66-4133-b740-88d46072eba6
-    defId: pow_dynamic_mass_reactor
-    location: Core
-    miniaturizationRank: 0
-    isStock: false
-    modifications:
-      payloadCount: 0
-      payloadOption: false
-      batteryCount: 1
-      quantity: 15
+      quantity: 20
       fireLinkOption: false
       arcs: []
   - id: 02f50376-4d8e-46cf-ba6d-defc2245d200
     defId: sens_mass_detector
-    location: Dorsal
+    location: Fore Starboard
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -558,7 +483,7 @@ manifest:
       arcs: []
   - id: 3c0a0398-573e-4c35-a789-7fe1cbdb7481
     defId: sens_mass_detector
-    location: ''
+    location: Fore Port
     miniaturizationRank: 0
     isStock: false
     modifications:
@@ -568,3 +493,214 @@ manifest:
       quantity: 1
       fireLinkOption: false
       arcs: []
+  - id: aa541796-e732-4e80-842e-854f6f05fe78
+    defId: wpn_dark_fusion_gun
+    location: Fore
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Pilot
+      arcs:
+        - Forward
+      emplacement: Standard Mount
+      weaponMount: Single
+      concealed: false
+      fireControl: Amazing
+      advanced: true
+  - id: 5264fc06-d26c-4967-961d-22907da96c6b
+    defId: def_stardrive_scrambler
+    location: Fore Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 4
+      fireLinkOption: false
+      arcs: []
+      advanced: false
+  - id: 91a6e460-f105-4b36-90c7-3fcf861665cf
+    defId: def_deflection_inducer
+    location: Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 16
+      fireLinkOption: false
+      arcs: []
+      advanced: false
+  - id: 473f6fbe-568f-4473-bda9-ac67086e4f68
+    defId: wpn_em_torpedo
+    location: Aft Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Port
+      emplacement: Sponson
+      weaponMount: Single
+      concealed: false
+      fireControl: Amazing
+  - id: 57e814a6-b9fa-485b-ac76-673af61a744d
+    defId: wpn_em_torpedo
+    location: Aft Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      weaponUser: Gunner
+      arcs:
+        - Forward
+        - Starboard
+      emplacement: Sponson
+      weaponMount: Single
+      concealed: false
+      fireControl: Amazing
+  - id: 36543ed5-7ad4-44ed-8f56-a52fef029bfc
+    defId: cmd_backup_command_deck
+    location: Unspecified
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 18d68e08-80da-4da1-896a-9de9178ed60c
+    defId: sys_life_support_pl_7
+    location: Fore Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: bef90e89-b0c3-4e46-9918-2b774d04ee5e
+    defId: sys_life_support_pl_7
+    location: Aft Starboard
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 1fcd93ed-b3d0-4731-b3f6-c1fcc714e8bc
+    defId: sys_life_support_pl_7
+    location: Aft Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: a20ff398-49ea-4d4e-8f94-f78045127d62
+    defId: sys_life_support_pl_7
+    location: Fore Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 22590d99-95f7-4c0f-a4a8-f5664f805059
+    defId: sys_life_support_pl_7
+    location: Fore Port
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 45078a4c-ef96-4c90-8da1-3e520c7ef83c
+    defId: sys_life_support_pl_7
+    location: Fore
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 7b1390e2-b86b-4a95-bb8b-6846412a2257
+    defId: sys_life_support_pl_7
+    location: Aft
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+      arcs: []
+  - id: 0cd825bd-09ca-4a06-a000-9e6b9a547673
+    defId: comp_nav_control_amazing
+    location: Aft Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 88043c03-b084-45de-adfb-886e08f431ce
+    defId: comp_sensor_control_amazing
+    location: Fore Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
+  - id: 87a15372-9481-4809-81fe-2d2ddd3f9659
+    defId: comp_tac_control_amazing
+    location: Aft Center
+    miniaturizationRank: 0
+    isStock: false
+    modifications:
+      payloadCount: 0
+      payloadOption: false
+      batteryCount: 1
+      quantity: 1
+      fireLinkOption: false
