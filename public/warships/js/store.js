@@ -33,6 +33,7 @@ export const useShipStore = defineStore('ship', () => {
     // Hangar State
     const hangar = ref([]);
     const activeShipId = ref(null);
+    const _isLoading = ref(false); // suppress watch-driven hangar syncs during loadState
 
     // Template Edit State
     const isTemplateEditMode = ref(false);
@@ -1229,8 +1230,10 @@ export const useShipStore = defineStore('ship', () => {
         });
     }
     function loadState(state) {
-        if(!state) return; 
-        if (!activeShipId.value) activeShipId.value = state.id || crypto.randomUUID();
+        if(!state) return;
+        _isLoading.value = true;
+        // Always resolve the ship's canonical ID before touching reactive state
+        activeShipId.value = state.id || activeShipId.value || crypto.randomUUID();
         meta.name = state.meta?.name || state.name || 'Untitled Ship'; 
         meta.length = state.meta?.length || '';
         meta.width = state.meta?.width || '';
@@ -1328,6 +1331,10 @@ export const useShipStore = defineStore('ship', () => {
                 });
             }
         }
+
+        _isLoading.value = false;
+        // Sync exactly once after the full state has been applied
+        syncActiveToHangar();
     }
 
     // Hangar Actions
@@ -1516,8 +1523,8 @@ export const useShipStore = defineStore('ship', () => {
         };
         localStorage.setItem('warships_architect_current_build', JSON.stringify(saveObj));
 
-        // Sync to Hangar
-        syncActiveToHangar();
+        // Sync to Hangar (skip while loadState is bulk-assigning reactive properties)
+        if (!_isLoading.value) syncActiveToHangar();
     }, { deep: true });
 
     const CREW_QUALITY_STATS = {
