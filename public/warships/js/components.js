@@ -2271,11 +2271,19 @@ export const SystemListWrapper = {
                 get sublightPctLabel() { return enginePctMap[this.sublightPctIndex] + '%'; },
                 get sublightPctMinIndex() {
                     const def = store.allEquipment.find(e => e.id === editingInstance.value.defId);
-                    const minPct = def ? Math.ceil(((def.minHullPts || 1) / (store.chassis.baseHull || 1)) * 100) : 5;
+                    if (!def) return 0;
+                    
+                    const baseHull = store.chassis.baseHull || 1;
+                    const minPts = def.minHullPts || 1;
+                    
                     let minIndex = 0;
-                    for (let i = 0; i < enginePctMap.length; i++) {
-                        if (enginePctMap[i] >= minPct) { minIndex = i; break; }
-                        if (i === enginePctMap.length - 1) minIndex = i;
+                    for (let i = enginePctMap.length - 1; i >= 0; i--) {
+                        const pct = enginePctMap[i];
+                        const calculatedPts = Math.ceil(baseHull * (pct / 100));
+                        if (calculatedPts <= minPts) {
+                            minIndex = i;
+                            break;
+                        }
                     }
                     return minIndex;
                 }
@@ -2297,7 +2305,7 @@ export const LocationDiagram = {
     <div class="row fit q-pa-sm">
         <!-- Diagram Side -->
         <div :class="readonly ? 'col-12' : 'col-12 col-md-8 q-pr-md'">
-            <div v-if="!readonly" class="text-h6 q-mb-md text-primary">Hit Location Diagram</div>
+            <div v-if="!readonly" class="text-h6 q-mb-md text-primary">Sections Diagram</div>
             
             <div :class="['diagram-grid', gridClass, readonly ? 'readonly-diagram' : '']">
                 <div v-for="loc in hullLocations" :key="loc" 
@@ -2821,7 +2829,7 @@ export const LocationDiagramWrapper = {
         const gridClass = computed(() => {
             const size = store.chassis.size || '';
             const baseHull = store.chassis.baseHull || 0;
-            if (size.startsWith('Small')) return 'grid-small';
+            if (size.startsWith('Small')) return baseHull <= 20 ? 'grid-small2' : 'grid-small4';
             if (size.startsWith('Light')) return 'grid-light';
             if (size.startsWith('Medium')) return 'grid-medium';
             if (size.startsWith('Heavy')) return 'grid-heavy';

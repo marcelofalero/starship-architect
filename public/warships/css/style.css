@@ -470,8 +470,19 @@ body.tour-active svg.driver-overlay-path {
 }
 
 /* Grid Layouts based on Size */
-.grid-small {
+.grid-small2 {
     grid-template-columns: 1fr;
+    grid-template-areas: 
+        "f"
+        "a";
+}
+.grid-small4 {
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+        "f"
+        "fc"
+        "ac"
+        "a";
 }
 .grid-light {
     grid-template-columns: 1fr 1.5fr 1fr;

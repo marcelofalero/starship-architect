@@ -24,6 +24,64 @@ export const DeckPlanWrapper = {
         const masterMapStartPanX = ref(0);
         const masterMapStartPanY = ref(0);
 
+        // Background image per deck
+        const showBgSettings = ref(false);
+        // Background is shared across all decks - stored on deckPlan root
+        // Structure: { data, masterMap: { opacity, scale, offsetX, offsetY }, sectionEditor: { ... } }
+        const activeDeckBg = computed(() => store.deckPlan?.background || null);
+        // Returns the settings sub-object for the currently active view
+        const activeBgSettings = computed(() => {
+            if (!activeDeckBg.value) return null;
+            // Migrate old flat format gracefully
+            if (!activeDeckBg.value.masterMap) {
+                const flat = activeDeckBg.value;
+                store.deckPlan.background = {
+                    data: flat.data,
+                    opacity: flat.opacity ?? flat.masterMap?.opacity ?? 0.3,
+                    masterMap: { scale: flat.scale ?? flat.masterMap?.scale ?? 5, offsetX: flat.offsetX ?? flat.masterMap?.offsetX ?? 0, offsetY: flat.offsetY ?? flat.masterMap?.offsetY ?? 0 },
+                    sectionEditor: { scale: flat.sectionEditor?.scale ?? 10, offsetX: flat.sectionEditor?.offsetX ?? 0, offsetY: flat.sectionEditor?.offsetY ?? 0 }
+                };
+            }
+            return showMasterMap.value ? activeDeckBg.value.masterMap : activeDeckBg.value.sectionEditor;
+        });
+
+        // Master map display options
+        const showSectionLabels = ref(true);
+        const glueSections = ref(false);
+
+        const uploadDeckBackground = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const MAX = 2000;
+                    let w = img.width, h = img.height;
+                    if (w > MAX || h > MAX) {
+                        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                        else       { w = Math.round(w * MAX / h); h = MAX; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    store.deckPlan.background = {
+                        data: canvas.toDataURL('image/jpeg', 0.85),
+                        opacity: 0.3,
+                        masterMap:     { scale: 5,  offsetX: 0, offsetY: 0 },
+                        sectionEditor: { scale: 10, offsetX: 0, offsetY: 0 }
+                    };
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        };
+
+        const clearDeckBackground = () => {
+            if (store.deckPlan) delete store.deckPlan.background;
+        };
+
         const onMasterMapWheel = (e) => {
             if (e.deltaY < 0) {
                 masterMapZoom.value = Math.min(3.0, masterMapZoom.value + 0.1);
@@ -1292,7 +1350,7 @@ export const DeckPlanWrapper = {
             window.removeEventListener('keyup', handleKeyUp);
         });
 
-        const exportToImage = () => {
+        const exportToImage = async () => {
             if (!activeSection.value) return;
             const canvas = document.createElement('canvas');
             const renderScale = 50; 
@@ -1304,26 +1362,7 @@ export const DeckPlanWrapper = {
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            const sortedItems = [...activeSection.value.items].sort((a, b) => {
-                const za = a.z !== undefined ? a.z : getDefaultZ(a.type);
-                const zb = b.z !== undefined ? b.z : getDefaultZ(b.type);
-                return za - zb; 
-            });
-            
-            sortedItems.forEach(item => {
-                if (item.hidden) return;
-                
-                if (item.type === 'wall_thin_h') {
-                    ctx.fillStyle = getItemColor(item);
-                    ctx.fillRect(item.x * renderScale, item.y * renderScale - (renderScale * 0.1), item.w * renderScale, renderScale * 0.2);
-                } else if (item.type === 'wall_thin_v') {
-                    ctx.fillStyle = getItemColor(item);
-                    ctx.fillRect(item.x * renderScale - (renderScale * 0.1), item.y * renderScale, renderScale * 0.2, item.h * renderScale);
-                } else {
-                    ctx.fillStyle = getItemColor(item);
-                    ctx.fillRect(item.x * renderScale, item.y * renderScale, item.w * renderScale, item.h * renderScale);
-                }
-            });
+            await renderSectionToCtx(ctx, activeSection.value, 0, 0, renderScale);
             
             const dataUrl = canvas.toDataURL('image/png');
             const a = document.createElement('a');
@@ -1333,6 +1372,262 @@ export const DeckPlanWrapper = {
             a.click();
             document.body.removeChild(a);
         };
+
+        // Render a section's items onto an existing canvas context at (originX, originY)
+        const renderSectionToCtx = async (ctx, section, originX, originY, rs) => {
+            // Background cell fill
+            ctx.fillStyle = '#111111';
+            ctx.fillRect(originX, originY, section.width * rs, section.height * rs);
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 0.5;
+            for (let gx = 0; gx <= section.width; gx++) {
+                ctx.beginPath();
+                ctx.moveTo(originX + gx * rs, originY);
+                ctx.lineTo(originX + gx * rs, originY + section.height * rs);
+                ctx.stroke();
+            }
+            for (let gy = 0; gy <= section.height; gy++) {
+                ctx.beginPath();
+                ctx.moveTo(originX, originY + gy * rs);
+                ctx.lineTo(originX + section.width * rs, originY + gy * rs);
+                ctx.stroke();
+            }
+
+            // Items — two passes: fill first, then text on top
+            const sortedItems = [...section.items].sort((a, b) => {
+                const za = a.z !== undefined ? a.z : getDefaultZ(a.type);
+                const zb = b.z !== undefined ? b.z : getDefaultZ(b.type);
+                return za - zb;
+            });
+
+            // Pass 1: fill rectangles
+            sortedItems.forEach(item => {
+                if (item.hidden) return;
+                ctx.fillStyle = getItemColor(item);
+                if (item.type === 'wall_thin_h') {
+                    ctx.fillRect(originX + item.x * rs, originY + item.y * rs - rs * 0.1, item.w * rs, rs * 0.2);
+                } else if (item.type === 'wall_thin_v') {
+                    ctx.fillRect(originX + item.x * rs - rs * 0.1, originY + item.y * rs, rs * 0.2, item.h * rs);
+                } else {
+                    ctx.fillRect(originX + item.x * rs, originY + item.y * rs, item.w * rs, item.h * rs);
+                }
+            });
+
+            const drawSvgToCtx = (svgStr, x, y) => {
+                return new Promise(resolve => {
+                    const img = new Image();
+                    const blob = new Blob([svgStr], {type: 'image/svg+xml;charset=utf-8'});
+                    const url = URL.createObjectURL(blob);
+                    img.onload = () => {
+                        ctx.drawImage(img, x, y);
+                        URL.revokeObjectURL(url);
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        URL.revokeObjectURL(url);
+                        resolve();
+                    };
+                    img.src = url;
+                });
+            };
+
+            // Pass 2: text labels
+            const noLabel = new Set(['floor', 'wall', 'wall_thin_h', 'wall_thin_v']);
+            for (const item of sortedItems) {
+                if (item.hidden) continue;
+                if (noLabel.has(item.type)) continue;
+
+                const cellW = item.w * rs;
+                const cellH = item.h * rs;
+                if (cellW < 8 || cellH < 8) continue; // too small to bother
+
+                const drawAtX = originX + item.x * rs;
+                const drawAtY = originY + item.y * rs;
+
+                if (item.type === 'stairs') {
+                    let svgStr = getStairSVG(item, rs);
+                    if (!svgStr.includes('xmlns=')) {
+                        svgStr = svgStr.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    await drawSvgToCtx(svgStr, drawAtX, drawAtY);
+                    continue;
+                }
+
+                if (item.type === 'internal_defense') {
+                    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${cellW}" height="${cellH}" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h8l-3-6H6z" /><circle cx="7" cy="14" r="2" /><path d="M8 12.5l5-4.5" /><rect x="7" y="4" width="8" height="6" rx="1" /><path d="M15 6h7" /><path d="M7 5H4v4h3" /></svg>`;
+                    await drawSvgToCtx(svgStr, drawAtX, drawAtY);
+                    continue;
+                }
+
+                if (item.type === 'camera') {
+                    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${cellW}" height="${cellH}" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`;
+                    await drawSvgToCtx(svgStr, drawAtX, drawAtY);
+                    continue;
+                }
+
+                if (item.type === 'ladder') {
+                    const isUp = item.vDir === 'up';
+                    const isDn = item.vDir === 'down';
+                    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${cellW}" height="${cellH}" stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="21"></line><line x1="18" y1="3" x2="18" y2="21"></line><line x1="6" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="18" y2="12"></line><line x1="6" y1="16" x2="18" y2="16"></line>${isUp ? '<polyline points="12 6 12 1 9 4 12 1 15 4" stroke="#4BB5C1"></polyline>' : isDn ? '<polyline points="12 18 12 23 9 20 12 23 15 20" stroke="#4BB5C1"></polyline>' : '<polyline points="12 1 12 6 9 3 12 1 15 3" stroke="#4BB5C1"></polyline><polyline points="12 23 12 18 9 21 12 23 15 21" stroke="#4BB5C1"></polyline>'}</svg>`;
+                    await drawSvgToCtx(svgStr, drawAtX, drawAtY);
+                    continue;
+                }
+
+                let label = '';
+                if (item.type === 'component') {
+                    const inst = store.installedComponents.find(c => c.instanceId === item.instanceId);
+                    if (inst) label = getName(inst);
+                } else {
+                    // amenity or structural type — use a readable format
+                    label = item.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                }
+                if (!label) continue;
+
+                // Font size: fit roughly to the smaller dimension
+                const fontSize = Math.max(8, Math.min(14, Math.floor(Math.min(cellW, cellH) * 0.22)));
+                ctx.font = `bold ${fontSize}px sans-serif`;
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const cx = originX + item.x * rs + cellW / 2;
+                const cy = originY + item.y * rs + cellH / 2;
+
+                // Clip to item bounds so text doesn't bleed
+                ctx.save();
+                ctx.rect(originX + item.x * rs, originY + item.y * rs, cellW, cellH);
+                ctx.clip();
+
+                // Word-wrap: break into lines that fit
+                const words = label.split(' ');
+                const maxWidth = cellW - 4;
+                const lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    const test = currentLine ? currentLine + ' ' + word : word;
+                    if (ctx.measureText(test).width <= maxWidth) {
+                        currentLine = test;
+                    } else {
+                        if (currentLine) lines.push(currentLine);
+                        currentLine = word;
+                    }
+                });
+                if (currentLine) lines.push(currentLine);
+
+                const lineH = fontSize + 2;
+                const startY = cy - (lines.length - 1) * lineH / 2;
+                lines.forEach((line, i) => {
+                    ctx.fillText(line, cx, startY + i * lineH);
+                });
+
+                ctx.restore();
+            }
+
+            // Section border
+            ctx.strokeStyle = '#4BB5C1';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(originX, originY, section.width * rs, section.height * rs);
+        };
+
+        const exportMasterMapImage = async () => {
+            if (!activeDeck.value) return;
+            const layout = masterMapLayout.value;
+            const rs = 50; // render scale: px per grid square
+            const GAP = rs; // gap between sections in pixels (exactly 1 square for VTT alignment)
+
+            // Compute section positions in canvas space
+            const numCols = layout[0]?.length || 1;
+            const numRows = layout.length;
+
+            // First pass: figure out column widths and row heights
+            const colWidths  = Array(numCols).fill(0);
+            const rowHeights = Array(numRows).fill(0);
+
+            layout.forEach((row, rIdx) => {
+                row.forEach((secId, cIdx) => {
+                    if (!secId) return;
+                    const sec = activeDeck.value.sections.find(s => s.id === secId);
+                    if (!sec) return;
+                    colWidths[cIdx]  = Math.max(colWidths[cIdx],  sec.width  * rs);
+                    rowHeights[rIdx] = Math.max(rowHeights[rIdx], sec.height * rs);
+                });
+            });
+
+            // Total canvas size
+            const totalW = colWidths.reduce((a, b) => a + b, 0)  + GAP * (numCols + 1);
+            const totalH = rowHeights.reduce((a, b) => a + b, 0) + GAP * (numRows + 1);
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = totalW;
+            canvas.height = totalH;
+            const ctx = canvas.getContext('2d');
+
+            // Black background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, totalW, totalH);
+
+            // Draw ship background image if present
+            const bg = activeDeckBg.value;
+            if (bg && bg.masterMap) {
+                await new Promise((resolve) => {
+                    const s  = bg.masterMap.scale  || 1;
+                    const ox = bg.masterMap.offsetX || 0;
+                    const oy = bg.masterMap.offsetY || 0;
+                    const bgImg = new Image();
+                    bgImg.onload = () => {
+                        ctx.save();
+                        ctx.globalAlpha = bg.opacity ?? 0.3;
+                        const iw = bgImg.width * s;
+                        const ih = bgImg.height * s;
+                        ctx.drawImage(bgImg,
+                            totalW / 2 - iw / 2 + ox,
+                            totalH / 2 - ih / 2 + oy,
+                            iw, ih);
+                        ctx.restore();
+                        resolve();
+                    };
+                    bgImg.src = bg.data;
+                });
+            }
+
+            // Draw sections sequentially so context state isn't interleaved
+            let y = GAP;
+            for (let rIdx = 0; rIdx < layout.length; rIdx++) {
+                const row = layout[rIdx];
+                let x = GAP;
+                for (let cIdx = 0; cIdx < row.length; cIdx++) {
+                    const secId = row[cIdx];
+                    if (secId) {
+                        const sec = activeDeck.value.sections.find(s => s.id === secId);
+                        if (sec) {
+                            const cellX = x + (colWidths[cIdx]  - sec.width  * rs) / 2;
+                            const cellY = y + (rowHeights[rIdx] - sec.height * rs) / 2;
+                            await renderSectionToCtx(ctx, sec, cellX, cellY, rs);
+                            // Section ID label
+                            ctx.font = 'bold 13px sans-serif';
+                            ctx.fillStyle = '#4BB5C1';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText(secId, cellX + sec.width * rs / 2, cellY - 4);
+                        }
+                    }
+                    x += colWidths[cIdx] + GAP;
+                }
+                y += rowHeights[rIdx] + GAP;
+            }
+
+            const sqW = Math.round(totalW / rs);
+            const sqH = Math.round(totalH / rs);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `${(store.meta?.name || 'ship').replace(/\s+/g, '_')}_deck${activeDeckIndex.value + 1}_mastermap_${sqW}x${sqH}sq.png`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        };
+
 
         const scaleOptions = [
             { label: '1 sq = 1m', value: 1 },
@@ -1368,11 +1663,13 @@ export const DeckPlanWrapper = {
             startComponentDrag, onDropGrid, getItemStyle, selectedItemIds, selectionBox,
             clipboard, copySection, pasteSection, clearSection, flipX, flipY,
             bringToFront, sendToBack, elementsTab, sortedSectionItems, toggleVisibility, getDefaultZ,
-            scaleOptions, gridScale, activeDeckIndex, goDeckUp, goDeckDown, moveDeckUp, moveDeckDown, exportToImage, getAbbreviation, getSectionName,
+            scaleOptions, gridScale, activeDeckIndex, goDeckUp, goDeckDown, moveDeckUp, moveDeckDown, exportToImage, exportMasterMapImage, getAbbreviation, getSectionName,
             isShiftPressed, amenities, formatType, activeSectionName, rotateItem, setVDir, changeTextSize, rotateText, getStairSVG,
             masterMapZoom, masterMapPanX, masterMapPanY, isMasterMapPanning,
             onMasterMapWheel, onMasterMapMouseDown, onMasterMapMouseMove, onMasterMapMouseUp,
-            activeColor, applyColor, clearColor, getWeaponArcs
+            activeColor, applyColor, clearColor, getWeaponArcs,
+            showBgSettings, activeDeckBg, activeBgSettings, uploadDeckBackground, clearDeckBackground,
+            showSectionLabels, glueSections
         };
     },
     template: `
@@ -1477,8 +1774,53 @@ export const DeckPlanWrapper = {
         <!-- MAIN CANVAS/GRID CONTAINER -->
         <div class="col-12 col-md-9 flex column" style="height: 100%;">
             
+            <!-- Hidden file input for background upload -->
+            <input type="file" accept="image/*" ref="bgUpload" style="display:none" @change="uploadDeckBackground" />
+
             <div class="row items-center q-gutter-sm q-pa-sm bg-dark text-white q-mb-sm rounded-borders shadow-2" style="border: 1px solid #4BB5C1;">
                 <q-toggle v-model="showMasterMap" label="Master Map" color="accent" class="q-mr-sm" />
+
+                <!-- Background image button + inline settings -->
+                <q-btn flat round dense icon="image" :color="activeDeckBg ? 'accent' : 'grey-6'" @click="showBgSettings = !showBgSettings">
+                    <q-tooltip>Floor Background Image</q-tooltip>
+                </q-btn>
+                <transition name="q-transition--fade">
+                <div v-if="showBgSettings" class="row items-center q-gutter-sm bg-grey-9 q-pa-sm rounded-borders" style="border: 1px solid #4BB5C1; flex-wrap: nowrap;">
+                    <q-btn v-if="!activeDeckBg" dense color="primary" icon="upload" label="Upload" size="sm" @click="$refs.bgUpload.click()" />
+                    <template v-if="activeDeckBg && activeBgSettings">
+                        <q-img :src="activeDeckBg.data" style="width:40px;height:40px;border-radius:4px;flex-shrink:0;" fit="cover" />
+                        <div class="column q-gutter-xs" style="min-width:160px;">
+                            <!-- Shared opacity -->
+                            <div class="row items-center q-gutter-xs">
+                                <span class="text-caption text-grey-4" style="width:52px;">Opacity</span>
+                                <q-slider dark dense v-model="activeDeckBg.opacity" :min="0" :max="1" :step="0.05" color="accent" style="flex:1" />
+                                <span class="text-caption" style="width:30px;">{{ Math.round(activeDeckBg.opacity*100) }}%</span>
+                            </div>
+                            <!-- Per-view scale & offset -->
+                            <div class="text-caption text-accent" style="font-size:0.7em; letter-spacing:0.05em; text-transform:uppercase; margin-top:2px;">
+                                {{ showMasterMap ? 'Master Map' : 'Section Editor' }}
+                            </div>
+                            <div class="row items-center q-gutter-xs">
+                                <span class="text-caption text-grey-4" style="width:52px;">Scale</span>
+                                <q-slider dark dense v-model="activeBgSettings.scale" :min="1" :max="20" :step="0.1" color="primary" style="flex:1" />
+                                <span class="text-caption" style="width:30px;">{{ activeBgSettings.scale.toFixed(1) }}x</span>
+                            </div>
+                            <div class="row items-center q-gutter-xs">
+                                <span class="text-caption text-grey-4" style="width:52px;">Offset X</span>
+                                <q-input dark dense borderless type="number" v-model.number="activeBgSettings.offsetX" style="width:70px" />
+                                <span class="text-caption text-grey-4" style="width:10px;">Y</span>
+                                <q-input dark dense borderless type="number" v-model.number="activeBgSettings.offsetY" style="width:70px" />
+                            </div>
+                        </div>
+                        <q-btn flat round dense icon="upload" color="grey-4" size="sm" @click="$refs.bgUpload.click()">
+                            <q-tooltip>Replace image</q-tooltip>
+                        </q-btn>
+                        <q-btn flat round dense icon="delete" color="negative" size="sm" @click="clearDeckBackground">
+                            <q-tooltip>Remove background</q-tooltip>
+                        </q-btn>
+                    </template>
+                </div>
+                </transition>
                 
                 <template v-if="!showMasterMap">
                     <q-separator dark vertical class="q-mx-sm" />
@@ -1559,29 +1901,45 @@ export const DeckPlanWrapper = {
                  @mouseup="onMasterMapMouseUp"
                  @mouseleave="onMasterMapMouseUp"
                  @contextmenu.prevent>
-                
+
                 <div style="position: sticky; top: 0; left: 100%; width: 0; height: 0; z-index: 100;">
                     <div style="position: absolute; right: 0; top: 0;" class="bg-dark rounded-borders shadow-2 p-1 border">
                         <q-btn-group outline>
                             <q-btn color="secondary" outline icon="zoom_out" @click="masterMapZoom = Math.max(0.1, masterMapZoom - 0.1)" />
                             <q-btn color="secondary" outline icon="refresh" @click="masterMapZoom = 1.0; masterMapPanX = 0; masterMapPanY = 0;" />
                             <q-btn color="secondary" outline icon="zoom_in" @click="masterMapZoom = Math.min(3.0, masterMapZoom + 0.1)" />
+                            <q-separator dark vertical />
+                            <q-btn :color="showSectionLabels ? 'info' : 'grey-7'" outline icon="label" @click="showSectionLabels = !showSectionLabels">
+                                <q-tooltip>Toggle section labels</q-tooltip>
+                            </q-btn>
+                            <q-btn :color="glueSections ? 'accent' : 'grey-7'" outline icon="grid_off" @click="glueSections = !glueSections">
+                                <q-tooltip>Glue sections together</q-tooltip>
+                            </q-btn>
+                            <q-separator dark vertical />
+                            <q-btn color="positive" outline icon="download" @click="exportMasterMapImage">
+                                <q-tooltip>Export as VTT map PNG</q-tooltip>
+                            </q-btn>
                         </q-btn-group>
                     </div>
                 </div>
 
-                <div :style="{ transform: 'scale(' + masterMapZoom + ') translate(' + masterMapPanX + 'px, ' + masterMapPanY + 'px)', transformOrigin: 'center center', margin: 'auto', transition: isMasterMapPanning ? 'none' : 'transform 0.1s ease-out' }">
-                    <table style="border-spacing: 20px; border-collapse: separate; margin: 0 auto; user-select: none;">
+                <div :style="{ transform: 'scale(' + masterMapZoom + ') translate(' + masterMapPanX + 'px, ' + masterMapPanY + 'px)', transformOrigin: 'center center', margin: 'auto', position: 'relative', transition: isMasterMapPanning ? 'none' : 'transform 0.1s ease-out' }">
+                    <!-- Background image moves with pan/zoom (master map settings) -->
+                    <img v-if="activeDeckBg && activeDeckBg.masterMap" :src="activeDeckBg.data"
+                         :style="{ position: 'absolute', top: '50%', left: '50%', maxWidth: 'none',
+                                   transform: 'translate(calc(-50% + ' + (activeDeckBg.masterMap.offsetX||0) + 'px), calc(-50% + ' + (activeDeckBg.masterMap.offsetY||0) + 'px)) scale(' + (activeDeckBg.masterMap.scale||1) + ')',
+                                   opacity: activeDeckBg.opacity, pointerEvents: 'none', zIndex: 0, userSelect: 'none', objectFit: 'contain' }" />
+                    <table :style="{ borderSpacing: glueSections ? '0' : '20px', borderCollapse: 'separate', margin: '0 auto', userSelect: 'none', position: 'relative', zIndex: 1 }">
                         <tr v-for="(row, rIdx) in masterMapLayout" :key="'row'+rIdx">
-                            <td v-for="(secId, sIdx) in row" :key="'sec'+sIdx" style="vertical-align: top; text-align: center;">
+                            <td v-for="(secId, sIdx) in row" :key="'sec'+sIdx" :style="{ verticalAlign: glueSections ? 'bottom' : 'top', textAlign: 'center' }">
                                 <template v-if="secId">
-                                    <div class="text-subtitle2 text-info q-mb-sm">{{ secId }} <span class="text-white text-caption">({{ getSectionName(secId) }})</span></div>
+                                    <div v-if="showSectionLabels" class="text-subtitle2 text-info q-mb-sm">{{ secId }} <span class="text-white text-caption">({{ getSectionName(secId) }})</span></div>
                                     <div v-if="activeDeck.sections.find(s => s.id === secId)" 
                                          :id="'master-map-cell-' + secId"
                                          class="cursor-pointer"
                                          @click="activeSectionId = secId; showMasterMap = false;"
                                          :style="{ position: 'relative', margin: '0 auto', width: (activeDeck.sections.find(s => s.id === secId).width * 20) + 'px', height: (activeDeck.sections.find(s => s.id === secId).height * 20) + 'px' }"
-                                         style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; border: 1px solid #4BB5C1; overflow: hidden; transition: box-shadow 0.2s;"
+                                         style="background-color: #111; background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; border: 1px solid #4BB5C1; overflow: hidden; transition: box-shadow 0.2s;"
                                          onmouseover="this.style.boxShadow='0 0 10px #4BB5C1'"
                                          onmouseout="this.style.boxShadow='none'">
                                          
@@ -1621,6 +1979,11 @@ export const DeckPlanWrapper = {
                  style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 30px 30px;"
                  @dragover.prevent
                  @drop="onDropGrid">
+                 <!-- Deck background image (section editor settings) -->
+                 <img v-if="activeDeckBg && activeDeckBg.sectionEditor" :src="activeDeckBg.data"
+                      :style="{ position: 'absolute', top: '50%', left: '50%', width: '100%', height: '100%',
+                                transform: 'translate(calc(-50% + ' + (activeDeckBg.sectionEditor.offsetX||0) + 'px), calc(-50% + ' + (activeDeckBg.sectionEditor.offsetY||0) + 'px)) scale(' + (activeDeckBg.sectionEditor.scale||1) + ')',
+                                opacity: activeDeckBg.opacity, pointerEvents: 'none', zIndex: 0, userSelect: 'none', objectFit: 'contain' }" />
                  
                  <div v-for="item in activeSection.items" :key="item.id" 
                       :style="getItemStyle(item, 30)"

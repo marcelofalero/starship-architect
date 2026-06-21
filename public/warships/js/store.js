@@ -219,15 +219,19 @@ export const useShipStore = defineStore('ship', () => {
         
         if (def.powerConsumed) {
             con = def.powerConsumed;
-            const quantity = instance.modifications?.quantity || 1;
-            // Similar to hull cost, if it's a weapon, multiply by quantity
-            if (quantity > 1) con *= quantity;
-            
-            if (isWeapon(def.id) || def.category === 'Weapon Systems') {
-                const weaponMount = instance.modifications?.weaponMount || 'Single';
-                if (weaponMount === 'Twin') con *= 2;
-                else if (weaponMount === 'Triple') con *= 3;
-                else if (weaponMount === 'Quad') con *= 4;
+            if (def.category === 'Sublight' || def.category === 'FTL Drives') {
+                con *= getComponentHullPts(instance);
+            } else {
+                const quantity = instance.modifications?.quantity || 1;
+                // Similar to hull cost, if it's a weapon, multiply by quantity
+                if (quantity > 1) con *= quantity;
+                
+                if (isWeapon(def.id) || def.category === 'Weapon Systems') {
+                    const weaponMount = instance.modifications?.weaponMount || 'Single';
+                    if (weaponMount === 'Twin') con *= 2;
+                    else if (weaponMount === 'Triple') con *= 3;
+                    else if (weaponMount === 'Quad') con *= 4;
+                }
             }
         }
 
