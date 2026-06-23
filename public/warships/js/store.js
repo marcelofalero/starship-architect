@@ -248,9 +248,6 @@ export const useShipStore = defineStore('ship', () => {
         if (!def || !def.damage) return null;
 
         let extraDice = 0;
-        if (instance.modifications && instance.modifications.advanced) {
-            extraDice += 2;
-        }
         if (currentStats.value.weapon_damage_dice) {
             extraDice += currentStats.value.weapon_damage_dice;
         }
