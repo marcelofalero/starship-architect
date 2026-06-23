@@ -3252,7 +3252,10 @@ export const ShipSheetWrapper = {
                 if (w.modifications.autofire) detailsParts.push('Autofire');
                 if (w.modifications.pointBlank) detailsParts.push('Point-Blank');
 
-                const arcsStr = w.modifications.arcs && w.modifications.arcs.length > 0 ? w.modifications.arcs.join(', ') : '';
+                let arcsStr = w.modifications.arcs && w.modifications.arcs.length > 0 ? w.modifications.arcs.join(', ') : '';
+                if (w.modifications.emplacement === 'Fixed Mount') {
+                    arcsStr = arcsStr ? `${arcsStr} (Fixed Mount: +3 step penalty unless target is directly ahead, a straight line)` : 'Fixed Mount (+3 step penalty unless target is directly ahead, a straight line)';
+                }
 
                 return {
                     instanceId: w.instanceId,
