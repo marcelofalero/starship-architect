@@ -60,31 +60,19 @@ Type: The general category of this system for purposes of assigning it to the da
 
 ### INSTALLATIONS
 
-The last systems a shipbuilder normally considers are the
-
-bunkroom, docking clamp, hangar, cargo hold, or ordnance transfer system; additional airlocks may be purchased at a cost of 1 hull point and 10 K each.
-
-### Brig (PL 6)
-
-miscellaneous facilities that don’t really fit into any other
-
-category. Some of these may be crucial to the ship’s mission; a heavy freighter should buy its cargo space first, and its defensive armament second.
+The last systems a shipbuilder normally considers are the miscellaneous facilities that don’t really fit into any other category. Some of these may be crucial to the ship’s mission; a heavy freighter should buy its cargo space first, and its defensive armament second.
 
 ### Airlock (PL 6)
 
-A small compartment with two heavy-duty hatches—one
+A compartment with two heavy-duty hatches—one leading outside the ship, the other leading inside—the airlock also includes the pumps and controls necessary to pressurize or depressurize the room. A ship automatically includes one free airlock per command deck, crew quarters, crew bunkroom, docking clamp, hangar, cargo hold, or ordnance transfer system; additional airlocks may be purchased at a cost of 1 hull point and 10 K each.
+
+### Brig (PL 6)
 
 Think of the brig as accommodations for undesirable passengers. Each two hull points devoted to the brig provides individual cells for four individuals, plus a security station, interrogation room, visiting area, and alarm system in case any of the guests decides to leave.
 
 ### Cargo Space (PL 6)
 
-leading outside the ship, the other leading inside—the airlock
-
-also includes the pumps and controls necessary to pressurize or depressurize the room. A ship automatically includes one free airlock per command deck, crew quarters, crew
-
-One hull point provides enough space for 10 cubic meters of cargo, or one cargo unit. A compartment 2 meters tall, 2 meters wide, and 2.5 meters deep would be typical for 1
-
-hull point of cargo space. Simply buying this system multiple times can purchase more cargo space.
+One hull point provides enough space for 10 cubic meters of cargo, or one cargo unit. A compartment 2 meters tall, 2 meters wide, and 2.5 meters deep would be typical for 1 hull point of cargo space. Simply buying this system multiple times can purchase more cargo space.
 
 ### Cargo Bay (PL 6)
 

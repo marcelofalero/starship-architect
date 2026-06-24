@@ -106,13 +106,40 @@ export const useShipStore = defineStore('ship', () => {
         return def.group === 'Sublight Drives' && def.stats && def.stats.speed !== undefined;
     }
 
+    function getPaidAirlockQuantity(instance) {
+        let freeAirlocks = 0;
+        installedComponents.value.forEach(inst => {
+            const d = allEquipment.value.find(e => e.id === inst.defId);
+            if (!d) return;
+            const q = inst.modifications?.quantity || 1;
+            if (d.category === 'Command' && d.id !== 'cmd_cockpit') freeAirlocks += q;
+            else if (d.category === 'Crew') freeAirlocks += q;
+            else if (d.id === 'misc_docking_clamps' || d.id === 'misc_hangar' || d.id === 'misc_cargo_hold' || d.id === 'misc_ordnance_transfer_system') freeAirlocks += q;
+        });
+
+        let previousAirlocks = 0;
+        for (const inst of installedComponents.value) {
+            if (inst === instance) break;
+            if (inst.defId === 'misc_airlock') previousAirlocks += (inst.modifications?.quantity || 1);
+        }
+
+        const currentQuantity = instance.modifications?.quantity || 1;
+        const availableFree = Math.max(0, freeAirlocks - previousAirlocks);
+        return Math.max(0, currentQuantity - availableFree);
+    }
+
     function calculateHullPts(instance) {
         const def = allEquipment.value.find(e => e.id === instance.defId);
         if (!def) return 0;
 
         let hullCost = 0;
         const batteryCount = instance.modifications?.batteryCount || 1;
-        const quantity = instance.modifications?.quantity || 1;
+        let quantity = instance.modifications?.quantity || 1;
+        
+        if (def.id === 'misc_airlock') {
+            quantity = getPaidAirlockQuantity(instance);
+            if (quantity === 0) return 0;
+        }
         const advanced = instance.modifications?.advanced || false;
         const emplacement = instance.modifications?.emplacement || 'Standard Mount';
         const weaponMount = instance.modifications?.weaponMount || 'Single';
@@ -271,6 +298,10 @@ export const useShipStore = defineStore('ship', () => {
         const def = allEquipment.value.find(e => e.id === instance.defId);
         if (!def || (!ignoreStock && instance.isStock)) return 0;
 
+        if (def.id === 'misc_airlock' && getPaidAirlockQuantity(instance) === 0) {
+            return 0;
+        }
+
         let cost = def.baseCost || 0;
         
         if (def.costPerHull) {
@@ -386,7 +417,11 @@ export const useShipStore = defineStore('ship', () => {
                  cost *= instance.modifications.batteryCount;
              }
              if (instance.modifications.quantity > 1 && def.minHullPts === undefined && (!def.hullCost || def.hullCost.type !== 'pct')) {
-                 cost *= instance.modifications.quantity;
+                 if (def.id === 'misc_airlock') {
+                     cost *= getPaidAirlockQuantity(instance);
+                 } else {
+                     cost *= instance.modifications.quantity;
+                 }
              }
         }
 

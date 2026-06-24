@@ -28,9 +28,11 @@ are more expensive in larger installations.
 
 Every ship requires either a cockpit or a command deck. A command deck begins at 2 hull points, and requires 1 extra hull point for each 100 hull points after the first 100 (a total of 3 hull points for a ship of 100 or more hull points, 4 for a ship of 200 or more, and so on). However, a command deck of 10 hull points can handle a ship of any size.
 
-A command deck includes three seats or stations per hull point. In a pitched battle, enemy fire may knock out the ship’s bridge or command deck. Many ships install an auxiliary command deck as a little bit of insurance against that lucky hit.
+A command deck includes three seats or stations per hull point. In a pitched battle, enemy fire may knock out the ship’s bridge or command deck.
 
-All command functions are duplicated in the auxiliary bridge. It takes one round to switch command from one bridge to another. The command deck includes an airlock for exterior access, if the ship designer wants one there.
+### Backup Command Deck (PL 6)
+
+Many ships install an auxiliary command deck as a little bit of insurance against that lucky hit. All command functions are duplicated in the auxiliary bridge. It takes one round to switch command from one bridge to another. The command deck includes an airlock for exterior access, if the ship designer wants one there.
 
 ### Flag Bridge (PL 6)
 
