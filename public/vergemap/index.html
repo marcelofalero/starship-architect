@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Verge - 3D Stellar Map</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Chakra+Petch:400,700|Russo+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js and plugins -->
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <a href="../" class="back-link">&larr; Back to Main Index</a>
+        <h2>The Verge Map</h2>
+        
+        <div class="panel-section">
+            <label for="search-star">Search Star System</label>
+            <select id="search-star">
+                <option value="">-- Select a Star --</option>
+            </select>
+        </div>
+
+        <div class="panel-section">
+            <label>Distance Calculator (LY)</label>
+            <select id="star-a">
+                <option value="">-- Origin --</option>
+            </select>
+            <select id="star-b">
+                <option value="">-- Destination --</option>
+            </select>
+            <button id="calc-btn">Calculate Distance</button>
+            <div id="distance-result" style="margin-bottom: 10px;"></div>
+            
+            <div id="travel-ui" style="display: none; border-top: 1px solid #333; padding-top: 10px;">
+                <label style="color: #00ffcc; font-size: 12px;">Travel Route: <strong id="travel-ship-name">Ship</strong></label>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="number" id="travel-distance" placeholder="Distance (LY)" step="any" style="flex: 2;">
+                    <button id="travel-btn" style="flex: 1;">Travel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <label>Ship Controls</label>
+            
+            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input type="text" id="new-ship-name" placeholder="New Ship Name" style="flex: 2;">
+                <button id="create-ship-btn" style="flex: 1;">Create</button>
+            </div>
+            
+            <select id="ship-select">
+                <option value="">-- Select Ship to Edit --</option>
+            </select>
+            
+            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input type="number" id="ship-x" placeholder="X" step="any">
+                <input type="number" id="ship-y" placeholder="Y" step="any">
+                <input type="number" id="ship-z" placeholder="Z" step="any">
+            </div>
+            
+            <div style="display: flex; gap: 5px;">
+                <button id="move-ship-btn" style="flex: 2;">Update Position</button>
+                <button id="delete-ship-btn" style="flex: 1; background-color: #ff3333; border-color: #aa2222; color: #fff;">Delete</button>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <label>Data Management</label>
+            <div style="display: flex; gap: 5px;">
+                <button id="export-yaml-btn" style="flex: 1;">Export YAML</button>
+                <button id="import-yaml-btn" style="flex: 1;">Import YAML</button>
+                <input type="file" id="import-yaml-file" accept=".yaml,.yml" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Panel overlay for clicks -->
+    <div id="info-panel" style="display: none;">
+        <button id="close-info">&times;</button>
+        <h3 id="info-name">Name</h3>
+        <p class="info-meta">Type: <span id="info-type"></span></p>
+        <p class="info-meta">Class: <span id="info-class"></span></p>
+        <p class="info-meta">Coords: <span id="info-coords"></span></p>
+        <div id="info-desc"></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
