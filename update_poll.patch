@@ -1,0 +1,63 @@
+--- public/vergemap/js/app.js
++++ public/vergemap/js/app.js
+@@ -126,24 +126,50 @@
+         // Check for moved ships
++        let remoteShipNames = new Set();
+         sessionData.ships.forEach(remoteShip => {
++            remoteShipNames.add(remoteShip.name);
+             const localShip = shipsData.find(s => s.name === remoteShip.name);
+             if (localShip) {
+                 // Check if coordinates changed significantly
+                 const distSq = (localShip.x - remoteShip.x)**2 + (localShip.y - remoteShip.y)**2 + (localShip.z - remoteShip.z)**2;
+-                if (distSq > 0.01) {
++                
++                // Also check if rotation changed
++                let rotChanged = false;
++                if (remoteShip.rx !== undefined && localShip.rx !== remoteShip.rx) rotChanged = true;
++                
++                if (distSq > 0.01 || rotChanged) {
+                     const oldX = localShip.x;
+                     const oldY = localShip.y;
+                     const oldZ = localShip.z;
+                     
+                     localShip.x = remoteShip.x;
+                     localShip.y = remoteShip.y;
+                     localShip.z = remoteShip.z;
++                    if (remoteShip.rx !== undefined) {
++                        localShip.rx = remoteShip.rx;
++                        localShip.ry = remoteShip.ry;
++                        localShip.rz = remoteShip.rz;
++                        localShip.rw = remoteShip.rw;
++                    }
+                     
+                     const mesh = sceneObjects[localShip.name];
+                     if (mesh) {
+                         animateShip(localShip, oldX, oldY, oldZ);
+                     }
+                     
+-                    if (document.getElementById('ship-select').value === localShip.name) {
++                    if (document.getElementById('ship-select') && document.getElementById('ship-select').value === localShip.name) {
+                         document.getElementById('ship-x').value = localShip.x.toFixed(2);
+                         document.getElementById('ship-y').value = localShip.y.toFixed(2);
+                         document.getElementById('ship-z').value = localShip.z.toFixed(2);
+                     }
+                     changed = true;
+                 }
++            } else {
++                // Ship doesn't exist locally, add it!
++                shipsData.push(remoteShip);
++                changed = true;
++                // Re-render to show it
++                setTimeout(() => { renderShips(); refreshDropdowns(); }, 0);
+             }
+         });
++        
++        // Check for deleted ships
++        for (let i = shipsData.length - 1; i >= 0; i--) {
++            if (!remoteShipNames.has(shipsData[i].name)) {
++                shipsData.splice(i, 1);
++                changed = true;
++                setTimeout(() => { renderShips(); refreshDropdowns(); }, 0);
++            }
++        }
+         

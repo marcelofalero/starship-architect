@@ -144,6 +144,7 @@ This means that it’s generally used against targets that aren’t maneuvering 
 
 The power cells can provide 6 hours of flight and up to 48 hours of life support.
 
+When the pod reaches its target, it uses a set of mechanical grapples to fasten itself to the enemy’s hull. It doesn’t have any facilities for cutting into the enemy ship, but the marines on board normally carry shaped charges or laser torches to make their entrance. This normally takes 1d4 rounds, although it depends a lot on what kind of gear the boarders have and what they’re trying to get into.
 ### Fabrication Facility (PL 7)
 
 This facility is a large, automated workshop with a manufacturing computer that holds design specs for thousands of useful devices and critical machinery. Virtually any part or component of the ship can be duplicated by the fabrication facility. Not only is the facility useful for creating specialpurpose tools, furniture, or repair parts, it also makes possible the repair of mortal damage to the ship without returning to a shipyard.
@@ -152,21 +153,8 @@ This facility is a large, automated workshop with a manufacturing computer that 
 
 The ship is equipped with a special airlock and ordnance transfer crane or tractor beam. It can reload external missile racks, bomb racks, or ordnance cells in d4 x 10 minutes, instead of d4 hours. Ammo carriers are often fitted with this system to permit faster reloading of expended missiles and bombs.
 
-### Security Suite (PL 7)
-
-The ultimate in shipboard security, this suite of protective devices includes video, sound, and thermal monitoring of all protected compartments by surveillance computers. All doors in the protected area are heavy-duty armored security hatches that can be set to open by key card, retinal scan, or positive control from the ship’s security center. Finally, each security suite purchased includes four weapon cupolas that can be used to mount any ranged or heavy weapon from the Player’s Handbook in strategic locations such as airlocks, passage intersections, or vital compartments.
-
-While it’s possible to protect the entire hull of a large system with security suites, it’s more cost-efficient to create “security zones” or “security decks” to guard vital areas or control access throughout the ship, leaving most of the hull with routine security measures and monitoring.
-
-When the pod reaches its target, it uses a set of mechan-
-
-ical grapples to fasten itself to the enemy’s hull. It doesn’t
-
 ### Stabilizer (PL 7)
 
-have any facilities for cutting into the enemy ship, but the
-
-marines on board normally carry shaped charges or laser torches to make their entrance. This normally takes 1d4 rounds, although it depends a lot on what kind of gear the boarders have and what they’re trying to get into.
 
 ### Evac System (PL 7)
 
@@ -210,7 +198,6 @@ The final step in shipboard manufacturing and repair technology, the nanomanufac
 | Extra pods | - | 1 | 0 | $50 K | Hangar | 2 10-man lifeboats |
 | Fabrication Facility | - | 4 | 2 | $200 K | Misc. | - |
 | Ordnance Transfer System- | 2 | 2 | $150 K | Hangar | - |
-| Security Suite | - | 1 | 1 | $200 K | Cmd | per 40 hull points protected |
 | Stabilizer | G, X | 5% | 1/hull | $200 K/hull | Engine | Adds 1 to maneuverability class |
 | Holofield Bay | Q, C | 1 | 1 | $100 K | Misc. |
 | Nanomanufacture Bay | S, C | 4 | 4 | $500 K | Misc. |

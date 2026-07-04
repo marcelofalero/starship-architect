@@ -1,0 +1,61 @@
+Warships Starship Architect
+
+1 of 1
+
+http://localhost:8080/warships/
+
+Untitled Ship
+
+CL 33
+
+Medium Ships Star�ghter (Light cruiser)
+Init +0; Senses Perception +0
+
+DEFENSE
+Ref 10 (Flat-footed 15), Fort 5; +0 Armor
+
+OFFENSE
+Acceleration �y 4 squares (starship scale)
+Ranged Heavy Mass Cannon +-5 (2d6)
+Amazing FC (-3 step)
+
+Ranged Heavy Mass Cannon +-5 (2d6)
+Amazing FC (-3 step)
+
+Ranged Advanced Fusion Beam +-5 (d12+2w/d12+4w/d8+5m)
+Twin Battery, Amazing FC (-3 step)
+
+Ranged Advanced Fusion Beam +-5 (d12+2w/d12+4w/d8+5m)
+Twin Battery, Amazing FC (-3 step)
+
+Ranged Advanced Dark Fusion Gun +-5 (4d6)
+Amazing FC (-3 step)
+
+STATISTICS
+Str 0
+
+Dex 0
+
+Int 0
+
+Base Atk +0; Grapple +-5
+
+SYSTEMS
+Neutronite, Heavy (PL 7), Advanced Induction engine, Drivewave, Life support (PL 7), Stateroom,
+Galley, Medical bay, Berthing, 6-man, Hydroponics bay, Command Deck, Mass Transceiver,
+Command Deck, Flag Bridge, Radio Transceiver, Sensor Control, Good, Computer Core, Good,
+Nav Control, Good, Fire Control, Good, Tac Control, Good, Mass Detector, Multiband Radar,
+Spectroanalyzer, Hi-Res Video, Hangar, Cargo Hold, Cargo Hold, Airlock, Airlock, Brig,
+Autocargo, Autocargo, Evac System, Fabrication Facility, AI Cradle, AI Automation, Dynamic
+Mass Reactor, Dynamic Mass Reactor, Dynamic Mass Reactor, Mass Detector, Mass Detector,
+Stardrive Scrambler, Advanced De�ection Inducer
+
+SPECIAL EQUIPMENT RULES
+Neutronite, Heavy (PL 7): LI: d8+1 | HI: d8+1 | En: d8+1 | Hull: 10%
+Induction engine: Pow: 1.0
+Drivewave: Min Size: 2 | Pow: 0
+Life support (PL 7): Life support for 40 hull points
+
+6/10/26, 23:20
+
+

@@ -16,20 +16,6 @@ type ResourceType struct {
 }
 
 func initTypes(db *sql.DB) {
-	// Check if empty
-	var count int
-	err := db.QueryRow("SELECT count(*) FROM resource_types").Scan(&count)
-	if err != nil {
-		// Table might not exist yet if schema wasn't applied, but entrypoint applies it.
-		// If running tests without full DB setup, this might fail.
-		// For safety we log and return.
-		log.Printf("Warning: initTypes check failed: %v", err)
-		return
-	}
-	if count > 0 {
-		return
-	}
-
 	// Insert defaults
 	// We use plural names to match the REST API endpoints (e.g. /ships, /libraries)
 	types := map[string]string{
@@ -37,10 +23,11 @@ func initTypes(db *sql.DB) {
 		"libraries":      `{"type": "object", "properties": {"components": {"type": "array"}, "ships": {"type": "array"}}}`,
 		"hangars":        `{"type": "object", "properties": {"ships": {"type": "array"}}, "required": ["ships"]}`,
 		"configurations": `{"type": "object"}`,
+		"sessions":       `{"type": "object", "properties": {"ships": {"type": "array"}}}`,
 	}
 
 	for name, schema := range types {
-		_, err := db.Exec("INSERT INTO resource_types (name, schema) VALUES (?, ?)", name, schema)
+		_, err := db.Exec("INSERT OR IGNORE INTO resource_types (name, schema) VALUES (?, ?)", name, schema)
 		if err != nil {
 			log.Printf("Failed to insert default type %s: %v", name, err)
 		}

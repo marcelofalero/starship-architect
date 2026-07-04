@@ -1,4 +1,4 @@
-name = "swse-backend-go"
+name = "sa-backend"
 main = "build/worker.mjs"
 compatibility_date = "2024-04-01"
 
@@ -8,8 +8,8 @@ SESSION_SECRET = "mock_session_secret"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "swse-db"
-database_id = "local-db-id"
+database_name = "sa-db"
+database_id = "7f4ac224-bc8c-4a85-b870-785ba839e6d2"
 
 [[rules]]
   type = "CompiledWasm"

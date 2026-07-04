@@ -17,50 +17,68 @@
             }
         }
     </script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
 
     <div id="ui-layer">
-        <a href="../" class="back-link">&larr; Back to Main Index</a>
-        <h2>The Verge Map</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <a href="../" class="back-link" data-i18n="backLink">&larr; Back to Main Index</a>
+            <select id="lang-select" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc;">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2 style="margin: 0;" data-i18n="title">The Verge Map</h2>
+            <div style="display: flex; gap: 5px;">
+                <button id="log-btn" data-i18n-title="logBtn" title="Movement Log" style="padding: 5px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </button>
+                <button id="share-btn" data-i18n-title="shareBtn" title="Share Link" style="padding: 5px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
         
-        <div class="panel-section">
-            <label for="search-star">Search Star System</label>
+        <div class="panel-section" id="panel-search">
+            <label for="search-star" data-i18n="searchStar">Search Star System</label>
             <select id="search-star">
-                <option value="">-- Select a Star --</option>
+                <option value="" data-i18n="selectStar">-- Select a Star --</option>
             </select>
         </div>
 
-        <div class="panel-section">
-            <label>Distance Calculator (LY)</label>
+        <div class="panel-section" id="panel-distance">
+            <label data-i18n="distCalc">Distance Calculator (LY)</label>
             <select id="star-a">
-                <option value="">-- Origin --</option>
+                <option value="" data-i18n="origin">-- Origin --</option>
             </select>
             <select id="star-b">
-                <option value="">-- Destination --</option>
+                <option value="" data-i18n="destination">-- Destination --</option>
             </select>
-            <button id="calc-btn">Calculate Distance</button>
+            <button id="calc-btn" data-i18n="calcDist">Calculate Distance</button>
             <div id="distance-result" style="margin-bottom: 10px;"></div>
             
             <div id="travel-ui" style="display: none; border-top: 1px solid #333; padding-top: 10px;">
-                <label style="color: #00ffcc; font-size: 12px;">Travel Route: <strong id="travel-ship-name">Ship</strong></label>
+                <label style="color: #00ffcc; font-size: 12px;"><span data-i18n="travelRoute">Travel Route:</span> <strong id="travel-ship-name">Ship</strong></label>
                 <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <input type="number" id="travel-distance" placeholder="Distance (LY)" step="any" style="flex: 2;">
-                    <button id="travel-btn" style="flex: 1;">Travel</button>
+                    <input type="number" id="travel-distance" data-i18n-placeholder="distancePlaceholder" placeholder="Distance (LY)" step="any" style="flex: 2;">
+                    <button id="travel-btn" data-i18n="travelBtn" style="flex: 1;">Travel</button>
                 </div>
             </div>
         </div>
 
-        <div class="panel-section">
-            <label>Ship Controls</label>
-            
-            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                <input type="text" id="new-ship-name" placeholder="New Ship Name" style="flex: 2;">
-                <button id="create-ship-btn" style="flex: 1;">Create</button>
+        <div class="panel-section" id="panel-ship-controls">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label data-i18n="shipControls" style="margin: 0;">Ship Controls</label>
             </div>
             
             <select id="ship-select">
-                <option value="">-- Select Ship to Edit --</option>
+                <option value="" data-i18n="selectShip">-- Select Ship to Edit --</option>
             </select>
             
             <div style="display: flex; gap: 5px; margin-bottom: 10px;">
@@ -69,17 +87,21 @@
                 <input type="number" id="ship-z" placeholder="Z" step="any">
             </div>
             
+            <input type="file" id="token-upload-file" accept="image/png, image/webp" style="display: none;">
+            
             <div style="display: flex; gap: 5px;">
-                <button id="move-ship-btn" style="flex: 2;">Update Position</button>
-                <button id="delete-ship-btn" style="flex: 1; background-color: #ff3333; border-color: #aa2222; color: #fff;">Delete</button>
+                <button id="move-ship-btn" data-i18n="updatePosition" style="flex: 2;">Update Position</button>
+                <button id="delete-ship-btn" data-i18n="deleteBtn" style="flex: 1; background-color: #ff3333; border-color: #aa2222; color: #fff;">Delete</button>
             </div>
         </div>
+        
 
-        <div class="panel-section">
-            <label>Data Management</label>
+
+        <div class="panel-section" id="panel-data-management">
+            <label data-i18n="dataManagement">Data Management</label>
             <div style="display: flex; gap: 5px;">
-                <button id="export-yaml-btn" style="flex: 1;">Export YAML</button>
-                <button id="import-yaml-btn" style="flex: 1;">Import YAML</button>
+                <button id="export-yaml-btn" data-i18n="exportYaml" style="flex: 1;">Export YAML</button>
+                <button id="import-yaml-btn" data-i18n="importYaml" style="flex: 1;">Import YAML</button>
                 <input type="file" id="import-yaml-file" accept=".yaml,.yml" style="display: none;">
             </div>
         </div>
@@ -89,13 +111,294 @@
     <div id="info-panel" style="display: none;">
         <button id="close-info">&times;</button>
         <h3 id="info-name">Name</h3>
-        <p class="info-meta">Type: <span id="info-type"></span></p>
-        <p class="info-meta">Class: <span id="info-class"></span></p>
-        <p class="info-meta">Coords: <span id="info-coords"></span></p>
+        <p class="info-meta"><span data-i18n="infoType">Type</span>: <span id="info-type"></span></p>
+        <p class="info-meta"><span data-i18n="infoClass">Class</span>: <span id="info-class"></span></p>
+        <p class="info-meta" id="info-owner-group"><span data-i18n="ownerLabel">Owner</span>: <span id="info-owner"></span></p>
+        <p class="info-meta"><span data-i18n="infoCoords">Coords</span>: <span id="info-coords"></span></p>
         <div id="info-desc"></div>
+        <div id="info-public-notes" style="margin-top: 10px; font-size: 12px; color: #aaddff;"></div>
+        <div id="info-private-notes" style="margin-top: 10px; font-size: 12px; color: #ffaa55; display: none;"></div>
+        <button id="info-move-ship-btn" style="margin-top: 15px; width: 100%; display: none;" data-i18n="moveShipBtn">Move Ship</button>
+        <button id="info-move-here-btn" style="margin-top: 15px; width: 100%; display: none;" data-i18n="moveHereBtn">Move Ship Here</button>
+        <button id="edit-entity-btn" style="margin-top: 15px; width: 100%; display: none;">Edit Details</button>
+    </div>
+
+    <div id="create-entity-modal" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h3 data-i18n="createEntityTitle">Create Entity</h3>
+            
+            <div class="editor-controls">
+                <label data-i18n="entityType">Entity Type</label>
+                <div class="tab-container" style="display: flex; gap: 5px; margin-bottom: 15px;">
+                    <button type="button" class="tab-btn active" id="tab-ship" style="flex: 1; padding: 8px 5px; font-size: 0.85em;">Ship</button>
+                    <button type="button" class="tab-btn" id="tab-star" style="flex: 1; padding: 8px 5px; font-size: 0.85em;">Star</button>
+                    <button type="button" class="tab-btn" id="tab-poi" style="flex: 1; padding: 8px 5px; font-size: 0.85em;">POI</button>
+                </div>
+                
+                <label data-i18n="entityNameLabel">Name</label>
+                <input type="text" id="create-entity-name" data-i18n-placeholder="entityNamePlaceholder" placeholder="Enter name...">
+                
+                <div id="create-star-class-group" style="display: none; margin-bottom: 10px;">
+                    <label data-i18n="starClassLabel">Star Class</label>
+                    <select id="create-star-class">
+                        <option value="O">Class O - Blue</option>
+                        <option value="B">Class B - Blue-White</option>
+                        <option value="A">Class A - White</option>
+                        <option value="F">Class F - Yellow-White</option>
+                        <option value="G" selected>Class G - Yellow</option>
+                        <option value="K">Class K - Orange</option>
+                        <option value="M">Class M - Red</option>
+                    </select>
+                </div>
+                
+                <div id="create-poi-type-group" style="display: none; margin-bottom: 10px;">
+                    <label data-i18n="poiTypeLabel">POI Type</label>
+                    <select id="create-poi-type">
+                        <option value="P_STATION" selected>Space Station</option>
+                        <option value="P_DERELICT">Derelict Ship</option>
+                        <option value="P_ANOMALY">Space Anomaly</option>
+                    </select>
+                </div>
+                
+                <div id="create-token-group" style="margin-bottom: 10px;">
+                    <label>Token Image / Custom Visual</label>
+                    <select id="create-entity-token" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
+                        <option value="">Default 3D Shape</option>
+                    </select>
+                    <button type="button" id="create-upload-token-btn" style="width: 100%; padding: 8px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 4px;">Upload Ship/POI Token</button>
+                </div>
+                
+                <div id="create-owner-group" style="margin-bottom: 10px;">
+                    <label data-i18n="ownershipLabel">Ownership</label>
+                    <select id="create-entity-owner" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
+                        <option value="GM" data-i18n="ownershipGM">GM</option>
+                        <option value="Players" data-i18n="ownershipPlayers" selected>Players</option>
+                    </select>
+                </div>
+                
+                <label data-i18n="coordinatesLabel">Coordinates (X, Y, Z)</label>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <input type="number" id="create-entity-x" placeholder="X" value="0" step="any">
+                    <input type="number" id="create-entity-y" placeholder="Y" value="0" step="any">
+                    <input type="number" id="create-entity-z" placeholder="Z" value="0" step="any">
+                </div>
+                
+                <label data-i18n="descriptionLabel">Description</label>
+                <textarea id="create-entity-desc" rows="3" style="width: 100%; box-sizing: border-box; background-color: #0A3D54; border: 1px solid #389EBD; color: white; font-family: inherit; padding: 10px; margin-bottom: 10px; border-radius: 2px; resize: vertical;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="submit-create-entity-btn" data-i18n="createBtn" style="flex: 1;">Create</button>
+                <button id="cancel-create-entity-btn" data-i18n="cancelBtn" style="flex: 1; background-color: #555;">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <div id="canvas-container"></div>
+
+    <div id="token-editor-modal" style="display: none;">
+        <div class="modal-content">
+            <h3 data-i18n="tokenEditor">Token Editor</h3>
+            <canvas id="token-preview" width="256" height="256"></canvas>
+            
+            <div class="editor-controls">
+                <label data-i18n="tokenRotation">Rotation (Degrees)</label>
+                <input type="range" id="token-rotation" min="0" max="360" value="0">
+                
+                <label data-i18n="tokenScale">Scale (Size on Map)</label>
+                <input type="number" id="token-scale" min="0.1" max="5.0" step="0.1" value="1.0">
+                
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="token-remove-bg" style="width: auto; margin: 0;">
+                    <span data-i18n="tokenRemoveBg">Auto-remove Background (Top-left Pixel)</span>
+                </label>
+                
+                <label data-i18n="tokenTolerance">Tolerance (0 - 255)</label>
+                <input type="range" id="token-tolerance" min="0" max="255" value="10">
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="save-token-btn" data-i18n="saveToken">Save Token</button>
+                <button id="cancel-token-btn" data-i18n="cancelToken" style="background-color: #555;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Editor Modal -->
+    <div id="entity-editor-modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Edit Entity</h3>
+            <div class="editor-controls">
+                <label>Name</label>
+                <input type="text" id="edit-entity-name" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
+                
+                <div id="edit-class-container" style="margin-bottom: 10px;">
+                    <label>System Class / POI Type</label>
+                    <select id="edit-entity-class" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px;">
+                        <option value="O">Star System (Class O - Blue)</option>
+                        <option value="B">Star System (Class B - Blue-White)</option>
+                        <option value="A">Star System (Class A - White)</option>
+                        <option value="F">Star System (Class F - Yellow-White)</option>
+                        <option value="G">Star System (Class G - Yellow)</option>
+                        <option value="K">Star System (Class K - Orange)</option>
+                        <option value="M">Star System (Class M - Red)</option>
+                        <option value="P">Point of Interest</option>
+                        <option value="P_STATION">Space Station</option>
+                        <option value="P_DERELICT">Derelict Ship</option>
+                        <option value="P_ANOMALY">Space Anomaly</option>
+                    </select>
+                </div>
+
+                <div id="edit-owner-group" style="margin-bottom: 10px;">
+                    <label data-i18n="ownershipLabel">Ownership</label>
+                    <select id="edit-entity-owner" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
+                        <option value="GM" data-i18n="ownershipGM">GM</option>
+                        <option value="Players" data-i18n="ownershipPlayers">Players</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label>Token Image / Custom Visual</label>
+                    <select id="edit-entity-token" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
+                        <option value="">Default 3D Shape</option>
+                    </select>
+                    <button id="entity-upload-token-btn" style="width: 100%; padding: 8px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 4px;">Upload New Token to Library</button>
+                </div>
+                
+                <label>Description (HTML allowed)</label>
+                <textarea id="edit-entity-desc" rows="4" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;"></textarea>
+                
+                <label>Public Notes</label>
+                <textarea id="edit-entity-public" rows="3" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;"></textarea>
+                
+                <label style="color: #ffaa55;">Private Notes (GM Only)</label>
+                <textarea id="edit-entity-private" rows="3" style="width: 100%; box-sizing: border-box; border-color: #ffaa55; margin-bottom: 10px;"></textarea>
+
+                <label style="display: flex; align-items: center; gap: 5px; color: #ffaa55;">
+                    <input type="checkbox" id="edit-entity-hidden" style="width: auto; margin: 0;">
+                    <span>Hidden from Players (GM Only)</span>
+                </label>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="save-entity-btn" style="flex: 1;">Save Changes</button>
+                <button id="delete-entity-btn" style="flex: 1; background-color: #ff3333; border-color: #aa2222; color: white;">Delete Entity</button>
+                <button id="cancel-entity-btn" style="flex: 1; background-color: #555;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move Ship Modal -->
+    <div id="move-ship-modal" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h3 id="move-ship-title-header" data-i18n="moveShipTitle">Move Ship</h3>
+            <div class="editor-controls">
+                <label data-i18n="moveDestTypeLabel">Destination Type</label>
+                <select id="move-dest-type" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                    <option value="entity" data-i18n="destEntity" selected>Entity (Star/POI/Ship)</option>
+                    <option value="coordinates" data-i18n="destCoordinates">Coordinates</option>
+                </select>
+
+                <div id="move-entity-select-group" style="margin-bottom: 10px;">
+                    <label data-i18n="selectTargetEntity">Target Entity</label>
+                    <select id="move-entity-select" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px;"></select>
+                </div>
+
+                <label data-i18n="coordinatesLabel">Coordinates (X, Y, Z)</label>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <input type="number" id="move-coord-x" placeholder="X" value="0" step="any" style="flex: 1;">
+                    <input type="number" id="move-coord-y" placeholder="Y" value="0" step="any" style="flex: 1;">
+                    <input type="number" id="move-coord-z" placeholder="Z" value="0" step="any" style="flex: 1;">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="confirm-move-ship-btn" style="flex: 1;" data-i18n="moveBtn">Move</button>
+                <button id="cancel-move-ship-btn" style="flex: 1; background-color: #555;" data-i18n="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move Here Modal -->
+    <div id="move-here-modal" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h3 data-i18n="moveHereTitle">Move Ship Here</h3>
+            <div class="editor-controls">
+                <label data-i18n="selectShipToMove">Select Ship</label>
+                <select id="move-here-ship-select" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;"></select>
+
+                <div id="move-here-details" style="font-size: 0.85em; color: #ccc; margin-bottom: 10px; line-height: 1.4;">
+                    <div><span data-i18n="targetLabel">Target</span>: <strong id="move-here-target-name"></strong></div>
+                    <div><span data-i18n="totalDistanceLabel">Total Distance</span>: <strong id="move-here-total-dist"></strong> LY</div>
+                </div>
+
+                <label data-i18n="travelDistanceLabel">Travel Distance (LY)</label>
+                <input type="number" id="move-here-distance" value="0" step="any" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="confirm-move-here-btn" style="flex: 1;" data-i18n="moveBtn">Move</button>
+                <button id="cancel-move-here-btn" style="flex: 1; background-color: #555;" data-i18n="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Session Modal -->
+    <div id="share-modal" style="display: none;">
+        <div class="modal-content" style="width: 450px; max-width: 90vw;">
+            <h3 data-i18n="shareSessionTitle">Share Session Access Links</h3>
+            <p style="font-size: 0.85em; color: #ccc; margin-bottom: 15px;" data-i18n="shareSessionDesc">Below are your session access links. Keep the Game Master link private; share the Player link with players to allow them to move ships, and the Viewer link for spectators.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="color: #ffaa55;" data-i18n="gmLink">Game Master Link (Admin - Full Access)</label>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="text" id="share-gm-url" readonly style="margin-bottom: 0;">
+                    <button class="share-copy-btn" data-target="share-gm-url" style="width: auto; padding: 10px;" data-i18n="copyBtn">Copy</button>
+                </div>
+                <small style="display: block; margin-top: 4px; color: #ffaa55; font-size: 0.75em;" data-i18n="gmLinkTip">To save this, drag this button to your bookmarks bar or press Ctrl+D / Cmd+D.</small>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="color: #59B7C7;" data-i18n="playerLink">Player Link (Navigation & Move Access)</label>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="text" id="share-player-url" readonly style="margin-bottom: 0;">
+                    <button class="share-copy-btn" data-target="share-player-url" style="width: auto; padding: 10px;" data-i18n="copyBtn">Copy</button>
+                    <button class="share-native-btn" data-role="Player" data-target="share-player-url" style="width: auto; padding: 10px; display: none;" data-i18n="shareBtnLabel">Share</button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="color: #bbb;" data-i18n="viewerLink">Viewer Link (Read-Only Spectator Access)</label>
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="text" id="share-viewer-url" readonly style="margin-bottom: 0;">
+                    <button class="share-copy-btn" data-target="share-viewer-url" style="width: auto; padding: 10px;" data-i18n="copyBtn">Copy</button>
+                    <button class="share-native-btn" data-role="Viewer" data-target="share-viewer-url" style="width: auto; padding: 10px; display: none;" data-i18n="shareBtnLabel">Share</button>
+                </div>
+            </div>
+            
+            <div id="fallback-share-actions" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center; border-top: 1px solid #0A3D54; padding-top: 15px;">
+                <a id="share-whatsapp-btn" target="_blank" class="btn-like" style="font-size: 0.85em; padding: 8px; text-decoration: none;" data-i18n="shareWhatsApp">Share Player Link via WhatsApp</a>
+                <a id="share-email-btn" class="btn-like" style="font-size: 0.85em; padding: 8px; text-decoration: none;" data-i18n="shareEmail">Share Player Link via Email</a>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button id="close-share-modal-btn" style="background-color: #555;" data-i18n="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movement Log Modal -->
+    <div id="log-modal" style="display: none;">
+        <div class="modal-content" style="width: 700px; max-width: 95vw;">
+            <h3 data-i18n="logTitle">Movement Log</h3>
+            <div id="movement-log-list" style="max-height: 300px; overflow-y: auto; font-size: 12px; border: 1px solid #333; padding: 10px; background: #1a1a1a; color: #ccc; margin-bottom: 15px; font-family: monospace; white-space: pre-wrap; line-height: 1.4;">
+                <!-- Logs injected here -->
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="close-log-modal-btn" style="width: auto; padding: 10px 20px; background-color: #555;" data-i18n="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (+ Button) -->
+    <button id="open-create-modal-btn" data-i18n-title="addEntity" title="Add Entity" style="display: none;">+</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script type="module" src="js/app.js"></script>

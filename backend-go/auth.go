@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/syumai/workers/cloudflare"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
 )
@@ -192,7 +193,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	secret := os.Getenv("SESSION_SECRET")
+	secret := getJWTSecret()
 	claims := jwt.MapClaims{
 		"sub":   user.ID,
 		"email": user.Email,
@@ -235,7 +236,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenString := parts[1]
-		secret := os.Getenv("SESSION_SECRET")
+		secret := getJWTSecret()
 		claims, err := verifyHS256Token(tokenString, secret)
 
 		if err != nil {
@@ -243,6 +244,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			// Invalid token, proceed as anonymous
 			next.ServeHTTP(w, r)
 		} else {
+			// Auto-recreate user if database was wiped but JWT is still cryptographically valid
+			sub, _ := claims["sub"].(string)
+			email, _ := claims["email"].(string)
+			name, _ := claims["name"].(string)
+			if sub != "" && email != "" {
+				db.Exec("INSERT OR IGNORE INTO users (id, email, name, password_hash) VALUES (?, ?, ?, '')", sub, email, name)
+			}
+			
 			ctx := context.WithValue(r.Context(), userContextKey, claims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
@@ -318,7 +327,7 @@ func authGoogleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create session token
-	secret := os.Getenv("SESSION_SECRET")
+	secret := getJWTSecret()
 	sessionClaims := jwt.MapClaims{
 		"sub":   userID,
 		"email": email,
@@ -335,3 +344,63 @@ func authGoogleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"access_token": sessionToken, "token_type": "bearer"})
 }
+
+func signSessionTokens(resourceID string) (map[string]string, error) {
+	secret := getJWTSecret()
+	if secret == "" {
+		secret = "default_secret_dev"
+	}
+
+	tokens := make(map[string]string)
+	roles := []string{"gm", "nav", "ro"}
+
+	for _, role := range roles {
+		claims := jwt.MapClaims{
+			"session_id": resourceID,
+			"role":       role,
+			"exp":        time.Now().Add(time.Hour * 24 * 365 * 10).Unix(), // 10 years durability
+		}
+		token, err := signHS256Token(claims, secret)
+		if err != nil {
+			return nil, err
+		}
+		tokens[role] = token
+	}
+	return tokens, nil
+}
+
+func getSessionAccessRank(r *http.Request, resourceID string) int {
+	claims, ok := r.Context().Value(userContextKey).(jwt.MapClaims)
+	if !ok {
+		return 0
+	}
+
+	sID, hasSession := claims["session_id"].(string)
+	role, hasRole := claims["role"].(string)
+	if hasSession && hasRole {
+		if sID == resourceID {
+			switch role {
+			case "gm":
+				return 3
+			case "nav":
+				return 2
+			case "ro":
+				return 1
+			}
+		}
+		return 0
+	}
+	return 0
+}
+
+func getJWTSecret() string {
+	secret := cloudflare.Getenv("SESSION_SECRET")
+	if secret == "" {
+		secret = os.Getenv("SESSION_SECRET")
+	}
+	if secret == "" {
+		secret = "default_secret_dev"
+	}
+	return secret
+}
+

@@ -924,7 +924,12 @@ export const DeckPlanWrapper = {
             if (!instance) return 'Missing Component';
             const id = instance.defId || instance;
             const def = store.allEquipment.find(e => e.id === id);
-            return def ? (getLocalizedName(def) || def.id) : (id || 'Unknown');
+            let name = def ? (getLocalizedName(def) || def.id) : (id || 'Unknown');
+            
+            if (instance?.modifications?.customSuffix) {
+                name = `${name} ${instance.modifications.customSuffix}`;
+            }
+            return name;
         };
 
         const startComponentDrag = (evt, comp) => {
@@ -1072,10 +1077,17 @@ export const DeckPlanWrapper = {
             });
         };
 
-        const formatType = (type) => {
+        const formatType = (itemOrType) => {
+            if (!itemOrType) return '';
+            const type = typeof itemOrType === 'string' ? itemOrType : (itemOrType.type || '');
+            let baseLabel = type.replace(/_/g, ' ').toUpperCase();
             const amenity = amenities.find(a => a.value === type);
-            if (amenity) return amenity.label.toUpperCase();
-            return type.replace(/_/g, ' ').toUpperCase();
+            if (amenity) baseLabel = amenity.label.toUpperCase();
+            
+            if (typeof itemOrType === 'object' && itemOrType.customLabel) {
+                return `${baseLabel} ${itemOrType.customLabel}`;
+            }
+            return baseLabel;
         };
 
         const getItemColor = (item) => {
@@ -1479,9 +1491,12 @@ export const DeckPlanWrapper = {
                 if (item.type === 'component') {
                     const inst = store.installedComponents.find(c => c.instanceId === item.instanceId);
                     if (inst) label = getName(inst);
+                    if (item.customLabel) label = `${label} ${item.customLabel}`;
                 } else {
                     // amenity or structural type — use a readable format
-                    label = item.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    const amenity = amenities.find(a => a.value === item.type);
+                    label = amenity ? amenity.label : item.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    if (item.customLabel) label = `${label} ${item.customLabel}`;
                 }
                 if (!label) continue;
 
@@ -1762,7 +1777,7 @@ export const DeckPlanWrapper = {
                             </q-item-section>
                             <q-item-section>
                                 <q-item-label style="text-transform: capitalize;">
-                                    {{ item.type === 'component' ? getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) : item.type }}
+                                    {{ item.type === 'component' ? getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) + (item.customLabel ? ' ' + item.customLabel : '') : formatType(item) }}
                                 </q-item-label>
                             </q-item-section>
                         </q-item>
@@ -1858,6 +1873,10 @@ export const DeckPlanWrapper = {
                         <q-input dark dense filled v-model.number="gridScale" type="number" style="width: 100px" suffix="m" />
                     </div>
 
+                    <div class="row items-center q-mr-sm" v-if="selectedItemIds.length === 1 && activeSection && !['floor', 'wall', 'wall_thin_h', 'wall_thin_v'].includes(activeSection.items.find(i => i.id === selectedItemIds[0])?.type)">
+                        <q-input dark dense filled v-model="activeSection.items.find(i => i.id === selectedItemIds[0]).customLabel" placeholder="Custom Suffix" style="width: 150px" />
+                    </div>
+
                     <q-btn-group outline v-if="selectedItemIds.length === 1 && activeSection && ['ladder', 'elevator'].includes(activeSection.items.find(i => i.id === selectedItemIds[0])?.type)" class="q-mr-sm">
                         <q-btn :color="activeSection.items.find(i => i.id === selectedItemIds[0]).vDir === 'up' ? 'primary' : 'grey-8'" label="UP" @click="setVDir('up')" />
                         <q-btn :color="activeSection.items.find(i => i.id === selectedItemIds[0]).vDir === 'down' ? 'primary' : 'grey-8'" label="DN" @click="setVDir('down')" />
@@ -1944,7 +1963,7 @@ export const DeckPlanWrapper = {
                                          onmouseout="this.style.boxShadow='none'">
                                          
                                          <div v-for="item in activeDeck.sections.find(s => s.id === secId).items" :key="'mi'+item.id" :style="getItemStyle(item, 20)">
-                                             <span v-if="item.type === 'component'" :style="{ textTransform: 'uppercase', whiteSpace: item.textRot ? 'nowrap' : 'normal', transform: item.textRot ? 'rotate(' + item.textRot + 'deg)' : 'none' }">{{ getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) }}</span>
+                                             <span v-if="item.type === 'component'" :style="{ textTransform: 'uppercase', whiteSpace: item.textRot ? 'nowrap' : 'normal', transform: item.textRot ? 'rotate(' + item.textRot + 'deg)' : 'none' }">{{ getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) }}{{ item.customLabel ? ' ' + item.customLabel : '' }}</span>
                                              <span v-else-if="item.type !== 'floor' && item.type !== 'wall' && item.type !== 'wall_thin_h' && item.type !== 'wall_thin_v' && item.type !== 'ladder' && item.type !== 'stairs'" :style="{ textTransform: 'uppercase', whiteSpace: item.textRot ? 'nowrap' : 'normal', transform: item.textRot ? 'rotate(' + item.textRot + 'deg)' : 'none' }">
                                                  <template v-if="amenities.find(a => a.value === item.type)?.iconOnly">
                                                      <svg v-if="item.type === 'internal_defense'" viewBox="0 0 24 24" width="1.2em" height="1.2em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -1957,7 +1976,7 @@ export const DeckPlanWrapper = {
                                                      </svg>
                                                      <q-icon v-else :name="amenities.find(a => a.value === item.type).icon" size="1.2em" />
                                                  </template>
-                                                 <template v-else>{{ formatType(item.type) }}</template>
+                                                 <template v-else>{{ formatType(item) }}</template>
                                              </span>
                                              <div v-if="item.type === 'stairs'" v-html="getStairSVG(item, 20)"></div>
                                              <div v-if="'rotation' in item && item.type !== 'stairs'" :style="{ position: 'absolute', top: item.rotation === 0 ? '0' : item.rotation === 180 ? 'auto' : '50%', bottom: item.rotation === 180 ? '0' : 'auto', left: item.rotation === 270 ? '0' : item.rotation === 90 ? 'auto' : '50%', right: item.rotation === 90 ? '0' : 'auto', width: (item.rotation === 0 || item.rotation === 180) ? '20px' : '3px', height: (item.rotation === 90 || item.rotation === 270) ? '20px' : '3px', transform: (item.rotation === 0 || item.rotation === 180) ? 'translateX(-50%)' : 'translateY(-50%)', backgroundColor: '#FFEB3B', zIndex: 5 }"></div>
@@ -1990,7 +2009,7 @@ export const DeckPlanWrapper = {
                       @mousedown="e => onItemClick(e, item)">
                      
                      <template v-if="item.type === 'component'">
-                         <span :style="{ whiteSpace: item.textRot ? 'nowrap' : 'normal', transform: item.textRot ? 'rotate(' + item.textRot + 'deg)' : 'none', zIndex: 10, position: 'relative' }">{{ getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) }}</span>
+                         <span :style="{ whiteSpace: item.textRot ? 'nowrap' : 'normal', transform: item.textRot ? 'rotate(' + item.textRot + 'deg)' : 'none', zIndex: 10, position: 'relative' }">{{ getName(store.installedComponents.find(c => c.instanceId === item.instanceId)) }}{{ item.customLabel ? ' ' + item.customLabel : '' }}</span>
                          
                          <!-- Render Weapon Arcs Overlay -->
                          <template v-if="getWeaponArcs(item).arcs.length > 0">
@@ -2034,7 +2053,7 @@ export const DeckPlanWrapper = {
                              </svg>
                              <q-icon v-else :name="amenities.find(a => a.value === item.type).icon" size="1.5em" />
                          </template>
-                         <template v-else>{{ formatType(item.type) }}</template>
+                         <template v-else>{{ formatType(item) }}</template>
                      </span>
                      <div v-if="item.type === 'stairs'" v-html="getStairSVG(item, 30)"></div>
                      <div v-if="'rotation' in item && item.type !== 'stairs'" :style="{ position: 'absolute', top: item.rotation === 0 ? '0' : item.rotation === 180 ? 'auto' : '50%', bottom: item.rotation === 180 ? '0' : 'auto', left: item.rotation === 270 ? '0' : item.rotation === 90 ? 'auto' : '50%', right: item.rotation === 90 ? '0' : 'auto', width: (item.rotation === 0 || item.rotation === 180) ? '30px' : '4px', height: (item.rotation === 90 || item.rotation === 270) ? '30px' : '4px', transform: (item.rotation === 0 || item.rotation === 180) ? 'translateX(-50%)' : 'translateY(-50%)', backgroundColor: '#FFEB3B', zIndex: 5 }"></div>

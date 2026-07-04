@@ -182,3 +182,55 @@ def test_resource_sharing(client, resource_type, initial_data):
     # Verify Gone for Owner too
     resp = client.get(f"/{resource_type}/{resource_id}", headers=owner["headers"])
     assert resp.status_code == 404
+
+def test_session_jwt_sharing(client):
+    owner = create_user(client, name="Session Owner")
+    
+    # Create session
+    resp = client.post("/sessions", json={
+        "name": "Role Test Session",
+        "visibility": "public",
+        "data": {"ships": []}
+    }, headers=owner["headers"])
+    
+    assert resp.status_code == 200
+    res_data = resp.json()
+    session_id = res_data["id"]
+    tokens = res_data["tokens"]
+    
+    assert "gm" in tokens
+    assert "nav" in tokens
+    assert "ro" in tokens
+    
+    # 1. Read with RO token (should succeed)
+    resp = client.get(f"/sessions/{session_id}", headers={"Authorization": f"Bearer {tokens['ro']}"})
+    assert resp.status_code == 200
+    
+    # 2. Write/Update with RO token (should fail)
+    resp = client.put(f"/sessions/{session_id}", json={
+        "name": "Updated Role Test Session",
+        "visibility": "public",
+        "data": {"ships": [{"name": "Enterprise"}]}
+    }, headers={"Authorization": f"Bearer {tokens['ro']}"})
+    assert resp.status_code == 403
+    
+    # 3. Write/Update with NAV token (should succeed)
+    resp = client.put(f"/sessions/{session_id}", json={
+        "name": "Updated Role Test Session",
+        "visibility": "public",
+        "data": {"ships": [{"name": "Enterprise"}]}
+    }, headers={"Authorization": f"Bearer {tokens['nav']}"})
+    assert resp.status_code == 200
+    
+    # 4. Delete with NAV token (should fail)
+    resp = client.delete(f"/sessions/{session_id}", headers={"Authorization": f"Bearer {tokens['nav']}"})
+    assert resp.status_code == 403
+    
+    # 5. Delete with GM token (should succeed)
+    resp = client.delete(f"/sessions/{session_id}", headers={"Authorization": f"Bearer {tokens['gm']}"})
+    assert resp.status_code == 204
+    
+    # 6. Verify Deleted
+    resp = client.get(f"/sessions/{session_id}", headers={"Authorization": f"Bearer {tokens['ro']}"})
+    assert resp.status_code == 404
+

@@ -38,10 +38,10 @@ func validateResourceData(resourceType string, data map[string]interface{}) erro
 	}
 
 	compiler := jsonschema.NewCompiler()
-	if err := compiler.AddResource("schema.json", strings.NewReader(schemaStr)); err != nil {
+	if err := compiler.AddResource("http://dummy/schema.json", strings.NewReader(schemaStr)); err != nil {
 		return fmt.Errorf("failed to load schema: %v", err)
 	}
-	schema, err := compiler.Compile("schema.json")
+	schema, err := compiler.Compile("http://dummy/schema.json")
 	if err != nil {
 		return fmt.Errorf("failed to compile schema: %v", err)
 	}

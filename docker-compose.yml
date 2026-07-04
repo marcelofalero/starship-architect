@@ -23,6 +23,13 @@ services:
     depends_on:
       - backend
 
+  mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
   tests:
     build:
       context: tests

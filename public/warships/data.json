@@ -2436,6 +2436,31 @@
       "detailedDescription_es": "The radio transceiver allows basic voice and data communication over standard radio frequencies. It is typically included with any command deck or control installation, although it doesn't take any more hull points."
     },
     {
+      "id": "cmd_security_suite",
+      "name": "Security Suite",
+      "category": "Command & Comms",
+      "group": "PL 7 - Gravity Age",
+      "tech": [],
+      "baseCost": 200000,
+      "costPerHull": 0,
+      "powerConsumed": 1.0,
+      "hullCost": {
+        "type": "flat",
+        "val": 1.0
+      },
+      "baseEp": 0,
+      "stats": {
+        "pl": "PL 7"
+      },
+      "sizeMult": false,
+      "upgradeSpecs": {
+        "quantity": true
+      },
+      "description": "per 40 hull points protected",
+      "detailedDescription": "The ultimate in shipboard security, this suite of protective devices includes video, sound, and thermal monitoring of all protected compartments by surveillance computers. All doors in the protected area are heavy-duty armored security hatches that can be set to open by key card, retinal scan, or positive control from the ship’s security center. Finally, each security suite purchased includes four weapon cupolas that can be used to mount any ranged or heavy weapon from the Player’s Handbook in strategic locations such as airlocks, passage intersections, or vital compartments.\n\nWhile it’s possible to protect the entire hull of a large system with security suites, it’s more cost-efficient to create “security zones” or “security decks” to guard vital areas or control access throughout the ship, leaving most of the hull with routine security measures and monitoring.",
+      "detailedDescription_es": "The ultimate in shipboard security, this suite of protective devices includes video, sound, and thermal monitoring of all protected compartments by surveillance computers. All doors in the protected area are heavy-duty armored security hatches that can be set to open by key card, retinal scan, or positive control from the ship’s security center. Finally, each security suite purchased includes four weapon cupolas that can be used to mount any ranged or heavy weapon from the Player’s Handbook in strategic locations such as airlocks, passage intersections, or vital compartments.\n\nWhile it’s possible to protect the entire hull of a large system with security suites, it’s more cost-efficient to create “security zones” or “security decks” to guard vital areas or control access throughout the ship, leaving most of the hull with routine security measures and monitoring."
+    },
+    {
       "id": "cmd_mass_transceiver",
       "name": "Mass Transceiver",
       "category": "Command & Comms",

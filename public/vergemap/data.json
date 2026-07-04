@@ -1,91 +1,586 @@
 {
   "stars": [
-    { "name": "Krios", "x": -1.00, "y": 38.00, "z": -10.00, "class": "K", "description": "A prominent K-class star in the upper coordinate regions." },
-    { "name": "Ptolemy", "x": 1, "y": 33, "z": 26, "class": "K", "description": "A prominent K-class star in the upper coordinate regions." },
-    { "name": "Dolthan", "x": 13, "y": 32, "z": -12, "class": "K", "description": "An orange dwarf system, slightly below the galactic plane." },
-    { "name": "Cambria", "x": 20, "y": 29, "z": 17, "class": "K", "description": "Located in the positive Z-axis, an orange K-class star." },
-    { "name": "Strome", "x": 7.5, "y": 28.5, "z": 3, "class": "M", "description": "A faint red dwarf close to the main plane." },
-    { "name": "Eldala", "x": 32, "y": 22, "z": -14, "class": "G", "description": "A yellow dwarf star on the frontier." },
-    { "name": "Walin", "x": 22.5, "y": 22, "z": 1, "class": "K", "description": "Almost perfectly aligned with the galactic plane." },
-    { "name": "Sage", "x": 12.5, "y": 22.5, "z": 31, "class": "G", "description": "A high-altitude yellow G-class star." },
-    { "name": "Lucullus", "x": 7.5, "y": 16, "z": -7, "class": "M", "description": "Red dwarf system." },
-    { "name": "Mantebron", "x": 27, "y": 14, "z": -22, "class": "K", "description": "Deep below the plane." },
-    { "name": "Exile", "x": 13.5, "y": 12, "z": -9, "class": "G", "description": "A suitably named solitary yellow star." },
-    { "name": "Dewi", "x": 22, "y": 11, "z": -15, "class": "K", "description": "Orange star." },
-    { "name": "MLA 733051", "x": 10, "y": 9, "z": 10, "class": "G", "description": "Cataloged yellow dwarf." },
-    { "name": "Oscar 44", "x": 8, "y": 7, "z": 9, "class": "G", "description": "A heavily settled G-class star." },
-    { "name": "Tarsis", "x": 20, "y": 6.5, "z": -6, "class": "K", "description": "A standard K-class star." },
-    { "name": "Richards", "x": 13, "y": 4, "z": 19, "class": "M", "description": "A red dwarf above the plane." },
-    { "name": "Coulomb", "x": 32.5, "y": 3, "z": 19, "class": "M", "description": "A frontier red dwarf." },
-    { "name": "Valles", "x": -17, "y": 34, "z": 6, "class": "K", "description": "Orange dwarf in the negative X sector." },
-    { "name": "Tendril", "x": -34.5, "y": 34.5, "z": 6, "class": "A", "description": "A brilliant white A-class star." },
-    { "name": "Patriot", "x": -30.5, "y": 29.5, "z": 1, "class": "O", "description": "A massive blue O-class star." },
-    { "name": "Ignatius", "x": -14, "y": 28.5, "z": -11, "class": "M", "description": "Red dwarf system." },
-    { "name": "Chisholm", "x": -7.5, "y": 23.5, "z": -8, "class": "M", "description": "Red dwarf." },
-    { "name": "Nyrthak", "x": -31.5, "y": 23.5, "z": -15, "class": "K", "description": "Orange K-class star." },
-    { "name": "Retrast", "x": -16.5, "y": 22.5, "z": 10, "class": "G", "description": "Yellow G-class." },
-    { "name": "Pallas", "x": -22.5, "y": 21, "z": 26, "class": "M", "description": "High-altitude red dwarf." },
-    { "name": "Tibonther", "x": -8.5, "y": 19, "z": -25, "class": "O", "description": "A blue giant." },
-    { "name": "Miyashi", "x": -17, "y": 16, "z": -17, "class": "M", "description": "Red dwarf." },
-    { "name": "Terivine", "x": -4.5, "y": 12.5, "z": 17, "class": "G", "description": "A yellow dwarf star." },
-    { "name": "Karnath", "x": -16, "y": 11, "z": -36, "class": "O", "description": "Deep blue giant." },
-    { "name": "Corrivale", "x": -31, "y": 11, "z": 34, "class": "O", "description": "High-altitude blue star." },
-    { "name": "Thalaassa", "x": -28.5, "y": 8, "z": 32, "class": "A", "description": "A white star." },
-    { "name": "Red 72", "x": -3, "y": 6.5, "z": 8, "class": "M", "description": "Red dwarf system." },
-    { "name": "Mikoa", "x": -6.5, "y": 4.5, "z": 1, "class": "G", "description": "Yellow star." },
-    { "name": "Talbott", "x": -12.5, "y": 4, "z": -7, "class": "M", "description": "Red dwarf." },
-    { "name": "Three Fates", "x": -21, "y": 5, "z": 10, "class": "G", "description": "A significant yellow star system." },
-    { "name": "Crow", "x": 19, "y": -5, "z": -14, "class": "K", "description": "Orange star." },
-    { "name": "Arisnar", "x": 10, "y": -1, "z": -33, "class": "K", "description": "Deep orange star." },
-    { "name": "McComb's Star", "x": 11, "y": -4, "z": 7, "class": "G", "description": "Yellow G-class star." },
-    { "name": "Oasis", "x": 7.5, "y": -6.5, "z": 9, "class": "G", "description": "A well-known yellow star." },
-    { "name": "Chester", "x": 30, "y": -4, "z": 19, "class": "A", "description": "White A-class star." },
-    { "name": "Argos", "x": 20, "y": -10, "z": 5, "class": "A", "description": "White star." },
-    { "name": "Algbeta", "x": 15, "y": -10.5, "z": -25, "class": "M", "description": "Deep red dwarf." },
-    { "name": "Armstrong", "x": 29, "y": -12, "z": -28, "class": "K", "description": "Orange star." },
-    { "name": "Algemron", "x": 14, "y": -14.5, "z": -31, "class": "G", "description": "Deep yellow star." },
-    { "name": "Yandub", "x": 3, "y": -10.5, "z": 41, "class": "K", "description": "Very high altitude orange star." },
-    { "name": "Polytroika", "x": 3, "y": -17.5, "z": 28, "class": "G", "description": "High altitude yellow star." },
-    { "name": "Zin Point", "x": 24.5, "y": -23, "z": -8, "class": "O", "description": "Blue star." },
-    { "name": "Hathorn", "x": 8.5, "y": -26.5, "z": 21, "class": "M", "description": "Red dwarf." },
-    { "name": "Meriden", "x": 16, "y": -28.5, "z": 10, "class": "K", "description": "Orange star." },
-    { "name": "Spiderhole", "x": 6.5, "y": -35.5, "z": 33, "class": "K", "description": "High altitude orange star." },
-    { "name": "Hammer's Star", "x": 16.5, "y": -37, "z": 17, "class": "G", "description": "Yellow star." },
-    { "name": "Aegis", "x": 0, "y": 0, "z": 0, "class": "G", "description": "The capital system of the Verge, located at the origin coordinates." },
-    { "name": "Riga 9", "x": -3, "y": -2, "z": -2, "class": "K", "description": "An orange dwarf system near Aegis." },
-    { "name": "Itrius", "x": -7.5, "y": -4.5, "z": -10, "class": "M", "description": "Red dwarf." },
-    { "name": "Annahoy", "x": -17, "y": -5, "z": 15, "class": "M", "description": "Red dwarf." },
-    { "name": "Garad", "x": -28.5, "y": -4, "z": -19, "class": "M", "description": "Red dwarf." },
-    { "name": "Endomar", "x": -27.5, "y": -10, "z": 32, "class": "K", "description": "Orange star." },
-    { "name": "Sedin", "x": -18.5, "y": -13.5, "z": -23, "class": "M", "description": "Red dwarf." },
-    { "name": "Rinstoke", "x": -7.5, "y": -10.5, "z": 24, "class": "G", "description": "Yellow star." },
-    { "name": "Titania", "x": -12.5, "y": -17.5, "z": -4, "class": "O", "description": "Blue star." },
-    { "name": "Oberon", "x": -13.5, "y": -21, "z": -4, "class": "O", "description": "Blue star." },
-    { "name": "Chinju", "x": -6.5, "y": -25, "z": 5, "class": "G", "description": "Yellow star." },
-    { "name": "Lombard", "x": -14.5, "y": -26.5, "z": -14, "class": "M", "description": "Red dwarf." },
-    { "name": "Loman", "x": -18, "y": -28.5, "z": 21, "class": "K", "description": "Orange star." },
-    { "name": "Calesque", "x": -22.5, "y": -21, "z": -41, "class": "G", "description": "Deep yellow star." },
-    { "name": "Karppolla", "x": -30, "y": -25, "z": -41, "class": "A", "description": "Deep white star." },
-    { "name": "Vieron", "x": -5.5, "y": -32, "z": -13, "class": "A", "description": "White star." },
-    { "name": "Resont", "x": -12, "y": -36.5, "z": 22, "class": "O", "description": "Blue star." },
-    { "name": "Tychus", "x": -24.5, "y": -35.5, "z": -24, "class": "M", "description": "Red dwarf." },
-    { "name": "Golfstone", "x": -29.5, "y": -38, "z": -21, "class": "A", "description": "White star." },
-    { "name": "Diana", "x": -3, "y": -43, "z": 8, "class": "K", "description": "Orange star." }
+    {
+      "name": "Krios",
+      "x": -1.0,
+      "y": 38.0,
+      "z": -10.0,
+      "class": "K",
+      "description": "A prominent K-class star in the upper coordinate regions."
+    },
+    {
+      "name": "Ptolemy",
+      "x": 1,
+      "y": 33,
+      "z": 26,
+      "class": "K",
+      "description": "A prominent K-class star in the upper coordinate regions."
+    },
+    {
+      "name": "Dolthan",
+      "x": 13,
+      "y": 32,
+      "z": -12,
+      "class": "K",
+      "description": "An orange dwarf system, slightly below the galactic plane."
+    },
+    {
+      "name": "Cambria",
+      "x": 20,
+      "y": 29,
+      "z": 17,
+      "class": "K",
+      "description": "Located in the positive Z-axis, an orange K-class star."
+    },
+    {
+      "name": "Strome",
+      "x": 7.5,
+      "y": 28.5,
+      "z": 3,
+      "class": "M",
+      "description": "A faint red dwarf close to the main plane."
+    },
+    {
+      "name": "Eldala",
+      "x": 32,
+      "y": 22,
+      "z": -14,
+      "class": "G",
+      "description": "A yellow dwarf star on the frontier."
+    },
+    {
+      "name": "Walin",
+      "x": 22.5,
+      "y": 22,
+      "z": 1,
+      "class": "K",
+      "description": "Almost perfectly aligned with the galactic plane."
+    },
+    {
+      "name": "Sage",
+      "x": 12.5,
+      "y": 22.5,
+      "z": 31,
+      "class": "G",
+      "description": "A high-altitude yellow G-class star."
+    },
+    {
+      "name": "Lucullus",
+      "x": 7.5,
+      "y": 16,
+      "z": -7,
+      "class": "M",
+      "description": "Red dwarf system."
+    },
+    {
+      "name": "Mantebron",
+      "x": 27,
+      "y": 14,
+      "z": -22,
+      "class": "K",
+      "description": "Deep below the plane."
+    },
+    {
+      "name": "Exile",
+      "x": 13.5,
+      "y": 12,
+      "z": -9,
+      "class": "G",
+      "description": "A suitably named solitary yellow star."
+    },
+    {
+      "name": "Dewi",
+      "x": 22,
+      "y": 11,
+      "z": -15,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "MLA 733051",
+      "x": 10,
+      "y": 9,
+      "z": 10,
+      "class": "G",
+      "description": "Cataloged yellow dwarf."
+    },
+    {
+      "name": "Oscar 44",
+      "x": 8,
+      "y": 7,
+      "z": 9,
+      "class": "G",
+      "description": "A heavily settled G-class star."
+    },
+    {
+      "name": "Tarsis",
+      "x": 20,
+      "y": 6.5,
+      "z": -6,
+      "class": "K",
+      "description": "A standard K-class star."
+    },
+    {
+      "name": "Richards",
+      "x": 13,
+      "y": 4,
+      "z": 19,
+      "class": "M",
+      "description": "A red dwarf above the plane."
+    },
+    {
+      "name": "Coulomb",
+      "x": 32.5,
+      "y": 3,
+      "z": 19,
+      "class": "M",
+      "description": "A frontier red dwarf."
+    },
+    {
+      "name": "Valles",
+      "x": -17,
+      "y": 34,
+      "z": 6,
+      "class": "K",
+      "description": "Orange dwarf in the negative X sector."
+    },
+    {
+      "name": "Tendril",
+      "x": -34.5,
+      "y": 34.5,
+      "z": 6,
+      "class": "A",
+      "description": "A brilliant white A-class star."
+    },
+    {
+      "name": "Patriot",
+      "x": -30.5,
+      "y": 29.5,
+      "z": 1,
+      "class": "O",
+      "description": "A massive blue O-class star."
+    },
+    {
+      "name": "Ignatius",
+      "x": -14,
+      "y": 28.5,
+      "z": -11,
+      "class": "M",
+      "description": "Red dwarf system."
+    },
+    {
+      "name": "Chisholm",
+      "x": -7.5,
+      "y": 23.5,
+      "z": -8,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Nyrthak",
+      "x": -31.5,
+      "y": 23.5,
+      "z": -15,
+      "class": "K",
+      "description": "Orange K-class star."
+    },
+    {
+      "name": "Retrast",
+      "x": -16.5,
+      "y": 22.5,
+      "z": 10,
+      "class": "G",
+      "description": "Yellow G-class."
+    },
+    {
+      "name": "Pallas",
+      "x": -22.5,
+      "y": 21,
+      "z": 26,
+      "class": "M",
+      "description": "High-altitude red dwarf."
+    },
+    {
+      "name": "Tibonther",
+      "x": -8.5,
+      "y": 19,
+      "z": -25,
+      "class": "O",
+      "description": "A blue giant."
+    },
+    {
+      "name": "Miyashi",
+      "x": -17,
+      "y": 16,
+      "z": -17,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Terivine",
+      "x": -4.5,
+      "y": 12.5,
+      "z": 17,
+      "class": "G",
+      "description": "A yellow dwarf star."
+    },
+    {
+      "name": "Karnath",
+      "x": -16,
+      "y": 11,
+      "z": -36,
+      "class": "O",
+      "description": "Deep blue giant."
+    },
+    {
+      "name": "Corrivale",
+      "x": -31,
+      "y": 11,
+      "z": 34,
+      "class": "O",
+      "description": "High-altitude blue star."
+    },
+    {
+      "name": "Thalaassa",
+      "x": -28.5,
+      "y": 8,
+      "z": 32,
+      "class": "A",
+      "description": "A white star."
+    },
+    {
+      "name": "Red 72",
+      "x": -3,
+      "y": 6.5,
+      "z": 8,
+      "class": "M",
+      "description": "Red dwarf system."
+    },
+    {
+      "name": "Mikoa",
+      "x": -6.5,
+      "y": 4.5,
+      "z": 1,
+      "class": "G",
+      "description": "Yellow star."
+    },
+    {
+      "name": "Talbott",
+      "x": -12.5,
+      "y": 4,
+      "z": -7,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Three Fates",
+      "x": -21,
+      "y": 5,
+      "z": 10,
+      "class": "G",
+      "description": "A significant yellow star system."
+    },
+    {
+      "name": "Crow",
+      "x": 19,
+      "y": -5,
+      "z": -14,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "Arisnar",
+      "x": 10,
+      "y": -1,
+      "z": -33,
+      "class": "K",
+      "description": "Deep orange star."
+    },
+    {
+      "name": "McComb's Star",
+      "x": 11,
+      "y": -4,
+      "z": 7,
+      "class": "G",
+      "description": "Yellow G-class star."
+    },
+    {
+      "name": "Oasis",
+      "x": 7.5,
+      "y": -6.5,
+      "z": 9,
+      "class": "G",
+      "description": "A well-known yellow star."
+    },
+    {
+      "name": "Chester",
+      "x": 30,
+      "y": -4,
+      "z": 19,
+      "class": "A",
+      "description": "White A-class star."
+    },
+    {
+      "name": "Argos",
+      "x": 20,
+      "y": -10,
+      "z": 5,
+      "class": "A",
+      "description": "White star."
+    },
+    {
+      "name": "Algbeta",
+      "x": 15,
+      "y": -10.5,
+      "z": -25,
+      "class": "M",
+      "description": "Deep red dwarf."
+    },
+    {
+      "name": "Armstrong",
+      "x": 29,
+      "y": -12,
+      "z": -28,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "Algemron",
+      "x": 14,
+      "y": -14.5,
+      "z": -31,
+      "class": "G",
+      "description": "Deep yellow star."
+    },
+    {
+      "name": "Yandub",
+      "x": 3,
+      "y": -10.5,
+      "z": 41,
+      "class": "K",
+      "description": "Very high altitude orange star."
+    },
+    {
+      "name": "Polytroika",
+      "x": 3,
+      "y": -17.5,
+      "z": 28,
+      "class": "G",
+      "description": "High altitude yellow star."
+    },
+    {
+      "name": "Zin Point",
+      "x": 24.5,
+      "y": -23,
+      "z": -8,
+      "class": "O",
+      "description": "Blue star."
+    },
+    {
+      "name": "Hathorn",
+      "x": 8.5,
+      "y": -26.5,
+      "z": 21,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Meriden",
+      "x": 16,
+      "y": -28.5,
+      "z": 10,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "Spiderhole",
+      "x": 6.5,
+      "y": -35.5,
+      "z": 33,
+      "class": "K",
+      "description": "High altitude orange star."
+    },
+    {
+      "name": "Hammer's Star",
+      "x": 16.5,
+      "y": -37,
+      "z": 17,
+      "class": "G",
+      "description": "Yellow star."
+    },
+    {
+      "name": "Aegis",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "class": "G",
+      "description": "The capital system of the Verge, located at the origin coordinates."
+    },
+    {
+      "name": "Riga 9",
+      "x": -3,
+      "y": -2,
+      "z": -2,
+      "class": "K",
+      "description": "An orange dwarf system near Aegis."
+    },
+    {
+      "name": "Itrius",
+      "x": -7.5,
+      "y": -4.5,
+      "z": -10,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Annahoy",
+      "x": -17,
+      "y": -5,
+      "z": 15,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Garad",
+      "x": -28.5,
+      "y": -4,
+      "z": -19,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Endomar",
+      "x": -27.5,
+      "y": -10,
+      "z": 32,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "Sedin",
+      "x": -18.5,
+      "y": -13.5,
+      "z": -23,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Rinstoke",
+      "x": -7.5,
+      "y": -10.5,
+      "z": 24,
+      "class": "G",
+      "description": "Yellow star."
+    },
+    {
+      "name": "Titania",
+      "x": -12.5,
+      "y": -17.5,
+      "z": -4,
+      "class": "O",
+      "description": "Blue star."
+    },
+    {
+      "name": "Oberon",
+      "x": -13.5,
+      "y": -21,
+      "z": -4,
+      "class": "O",
+      "description": "Blue star."
+    },
+    {
+      "name": "Chinju",
+      "x": -6.5,
+      "y": -25,
+      "z": 5,
+      "class": "G",
+      "description": "Yellow star."
+    },
+    {
+      "name": "Lombard",
+      "x": -14.5,
+      "y": -26.5,
+      "z": -14,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Loman",
+      "x": -18,
+      "y": -28.5,
+      "z": 21,
+      "class": "K",
+      "description": "Orange star."
+    },
+    {
+      "name": "Calesque",
+      "x": -22.5,
+      "y": -21,
+      "z": -41,
+      "class": "G",
+      "description": "Deep yellow star."
+    },
+    {
+      "name": "Karppolla",
+      "x": -30,
+      "y": -25,
+      "z": -41,
+      "class": "A",
+      "description": "Deep white star."
+    },
+    {
+      "name": "Vieron",
+      "x": -5.5,
+      "y": -32,
+      "z": -13,
+      "class": "A",
+      "description": "White star."
+    },
+    {
+      "name": "Resont",
+      "x": -12,
+      "y": -36.5,
+      "z": 22,
+      "class": "O",
+      "description": "Blue star."
+    },
+    {
+      "name": "Tychus",
+      "x": -24.5,
+      "y": -35.5,
+      "z": -24,
+      "class": "M",
+      "description": "Red dwarf."
+    },
+    {
+      "name": "Golfstone",
+      "x": -29.5,
+      "y": -38,
+      "z": -21,
+      "class": "A",
+      "description": "White star."
+    },
+    {
+      "name": "Diana",
+      "x": -3,
+      "y": -43,
+      "z": 8,
+      "class": "K",
+      "description": "Orange star."
+    }
   ],
   "ships": [
     {
-      "name": "Aegis Patrol Alpha",
+      "name": "New Dawn",
       "x": 2,
       "y": 2,
       "z": 0,
-      "description": "Standard system patrol craft assigned to the Aegis sector."
-    },
-    {
-      "name": "TSS Pioneer",
-      "x": -10,
-      "y": 15,
-      "z": -5,
-      "description": "Exploration vessel surveying the stellar neighborhood."
+      "description": "A sleek, dark vessel equipped with advanced weaponry and sensors.",
+      "tokenUrl": "data:image/webp;base64,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",
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "rw": 1
     }
   ]
 }

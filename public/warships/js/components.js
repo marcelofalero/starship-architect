@@ -188,6 +188,10 @@ const SystemList = {
                         <div class="text-caption">Location</div>
                         <q-select dark filled v-model="editingInstance.location" :options="availableLocations" new-value-mode="add-unique" use-input hint="Enter a custom location or select from list" />
                     </div>
+                    <div class="q-mb-md">
+                        <div class="text-caption">Custom Name Suffix</div>
+                        <q-input dark filled v-model="editingInstance.modifications.customSuffix" hint="E.g. '- Flowers' or 'A'" />
+                    </div>
                     <div v-if="isWeapon(editingInstance.defId)" class="q-mb-md">
                         <div class="text-caption">Weapon User</div>
                         <q-btn-toggle spread dark v-model="editingInstance.modifications.weaponUser" toggle-color="primary" :options="[{label: 'Pilot', value: 'Pilot'}, {label: 'Copilot', value: 'Copilot'}, {label: 'Gunner', value: 'Gunner'}]" />
@@ -1921,6 +1925,11 @@ export const SystemListWrapper = {
                     name = name.replace(/\(\d+d\d+(x\d+)?\)/, `(${calcDmg})`);
                 }
             }
+
+            if (instance?.modifications?.customSuffix) {
+                name = `${name} ${instance.modifications.customSuffix}`;
+            }
+
             return name;
         };
         const getDef = (id) => store.allEquipment.find(e => e.id === id);
@@ -2160,6 +2169,9 @@ export const SystemListWrapper = {
         const openConfig = (instance) => {
             if (!instance.modifications.arcs) {
                 instance.modifications.arcs = [];
+            }
+            if (instance.modifications.customSuffix === undefined) {
+                instance.modifications.customSuffix = '';
             }
             const def = store.allEquipment.find(e => e.id === instance.defId);
             if (def && (isWeapon(def.id) || isSensor(def.id))) {
@@ -2635,6 +2647,9 @@ export const ArcDiagramWrapper = {
             if (instance?.modifications?.batteryCount > 1) {
                 name = `${instance.modifications.batteryCount}x ${name}`;
             }
+            if (instance?.modifications?.customSuffix) {
+                name = `${name} ${instance.modifications.customSuffix}`;
+            }
             return name;
         };
 
@@ -3050,6 +3065,10 @@ export const ShipSheetWrapper = {
                 if (instance.modifications.advanced) parts.push('Advanced');
                 if (instance.modifications.mount && instance.modifications.mount !== 'single') parts.push(instance.modifications.mount.charAt(0).toUpperCase() + instance.modifications.mount.slice(1));
                 if (parts.length > 0) name = `${parts.join(' ')} ${name}`;
+
+                if (instance.modifications.customSuffix) {
+                    name = `${name} ${instance.modifications.customSuffix}`;
+                }
             }
             return name;
         };

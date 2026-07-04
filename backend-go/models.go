@@ -31,9 +31,11 @@ type Resource struct {
 	CreatedAt  int64                  `json:"created_at"`
 	UpdatedAt  int64                  `json:"updated_at"`
 	Links      map[string]Link        `json:"_links"`
+	Tokens     map[string]string      `json:"tokens,omitempty"`
 }
 
 type CreateResource struct {
+	ID         string                 `json:"id"`
 	Name       string                 `json:"name"`
 	Type       string                 `json:"type"`
 	Data       map[string]interface{} `json:"data"`

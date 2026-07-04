@@ -50,6 +50,12 @@ Many armored cruisers, battleships, carriers, or dreadnoughts are equipped with 
 
 Carriers and other ships that carry a large number of embarked small craft usually set aside special facilities for controlling the launch and recovery of their fighters and bombers. The launch tower is a center for coordinating the activities of small craft squadrons and maintaining “traffic control” in the vicinity of the ship.
 
+### Security Suite (PL 7)
+
+The ultimate in shipboard security, this suite of protective devices includes video, sound, and thermal monitoring of all protected compartments by surveillance computers. All doors in the protected area are heavy-duty armored security hatches that can be set to open by key card, retinal scan, or positive control from the ship’s security center. Finally, each security suite purchased includes four weapon cupolas that can be used to mount any ranged or heavy weapon from the Player’s Handbook in strategic locations such as airlocks, passage intersections, or vital compartments.
+
+While it’s possible to protect the entire hull of a large system with security suites, it’s more cost-efficient to create “security zones” or “security decks” to guard vital areas or control access throughout the ship, leaving most of the hull with routine security measures and monitoring.
+
 ### The Computer Core
 
 Basic systems monitoring, navigation, and engineering controls require some amount of computer support. Any ship equipped with a cockpit or command deck possesses builtin computers with the bare minimum of computing power necessary to fly the ship. However, it’s possible to install computers that add substantially to the ship’s combat abilities.
@@ -315,6 +321,7 @@ Usually, ships with this sensor system will employ a team of “ESPers” to con
 | Command Deck | - | 2+ | 0 | $300 K/hull | +1 hull point per 100 hull (max 10) |
 | Flag Bridge | - | 3 | 0 | $50 K | - |
 | Launch Tower | - | 2 | 0 | $50 K | - |
+| Security Suite | - | 1 | 1 | $200 K | per 40 hull points protected |
 | Laser Transceiver | - | 1 | 1 | $50 K | - |
 | Radio Transceiver | - | 0.5 | 1 | $25 K | - |
 | Mass Transceiver | G | 1 | 1 | $100 K | - |

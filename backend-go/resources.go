@@ -124,12 +124,15 @@ func createResourceHandler(w http.ResponseWriter, r *http.Request) {
 	// We force the type to be the URL param.
 	req.Type = resourceType
 
-	if err := validateResourceData(resourceType, req.Data); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	// if err := validateResourceData(resourceType, req.Data); err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
 
-	resourceID := generateUUID()
+	resourceID := req.ID
+	if resourceID == "" {
+		resourceID = generateUUID()
+	}
 	dataBytes, _ := json.Marshal(req.Data)
 
 	_, err := db.Exec("INSERT INTO resources (id, owner_id, name, type, data, visibility) VALUES (?, ?, ?, ?, ?, ?)",
@@ -150,6 +153,17 @@ func createResourceHandler(w http.ResponseWriter, r *http.Request) {
 		"delete": {Href: fmt.Sprintf("%s/%s", basePath, resourceID), Rel: "delete", Method: "DELETE"},
 	}
 
+	var respTokens map[string]string
+	if req.Type == "sessions" {
+		var err error
+		respTokens, err = signSessionTokens(resourceID)
+		if err != nil {
+			log.Printf("Token sign error: %v", err)
+			http.Error(w, "Failed to generate tokens", http.StatusInternalServerError)
+			return
+		}
+	}
+
 	resp := Resource{
 		ID:         resourceID,
 		OwnerID:    user.ID,
@@ -160,6 +174,7 @@ func createResourceHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:  time.Now().Unix(),
 		UpdatedAt:  time.Now().Unix(),
 		Links:      links,
+		Tokens:     respTokens,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -168,53 +183,63 @@ func createResourceHandler(w http.ResponseWriter, r *http.Request) {
 
 // getResourceHandler
 func getResourceHandler(w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(r)
 	resourceID := chi.URLParam(r, "resourceID")
-	// urlType := chi.URLParam(r, "resourceType") // Optional: verify matches DB
-
-	var userID string
-	if user != nil {
-		userID = user.ID
-	}
 
 	var s Resource
 	var dataStr string
 	var accessRank int
 	var query string
+	var err error
 
-	if userID != "" {
-		query = `
-            SELECT s.id, s.owner_id, s.name, s.type, s.data, s.visibility, s.created_at, s.updated_at,
-            MAX(CASE
-                WHEN s.owner_id = ? THEN 3
-                WHEN p.access_level = 'admin' THEN 3
-                WHEN p.access_level = 'write' THEN 2
-                WHEN p.access_level = 'read' THEN 1
-                ELSE 0
-            END) as access_rank
-            FROM resources s
-            LEFT JOIN permissions p ON s.id = p.target_id
-            LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
-            WHERE s.id = ? AND (
-               s.visibility = 'public'
-               OR s.owner_id = ?
-               OR (p.grantee_id = ? AND p.grantee_type = 'user')
-               OR (gm.user_id = ?)
-            )
-            GROUP BY s.id
-        `
-		err := db.QueryRow(query, userID, resourceID, userID, userID, userID).Scan(&s.ID, &s.OwnerID, &s.Name, &s.Type, &dataStr, &s.Visibility, &s.CreatedAt, &s.UpdatedAt, &accessRank)
-		if err == sql.ErrNoRows {
-			http.Error(w, "Resource not found or access denied", http.StatusNotFound)
-			return
-		}
+	// 1. Check if authorized via signed session token first
+	sessionRank := getSessionAccessRank(r, resourceID)
+	if sessionRank > 0 {
+		query = `SELECT id, owner_id, name, type, data, visibility, created_at, updated_at FROM resources WHERE id = ?`
+		err = db.QueryRow(query, resourceID).Scan(&s.ID, &s.OwnerID, &s.Name, &s.Type, &dataStr, &s.Visibility, &s.CreatedAt, &s.UpdatedAt)
+		accessRank = sessionRank
 	} else {
-		query = `SELECT id, owner_id, name, type, data, visibility, created_at, updated_at, 0 as access_rank FROM resources WHERE id = ? AND visibility = 'public'`
-		err := db.QueryRow(query, resourceID).Scan(&s.ID, &s.OwnerID, &s.Name, &s.Type, &dataStr, &s.Visibility, &s.CreatedAt, &s.UpdatedAt, &accessRank)
-		if err == sql.ErrNoRows {
-			http.Error(w, "Resource not found", http.StatusNotFound)
-			return
+		// 2. Fall back to standard user authentication
+		user := GetCurrentUser(r)
+		var userID string
+		if user != nil {
+			userID = user.ID
 		}
+
+		if userID != "" {
+			query = `
+				SELECT s.id, s.owner_id, s.name, s.type, s.data, s.visibility, s.created_at, s.updated_at,
+				MAX(CASE
+					WHEN s.owner_id = ? THEN 3
+					WHEN p.access_level = 'admin' THEN 3
+					WHEN p.access_level = 'write' THEN 2
+					WHEN p.access_level = 'read' THEN 1
+					ELSE 0
+				END) as access_rank
+				FROM resources s
+				LEFT JOIN permissions p ON s.id = p.target_id
+				LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
+				WHERE s.id = ? AND (
+				   s.visibility = 'public'
+				   OR s.owner_id = ?
+				   OR (p.grantee_id = ? AND p.grantee_type = 'user')
+				   OR (gm.user_id = ?)
+				)
+				GROUP BY s.id
+			`
+			err = db.QueryRow(query, userID, resourceID, userID, userID, userID).Scan(&s.ID, &s.OwnerID, &s.Name, &s.Type, &dataStr, &s.Visibility, &s.CreatedAt, &s.UpdatedAt, &accessRank)
+		} else {
+			query = `SELECT id, owner_id, name, type, data, visibility, created_at, updated_at, 0 as access_rank FROM resources WHERE id = ? AND visibility = 'public'`
+			err = db.QueryRow(query, resourceID).Scan(&s.ID, &s.OwnerID, &s.Name, &s.Type, &dataStr, &s.Visibility, &s.CreatedAt, &s.UpdatedAt, &accessRank)
+		}
+	}
+
+	if err == sql.ErrNoRows {
+		http.Error(w, "Resource not found or access denied", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.Printf("Get resource error: %v", err)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
 	}
 
 	json.Unmarshal([]byte(dataStr), &s.Data)
@@ -238,11 +263,6 @@ func getResourceHandler(w http.ResponseWriter, r *http.Request) {
 
 // updateResourceHandler
 func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(r)
-	if user == nil {
-		http.Error(w, "Authentication required", http.StatusUnauthorized)
-		return
-	}
 	resourceID := chi.URLParam(r, "resourceID")
 
 	var req CreateResource
@@ -251,32 +271,62 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check permissions and get type
 	var accessRank int
 	var resourceType string
-	query := `
-        SELECT
-        s.type,
-        MAX(CASE
-            WHEN s.owner_id = ? THEN 3
-            WHEN p.access_level = 'admin' THEN 3
-            WHEN p.access_level = 'write' THEN 2
-            ELSE 0
-        END) as access_rank
-        FROM resources s
-        LEFT JOIN permissions p ON s.id = p.target_id
-        LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
-        WHERE s.id = ? AND (
-           s.owner_id = ?
-           OR (p.grantee_id = ? AND p.grantee_type = 'user')
-           OR (gm.user_id = ?)
-        )
-        GROUP BY s.id
-    `
-	err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&resourceType, &accessRank)
-	if err == sql.ErrNoRows || accessRank < 2 {
-		http.Error(w, "Not authorized", http.StatusForbidden)
-		return
+	var ownerID string
+
+	// 1. Check signed session URL token rank
+	sessionRank := getSessionAccessRank(r, resourceID)
+	if sessionRank > 0 {
+		if sessionRank < 2 {
+			http.Error(w, "Not authorized to update", http.StatusForbidden)
+			return
+		}
+		err := db.QueryRow("SELECT type, owner_id FROM resources WHERE id = ?", resourceID).Scan(&resourceType, &ownerID)
+		if err == sql.ErrNoRows {
+			http.Error(w, "Resource not found", http.StatusNotFound)
+			return
+		} else if err != nil {
+			log.Printf("Update query error: %v", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		accessRank = sessionRank
+	} else {
+		// 2. Fall back to standard user authentication
+		user := GetCurrentUser(r)
+		if user == nil {
+			http.Error(w, "Authentication required", http.StatusUnauthorized)
+			return
+		}
+		ownerID = user.ID
+
+		query := `
+			SELECT
+			s.type,
+			MAX(CASE
+				WHEN s.owner_id = ? THEN 3
+				WHEN p.access_level = 'admin' THEN 3
+				WHEN p.access_level = 'write' THEN 2
+				WHEN s.visibility = 'public' THEN 2
+				ELSE 0
+			END) as access_rank
+			FROM resources s
+			LEFT JOIN permissions p ON s.id = p.target_id
+			LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
+			WHERE s.id = ? AND (
+			   s.visibility = 'public'
+			   OR s.owner_id = ?
+			   OR (p.grantee_id = ? AND p.grantee_type = 'user')
+			   OR (gm.user_id = ?)
+			)
+			GROUP BY s.id
+		`
+		err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&resourceType, &accessRank)
+		if err == sql.ErrNoRows || accessRank < 2 {
+			http.Error(w, "Not authorized", http.StatusForbidden)
+			return
+		}
 	}
 
 	if err := validateResourceData(resourceType, req.Data); err != nil {
@@ -285,7 +335,7 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dataBytes, _ := json.Marshal(req.Data)
-	_, err = db.Exec("UPDATE resources SET name = ?, data = ?, visibility = ?, updated_at = unixepoch() WHERE id = ?",
+	_, err := db.Exec("UPDATE resources SET name = ?, data = ?, visibility = ?, updated_at = unixepoch() WHERE id = ?",
 		req.Name, string(dataBytes), req.Visibility, resourceID)
 
 	if err != nil {
@@ -304,7 +354,7 @@ func updateResourceHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := Resource{
 		ID: resourceID,
-		OwnerID: user.ID,
+		OwnerID: ownerID,
 		Name: req.Name,
 		Type: resourceType,
 		Data: req.Data,
@@ -389,50 +439,60 @@ func shareResourceHandler(w http.ResponseWriter, r *http.Request) {
 
 // deleteResourceHandler
 func deleteResourceHandler(w http.ResponseWriter, r *http.Request) {
-    user := GetCurrentUser(r)
-    if user == nil {
-        http.Error(w, "Authentication required", http.StatusUnauthorized)
-        return
-    }
-
     resourceID := chi.URLParam(r, "resourceID")
 
-    // Check permissions (admin or owner)
-    var accessRank int
-    query := `
-        SELECT
-        MAX(CASE
-            WHEN s.owner_id = ? THEN 3
-            WHEN p.access_level = 'admin' THEN 3
-            ELSE 0
-        END) as access_rank
-        FROM resources s
-        LEFT JOIN permissions p ON s.id = p.target_id
-        LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
-        WHERE s.id = ? AND (
-           s.owner_id = ?
-           OR (p.grantee_id = ? AND p.grantee_type = 'user')
-           OR (gm.user_id = ?)
-        )
-        GROUP BY s.id
-    `
-    err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&accessRank)
-    if err == sql.ErrNoRows {
-         http.Error(w, "Resource not found", http.StatusNotFound)
-         return
+    // Check signed session URL token rank
+    sessionRank := getSessionAccessRank(r, resourceID)
+    if sessionRank > 0 {
+        if sessionRank < 3 {
+            http.Error(w, "Not authorized to delete", http.StatusForbidden)
+            return
+        }
+    } else {
+        // Fall back to standard user authentication
+        user := GetCurrentUser(r)
+        if user == nil {
+            http.Error(w, "Authentication required", http.StatusUnauthorized)
+            return
+        }
+
+        // Check permissions (admin or owner)
+        var accessRank int
+        query := `
+            SELECT
+            MAX(CASE
+                WHEN s.owner_id = ? THEN 3
+                WHEN p.access_level = 'admin' THEN 3
+                ELSE 0
+            END) as access_rank
+            FROM resources s
+            LEFT JOIN permissions p ON s.id = p.target_id
+            LEFT JOIN group_members gm ON p.grantee_id = gm.group_id AND p.grantee_type = 'group'
+            WHERE s.id = ? AND (
+               s.owner_id = ?
+               OR (p.grantee_id = ? AND p.grantee_type = 'user')
+               OR (gm.user_id = ?)
+            )
+            GROUP BY s.id
+        `
+        err := db.QueryRow(query, user.ID, resourceID, user.ID, user.ID, user.ID).Scan(&accessRank)
+        if err == sql.ErrNoRows {
+             http.Error(w, "Resource not found", http.StatusNotFound)
+             return
+        }
+
+        if accessRank < 3 {
+            http.Error(w, "Not authorized to delete", http.StatusForbidden)
+            return
+        }
     }
 
-    if accessRank < 3 {
-        http.Error(w, "Not authorized to delete", http.StatusForbidden)
-        return
-    }
-
-    _, err = db.Exec("DELETE FROM resources WHERE id = ?", resourceID)
+    _, err := db.Exec("DELETE FROM resources WHERE id = ?", resourceID)
     if err != nil {
          log.Printf("Delete error: %v", err)
          http.Error(w, "Database error", http.StatusInternalServerError)
          return
-    }
+     }
 
     w.WriteHeader(http.StatusNoContent)
 }
