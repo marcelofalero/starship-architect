@@ -1440,6 +1440,9 @@ function animateShip(ship, oldX, oldY, oldZ) {
     const moveDir = endPos.clone().sub(startPos);
     let startQuat, endQuat;
     const mesh = sceneObjects[ship.name];
+
+    // Capture camera start position once so the lerp is clean across frames
+    const cameraStartTarget = controls.target.clone();
     
     if (mesh && moveDir.lengthSq() > 0.001) {
         startQuat = mesh.quaternion.clone();
@@ -1486,13 +1489,10 @@ function animateShip(ship, oldX, oldY, oldZ) {
         const currentPos = new THREE.Vector3().lerpVectors(startPos, endPos, moveEase);
         
         if (mesh) {
-            const prevPos = mesh.position.clone();
             mesh.position.copy(currentPos);
 
-            // Move camera and orbit target by the same delta to follow the ship
-            const delta = currentPos.clone().sub(prevPos);
-            controls.target.add(delta);
-            camera.position.add(delta);
+            // Pan orbit target from its original position to the destination over the animation
+            controls.target.lerpVectors(cameraStartTarget, endPos, moveEase);
             
             if (startQuat && endQuat) {
                 mesh.quaternion.slerpQuaternions(startQuat, endQuat, rotEase);
@@ -1764,10 +1764,9 @@ function submitMoveShip() {
     
     if (isStarOrPoi) {
         saveStars();
-        renderStars();
+        renderStars(); // POI mesh can be re-rendered since it's not being animated
     } else {
-        saveShips();
-        renderShips();
+        saveShips(); // Don't call renderShips() — it would destroy the mesh being animated
     }
     
     if (currentSessionId) updateBackendSession(currentSessionId, shipsData);
