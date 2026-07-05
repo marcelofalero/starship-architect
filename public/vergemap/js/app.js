@@ -1486,7 +1486,13 @@ function animateShip(ship, oldX, oldY, oldZ) {
         const currentPos = new THREE.Vector3().lerpVectors(startPos, endPos, moveEase);
         
         if (mesh) {
+            const prevPos = mesh.position.clone();
             mesh.position.copy(currentPos);
+
+            // Move camera and orbit target by the same delta to follow the ship
+            const delta = currentPos.clone().sub(prevPos);
+            controls.target.add(delta);
+            camera.position.add(delta);
             
             if (startQuat && endQuat) {
                 mesh.quaternion.slerpQuaternions(startQuat, endQuat, rotEase);
