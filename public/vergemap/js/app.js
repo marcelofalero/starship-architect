@@ -646,6 +646,40 @@ init();async function init() {
         }
     });
     document.getElementById('move-entity-select').addEventListener('change', updateMoveCoordsFromSelectedEntity);
+
+    // Auto-detect entity when coords are typed manually
+    function onMoveCoordInput() {
+        const x = parseFloat(document.getElementById('move-coord-x').value);
+        const y = parseFloat(document.getElementById('move-coord-y').value);
+        const z = parseFloat(document.getElementById('move-coord-z').value);
+        if (isNaN(x) || isNaN(y) || isNaN(z)) return;
+
+        const TOLERANCE = 0.5;
+        const all = [...starsData, ...shipsData].filter(e => !currentMoveShip || e.name !== currentMoveShip.name);
+        const match = all.find(e => {
+            const dx = e.x - x, dy = e.y - y, dz = e.z - z;
+            return Math.sqrt(dx*dx + dy*dy + dz*dz) <= TOLERANCE;
+        });
+
+        const destTypeEl = document.getElementById('move-dest-type');
+        const selectGroup = document.getElementById('move-entity-select-group');
+        const entitySelect = document.getElementById('move-entity-select');
+
+        if (match) {
+            destTypeEl.value = 'entity';
+            selectGroup.style.display = 'block';
+            // Select the matching entity in the dropdown if it exists as an option
+            if ([...entitySelect.options].some(o => o.value === match.name)) {
+                entitySelect.value = match.name;
+            }
+        } else {
+            destTypeEl.value = 'coords';
+            selectGroup.style.display = 'none';
+        }
+    }
+    ['move-coord-x', 'move-coord-y', 'move-coord-z'].forEach(id => {
+        document.getElementById(id).addEventListener('input', onMoveCoordInput);
+    });
     document.getElementById('cancel-move-ship-btn').addEventListener('click', () => {
         document.getElementById('move-ship-modal').style.display = 'none';
     });
