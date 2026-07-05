@@ -1382,6 +1382,14 @@ function updateShipPosition() {
     
     animateShip(ship, oldX, oldY, oldZ);
     setLastMovedShip(ship.name);
+
+    // Clear any active navigation route for this ship so "toward X" label doesn't persist
+    if (currentRoute && currentRoute.ship === ship) {
+        currentRoute = null;
+        document.getElementById('travel-ui').style.display = 'none';
+    }
+    if (currentMoveHereTarget) currentMoveHereTarget = null;
+
     addLog(`${ship.name} updated position to X:${ship.x.toFixed(2)}, Y:${ship.y.toFixed(2)}, Z:${ship.z.toFixed(2)}`);
     saveShips();
     if (currentSessionId) updateBackendSession(currentSessionId, shipsData);
@@ -1696,7 +1704,14 @@ function submitMoveShip() {
     
     animateShip(currentMoveShip, oldX, oldY, oldZ);
     setLastMovedShip(currentMoveShip.name);
-    
+
+    // Clear any active navigation route for this ship so "toward X" label doesn't persist
+    if (currentRoute && currentRoute.ship === currentMoveShip) {
+        currentRoute = null;
+        document.getElementById('travel-ui').style.display = 'none';
+    }
+    if (currentMoveHereTarget) currentMoveHereTarget = null;
+
     const destType = document.getElementById('move-dest-type').value;
     const targetEntityName = document.getElementById('move-entity-select').value;
     let logMsg = '';
