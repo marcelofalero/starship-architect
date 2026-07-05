@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"syscall/js"
+
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -88,8 +88,8 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 		defer func() {
 			// Use the helper instead of fmt.Printf
 			msg := fmt.Sprintf("%s %s %d %v", r.Method, r.URL.Path, ww.Status(), time.Since(t1))
-			// js.ValueOf(msg) creates the JS string primitive
-			js.Global().Get("console").Call("log", js.ValueOf(msg))
+			// Use the standard log instead of syscall/js
+			log.Println(msg)
 		}()
 
 		next.ServeHTTP(ww, r)
