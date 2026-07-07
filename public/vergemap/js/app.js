@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { generateSystem } from './systemGenerator.js';
+
+const clock = new THREE.Clock();
+let activeSystemView = null;
 
 const i18n = {
     en: {
@@ -183,6 +187,11 @@ let shipsData = [];
 let logsData = [];
 let tokensData = [];
 let lastMovedShipName = localStorage.getItem('lastMovedShipName') || null;
+
+let currentLayer = 'GALAXY';
+let currentSystemFocus = null;
+let galaxyGroup = new THREE.Group();
+let systemGroup = new THREE.Group();
 
 function setLastMovedShip(name) {
     lastMovedShipName = name;
@@ -467,6 +476,9 @@ function setupMqttPubSub(sessionId) {
                     localStar.z = remoteEntity.z;
                     if (remoteEntity.description !== undefined) localStar.description = remoteEntity.description;
                     if (remoteEntity.privateNotes !== undefined) localStar.privateNotes = remoteEntity.privateNotes;
+                    if (remoteEntity.systemSeed !== undefined) localStar.systemSeed = remoteEntity.systemSeed;
+                    if (remoteEntity.planets !== undefined) localStar.planets = remoteEntity.planets;
+                    else delete localStar.planets;
                     
                     if (localStar.tokenId !== remoteEntity.tokenId || localStar.tokenScale !== remoteEntity.tokenScale) {
                         localStar.tokenId = remoteEntity.tokenId;
@@ -475,6 +487,11 @@ function setupMqttPubSub(sessionId) {
                     renderStars();
                     refreshDropdowns();
                     saveStars();
+                    
+                    // If we are currently inside the system that was just regenerated/edited, re-render it live!
+                    if (currentLayer === 'SYSTEM' && currentSystemFocus === localStar) {
+                        renderSystem();
+                    }
                 }
                 return;
             }
@@ -594,7 +611,13 @@ init();async function init() {
 
     const gridHelper = new THREE.GridHelper(120, 48, 0x333333, 0x111111);
     gridHelper.rotation.x = Math.PI / 2; 
-    scene.add(gridHelper);
+    
+    // Add layers to scene
+    scene.add(galaxyGroup);
+    scene.add(systemGroup);
+    systemGroup.visible = false;
+    
+    galaxyGroup.add(gridHelper);
 
     await loadData();
 
@@ -1087,8 +1110,8 @@ async function loadData() {
 }
 
 function removeMeshCompletely(mesh, name) {
-    scene.remove(mesh);
-    if (mesh.userData.stem) scene.remove(mesh.userData.stem);
+    if (mesh.parent) mesh.parent.remove(mesh);
+    if (mesh.userData.stem && mesh.userData.stem.parent) mesh.userData.stem.parent.remove(mesh.userData.stem);
     mesh.children.forEach(child => {
         if (child.element) child.element.remove();
     });
@@ -1185,7 +1208,7 @@ function renderStars() {
         
         const isPoi = star.class && star.class.startsWith('P');
         mesh.userData = { type: isPoi ? 'POI' : 'Star', data: star };
-        scene.add(mesh);
+        galaxyGroup.add(mesh);
         interactiveObjects.push(mesh);
 
         const stemGeom = new THREE.BufferGeometry().setFromPoints([
@@ -1194,7 +1217,7 @@ function renderStars() {
         ]);
         const stemMat = new THREE.LineBasicMaterial({ color: 0x444444 });
         const stem = new THREE.Line(stemGeom, stemMat);
-        scene.add(stem);
+        galaxyGroup.add(stem);
 
         const starDiv = document.createElement('div');
         starDiv.className = 'star-label';
@@ -1294,13 +1317,13 @@ function renderShips() {
             ]);
             const stemMat = new THREE.LineBasicMaterial({ color: 0x4bb5c1, transparent: true, opacity: 0.5 });
             const stem = new THREE.Line(stemGeom, stemMat);
-            scene.add(stem);
+            galaxyGroup.add(stem);
             mesh.userData.stem = stem;
         }
         
         mesh.renderOrder = 10;
         mesh.frustumCulled = false;
-        scene.add(mesh);
+        galaxyGroup.add(mesh);
         interactiveObjects.push(mesh);
 
         const shipDiv = document.createElement('div');
@@ -1673,8 +1696,15 @@ function showInfoPanel(userData) {
     infoCoords.textContent = `X:${data.x.toFixed(2) || data.x}, Y:${data.y.toFixed(2) || data.y}, Z:${data.z.toFixed(2) || data.z}`;
     
     // Support HTML content inside the description
-    infoDesc.innerHTML = parseMarkdown(data.description || "No description available.");
+    let descHtml = data.description || "No description available.";
+    if (data.gravity) descHtml += `\n\n**Gravity:** ${data.gravity}`;
+    if (data.temperature) descHtml += `\n**Temperature:** ${data.temperature}`;
+    if (data.atmosphere) descHtml += `\n**Atmosphere:** ${data.atmosphere}`;
+    if (data.year) descHtml += `\n**Orbital Period (Year):** ${data.year}`;
+    if (data.day) descHtml += `\n**Rotational Period (Day):** ${data.day}`;
+    if (data.tilt) descHtml += `\n**Axial Tilt:** ${data.tilt}`;
     
+    infoDesc.innerHTML = parseMarkdown(descHtml);    
     const publicNotes = document.getElementById('info-public-notes');
     const privateNotes = document.getElementById('info-private-notes');
     const editBtn = document.getElementById('edit-entity-btn');
@@ -1730,6 +1760,14 @@ function showInfoPanel(userData) {
         moveHereBtn.style.display = 'none';
     }
 
+    const enterSystemBtn = document.getElementById('info-enter-system-btn');
+    if (userData.type === 'Star') {
+        enterSystemBtn.style.display = 'block';
+        enterSystemBtn.onclick = () => enterSystem(userData.data);
+    } else {
+        enterSystemBtn.style.display = 'none';
+    }
+
     if (currentMode === 'gm') {
         if (data.privateNotes) {
             privateNotes.style.display = 'block';
@@ -1745,6 +1783,155 @@ function showInfoPanel(userData) {
     }
     
     infoPanel.style.display = 'block';
+}
+
+function enterSystem(starData) {
+    currentLayer = 'SYSTEM';
+    currentSystemFocus = starData;
+    galaxyGroup.visible = false;
+    systemGroup.visible = true;
+    
+    document.getElementById('back-to-galaxy-btn').style.display = 'inline-block';
+    if (currentMode === 'gm') {
+        document.getElementById('system-generation-controls').style.display = 'flex';
+    } else {
+        document.getElementById('system-generation-controls').style.display = 'none';
+    }
+    document.getElementById('info-panel').style.display = 'none';
+    
+    // Hide galaxy labels manually since CSS2DRenderer doesn't update invisible branches
+    galaxyGroup.traverse((child) => {
+        if (child.isCSS2DObject) child.element.style.visibility = 'hidden';
+    });
+    
+    // Animate camera to origin for system view
+    const startPos = camera.position.clone();
+    const endPos = new THREE.Vector3(0, 0, 90);
+    const startTarget = controls.target.clone();
+    const endTarget = new THREE.Vector3(0, 0, 0);
+    
+    const duration = 1000;
+    const startTime = performance.now();
+
+    function tweenCamera(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        
+        if (progress < 1) {
+            requestAnimationFrame(tweenCamera);
+        } else {
+            renderSystem();
+        }
+    }
+    requestAnimationFrame(tweenCamera);
+}
+
+function exitSystem() {
+    currentLayer = 'GALAXY';
+    currentSystemFocus = null;
+    galaxyGroup.visible = true;
+    systemGroup.visible = false;
+    activeSystemView = null;
+    
+    // Restore galaxy labels
+    galaxyGroup.traverse((child) => {
+        if (child.isCSS2DObject) child.element.style.visibility = 'visible';
+    });
+    
+    // Clear system group meshes
+    while(systemGroup.children.length > 0){ 
+        const child = systemGroup.children[0];
+        systemGroup.remove(child);
+        if (child.userData && child.userData.stem && child.userData.stem.parent) {
+             child.userData.stem.parent.remove(child.userData.stem);
+        }
+        if (child.children) {
+             child.children.forEach(c => {
+                 if (c.element) c.element.remove();
+             });
+        }
+    }
+
+    document.getElementById('back-to-galaxy-btn').style.display = 'none';
+    document.getElementById('system-generation-controls').style.display = 'none';
+}
+
+document.getElementById('back-to-galaxy-btn').addEventListener('click', exitSystem);
+
+document.getElementById('regenerate-system-btn').addEventListener('click', () => {
+    if (currentSystemFocus && currentMode === 'gm') {
+        currentSystemFocus.systemSeed = Math.random().toString(36).substring(2, 15);
+        delete currentSystemFocus.planets;
+        renderSystem();
+        saveStars();
+        
+        if (currentSessionId) updateBackendSession(currentSessionId, shipsData);
+        if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(currentSystemFocus));
+    }
+});
+
+function renderSystem() {
+    // Clear previous
+    while(systemGroup.children.length > 0){ 
+        const child = systemGroup.children[0];
+        systemGroup.remove(child);
+        if (child.children) {
+             child.children.forEach(c => {
+                 if (c.element) c.element.remove();
+             });
+        }
+    }
+
+    const genMode = document.getElementById('generation-mode-select') ? document.getElementById('generation-mode-select').value : 'Normal';
+    const isFirstTime = !currentSystemFocus.planets;
+    activeSystemView = generateSystem(currentSystemFocus, genMode);
+    activeSystemView.position.set(0, 0, 0);
+    
+    if (isFirstTime) {
+        saveStars();
+    }
+
+    // Add labels to the interactable meshes
+    if (activeSystemView.userData && activeSystemView.userData.interactableMeshes) {
+        activeSystemView.userData.interactableMeshes.forEach(mesh => {
+            if (mesh.userData.name && !mesh.userData.isOrbiter) {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'star-label';
+                labelDiv.textContent = mesh.userData.name;
+                labelDiv.style.color = "#FF5722";
+                labelDiv.style.fontWeight = "bold";
+                labelDiv.style.fontSize = mesh.userData.isStar ? "16px" : "11px";
+                labelDiv.style.marginTop = mesh.userData.isStar ? "2em" : "1.5em";
+                labelDiv.style.pointerEvents = "auto";
+                labelDiv.style.cursor = "pointer";
+                
+                labelDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    if (mesh.userData.isStar) {
+                        showInfoPanel({ type: 'Star', data: currentSystemFocus });
+                    } else if (mesh.userData.data) {
+                        // Make sure x/y/z are present so it doesn't crash the panel coords display
+                        if (mesh.userData.data.x === undefined) {
+                            mesh.userData.data.x = 0;
+                            mesh.userData.data.y = 0;
+                            mesh.userData.data.z = 0;
+                        }
+                        showInfoPanel({ type: 'Planet', data: mesh.userData.data });
+                    }
+                };
+                
+                const label = new CSS2DObject(labelDiv);
+                label.position.set(0, 0, 0); 
+                mesh.add(label);
+            }
+        });
+    }
+
+    systemGroup.add(activeSystemView);
 }
 
 let currentEditEntity = null;
@@ -2113,7 +2300,9 @@ function saveEntityEdits() {
     } else {
         saveStars();
         renderStars();
+        if (currentLayer === 'SYSTEM') renderSystem();
         if (currentSessionId) updateBackendSession(currentSessionId, shipsData);
+        if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(data));
     }
     
     refreshDropdowns();
@@ -2222,7 +2411,7 @@ function calculateDistance() {
         travelUi.style.display = 'none';
         currentRoute = null;
         if (routeLine) {
-            scene.remove(routeLine);
+            if (routeLine.parent) routeLine.parent.remove(routeLine);
             routeLine.geometry.dispose();
             routeLine.material.dispose();
             routeLine = null;
@@ -2247,7 +2436,7 @@ function calculateDistance() {
         
         // Draw or update the dashed line between the two points
         if (routeLine) {
-            scene.remove(routeLine);
+            if (routeLine.parent) routeLine.parent.remove(routeLine);
             routeLine.geometry.dispose();
             routeLine.material.dispose();
             routeLine = null;
@@ -2275,7 +2464,7 @@ function calculateDistance() {
             });
             routeLine = new THREE.Line(lineGeom, lineMat);
             routeLine.computeLineDistances();
-            scene.add(routeLine);
+            galaxyGroup.add(routeLine);
         }
 
         const originIsShip = shipsData.some(s => s.name === starA.name);
@@ -2596,6 +2785,8 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
     
+    const delta = Math.min(clock.getDelta(), 0.1);
+    
     interactiveObjects.forEach(mesh => {
         if(mesh.userData.type === 'Ship') {
             if (!mesh.userData.hasToken) {
@@ -2614,6 +2805,50 @@ function animate() {
             }
         }
     });
+
+    if (currentLayer === 'SYSTEM' && activeSystemView) {
+        if (activeSystemView.userData.starGroup) {
+            activeSystemView.userData.starGroup.rotation.y += 0.25 * delta;
+            if (activeSystemView.userData.starUniforms) {
+                activeSystemView.userData.starUniforms.forEach(u => {
+                    if(u.uTime) u.uTime.value += delta * 1.5;
+                });
+            }
+        }
+        if (activeSystemView.userData.beltMeshes) {
+            activeSystemView.userData.beltMeshes.forEach(b => {
+                b.mesh.rotation.z += b.speed * delta;
+            });
+        }
+        if (activeSystemView.userData.orbitBodies) {
+            activeSystemView.userData.orbitBodies.forEach((p) => {
+                p.orbitAngle += p.orbitSpeed * delta;
+                p.mesh.position.set(
+                    p.a * Math.cos(p.orbitAngle) - p.c,
+                    p.b * Math.sin(p.orbitAngle),
+                    0
+                );
+                
+                if (p.isTidalLocked) {
+                    p.mesh.rotation.y = -p.orbitAngle + Math.PI / 2;
+                } else {
+                    p.mesh.rotation.y += p.rotationSpeed * delta;
+                }
+                
+                if (p.mesh.userData.orbiters) {
+                    p.mesh.userData.orbiters.forEach((o) => {
+                        o.angle += o.speed * delta;
+                        o.mesh.position.set(
+                            o.dist * Math.cos(o.angle),
+                            o.dist * Math.sin(o.angle),
+                            0
+                        );
+                        o.mesh.rotation.y += (0.1 + Math.abs(o.speed)) * delta;
+                    });
+                }
+            });
+        }
+    }
 
     controls.update();
     renderer.render(scene, camera);

@@ -24,6 +24,15 @@
     <div id="ui-layer">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <a href="../" class="back-link" data-i18n="backLink">&larr; Back to Main Index</a>
+            <button id="back-to-galaxy-btn" style="display: none; padding: 2px 5px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
+            <div id="system-generation-controls" style="display: none; gap: 5px; align-items: center;">
+                <select id="generation-mode-select" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white;">
+                    <option value="Normal">Normal</option>
+                    <option value="Viable">Viable</option>
+                    <option value="ViableHigh">Viable with high (tech)</option>
+                </select>
+                <button id="regenerate-system-btn" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white; cursor: pointer;" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
+            </div>
             <select id="lang-select" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc;">
                 <option value="en">English</option>
                 <option value="es">Español</option>
@@ -120,6 +129,7 @@
         <div id="info-private-notes" style="margin-top: 10px; font-size: 12px; color: #ffaa55; display: none;"></div>
         <button id="info-move-ship-btn" style="margin-top: 15px; width: 100%; display: none;" data-i18n="moveShipBtn">Move Ship</button>
         <button id="info-move-here-btn" style="margin-top: 15px; width: 100%; display: none;" data-i18n="moveHereBtn">Move Ship Here</button>
+        <button id="info-enter-system-btn" style="margin-top: 15px; width: 100%; display: none; background-color: #007bff; color: white;" data-i18n="enterSystemBtn">Enter System</button>
         <button id="edit-entity-btn" style="margin-top: 15px; width: 100%; display: none;">Edit Details</button>
     </div>
 
