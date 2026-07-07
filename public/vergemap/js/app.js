@@ -231,6 +231,39 @@ function applyTranslations(lang) {
     }
 }
 
+function parseMarkdown(text) {
+    if (!text) return "";
+    
+    let parsed = text;
+    // Replace literal escaped newlines with actual newlines to standardize
+    parsed = parsed.replace(/\\n/g, '\n');
+    
+    // Basic HTML escaping
+    parsed = parsed
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+        
+    // Bold
+    parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    parsed = parsed.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    
+    // Italic
+    parsed = parsed.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+    parsed = parsed.replace(/_([^_]+)_/g, '<em>$1</em>');
+    
+    // Strikethrough
+    parsed = parsed.replace(/~~(.*?)~~/g, '<del>$1</del>');
+    
+    // Links: [text](url)
+    parsed = parsed.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: #4bb5c1; text-decoration: underline;">$1</a>');
+    
+    // Newlines
+    parsed = parsed.replace(/\n/g, '<br>');
+    
+    return parsed;
+}
+
 // Auto-detect Spanish browser language or use saved preference
 const savedLang = localStorage.getItem('vergeMapLang');
 const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
@@ -304,7 +337,9 @@ const infoDesc = document.getElementById('info-desc');
 // API and Session Sync
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? '' // Local NGINX proxy handles API requests
-    : 'https://sa-backend.mafalero.workers.dev';
+    : (window.location.hostname === 'starship.dimble.net' || window.location.hostname === 'starship-architect.pages.dev')
+        ? 'https://sa-backend.mafalero.workers.dev'
+        : 'https://sa-backend-dev.mafalero.workers.dev';
 let isSyncing = false;
 
 async function ensureAuth() {
@@ -420,7 +455,31 @@ function setupMqttPubSub(sessionId) {
     
     mqttClient.on('message', (topic, message) => {
         try {
-            const remoteShip = JSON.parse(message.toString());
+            const remoteEntity = JSON.parse(message.toString());
+            
+            // Check if it's actually a Star or POI being moved/updated
+            let localStar = starsData.find(s => s.name === remoteEntity.name);
+            if (localStar) {
+                const timeSinceLocalMove = performance.now() - (localStar._lastLocalMove || 0);
+                if (timeSinceLocalMove > 5000) {
+                    localStar.x = remoteEntity.x;
+                    localStar.y = remoteEntity.y;
+                    localStar.z = remoteEntity.z;
+                    if (remoteEntity.description !== undefined) localStar.description = remoteEntity.description;
+                    if (remoteEntity.privateNotes !== undefined) localStar.privateNotes = remoteEntity.privateNotes;
+                    
+                    if (localStar.tokenId !== remoteEntity.tokenId || localStar.tokenScale !== remoteEntity.tokenScale) {
+                        localStar.tokenId = remoteEntity.tokenId;
+                        localStar.tokenScale = remoteEntity.tokenScale;
+                    }
+                    renderStars();
+                    refreshDropdowns();
+                    saveStars();
+                }
+                return;
+            }
+
+            const remoteShip = remoteEntity;
             let localShip = shipsData.find(s => s.name === remoteShip.name);
             let shouldRender = false;
 
@@ -805,8 +864,8 @@ function showShareModal(tokens) {
     
     if (tokens) {
         gmVal = `${baseUrl}?session=${tokens.gm}`;
-        playerVal = `${baseUrl}?session=${tokens.nav}`;
-        viewerVal = `${baseUrl}?session=${tokens.ro}`;
+        playerVal = `${baseUrl}?session=${tokens.player}`;
+        viewerVal = `${baseUrl}?session=${tokens.viewer}`;
     } else if (currentSessionId && sessionToken) {
         // Fallback for current active token in URL
         if (currentMode === 'gm') {
@@ -1162,6 +1221,18 @@ function renderShips() {
             removeMeshCompletely(mesh, key);
         }
     });    
+    
+    // Group ships by coordinates to detect overlapping at stars
+    const shipsAtStar = {};
+    shipsData.forEach(ship => {
+        const key = `${ship.x.toFixed(2)},${ship.y.toFixed(2)},${ship.z.toFixed(2)}`;
+        const star = starsData.find(s => s.x.toFixed(2) === ship.x.toFixed(2) && s.y.toFixed(2) === ship.y.toFixed(2) && s.z.toFixed(2) === ship.z.toFixed(2));
+        if (star) {
+            if (!shipsAtStar[key]) shipsAtStar[key] = [];
+            shipsAtStar[key].push(ship);
+        }
+    });
+
     shipsData.forEach(ship => {
         if (ship.isHidden && currentMode !== 'gm') return;
         
@@ -1200,30 +1271,53 @@ function renderShips() {
             mesh.userData = { type: 'Ship', data: ship, hasToken: false };
         }
         
-        mesh.position.set(-ship.x, ship.y, ship.z);
-        mesh.userData = { type: 'Ship', data: ship, hasToken: !!resolvedTokenUrl };
+        const key = `${ship.x.toFixed(2)},${ship.y.toFixed(2)},${ship.z.toFixed(2)}`;
+        const orbitingShips = shipsAtStar[key];
+        
+        if (orbitingShips) {
+            const shipIndex = orbitingShips.indexOf(ship);
+            const total = orbitingShips.length;
+            const angle = (shipIndex / total) * Math.PI * 2;
+            const radius = 1.2;
+            
+            mesh.position.set(-ship.x + Math.cos(angle)*radius, ship.y + Math.sin(angle)*radius, ship.z);
+            mesh.scale.set(0.4, 0.4, 0.4);
+            mesh.userData.isOrbiting = true;
+            mesh.userData.orbitAngle = angle;
+            mesh.userData.orbitRadius = radius;
+            mesh.userData.orbitCenter = new THREE.Vector3(-ship.x, ship.y, ship.z);
+        } else {
+            mesh.position.set(-ship.x, ship.y, ship.z);
+            const stemGeom = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-ship.x, ship.y, 0),
+                new THREE.Vector3(-ship.x, ship.y, ship.z)
+            ]);
+            const stemMat = new THREE.LineBasicMaterial({ color: 0x4bb5c1, transparent: true, opacity: 0.5 });
+            const stem = new THREE.Line(stemGeom, stemMat);
+            scene.add(stem);
+            mesh.userData.stem = stem;
+        }
+        
         mesh.renderOrder = 10;
         mesh.frustumCulled = false;
         scene.add(mesh);
         interactiveObjects.push(mesh);
-
-        const stemGeom = new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(-ship.x, ship.y, 0),
-            new THREE.Vector3(-ship.x, ship.y, ship.z)
-        ]);
-        const stemMat = new THREE.LineBasicMaterial({ color: 0x4bb5c1, transparent: true, opacity: 0.5 });
-        const stem = new THREE.Line(stemGeom, stemMat);
-        scene.add(stem);
 
         const shipDiv = document.createElement('div');
         shipDiv.className = 'star-label';
         shipDiv.textContent = ship.name;
         shipDiv.style.color = "#00ffcc";
         const label = new CSS2DObject(shipDiv);
-        label.position.set(0, 1, 0);
+        
+        if (orbitingShips) {
+            label.position.set(0, 1.5, 0); // Keep it slightly above the small mesh
+            shipDiv.style.fontSize = '10px';
+        } else {
+            label.position.set(0, 1, 0);
+        }
+        
         mesh.add(label);
         
-        mesh.userData.stem = stem;
         sceneObjects[ship.name] = mesh;
     });
 }
@@ -1236,7 +1330,7 @@ function refreshDropdowns() {
 
     let starsOptions = `<optgroup data-i18n-label="optgroupStars" label="${i18n[currentLang].optgroupStars}">`;
     let poisOptions = `<optgroup data-i18n-label="optgroupPois" label="${i18n[currentLang].optgroupPois}">`;
-    starsData.forEach(star => {
+    [...starsData].sort((a, b) => a.name.localeCompare(b.name)).forEach(star => {
         if (star.isHidden && currentMode !== 'gm') return;
         if (star.class && star.class.startsWith('P')) {
             poisOptions += `<option value="${star.name}">${star.name}</option>`;
@@ -1248,7 +1342,7 @@ function refreshDropdowns() {
     poisOptions += '</optgroup>';
 
     let shipsOptions = `<optgroup data-i18n-label="optgroupShips" label="${i18n[currentLang].optgroupShips}">`;
-    shipsData.forEach(ship => {
+    [...shipsData].sort((a, b) => a.name.localeCompare(b.name)).forEach(ship => {
         if (ship.isHidden && currentMode !== 'gm') return;
         shipsOptions += `<option value="${ship.name}">${ship.name}</option>`;
     });
@@ -1272,18 +1366,21 @@ function setActiveCreateTab(type) {
         document.getElementById('tab-ship').classList.add('active');
         document.getElementById('create-star-class-group').style.display = 'none';
         document.getElementById('create-poi-type-group').style.display = 'none';
+        document.getElementById('create-ship-class-group').style.display = 'block';
         document.getElementById('create-token-group').style.display = 'block';
         document.getElementById('create-owner-group').style.display = 'block';
     } else if (type === 'Star') {
         document.getElementById('tab-star').classList.add('active');
         document.getElementById('create-star-class-group').style.display = 'block';
         document.getElementById('create-poi-type-group').style.display = 'none';
+        document.getElementById('create-ship-class-group').style.display = 'none';
         document.getElementById('create-token-group').style.display = 'none';
         document.getElementById('create-owner-group').style.display = 'none';
     } else if (type === 'POI') {
         document.getElementById('tab-poi').classList.add('active');
         document.getElementById('create-star-class-group').style.display = 'none';
         document.getElementById('create-poi-type-group').style.display = 'block';
+        document.getElementById('create-ship-class-group').style.display = 'none';
         document.getElementById('create-token-group').style.display = 'block';
         document.getElementById('create-owner-group').style.display = 'block';
     }
@@ -1310,6 +1407,7 @@ function submitCreateEntity() {
     const tokenId = document.getElementById('create-entity-token').value;
     
     if (currentCreateType === 'Ship') {
+        const cls = document.getElementById('create-ship-class').value.trim();
         const newShip = {
             name: name,
             x: x,
@@ -1318,6 +1416,7 @@ function submitCreateEntity() {
             description: desc || "A newly commissioned ship.",
             owner: document.getElementById('create-entity-owner').value
         };
+        if (cls) newShip.class = cls;
         if (tokenId) newShip.tokenId = tokenId;
         shipsData.push(newShip);
         saveShips();
@@ -1441,6 +1540,19 @@ function animateShip(ship, oldX, oldY, oldZ) {
     let startQuat, endQuat;
     const mesh = sceneObjects[ship.name];
 
+    if (mesh) {
+        mesh.userData.isOrbiting = false;
+        mesh.scale.set(1, 1, 1);
+        
+        // Reset label position if it was orbiting
+        mesh.children.forEach(child => {
+            if (child.isCSS2DObject) {
+                child.position.set(0, 1, 0);
+                child.element.style.fontSize = '';
+            }
+        });
+    }
+
     // Capture camera start position once so the lerp is clean across frames
     const cameraStartTarget = controls.target.clone();
     
@@ -1513,6 +1625,9 @@ function animateShip(ship, oldX, oldY, oldZ) {
         
         if (elapsed < duration) {
             requestAnimationFrame(tweenShip);
+        } else {
+            // Animation finished. Render ships again so they snap into orbit if applicable
+            renderShips();
         }
     }
     requestAnimationFrame(tweenShip);
@@ -1558,14 +1673,14 @@ function showInfoPanel(userData) {
     infoCoords.textContent = `X:${data.x.toFixed(2) || data.x}, Y:${data.y.toFixed(2) || data.y}, Z:${data.z.toFixed(2) || data.z}`;
     
     // Support HTML content inside the description
-    infoDesc.innerHTML = data.description || "No description available.";
+    infoDesc.innerHTML = parseMarkdown(data.description || "No description available.");
     
     const publicNotes = document.getElementById('info-public-notes');
     const privateNotes = document.getElementById('info-private-notes');
     const editBtn = document.getElementById('edit-entity-btn');
     
     if (data.publicNotes) {
-        publicNotes.innerHTML = `<strong>Public Notes:</strong><br>${data.publicNotes.replace(/\\n/g, '<br>')}`;
+        publicNotes.innerHTML = `<strong>Public Notes:</strong><br>${parseMarkdown(data.publicNotes)}`;
     } else {
         publicNotes.innerHTML = '';
     }
@@ -1588,6 +1703,28 @@ function showInfoPanel(userData) {
     const moveHereBtn = document.getElementById('info-move-here-btn');
     if ((userData.type === 'Star' || userData.type === 'POI') && currentMode !== 'ro') {
         moveHereBtn.style.display = 'block';
+        
+        const allowedShips = shipsData.filter(ship => {
+            if (currentMode === 'gm') return true;
+            if (currentMode === 'nav') return ship.owner !== 'GM';
+            return false;
+        });
+        
+        let targetShip = allowedShips.find(s => s.name === lastMovedShipName);
+        if (!targetShip && allowedShips.length > 0) targetShip = allowedShips[0];
+        
+        const baseText = i18n[currentLang].moveHereBtn || "Move Ship Here";
+        if (targetShip) {
+            const dx = targetShip.x - data.x;
+            const dy = targetShip.y - data.y;
+            const dist = Math.sqrt(dx*dx + dy*dy).toFixed(2);
+            moveHereBtn.innerHTML = `${baseText}<br><span style="font-size: 0.7em; color: #888; font-weight: normal; text-transform: none;">${targetShip.name} - ${dist} LY</span>`;
+            moveHereBtn.removeAttribute('data-i18n');
+        } else {
+            moveHereBtn.innerHTML = baseText;
+            moveHereBtn.setAttribute('data-i18n', 'moveHereBtn');
+        }
+
         moveHereBtn.onclick = () => openMoveHereModal(userData);
     } else {
         moveHereBtn.style.display = 'none';
@@ -1596,7 +1733,7 @@ function showInfoPanel(userData) {
     if (currentMode === 'gm') {
         if (data.privateNotes) {
             privateNotes.style.display = 'block';
-            privateNotes.innerHTML = `<strong>Private Notes:</strong><br>${data.privateNotes.replace(/\\n/g, '<br>')}`;
+            privateNotes.innerHTML = `<strong>Private Notes:</strong><br>${parseMarkdown(data.privateNotes)}`;
         } else {
             privateNotes.style.display = 'none';
         }
@@ -1619,11 +1756,19 @@ function openEntityEditor(userData) {
     document.getElementById('edit-entity-name').value = data.name || '';
     
     const classContainer = document.getElementById('edit-class-container');
+    const shipClassContainer = document.getElementById('edit-ship-class-container');
+    
     if (userData.type === 'Star' || userData.type === 'POI') {
         classContainer.style.display = 'block';
+        shipClassContainer.style.display = 'none';
         document.getElementById('edit-entity-class').value = data.class || 'G';
+    } else if (userData.type === 'Ship') {
+        classContainer.style.display = 'none';
+        shipClassContainer.style.display = 'block';
+        document.getElementById('edit-ship-class').value = data.class || '';
     } else {
         classContainer.style.display = 'none';
+        shipClassContainer.style.display = 'none';
     }
     
     const ownerContainer = document.getElementById('edit-owner-group');
@@ -1676,14 +1821,14 @@ function openMoveShipModal(userData) {
     let options = '';
     
     // Add other ships
-    shipsData.forEach(ship => {
+    [...shipsData].sort((a, b) => a.name.localeCompare(b.name)).forEach(ship => {
         if (ship.name !== currentMoveShip.name) {
             options += `<option value="${ship.name}">${ship.name} (Ship)</option>`;
         }
     });
     
     // Add stars and POIs
-    starsData.forEach(ent => {
+    [...starsData].sort((a, b) => a.name.localeCompare(b.name)).forEach(ent => {
         if (ent.name !== currentMoveShip.name) {
             let label = ent.class && ent.class.startsWith('P') ? 'POI' : 'Star';
             options += `<option value="${ent.name}">${ent.name} (${label})</option>`;
@@ -1815,7 +1960,7 @@ function openMoveHereModal(userData) {
     
     document.getElementById('confirm-move-here-btn').disabled = false;
     
-    allowedShips.forEach(ship => {
+    [...allowedShips].sort((a, b) => a.name.localeCompare(b.name)).forEach(ship => {
         options += `<option value="${ship.name}">${ship.name}</option>`;
     });
     shipSelect.innerHTML = options;
@@ -1945,6 +2090,10 @@ function saveEntityEdits() {
     
     if (currentEditEntity.type === 'Star' || currentEditEntity.type === 'POI') {
         data.class = document.getElementById('edit-entity-class').value;
+    } else if (currentEditEntity.type === 'Ship') {
+        const cls = document.getElementById('edit-ship-class').value.trim();
+        if (cls) data.class = cls;
+        else delete data.class;
     }
     
     if (currentEditEntity.type === 'Ship' || currentEditEntity.type === 'POI') {
@@ -2448,9 +2597,21 @@ function animate() {
     requestAnimationFrame(animate);
     
     interactiveObjects.forEach(mesh => {
-        if(mesh.userData.type === 'Ship' && !mesh.userData.hasToken) {
-            mesh.rotation.y += 0.02;
-            mesh.rotation.x += 0.01;
+        if(mesh.userData.type === 'Ship') {
+            if (!mesh.userData.hasToken) {
+                mesh.rotation.y += 0.02;
+                mesh.rotation.x += 0.01;
+            }
+            if (mesh.userData.isOrbiting) {
+                mesh.userData.orbitAngle -= 0.005; // Orbit speed
+                const center = mesh.userData.orbitCenter;
+                const r = mesh.userData.orbitRadius;
+                mesh.position.set(
+                    center.x + Math.cos(mesh.userData.orbitAngle) * r,
+                    center.y + Math.sin(mesh.userData.orbitAngle) * r,
+                    center.z
+                );
+            }
         }
     });
 

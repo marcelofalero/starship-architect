@@ -1,8 +1,0 @@
-name = "sa-backend"
-main = "src/index.ts"
-compatibility_date = "2024-04-01"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "sa-db"
-database_id = "7f4ac224-bc8c-4a85-b870-785ba839e6d2"
