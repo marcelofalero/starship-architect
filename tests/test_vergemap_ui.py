@@ -8,26 +8,7 @@ BACKEND_URL = os.environ.get("BASE_URL", "http://backend:8787")
 
 def create_session_tokens():
     with httpx.Client(base_url=BACKEND_URL, timeout=10.0) as client:
-        # Register user
-        email = f"ui_test_{uuid.uuid4()}@example.com"
-        password = "password123"
-        resp = client.post("/auth/register", json={
-            "email": email,
-            "password": password,
-            "name": "UI Tester"
-        })
-        assert resp.status_code == 200
-        
-        # Login
-        resp = client.post("/auth/login", json={
-            "email": email,
-            "password": password
-        })
-        assert resp.status_code == 200
-        token = resp.json().get("access_token")
-        headers = {"Authorization": f"Bearer {token}"}
-        
-        # Create session with a custom ship
+        # Create session with a custom ship directly (no authentication needed to create a session)
         resp = client.post("/sessions", json={
             "name": "UI Test Session",
             "visibility": "public",
@@ -42,14 +23,14 @@ def create_session_tokens():
                     }
                 ]
             }
-        }, headers=headers)
+        })
         assert resp.status_code == 200
         return resp.json()["tokens"]
 
 def test_vergemap_ro_permissions(page: Page):
     # 1. Get tokens
     tokens = create_session_tokens()
-    ro_token = tokens["ro"]
+    ro_token = tokens["viewer"]
     
     # 2. Go to the vergemap page with the read-only token
     page.goto(f"/vergemap/?session={ro_token}")

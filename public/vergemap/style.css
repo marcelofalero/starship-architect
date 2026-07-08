@@ -214,7 +214,7 @@ button:active, .btn-like:active {
 }
 
 /* Token & Entity & Share Modals */
-#create-entity-modal, #token-editor-modal, #entity-editor-modal, #share-modal, #move-ship-modal, #move-here-modal, #log-modal {
+#create-entity-modal, #token-editor-modal, #entity-editor-modal, #share-modal, #move-ship-modal, #move-here-modal, #log-modal, #system-tools-modal {
     position: fixed;
     top: 0;
     left: 0;

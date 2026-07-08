@@ -22,18 +22,11 @@
 <body>
 
     <div id="ui-layer">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <a href="../" class="back-link" data-i18n="backLink">&larr; Back to Main Index</a>
-            <button id="back-to-galaxy-btn" style="display: none; padding: 2px 5px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
-            <div id="system-generation-controls" style="display: none; gap: 5px; align-items: center;">
-                <select id="generation-mode-select" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white;">
-                    <option value="Normal">Normal</option>
-                    <option value="Viable">Viable</option>
-                    <option value="ViableHigh">Viable with high (tech)</option>
-                </select>
-                <button id="regenerate-system-btn" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white; cursor: pointer;" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
-            </div>
-            <select id="lang-select" style="padding: 2px 5px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <a href="../" class="back-link" data-i18n="backLink" style="margin-bottom: 0;">&larr; Back to Main Index</a>
+            <button id="back-to-galaxy-btn" style="display: none; width: auto; padding: 6px 10px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
+            <button id="back-to-galaxy-btn" style="display: none; width: auto; padding: 6px 10px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
+            <select id="lang-select" style="width: auto; margin-bottom: 0; padding: 4px 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc;">
                 <option value="en">English</option>
                 <option value="es">Español</option>
             </select>
@@ -41,6 +34,12 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h2 style="margin: 0;" data-i18n="title">The Verge Map</h2>
             <div style="display: flex; gap: 5px;">
+                <button id="system-tools-btn" title="System Tools" style="display: none; padding: 5px; cursor: pointer; background: #bd3838; border: none; color: white; border-radius: 4px; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                      <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg>
+                </button>
                 <button id="log-btn" data-i18n-title="logBtn" title="Movement Log" style="padding: 5px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -112,6 +111,9 @@
                 <button id="export-yaml-btn" data-i18n="exportYaml" style="flex: 1;">Export YAML</button>
                 <button id="import-yaml-btn" data-i18n="importYaml" style="flex: 1;">Import YAML</button>
                 <input type="file" id="import-yaml-file" accept=".yaml,.yml" style="display: none;">
+            </div>
+            <div style="margin-top: 5px;">
+                <button id="reset-session-btn" style="width: 100%; background-color: #aa2222; border: 1px solid #ff3333;">Reset Session</button>
             </div>
         </div>
     </div>
@@ -191,7 +193,7 @@
                     </select>
                 </div>
                 
-                <label data-i18n="coordinatesLabel">Coordinates (X, Y, Z)</label>
+                <label id="create-entity-coords-label" data-i18n="coordinatesLabel">Coordinates (X, Y, Z)</label>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="number" id="create-entity-x" placeholder="X" value="0" step="any">
                     <input type="number" id="create-entity-y" placeholder="Y" value="0" step="any">
@@ -350,7 +352,7 @@
                     <div><span data-i18n="totalDistanceLabel">Total Distance</span>: <strong id="move-here-total-dist"></strong> LY</div>
                 </div>
 
-                <label data-i18n="travelDistanceLabel">Travel Distance (LY)</label>
+                <label id="move-here-distance-label" data-i18n="travelDistanceLabel">Travel Distance (LY)</label>
                 <input type="number" id="move-here-distance" value="0" step="any" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -413,6 +415,25 @@
             </div>
             <div style="display: flex; justify-content: flex-end;">
                 <button id="close-log-modal-btn" style="width: auto; padding: 10px 20px; background-color: #555;" data-i18n="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Tools Modal -->
+    <div id="system-tools-modal" style="display: none;">
+        <div class="modal-content" style="width: 350px;">
+            <h3>System Generation Tools</h3>
+            <div class="editor-controls">
+                <label>Generation Mode</label>
+                <select id="generation-mode-select" style="width: 100%; box-sizing: border-box; margin-bottom: 15px; padding: 6px 10px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white;">
+                    <option value="Normal">Normal</option>
+                    <option value="Viable">Viable</option>
+                    <option value="ViableHigh">Viable with high (tech)</option>
+                </select>
+                <button id="regenerate-system-btn" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold;" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="close-system-tools-btn" style="flex: 1; background-color: #555;">Close</button>
             </div>
         </div>
     </div>

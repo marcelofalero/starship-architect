@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS resources (
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Seed the anonymous system user so sessions can be created without login
+INSERT OR IGNORE INTO users (id, email, name) VALUES ('anonymous', 'anonymous@system', 'Anonymous');
+
 CREATE TABLE IF NOT EXISTS permissions (
     target_id TEXT NOT NULL,
     grantee_id TEXT NOT NULL,

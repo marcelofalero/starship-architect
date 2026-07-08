@@ -1,0 +1,11 @@
+/home/mfalero/Projects/Personal/starship-architect/scripts/taiga-cli/target/release/deps/ipnet-f9ab634d72337b61.d: /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/lib.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipext.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipnet.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/mask.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/parser.rs
+
+/home/mfalero/Projects/Personal/starship-architect/scripts/taiga-cli/target/release/deps/libipnet-f9ab634d72337b61.rlib: /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/lib.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipext.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipnet.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/mask.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/parser.rs
+
+/home/mfalero/Projects/Personal/starship-architect/scripts/taiga-cli/target/release/deps/libipnet-f9ab634d72337b61.rmeta: /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/lib.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipext.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipnet.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/mask.rs /home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/parser.rs
+
+/home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/lib.rs:
+/home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipext.rs:
+/home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/ipnet.rs:
+/home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/mask.rs:
+/home/mfalero/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ipnet-2.12.0/src/parser.rs:

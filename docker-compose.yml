@@ -51,27 +51,6 @@ services:
     volumes:
       - ./docs:/usr/share/nginx/html:ro
 
-  taiga-mcp:
-    image: node:alpine
-    working_dir: /app
-    ports:
-      - "4242:4242"
-    environment:
-      - TAIGA_URL=${TAIGA_URL}
-      - TAIGA_USERNAME=${TAIGA_USERNAME}
-      - TAIGA_PASSWORD=${TAIGA_PASSWORD}
-    command: >
-      sh -c "apk add --no-cache git &&
-             git clone https://github.com/illodev/taiga-mcp.git /tmp/taiga-mcp &&
-             cp -r /tmp/taiga-mcp/* /app/ &&
-             cp /tmp/taiga-mcp/.npmrc /app/ 2>/dev/null || true &&
-             rm -rf /tmp/taiga-mcp &&
-             npm install &&
-             sed -i '/registerWikiTools/d; /registerMembershipTools/d; /registerRoleTools/d; /registerUserTools/d; /registerStatusTools/d; /registerCustomAttributeTools/d; /registerHistoryTools/d; /registerTimelineTools/d; /registerResolverTools/d; /registerWebhookTools/d; /registerExportImportTools/d; /registerProjectTools/d; /registerMilestoneTools/d; /registerSearchTools/d' src/index.ts &&
-             npm run build &&
-             tail -f /dev/null"
-    restart: unless-stopped
-
 volumes:
   wrangler-state:
 

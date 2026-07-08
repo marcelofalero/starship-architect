@@ -23,6 +23,60 @@ function weightedChoice(rng, weights) {
     return weights.length - 1;
 }
 
+function calculateGRAPH(surfaceGravity, tempC, atmStr, distance, starClass) {
+    let g = 2;
+    if (surfaceGravity < 0.2) g = 0;
+    else if (surfaceGravity <= 0.8) g = 1;
+    else if (surfaceGravity <= 1.2) g = 2;
+    else if (surfaceGravity <= 2.0) g = 3;
+    else if (surfaceGravity <= 4.0) g = 4;
+    else g = 5;
+
+    let h = 2;
+    if (tempC <= -200) h = 0;
+    else if (tempC <= -50) h = 1;
+    else if (tempC <= 50) h = 2;
+    else if (tempC <= 100) h = 3;
+    else if (tempC <= 500) h = 4;
+    else h = 5;
+
+    let a = 2, p = 3;
+    if (atmStr.includes("None") || atmStr.includes("Trace")) {
+        a = 0; p = atmStr.includes("Trace") ? 1 : 0;
+    } else if (atmStr.includes("Nitrogen/Oxygen (1 atm)")) {
+        a = 2; p = 3;
+    } else if (atmStr.includes("Nitrogen/Oxygen (Thick)")) {
+        a = 2; p = 4;
+    } else if (atmStr.includes("Carbon Dioxide") || atmStr.includes("Methane")) {
+        a = 3; 
+        p = atmStr.includes("Thin") ? 2 : (atmStr.includes("Thick") ? 4 : 3);
+    } else if (atmStr.includes("Sulfur") || atmStr.includes("Silicate")) {
+        a = 4; p = 4;
+    } else if (atmStr.includes("Hydrogen/Helium")) {
+        a = 1; p = 5; 
+    } else {
+        a = 2; p = 2;
+    }
+
+    let rBase = 2;
+    if (starClass === 'O' || starClass === 'B') rBase = 4;
+    else if (starClass === 'A' || starClass === 'F') rBase = 3;
+    else if (starClass === 'G') rBase = 2;
+    else rBase = 1; 
+    
+    let rDist = Math.max(0, Math.floor(rBase - Math.sqrt(distance) + 1));
+    if (distance < 0.3) rDist += 2;
+    else if (distance < 0.8) rDist += 1;
+    
+    let rMag = (surfaceGravity < 0.8) ? 1 : 0;
+    let rAtm = (p <= 1) ? 1 : 0;
+    
+    let r = rDist + rMag + rAtm;
+    r = Math.max(0, Math.min(5, r));
+
+    return `G${g}/R${r}/A${a}/P${p}/H${h}`;
+}
+
 const STAR_TYPES = [
     { name: 'Yellow Dwarf', colorLow: 0x5a0a00, colorMid: 0xff3c00, colorHigh: 0xffffd2, color: 0xfffbe0, glowColor: 0xffee88, size: 0.48, intensity: 3.5 },
     { name: 'Red Dwarf', colorLow: 0x220000, colorMid: 0x881100, colorHigh: 0xff5533, color: 0xff7744, glowColor: 0xff5533, size: 0.30, intensity: 2.0 },
@@ -177,7 +231,7 @@ export function generateSystem(systemData, genMode = "Normal") {
             delete systemData.planets; 
         }
         
-        group = generateSystemImpl(systemData);
+        group = generateSystemImpl(systemData, genMode);
         
         if (!isNewGeneration || genMode === "Normal") {
             break; 
@@ -214,19 +268,33 @@ export function generateSystem(systemData, genMode = "Normal") {
     return group;
 }
 
-function generateSystemImpl(systemData) {
+function generateSystemImpl(systemData, genMode = "Normal") {
     const group = new THREE.Group();
     // Using star seed/id to reliably seed the RNG so it looks the same every time
     const seed = systemData.systemSeed || systemData.id || systemData.name || "DefaultSystem";
     const rng = makeRNG(seed);
 
-    const starIdx = weightedChoice(rng, [3, 2, 1, 2, 1]);
+    let starIdx = -1;
+    if (systemData.class) {
+        let expectedName = systemData.class;
+        if (expectedName === 'O' || expectedName === 'B') expectedName = 'Blue Giant';
+        else if (expectedName === 'A') expectedName = 'White Dwarf';
+        else if (expectedName === 'F' || expectedName === 'G') expectedName = 'Yellow Dwarf';
+        else if (expectedName === 'K') expectedName = 'Orange Giant';
+        else if (expectedName === 'M') expectedName = 'Red Dwarf';
+        
+        starIdx = STAR_TYPES.findIndex(s => s.name === expectedName);
+    }
+    if (starIdx === -1) {
+        starIdx = weightedChoice(rng, [3, 2, 1, 2, 1]);
+    }
     const starType = STAR_TYPES[starIdx];
 
     const starGroup = new THREE.Group();
     group.add(starGroup);
 
-    const isBinary = rng() > 0.8;
+    const isBinary = rng() > 0.9;
+    
     let displayStarType = starType.name;
 
     const star1Geo = new THREE.IcosahedronGeometry(starType.size * 2, 15); // Scale up a bit for system view
@@ -300,17 +368,41 @@ function generateSystemImpl(systemData) {
     }
 
     let bodyCount = Math.floor(rng() * 4) + 1 + Math.floor(rng() * 4) + 1; // 2-8
-    const starMass = starType.intensity;
-    let currentOrbitRadius = (starType.size * 2) * 1.5 + (starMass * 0.8);
+    
+        const starMass = starType.intensity;
+    let effectiveStarMass = starMass;
+    if (isBinary) effectiveStarMass *= 1.8; // Second star adds heat
+
+    // Calculate System Age based on Star Class
+    let systemAge = 4.5; // default 4.5 Billion years
+    if (starType.name.includes("Class O") || starType.name.includes("Class B")) systemAge = 0.01 + rng() * 0.1;
+    else if (starType.name.includes("Class A")) systemAge = 0.1 + rng() * 1.0;
+    else if (starType.name.includes("Class F")) systemAge = 1.0 + rng() * 2.0;
+    else if (starType.name.includes("Class G")) systemAge = 3.0 + rng() * 4.0;
+    else if (starType.name.includes("Class K")) systemAge = 4.0 + rng() * 8.0;
+    else if (starType.name.includes("Class M")) systemAge = 5.0 + rng() * 10.0;
+    
+    systemData.age = systemAge.toFixed(2) + " Billion Years";
+
+    let currentOrbitRadius = (starType.size * 2.0) + (starMass * 0.3) + (rng() * 0.5);
     
     if (isBinary) {
         currentOrbitRadius += 2.5;
-        // Circumbinary Orbits: ~10% of binary systems host planets, usually large gas giants
-        if (rng() > 0.1) {
+        // Circumbinary Orbits: ~50% of binary systems host planets, usually large gas giants
+        if (rng() > 0.5) {
             bodyCount = 0; 
         } else {
-            bodyCount = Math.floor(rng() * 2) + 1; // 1-2 planets
+            bodyCount = Math.floor(rng() * 3) + 1; // 1-3 planets
         }
+    }
+    
+    if (genMode.startsWith("Viable") && bodyCount < 2) {
+        bodyCount = 2 + Math.floor(rng() * 2); // Ensure enough planets for viable
+    }
+
+    let forceViableIdx = -1;
+    if (genMode.startsWith("Viable") && bodyCount > 0) {
+        forceViableIdx = Math.floor(rng() * bodyCount);
     }
 
     const orbitBodies = [];
@@ -321,17 +413,61 @@ function generateSystemImpl(systemData) {
         const spacingMultiplier = 0.5 + (i * 0.35);
         const randomOffset = 0.5 + (rng() * 1.5);
 
+        // Estimate orbital radius to determine temperature-appropriate planet type
+        let estA;
+        if (i === forceViableIdx) {
+            estA = 0.8711 * effectiveStarMass;
+            if (estA <= currentOrbitRadius + 0.5) estA = currentOrbitRadius + 0.5 + rng() * 0.5;
+            currentOrbitRadius = estA;
+        } else {
+            currentOrbitRadius += minDistance + (randomOffset * spacingMultiplier * (starMass * 0.3));
+            if (i === 1 && bodyCount >= 3 && rng() > 0.4 && i !== forceViableIdx) {
+                beltR = currentOrbitRadius + 1.5;
+                currentOrbitRadius += 3.0; 
+            }
+            estA = currentOrbitRadius;
+        }
+        
+        let estTemp = Math.floor(280 * Math.pow(effectiveStarMass, 0.5) / Math.sqrt(estA));
+
         // Determine Planet Type early
         let btIdx;
-        if (isBinary) {
-            // Binary systems that DO have planets are almost always gas giants
+        if (i === forceViableIdx) {
+            if (isBinary) {
+                if (genMode === "Viable") {
+                    const r = rng();
+                    if (r > 0.3) btIdx = 6; // Terran (70%)
+                    else if (r > 0.05) btIdx = 2; // Ocean (25%)
+                    else btIdx = 3; // Desert (Terraformed) (5%)
+                } else {
+                    btIdx = rng() > 0.5 ? 3 : 6; // Desert (Tatooine) or Terran
+                }
+            } else {
+                if (genMode === "Viable") {
+                    const r = rng();
+                    if (r > 0.4) btIdx = 6; // Terran (60%)
+                    else if (r > 0.2) btIdx = 7; // Eyeball (20%)
+                    else if (r > 0.05) btIdx = 2; // Ocean (15%)
+                    else btIdx = rng() > 0.5 ? 3 : 1; // Desert or Rocky (Terraformed) (5%)
+                } else {
+                    btIdx = rng() > 0.5 ? 6 : 7; // Terran or Eyeball
+                }
+            }
+        } else if (isBinary) {
             btIdx = rng() > 0.2 ? 5 : 4; 
-        } else if (i === 0) {
-            btIdx = rng() > 0.5 ? 0 : 1;
-        } else if (i === bodyCount - 1 && i > 1) {
-            btIdx = rng() > 0.5 ? 5 : 4;
+        } else if (estTemp > 450) {
+            btIdx = rng() > 0.5 ? 0 : 1; // Molten or Rocky
+        } else if (estTemp < 200) {
+            btIdx = rng() > 0.5 ? 5 : 4; // Ice or Gas Giant
         } else {
-            btIdx = Math.floor(rng() * BODY_TYPES.length);
+            // Habitable zone planets
+            const r = rng();
+            if (r < 0.2) btIdx = 4; // Gas Giant
+            else if (r < 0.4) btIdx = 2; // Ocean
+            else if (r < 0.6) btIdx = 3; // Desert
+            else if (r < 0.8) btIdx = 6; // Terran
+            else if (r < 0.9) btIdx = 7; // Eyeball
+            else btIdx = 1; // Rocky
         }
         const bt = BODY_TYPES[btIdx];
 
@@ -351,14 +487,7 @@ function generateSystemImpl(systemData) {
             const offsets = [Math.PI / 3, -Math.PI / 3];
             orbitAngle = prev.orbitAngle + offsets[Math.floor(rng() * offsets.length)];
         } else {
-            currentOrbitRadius += minDistance + (randomOffset * spacingMultiplier * (starMass * 0.3));
-
-            if (i === 1 && bodyCount >= 3 && rng() > 0.4) {
-                beltR = currentOrbitRadius + 1.5;
-                currentOrbitRadius += 3.0; 
-            }
-
-            a = currentOrbitRadius; // Semi-major axis
+            a = estA; // Semi-major axis
             
             // Ultra-Eccentric Orbits: ~50% for solitary giants, rare for small worlds
             if (bt.isGas && bodyCount === 1) {
@@ -426,7 +555,7 @@ function generateSystemImpl(systemData) {
 
         // Basic blackbody temperature approx
         const baseTemp = 280; // Kelvin for Earth-like at 1 AU
-        let surfaceTemp = Math.floor(baseTemp * Math.pow(starMass, 0.5) / Math.sqrt(a));
+        let surfaceTemp = Math.floor(baseTemp * Math.pow(effectiveStarMass, 0.5) / Math.sqrt(a));
         
         // Apply atmospheric effects (greenhouse, etc.) based on planet type
         if (bt.name === "Scorched World") surfaceTemp += 200 + rng() * 300;
@@ -460,38 +589,152 @@ function generateSystemImpl(systemData) {
         } else if (bt.name === "Terran World" || bt.name === "Eyeball World") {
             atmosphere = "Nitrogen/Oxygen (1 atm)";
         } else if (bt.name === "Ocean World") {
-            atmosphere = rng() > 0.5 ? "Nitrogen/Oxygen (Thick)" : "Ammonia/Methane (Thick)";
+            if (i === forceViableIdx && genMode === "Viable") {
+                atmosphere = "Nitrogen/Oxygen (1 atm)";
+            } else {
+                const r = rng();
+                if (r > 0.7) atmosphere = "Nitrogen/Oxygen (1 atm)"; // 30% chance for perfect Ocean atmosphere
+                else if (r > 0.3) atmosphere = "Nitrogen/Oxygen (Thick)";
+                else atmosphere = "Ammonia/Methane (Thick)";
+            }
         } else if (bt.name === "Desert World") {
-            atmosphere = "Thin Carbon Dioxide";
+            if (i === forceViableIdx && genMode === "Viable") {
+                atmosphere = "Nitrogen/Oxygen (1 atm)";
+            } else {
+                atmosphere = rng() > 0.7 ? "Nitrogen/Oxygen (1 atm)" : "Thin Carbon Dioxide"; // 30% chance for breathable arid world
+            }
         } else if (bt.name === "Molten Rock") {
             atmosphere = "Silicate Vapor / Sulfur Dioxide";
         } else if (bt.name === "Ice World") {
             atmosphere = rng() > 0.5 ? "Thin Nitrogen/Methane" : "Trace Exosphere";
         } else if (bt.name === "Rocky World") {
-            atmosphere = rng() > 0.5 ? "None" : "Trace Carbon Dioxide";
+            if (i === forceViableIdx && genMode === "Viable") {
+                atmosphere = "Nitrogen/Oxygen (1 atm)";
+            } else {
+                atmosphere = rng() > 0.95 ? "Nitrogen/Oxygen (1 atm)" : (rng() > 0.5 ? "None" : "Trace Carbon Dioxide"); // 5% chance for breathable rocky anomaly
+            }
         } else {
             atmosphere = "Variable / Standard";
         }
 
-        let desc = `A ${bt.name.toLowerCase()} orbiting at ${a.toFixed(2)} AU. `;
+        const tempC = Math.floor(surfaceTemp - 273.15);
+        let currentGraph = calculateGRAPH(surfaceGravity, tempC, atmosphere, a, systemData.class);
+
+        let isTerraformed = false;
+        let anomaliesText = "";
+        let subtype = bt.name;
+        let features = [];
+        
+        let match = currentGraph.match(/G(\d+)\/R(\d+)\/A(\d+)\/P(\d+)\/H(\d+)/);
+        if (match) {
+            let g = parseInt(match[1]);
+            let r = parseInt(match[2]);
+            let a_val = parseInt(match[3]);
+            let p_val = parseInt(match[4]);
+            let h = parseInt(match[5]);
+
+            const isPerfect = (a_val === 2 && p_val === 3 && h === 2 && g === 2 && r <= 1);
+            const isBarelyViable = (!isPerfect && g >= 1 && g <= 3 && r <= 3 && p_val <= 3 && h >= 1 && h <= 3);
+
+            if (isBarelyViable && rng() < 0.05) {
+                isTerraformed = true;
+                const anomalies = [];
+                if (g !== 2) { g += (g < 2 ? 1 : -1); anomalies.push("gravity"); }
+                if (r > 0) { r -= 1; anomalies.push("magnetic field"); }
+                if (a_val !== 2) { a_val += (a_val < 2 ? 1 : -1); anomalies.push("atmosphere"); }
+                if (p_val !== 3) { p_val += (p_val < 3 ? 1 : -1); anomalies.push("pressure"); }
+                if (h !== 2) { h += (h < 2 ? 1 : -1); anomalies.push("thermodynamics"); }
+
+                currentGraph = `G${g}/R${r}/A${a_val}/P${p_val}/H${h}`;
+                anomaliesText = anomalies.join(", ");
+                features.push(rng() > 0.5 ? "Ancient Ruins" : "Precursor Artifacts");
+            }
+            
+            // Subtype Logic
+            if (bt.name === "Terran World") {
+                if (a_val === 3) subtype = "Swamp World";
+                else if (tempC > 30 && p_val >= 3) subtype = "Jungle World";
+                else if (tempC < -5) subtype = "Tundra World";
+            } else if (bt.name === "Ocean World") {
+                if (a_val === 3 || a_val === 4) subtype = "Ammonia Ocean World";
+                else if (tempC > 40) subtype = "Boiling Ocean World";
+            } else if (bt.name === "Ice World") {
+                if (p_val >= 2) subtype = "Glacial World";
+            } else if (bt.name === "Desert World") {
+                if (tempC > 50) subtype = "Scorched Desert";
+                else if (p_val <= 1) subtype = "Barren Desert";
+            }
+
+            // Feature Logic
+            // Biological features require a minimum temperature to sustain complex ecosystems globally
+            if ((a_val === 2 || a_val === 3) && !bt.isGas && tempC > -30) {
+                if (rng() > 0.85) features.push("Exotic Flora");
+                
+                // Bioluminescence makes sense on dark planets that are still warm enough for life
+                const isDark = (p_val >= 4 || bt.isTidalLocked || (a > 2.0 && p_val >= 3));
+                if (isDark && rng() > 0.6) features.push("Bioluminescent Ecosystem");
+            }
+            if (p_val >= 3 && (e > 0.2 || tempC > 40) && rng() > 0.7) {
+                features.push("Extreme Weather");
+            }
+            if (a_val === 2 && g <= 2 && tempC > 5 && rng() > 0.85) {
+                features.push("Megafauna");
+            }
+            if (r > 1 && rng() > 0.7 && !bt.isGas) {
+                features.push("Radioactive Hotspots");
+            }
+
+            // Microenvironment Features (Life finds a way in harsh extremes)
+            const isYoung = systemAge < 3.0;
+            const isOld = systemAge > 8.0;
+
+            if (tempC <= -30 && p_val > 0) {
+                if (isYoung && rng() > 0.4) features.push("Thermal Vents");
+                else if (!isOld && rng() > 0.75) features.push(rng() > 0.5 ? "Geothermal Oases" : "Subterranean Biosphere");
+            }
+            if (tempC >= 50 && p_val > 0 && rng() > 0.8) {
+                features.push("Habitable Polar Regions");
+            }
+            if (p_val <= 1 && !bt.isGas && rng() > 0.85) {
+                features.push("Crystalline Caverns");
+            }
+            if (isYoung && !bt.isGas && rng() > 0.7) {
+                features.push("Active Volcanism");
+            }
+        }
+
+        let desc = `A ${subtype.toLowerCase()} orbiting at ${a.toFixed(2)} AU. `;
         if (e > 0.2) desc += `Its highly eccentric orbit (e = ${e.toFixed(2)}) subjects it to extreme seasonal variations. `;
         if (bt.isTidalLocked) desc += "It is tidally locked, presenting only one face to its star. ";
         if (bt.isGas) desc += "Massive storms and high gravity make its atmosphere treacherous.";
+        else if (isTerraformed && anomaliesText) {
+            desc += `Anomalously, it possesses unnatural fluctuations in its ${anomaliesText}, suggesting ancient terraforming efforts. `;
+        }
         else if (surfaceTemp > 350) desc += "The surface is blisteringly hot and hostile to life.";
         else if (surfaceTemp < 250) desc += "A frozen, desolate landscape dominates the surface.";
         else desc += "Conditions may be suitable for hardy ecosystems or outposts.";
 
-        // Find or create planet persistence data
+        if (features.length > 0) {
+            desc += ` Notable features include: ${features.join(", ")}.`;
+        }
+
         if (!systemData.planets) systemData.planets = [];
         let pData = systemData.planets.find(p => p.originalName === pName);
         if (!pData) {
             pData = { originalName: pName, name: pName, description: desc };
             systemData.planets.push(pData);
+        } else if (pData.type !== bt.name) {
+            pData.description = desc;
         }
-        // Always update physics in case the seed changed
+
         pData.gravity = surfaceGravity + "g";
-        pData.temperature = Math.floor(surfaceTemp) + " K";
+        pData.temperature = Math.floor(surfaceTemp) + " K (" + tempC + "°C)";
         pData.atmosphere = atmosphere;
+        pData.graph = currentGraph;
+        if (isTerraformed) pData.anomalies = anomaliesText;
+        pData.subtype = subtype;
+        pData.features = features;
+
         pData.year = yearDays + " Earth Days";
         pData.day = dayHours + " Hours";
         pData.tilt = axisTilt + "°";
@@ -528,6 +771,7 @@ function generateSystemImpl(systemData) {
             const moonDst = bodyRadius * 2.8;
             const moonGeo = new THREE.SphereGeometry(moonR, 16, 16);
             const moonMat = new THREE.MeshStandardMaterial({ color: 0x778899, roughness: 0.95, metalness: 0.05, map: planetTextures.rocky });
+            const moon = new THREE.Mesh(moonGeo, moonMat);
             const moonPivot = new THREE.Group();
             const moonInc = (rng() - 0.5) * 0.4;
             const moonLan = rng() * Math.PI * 2;
@@ -578,8 +822,10 @@ function generateSystemImpl(systemData) {
             }
             
             mData.gravity = moonGravity + "g";
-            mData.temperature = Math.floor(moonTemp) + " K";
+            const moonTempC = Math.floor(moonTemp - 273.15);
+            mData.temperature = Math.floor(moonTemp) + " K (" + moonTempC + "°C)";
             mData.atmosphere = moonAtmosphere;
+            mData.graph = calculateGRAPH(parseFloat(moonGravity), moonTempC, moonAtmosphere, a, systemData.class);
             mData.year = moonYearDays + " Earth Days";
             mData.day = (moonYearDays * 24).toFixed(1) + " Hours (Tidally Locked)";
             mData.tilt = moonTilt + "°";
@@ -628,29 +874,119 @@ function generateSystemImpl(systemData) {
 
     const beltMeshes = [];
     if (beltR > 0) {
-        const innerBeltGeo = new THREE.RingGeometry(beltR - 0.5, beltR + 0.3, 64);
-        const innerBeltMat = new THREE.MeshBasicMaterial({
-            color: 0xaa9988,
-            map: planetTextures.asteroids,
-            alphaMap: planetTextures.asteroids,
-            transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false, blending: THREE.NormalBlending
-        });
-        const innerBelt = new THREE.Mesh(innerBeltGeo, innerBeltMat);
-        // Rings are on X-Y plane
-        beltMeshes.push({ mesh: innerBelt, speed: 0.01 });
-        group.add(innerBelt);
+        const particleCount1 = 1200;
+        const positions1 = new Float32Array(particleCount1 * 3);
+        const colors1 = new Float32Array(particleCount1 * 3);
 
-        const outerBeltGeo = new THREE.RingGeometry(beltR - 0.1, beltR + 0.8, 64);
-        const outerBeltMat = new THREE.MeshBasicMaterial({
-            color: 0xc2b2a2,
-            map: planetTextures.asteroids,
-            alphaMap: planetTextures.asteroids,
-            transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false, blending: THREE.NormalBlending
+        const color1 = new THREE.Color(0xa89988);
+        const color2 = new THREE.Color(0x8c7c6c);
+        const color3 = new THREE.Color(0x6e5e52);
+
+        for (let j = 0; j < particleCount1; j++) {
+            const rOffset = (rng() - 0.5) * 1.6;
+            const r = beltR + rOffset;
+            const theta = rng() * Math.PI * 2;
+            
+            const x = r * Math.cos(theta);
+            const y = r * Math.sin(theta);
+            const z = (rng() - 0.5) * 0.25;
+
+            positions1[j * 3] = x;
+            positions1[j * 3 + 1] = y;
+            positions1[j * 3 + 2] = z;
+
+            let pColor = color1;
+            const randColor = rng();
+            if (randColor > 0.6) pColor = color2;
+            else if (randColor > 0.3) pColor = color3;
+
+            const shade = 0.8 + rng() * 0.4;
+            colors1[j * 3] = pColor.r * shade;
+            colors1[j * 3 + 1] = pColor.g * shade;
+            colors1[j * 3 + 2] = pColor.b * shade;
+        }
+
+        const beltGeo1 = new THREE.BufferGeometry();
+        beltGeo1.setAttribute('position', new THREE.BufferAttribute(positions1, 3));
+        beltGeo1.setAttribute('color', new THREE.BufferAttribute(colors1, 3));
+
+        const createCircleTexture = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16;
+            canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.7)');
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 16, 16);
+            return new THREE.CanvasTexture(canvas);
+        };
+
+        const circleTexture = createCircleTexture();
+
+        const beltMat1 = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.85,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            map: circleTexture
         });
-        const outerBelt = new THREE.Mesh(outerBeltGeo, outerBeltMat);
-        outerBelt.rotation.z = Math.PI / 3;
-        beltMeshes.push({ mesh: outerBelt, speed: 0.015 });
-        group.add(outerBelt);
+
+        const beltPoints1 = new THREE.Points(beltGeo1, beltMat1);
+        beltMeshes.push({ mesh: beltPoints1, speed: 0.005 });
+        group.add(beltPoints1);
+
+        const particleCount2 = 800;
+        const positions2 = new Float32Array(particleCount2 * 3);
+        const colors2 = new Float32Array(particleCount2 * 3);
+
+        for (let j = 0; j < particleCount2; j++) {
+            const rOffset = (rng() - 0.5) * 1.2;
+            const r = beltR + rOffset;
+            const theta = rng() * Math.PI * 2;
+            
+            const x = r * Math.cos(theta);
+            const y = r * Math.sin(theta);
+            const z = (rng() - 0.5) * 0.15;
+
+            positions2[j * 3] = x;
+            positions2[j * 3 + 1] = y;
+            positions2[j * 3 + 2] = z;
+
+            let pColor = color1;
+            const randColor = rng();
+            if (randColor > 0.6) pColor = color2;
+            else if (randColor > 0.3) pColor = color3;
+
+            const shade = 0.8 + rng() * 0.4;
+            colors2[j * 3] = pColor.r * shade;
+            colors2[j * 3 + 1] = pColor.g * shade;
+            colors2[j * 3 + 2] = pColor.b * shade;
+        }
+
+        const beltGeo2 = new THREE.BufferGeometry();
+        beltGeo2.setAttribute('position', new THREE.BufferAttribute(positions2, 3));
+        beltGeo2.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+
+        const beltMat2 = new THREE.PointsMaterial({
+            size: 0.10,
+            vertexColors: true,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.75,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            map: circleTexture
+        });
+
+        const beltPoints2 = new THREE.Points(beltGeo2, beltMat2);
+        beltMeshes.push({ mesh: beltPoints2, speed: 0.007 });
+        group.add(beltPoints2);
     }
 
     group.userData = { orbitBodies, starType: { name: displayStarType }, bodyCount, interactableMeshes, starGroup, beltMeshes, starUniforms };
