@@ -8,7 +8,7 @@ import {
     starTexture, starGeometry, shipGeometry, shipMat,
     raycaster, pointer,
     initScene, renderStars, renderShips, renderSystem,
-    enterSystem, exitSystem, animateShip, onPointerDown, onWindowResize, animate
+    enterSystem, exitSystem, animateShip, onPointerDown, onWindowResize, animate, recenterMap
 } from './scene.js';
 import {
     uiCtx, currentLang, i18n, applyTranslations, applyModeUI,
@@ -177,6 +177,7 @@ init();async function init() {
     
     // Create Entity Modal triggers
     document.getElementById('open-create-modal-btn').addEventListener('click', openCreateModal);
+    document.getElementById('recenter-map-btn').addEventListener('click', recenterMap);
 
     document.getElementById('tab-ship').addEventListener('click', () => setActiveCreateTab('Ship'));
     document.getElementById('tab-star').addEventListener('click', () => setActiveCreateTab('Star'));

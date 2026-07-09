@@ -459,8 +459,11 @@
         <button id="regenerate-system-btn" style="padding: 10px 15px; border-radius: 20px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5);" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
     </div>
 
-    <!-- Floating Action Button (+ Button) -->
-    <button id="open-create-modal-btn" data-i18n-title="addEntity" title="Add Entity" style="display: none;">+</button>
+    <!-- Floating Action Buttons Container -->
+    <div style="position: fixed; bottom: 24px; right: 24px; display: flex; gap: 10px; z-index: 1000; pointer-events: none;">
+        <button id="recenter-map-btn" class="floating-btn" title="Recenter Map" style="pointer-events: auto;">⌖</button>
+        <button id="open-create-modal-btn" class="floating-btn" data-i18n-title="addEntity" title="Add Entity" style="display: none; pointer-events: auto; font-size: 28px;">+</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script type="module" src="js/app.js"></script>

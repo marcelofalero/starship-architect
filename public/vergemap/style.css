@@ -313,11 +313,8 @@ button:active, .btn-like:active {
     box-shadow: 0 0 8px rgba(75, 181, 193, 0.4);
 }
 
-/* Google Style Positioned Floating Action Button (+ Button) using theme colors */
-#open-create-modal-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
+/* Google Style Positioned Floating Action Buttons using theme colors */
+.floating-btn {
     width: 50px;
     height: 50px;
     background-color: #001A33;
@@ -325,25 +322,24 @@ button:active, .btn-like:active {
     border: 1px solid #4BB5C1;
     border-radius: 2px;
     font-family: 'Russo One', sans-serif;
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1;
     cursor: pointer;
-    z-index: 1000;
-    display: none; /* JS controls display: flex/none */
+    display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     transition: all 0.2s ease;
 }
 
-#open-create-modal-btn:hover {
+.floating-btn:hover {
     background-color: #0A3D54;
     color: #59B7C7;
     border-color: #59B7C7;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
 }
 
-#open-create-modal-btn:active {
+.floating-btn:active {
     transform: scale(0.95);
 }
 

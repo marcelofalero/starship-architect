@@ -731,6 +731,31 @@ export function onWindowResize() {
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+export function recenterMap() {
+    const duration = 800;
+    const startPos = camera.position.clone();
+    const startTarget = controls.target.clone();
+    
+    const endTarget = new THREE.Vector3(0, 0, 0);
+    const endPos = new THREE.Vector3(0, 0, 90);
+    
+    const startTime = performance.now();
+
+    function tweenCamera(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        
+        if (progress < 1) {
+            requestAnimationFrame(tweenCamera);
+        }
+    }
+    requestAnimationFrame(tweenCamera);
+}
+
 export function animate() {
     requestAnimationFrame(animate);
     
@@ -797,6 +822,17 @@ export function animate() {
                 }
             });
         }
+    }
+
+    // Limit the OrbitControls target to keep the user from panning outside of the actual map
+    if (currentLayer === 'SYSTEM') {
+        controls.target.x = Math.max(-40, Math.min(40, controls.target.x));
+        controls.target.y = Math.max(-40, Math.min(40, controls.target.y));
+        controls.target.z = Math.max(-40, Math.min(40, controls.target.z));
+    } else {
+        controls.target.x = Math.max(-70, Math.min(70, controls.target.x));
+        controls.target.y = Math.max(-70, Math.min(70, controls.target.y));
+        controls.target.z = Math.max(-40, Math.min(40, controls.target.z));
     }
 
     controls.update();
