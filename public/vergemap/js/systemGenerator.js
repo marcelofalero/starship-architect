@@ -315,10 +315,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
 
     const star1 = new THREE.Mesh(star1Geo, star1Mat);
     star1.userData = {
+        type: 'Star',
+        data: systemData,
         isSystemBody: true,
         isStar: true,
         name: systemData.name + (isBinary ? ' A' : ' Prime'),
-        type: starType.name,
+        starTypeName: starType.name,
         color: starType.glowColor,
     };
     starGroup.add(star1);
@@ -348,10 +350,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         });
         const star2 = new THREE.Mesh(star2Geo, star2Mat);
         star2.userData = {
+            type: 'Star',
+            data: systemData,
             isSystemBody: true,
             isStar: true,
             name: systemData.name + ' B',
-            type: star2Type.name,
+            starTypeName: star2Type.name,
             color: star2Type.glowColor,
         };
 
@@ -742,11 +746,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         pData.tex = bt.tex;
 
         body.userData = {
+            type: 'Planet',
+            data: pData,
             isSystemBody: true,
             name: pData.name,
-            type: bt.name,
+            planetTypeName: bt.name,
             color: bt.color,
-            data: pData
         };
         interactableMeshes.push(body);
 
@@ -834,12 +839,13 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             mData.tex = "rocky";
             
             moon.userData = {
+                type: 'Planet',
+                data: mData,
                 isSystemBody: true,
                 isOrbiter: true,
                 name: mData.name,
-                type: "Natural Satellite",
+                planetTypeName: "Natural Satellite",
                 color: 0x778899,
-                data: mData
             };
             interactableMeshes.push(moon);
             body.userData.orbiters.push({ mesh: moon, dist: moonDst, angle: moonAngle, speed: moonSpeed });

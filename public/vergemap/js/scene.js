@@ -214,15 +214,22 @@ export function renderStars() {
         const starDiv = document.createElement('div');
         starDiv.className = 'star-label';
         starDiv.textContent = star.name;
+        starDiv.style.pointerEvents = "auto";
+        starDiv.style.cursor = "pointer";
+        starDiv.onclick = (e) => {
+            e.stopPropagation();
+            showInfoPanel({ type: isPoi ? 'POI' : 'Star', data: star });
+        };
         if (star.name === "Aegis") {
             starDiv.style.color = "#FF5722";
             starDiv.style.fontWeight = "bold";
             starDiv.style.fontSize = "16px";
         }
-        const label = new CSS2DObject(starDiv);
-        label.position.set(0, 1.2, 0);
+        const label = new THREE.Group(); // Or keeping it as CSS2DObject
+        const cssLabel = new CSS2DObject(starDiv);
+        cssLabel.position.set(0, 1.2, 0);
         if (currentLayer === 'SYSTEM') starDiv.style.visibility = 'hidden';
-        mesh.add(label);
+        mesh.add(cssLabel);
 
         mesh.userData.stem = stem;
         state.sceneObjects[star.name] = mesh;
@@ -331,6 +338,12 @@ export function renderShips() {
         shipDiv.className = 'star-label';
         shipDiv.textContent = ship.name;
         shipDiv.style.color = "#00ffcc";
+        shipDiv.style.pointerEvents = "auto";
+        shipDiv.style.cursor = "pointer";
+        shipDiv.onclick = (e) => {
+            e.stopPropagation();
+            showInfoPanel({ type: 'Ship', data: ship, hasToken: !!resolvedTokenUrl });
+        };
         const label = new CSS2DObject(shipDiv);
         
         if (orbitingShips) {
@@ -731,7 +744,23 @@ export function animateShip(ship, oldX, oldY, oldZ) {
     requestAnimationFrame(tweenShip);
 }
 
+export function rebuildInteractiveObjects() {
+    interactiveObjects.length = 0;
+    if (currentLayer === 'GALAXY') {
+        Object.values(state.sceneObjects).forEach(mesh => {
+            const hitbox = mesh.children.find(child => child.geometry && child.material && child.material.visible === false);
+            interactiveObjects.push(hitbox || mesh);
+        });
+    } else if (currentLayer === 'SYSTEM' && activeSystemView && activeSystemView.userData.interactableMeshes) {
+        activeSystemView.userData.interactableMeshes.forEach(mesh => {
+            interactiveObjects.push(mesh);
+        });
+    }
+}
+
 export function onPointerDown(event) {
+    rebuildInteractiveObjects();
+
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
