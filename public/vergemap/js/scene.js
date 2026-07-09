@@ -29,9 +29,7 @@ export let currentLayer = 'GALAXY';
 export let currentSystemFocus = null;
 export let galaxyScene = new THREE.Scene();
 export let systemScene = new THREE.Scene();
-export let planetScene = new THREE.Scene();
 export let currentScene = galaxyScene;
-export let currentPlanetFocus = null;
 export let starTexture, starGeometry, shipGeometry, shipMat;
 export const raycaster = new THREE.Raycaster();
 export const pointer = new THREE.Vector2();
@@ -301,13 +299,13 @@ export function renderShips() {
             ]);
             const stemMat = new THREE.LineBasicMaterial({ color: 0x4bb5c1, transparent: true, opacity: 0.5 });
             const stem = new THREE.Line(stemGeom, stemMat);
-            galaxyGroup.add(stem);
+            galaxyScene.add(stem);
             mesh.userData.stem = stem;
         }
         
         mesh.renderOrder = 10;
         mesh.frustumCulled = false;
-        galaxyGroup.add(mesh);
+        galaxyScene.add(mesh);
         interactiveObjects.push(mesh);
 
         const shipDiv = document.createElement('div');
@@ -524,6 +522,25 @@ export function enterSystem(starData) {
     document.getElementById('back-to-galaxy-btn').style.display = 'inline-block';
     document.getElementById('info-panel').style.display = 'none';
     
+    // Unlock orbit controls for free 3D rotation in system view
+    controls.minAzimuthAngle = -Infinity;
+    controls.maxAzimuthAngle = Infinity;
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle = Math.PI;
+    controls.maxDistance = 300;
+    
+    // Show system HUD
+    const hud = document.getElementById('system-hud');
+    if (hud) {
+        const starClassNames = { O: 'Blue', B: 'Blue-White', A: 'White', F: 'Yellow-White', G: 'Yellow', K: 'Orange', M: 'Red' };
+        document.getElementById('system-hud-name').textContent = starData.name;
+        document.getElementById('system-hud-class').textContent =
+            starData.class ? `Class ${starData.class} — ${starClassNames[starData.class] || starData.class}` : '';
+        hud.style.opacity = '0';
+        hud.style.display = 'block';
+        setTimeout(() => { hud.style.opacity = '1'; }, 50);
+    }
+    
     applyModeUI();
     
     toggleLabels(galaxyScene, false);
@@ -562,6 +579,20 @@ export function exitSystem() {
     currentScene.add(camera);
     activeSystemView = null;
     
+    // Restore galaxy orbit constraints
+    controls.minAzimuthAngle = -Math.PI / 12;
+    controls.maxAzimuthAngle = Math.PI / 12;
+    controls.minPolarAngle = Math.PI / 2 - Math.PI / 12;
+    controls.maxPolarAngle = Math.PI / 2 + Math.PI / 12;
+    controls.maxDistance = 200;
+    
+    // Hide system HUD
+    const hud = document.getElementById('system-hud');
+    if (hud) {
+        hud.style.opacity = '0';
+        setTimeout(() => { hud.style.display = 'none'; }, 300);
+    }
+    
     toggleLabels(galaxyScene, true);
     toggleLabels(systemScene, false);
     
@@ -573,137 +604,7 @@ export function exitSystem() {
     applyModeUI();
 }
 
-export function enterPlanet(planetData) {
-    if (currentLayer !== 'SYSTEM') return;
-    currentLayer = 'PLANET';
-    currentPlanetFocus = planetData;
-    
-    currentScene = planetScene;
-    currentScene.add(camera);
-    
-    // Clear old planet view
-    clearScene(planetScene);
-    
-    // Setup close up planet mesh
-    const pGeo = new THREE.SphereGeometry(15, 64, 64);
-    const pMat = new THREE.MeshStandardMaterial({ color: 0xcccccc });
-    
-    let texName = planetData.tex;
-    if (!texName) {
-        const typeMap = {
-            'Gas Giant': 'gas',
-            'Ice World': 'ice',
-            'Desert World': 'desert',
-            'Molten Rock': 'molten',
-            'Ocean World': 'ocean',
-            'Rocky World': 'rocky',
-            'Eyeball World': 'eyeball',
-            'Terran World': 'terran',
-            'Natural Satellite': 'rocky'
-        };
-        texName = typeMap[planetData.type] || 'terran';
-    }
-    
-    const textureUrl = `${texName}_highres.png`;
-    const texLoader = new THREE.TextureLoader();
-    
-    texLoader.load(textureUrl, (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace; // Modern three.js uses colorSpace
-        pMat.map = texture;
-        pMat.color.setHex(0xffffff);
-        pMat.needsUpdate = true;
-    }, undefined, () => {
-        console.warn(`Failed to load texture: ${textureUrl}, falling back to terran.`);
-        pMat.map = texLoader.load('terran_highres.png');
-        pMat.color.setHex(0xffffff);
-        pMat.needsUpdate = true;
-    });
-    const pMesh = new THREE.Mesh(pGeo, pMat);
-    
-    const planetNameDiv = document.createElement('div');
-    planetNameDiv.className = 'star-label';
-    planetNameDiv.textContent = planetData.name;
-    planetNameDiv.style.fontSize = "20px";
-    planetNameDiv.style.fontWeight = "bold";
-    planetNameDiv.style.color = "#4BB5C1";
-    planetNameDiv.style.textShadow = "2px 2px 4px #000";
-    const label = new CSS2DObject(planetNameDiv);
-    label.position.set(0, 16.5, 0);
-    pMesh.add(label);
-    
-    planetScene.add(pMesh);
-    
-    toggleLabels(systemScene, false);
-    toggleLabels(planetScene, true);
-    
-    // Animate camera to origin for planet view
-    const startPos = camera.position.clone();
-    const endPos = new THREE.Vector3(0, 0, 45); // Closer than system
-    const startTarget = controls.target.clone();
-    const endTarget = new THREE.Vector3(0, 0, 0);
-    
-    const duration = 1000;
-    const startTime = performance.now();
 
-    function tweenCamera(time) {
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        
-        camera.position.lerpVectors(startPos, endPos, ease);
-        controls.target.lerpVectors(startTarget, endTarget, ease);
-        
-        if (progress < 1) {
-            requestAnimationFrame(tweenCamera);
-        }
-    }
-    requestAnimationFrame(tweenCamera);
-    
-    document.getElementById('info-panel').style.display = 'none';
-    document.getElementById('planet-nav-left').style.display = 'flex';
-    document.getElementById('planet-nav-right').style.display = 'flex';
-    document.getElementById('planet-nav-esc').style.display = 'block';
-}
-
-export function exitPlanet() {
-    if (currentLayer !== 'PLANET') return;
-    currentLayer = 'SYSTEM';
-    currentPlanetFocus = null;
-    
-    currentScene = systemScene;
-    currentScene.add(camera);
-    
-    document.getElementById('planet-nav-left').style.display = 'none';
-    document.getElementById('planet-nav-right').style.display = 'none';
-    document.getElementById('planet-nav-esc').style.display = 'none';
-    
-    toggleLabels(planetScene, false);
-    toggleLabels(systemScene, true);
-    
-    clearScene(planetScene);
-    
-    const startPos = camera.position.clone();
-    const endPos = new THREE.Vector3(0, 0, 90);
-    const startTarget = controls.target.clone();
-    const endTarget = new THREE.Vector3(0, 0, 0);
-    
-    const duration = 800;
-    const startTime = performance.now();
-
-    function tweenCamera(time) {
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        
-        camera.position.lerpVectors(startPos, endPos, ease);
-        controls.target.lerpVectors(startTarget, endTarget, ease);
-        
-        if (progress < 1) {
-            requestAnimationFrame(tweenCamera);
-        }
-    }
-    requestAnimationFrame(tweenCamera);
-}
 
 export function animateShip(ship, oldX, oldY, oldZ) {
     const startPos = new THREE.Vector3(-oldX, oldY, oldZ);
@@ -905,8 +806,7 @@ export function animate() {
 
 export function initScene(container) {
     galaxyScene.fog = new THREE.FogExp2(0x050505, 0.005);
-    systemScene.fog = new THREE.FogExp2(0x050505, 0.005);
-    planetScene.fog = new THREE.FogExp2(0x050505, 0.005);
+    systemScene.fog = new THREE.FogExp2(0x020208, 0.003);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 90);
@@ -937,11 +837,9 @@ export function initScene(container) {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     galaxyScene.add(ambientLight);
     
-    const ambientLightSys = new THREE.AmbientLight(0xffffff, 0.4);
+    // System scene: lower ambient so the star's point light does more work
+    const ambientLightSys = new THREE.AmbientLight(0x111133, 0.5);
     systemScene.add(ambientLightSys);
-    
-    const ambientLightPlanet = new THREE.AmbientLight(0xffffff, 0.4);
-    planetScene.add(ambientLightPlanet);
 
     const pointLight = new THREE.PointLight(0xffffff, 1);
     camera.add(pointLight); 

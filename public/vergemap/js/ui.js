@@ -1,5 +1,5 @@
 import { state, saveLogs } from './data.js';
-import { currentLayer, currentSystemFocus, currentPlanetFocus, enterSystem, exitSystem, enterPlanet, exitPlanet } from './scene.js';
+import { currentLayer, currentSystemFocus, enterSystem, exitSystem } from './scene.js';
 
 export const uiCtx = {
     getCurrentMode: () => 'ro',
@@ -574,10 +574,6 @@ export function showInfoPanel(userData) {
         enterSystemBtn.textContent = i18n[currentLang].enterSystemBtn || "Enter System";
         enterSystemBtn.style.display = 'block';
         enterSystemBtn.onclick = () => enterSystem(userData.data);
-    } else if ((userData.type === 'Planet' || userData.type === 'Moon') && currentLayer === 'SYSTEM') {
-        enterSystemBtn.textContent = "View Planet";
-        enterSystemBtn.style.display = 'block';
-        enterSystemBtn.onclick = () => enterPlanet(userData.data);
     } else {
         enterSystemBtn.style.display = 'none';
     }
@@ -789,34 +785,7 @@ export function updateMoveCoordsFromSelectedEntity() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (currentLayer === 'PLANET') {
-            exitPlanet();
-        } else if (currentLayer === 'SYSTEM') {
-            exitSystem();
-        }
-    } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && currentLayer === 'PLANET' && currentSystemFocus) {
-        cyclePlanetFocus(e.key === 'ArrowRight' ? 1 : -1);
+    if (e.key === 'Escape' && currentLayer === 'SYSTEM') {
+        exitSystem();
     }
-});
-
-function cyclePlanetFocus(direction) {
-    const planets = currentSystemFocus.planets || [];
-    if (planets.length === 0) return;
-    
-    let currentIndex = planets.findIndex(p => p.name === currentPlanetFocus?.name);
-    if (currentIndex === -1) currentIndex = 0;
-    
-    let nextIndex = currentIndex + direction;
-    if (nextIndex < 0) nextIndex = planets.length - 1;
-    if (nextIndex >= planets.length) nextIndex = 0;
-    
-    enterPlanet(planets[nextIndex]);
-    showInfoPanel({ type: 'Planet', data: planets[nextIndex] });
-}
-
-document.getElementById('planet-nav-left').addEventListener('click', () => cyclePlanetFocus(-1));
-document.getElementById('planet-nav-right').addEventListener('click', () => cyclePlanetFocus(1));
-document.getElementById('planet-nav-esc').addEventListener('click', () => {
-    if (currentLayer === 'PLANET') exitPlanet();
 });
