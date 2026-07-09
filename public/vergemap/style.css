@@ -343,6 +343,19 @@ button:active, .btn-like:active {
     transform: scale(0.95);
 }
 
+#floating-system-tools {
+    background-color: #bd3838;
+    color: white;
+    border-color: #bd3838;
+}
+
+#floating-system-tools:hover {
+    background-color: #d14747;
+    border-color: #d14747;
+    color: white;
+    box-shadow: 0 6px 14px rgba(209, 71, 71, 0.4);
+}
+
 /* Hide Ship Controls Section */
 #panel-ship-controls {
     display: none !important;
