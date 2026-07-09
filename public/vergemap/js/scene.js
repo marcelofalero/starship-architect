@@ -600,6 +600,8 @@ export function exitSystem() {
     clearScene(systemScene);
 
     document.getElementById('back-to-galaxy-btn').style.display = 'none';
+    const toolsModal = document.getElementById('system-tools-modal');
+    if (toolsModal) toolsModal.style.display = 'none';
     
     applyModeUI();
 }
@@ -892,6 +894,13 @@ export function initScene(container) {
     // Setup system tools UI listeners
     document.getElementById('back-to-galaxy-btn').addEventListener('click', exitSystem);
 
+    document.getElementById('floating-system-tools').addEventListener('click', () => {
+        document.getElementById('system-tools-modal').style.display = 'flex';
+    });
+
+    document.getElementById('close-system-tools-btn').addEventListener('click', () => {
+        document.getElementById('system-tools-modal').style.display = 'none';
+    });
 
     document.getElementById('regenerate-system-btn').addEventListener('click', () => {
         if (currentSystemFocus && currentMode === 'gm') {
@@ -902,6 +911,8 @@ export function initScene(container) {
             
             if (currentSessionId) updateBackendSession(currentSessionId, state.ships);
             if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(currentSystemFocus));
+            
+            document.getElementById('system-tools-modal').style.display = 'none';
         }
     });
 
