@@ -4,7 +4,7 @@ import {
     currentScene, camera, renderer, labelRenderer, controls,
     activeSystemView, clock, interactiveObjects,
     currentLayer, currentSystemFocus,
-    galaxyScene, systemScene, planetScene,
+    galaxyScene, systemScene,
     starTexture, starGeometry, shipGeometry, shipMat,
     raycaster, pointer,
     initScene, renderStars, renderShips, renderSystem,

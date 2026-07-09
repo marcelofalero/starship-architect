@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
 import {
     currentScene, camera, controls, currentLayer, currentSystemFocus,
-    galaxyScene, systemScene, planetScene, renderStars, renderShips, renderSystem,
+    galaxyScene, systemScene, renderStars, renderShips, renderSystem,
     animateShip, removeMeshCompletely
 } from './scene.js';
 import {
