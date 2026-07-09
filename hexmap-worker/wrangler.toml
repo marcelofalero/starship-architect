@@ -1,0 +1,11 @@
+name = "hexmap-worker"
+main = "build/worker/shim.mjs"
+compatibility_date = "2024-04-01"
+
+[build]
+command = "worker-build --release"
+
+# Fallback KV cache binding
+# [[kv_namespaces]]
+# binding = "MAP_CACHE"
+# id = "hexmap-cache-dev"
