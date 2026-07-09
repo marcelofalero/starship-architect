@@ -95,6 +95,8 @@ export function removeMeshCompletely(mesh, name) {
     if (mesh.userData.stem && mesh.userData.stem.parent) mesh.userData.stem.parent.remove(mesh.userData.stem);
     mesh.children.forEach(child => {
         if (child.element) child.element.remove();
+        const childIdx = interactiveObjects.indexOf(child);
+        if (childIdx > -1) interactiveObjects.splice(childIdx, 1);
     });
     const index = interactiveObjects.indexOf(mesh);
     if (index > -1) interactiveObjects.splice(index, 1);
@@ -189,8 +191,17 @@ export function renderStars() {
         
         const isPoi = star.class && star.class.startsWith('P');
         mesh.userData = { type: isPoi ? 'POI' : 'Star', data: star };
+        
+        // Add invisible larger hitbox to make it easy to click but not interfere with orbits
+        const hitboxRadius = (star.class === 'P_ANOMALY') ? 0.9 : 0.75;
+        const hitboxGeo = new THREE.SphereGeometry(hitboxRadius, 8, 8);
+        const hitboxMat = new THREE.MeshBasicMaterial({ visible: false });
+        const hitbox = new THREE.Mesh(hitboxGeo, hitboxMat);
+        hitbox.userData = mesh.userData;
+        mesh.add(hitbox);
+        
         galaxyScene.add(mesh);
-        interactiveObjects.push(mesh);
+        interactiveObjects.push(hitbox);
 
         const stemGeom = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(-star.x, star.y, 0),
@@ -305,8 +316,16 @@ export function renderShips() {
         
         mesh.renderOrder = 10;
         mesh.frustumCulled = false;
+        
+        // Add invisible larger hitbox to make it easy to click
+        const hitboxGeo = new THREE.SphereGeometry(0.6, 8, 8);
+        const hitboxMat = new THREE.MeshBasicMaterial({ visible: false });
+        const hitbox = new THREE.Mesh(hitboxGeo, hitboxMat);
+        hitbox.userData = mesh.userData;
+        mesh.add(hitbox);
+        
         galaxyScene.add(mesh);
-        interactiveObjects.push(mesh);
+        interactiveObjects.push(hitbox);
 
         const shipDiv = document.createElement('div');
         shipDiv.className = 'star-label';
