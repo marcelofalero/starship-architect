@@ -1,5 +1,5 @@
 import { state, saveLogs } from './data.js';
-import { currentLayer, currentSystemFocus, enterSystem } from './scene.js';
+import { currentLayer, currentSystemFocus, currentPlanetFocus, enterSystem, exitSystem, enterPlanet, exitPlanet } from './scene.js';
 
 export const uiCtx = {
     getCurrentMode: () => 'ro',
@@ -271,7 +271,11 @@ export function applyModeUI() {
     const moveBtn = document.getElementById('move-ship-btn');
     const delBtn = document.getElementById('delete-ship-btn');
     const logPanel = document.getElementById('panel-movement-log');
-    const sysToolsBtn = document.getElementById('system-tools-btn');
+    const sysToolsBtn = document.getElementById('floating-system-tools');
+    
+    const isGalaxy = (currentLayer === 'GALAXY');
+    document.getElementById('panel-search').style.display = isGalaxy ? 'block' : 'none';
+    document.getElementById('panel-distance').style.display = isGalaxy ? 'block' : 'none';
     
     if (currentMode === 'ro') {
         if (shipControls) shipControls.style.display = 'none';
@@ -279,22 +283,22 @@ export function applyModeUI() {
         if (logPanel) logPanel.style.display = 'none';
         if (sysToolsBtn) sysToolsBtn.style.display = 'none';
     } else if (currentMode === 'nav') {
-        if (shipControls) shipControls.style.display = 'block';
+        if (shipControls) shipControls.style.display = isGalaxy ? 'block' : 'none';
         if (openCreateBtn) openCreateBtn.style.display = 'none';
         if (tokenRow) tokenRow.style.display = 'none';
         if (delBtn) delBtn.style.display = 'none';
         if (dataManagement) dataManagement.style.display = 'none';
         if (moveBtn) moveBtn.style.flex = '1';
-        if (logPanel) logPanel.style.display = 'block';
+        if (logPanel) logPanel.style.display = isGalaxy ? 'block' : 'none';
         if (sysToolsBtn) sysToolsBtn.style.display = 'none';
     } else if (currentMode === 'gm') {
-        if (shipControls) shipControls.style.display = 'block';
+        if (shipControls) shipControls.style.display = isGalaxy ? 'block' : 'none';
         if (openCreateBtn) openCreateBtn.style.display = 'flex';
         if (tokenRow) tokenRow.style.display = 'flex';
         if (delBtn) delBtn.style.display = 'block';
-        if (dataManagement) dataManagement.style.display = 'block';
+        if (dataManagement) dataManagement.style.display = isGalaxy ? 'block' : 'none';
         if (moveBtn) moveBtn.style.flex = '2';
-        if (logPanel) logPanel.style.display = 'block';
+        if (logPanel) logPanel.style.display = isGalaxy ? 'block' : 'none';
         if (sysToolsBtn) {
             sysToolsBtn.style.display = currentLayer === 'SYSTEM' ? 'flex' : 'none';
         }
@@ -567,8 +571,13 @@ export function showInfoPanel(userData) {
 
     const enterSystemBtn = document.getElementById('info-enter-system-btn');
     if (userData.type === 'Star' && currentLayer !== 'SYSTEM') {
+        enterSystemBtn.textContent = i18n[currentLang].enterSystemBtn || "Enter System";
         enterSystemBtn.style.display = 'block';
         enterSystemBtn.onclick = () => enterSystem(userData.data);
+    } else if ((userData.type === 'Planet' || userData.type === 'Moon') && currentLayer === 'SYSTEM') {
+        enterSystemBtn.textContent = "View Planet";
+        enterSystemBtn.style.display = 'block';
+        enterSystemBtn.onclick = () => enterPlanet(userData.data);
     } else {
         enterSystemBtn.style.display = 'none';
     }
@@ -778,3 +787,36 @@ export function updateMoveCoordsFromSelectedEntity() {
         document.getElementById('move-coord-z').value = found.z;
     }
 }
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (currentLayer === 'PLANET') {
+            exitPlanet();
+        } else if (currentLayer === 'SYSTEM') {
+            exitSystem();
+        }
+    } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && currentLayer === 'PLANET' && currentSystemFocus) {
+        cyclePlanetFocus(e.key === 'ArrowRight' ? 1 : -1);
+    }
+});
+
+function cyclePlanetFocus(direction) {
+    const planets = currentSystemFocus.planets || [];
+    if (planets.length === 0) return;
+    
+    let currentIndex = planets.findIndex(p => p.name === currentPlanetFocus?.name);
+    if (currentIndex === -1) currentIndex = 0;
+    
+    let nextIndex = currentIndex + direction;
+    if (nextIndex < 0) nextIndex = planets.length - 1;
+    if (nextIndex >= planets.length) nextIndex = 0;
+    
+    enterPlanet(planets[nextIndex]);
+    showInfoPanel({ type: 'Planet', data: planets[nextIndex] });
+}
+
+document.getElementById('planet-nav-left').addEventListener('click', () => cyclePlanetFocus(-1));
+document.getElementById('planet-nav-right').addEventListener('click', () => cyclePlanetFocus(1));
+document.getElementById('planet-nav-esc').addEventListener('click', () => {
+    if (currentLayer === 'PLANET') exitPlanet();
+});

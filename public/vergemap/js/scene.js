@@ -16,18 +16,22 @@ import {
     infoName,
     infoCoords,
     currentLang,
-    i18n
+    i18n,
+    applyModeUI
 } from './ui.js';
 
-export let scene, camera, renderer, labelRenderer, controls;
+export let camera, renderer, labelRenderer, controls;
 export let activeSystemView = null;
 export const clock = new THREE.Clock();
 export const interactiveObjects = []; // Array of meshes for raycasting
 
 export let currentLayer = 'GALAXY';
 export let currentSystemFocus = null;
-export let galaxyGroup = new THREE.Group();
-export let systemGroup = new THREE.Group();
+export let galaxyScene = new THREE.Scene();
+export let systemScene = new THREE.Scene();
+export let planetScene = new THREE.Scene();
+export let currentScene = galaxyScene;
+export let currentPlanetFocus = null;
 export let starTexture, starGeometry, shipGeometry, shipMat;
 export const raycaster = new THREE.Raycaster();
 export const pointer = new THREE.Vector2();
@@ -65,6 +69,27 @@ export function createStarTexture() {
     ctx.fillRect(0, 0, 64, 64);
     
     return new THREE.CanvasTexture(canvas);
+}
+
+export function toggleLabels(sceneObj, isVisible) {
+    sceneObj.traverse((child) => {
+        if (child.isCSS2DObject && child.element) {
+            child.element.style.visibility = isVisible ? 'visible' : 'hidden';
+        }
+    });
+}
+
+export function clearScene(sceneObj) {
+    for (let i = sceneObj.children.length - 1; i >= 0; i--) {
+        const child = sceneObj.children[i];
+        if (child.isCamera || child.isLight) continue;
+        sceneObj.remove(child);
+        child.traverse(c => {
+            if (c && c.element && typeof c.element.remove === 'function') {
+                try { c.element.remove(); } catch(e) {}
+            }
+        });
+    }
 }
 
 export function removeMeshCompletely(mesh, name) {
@@ -166,7 +191,7 @@ export function renderStars() {
         
         const isPoi = star.class && star.class.startsWith('P');
         mesh.userData = { type: isPoi ? 'POI' : 'Star', data: star };
-        galaxyGroup.add(mesh);
+        galaxyScene.add(mesh);
         interactiveObjects.push(mesh);
 
         const stemGeom = new THREE.BufferGeometry().setFromPoints([
@@ -175,7 +200,7 @@ export function renderStars() {
         ]);
         const stemMat = new THREE.LineBasicMaterial({ color: 0x444444 });
         const stem = new THREE.Line(stemGeom, stemMat);
-        galaxyGroup.add(stem);
+        galaxyScene.add(stem);
 
         const starDiv = document.createElement('div');
         starDiv.className = 'star-label';
@@ -187,6 +212,7 @@ export function renderStars() {
         }
         const label = new CSS2DObject(starDiv);
         label.position.set(0, 1.2, 0);
+        if (currentLayer === 'SYSTEM') starDiv.style.visibility = 'hidden';
         mesh.add(label);
 
         mesh.userData.stem = stem;
@@ -297,6 +323,7 @@ export function renderShips() {
             label.position.set(0, 1, 0);
         }
         
+        if (currentLayer === 'SYSTEM') shipDiv.style.visibility = 'hidden';
         mesh.add(label);
         
         state.sceneObjects[ship.name] = mesh;
@@ -305,15 +332,7 @@ export function renderShips() {
 
 export function renderSystem() {
     // Clear previous
-    while(systemGroup.children.length > 0){ 
-        const child = systemGroup.children[0];
-        systemGroup.remove(child);
-        child.traverse(c => {
-            if (c && c.element && typeof c.element.remove === 'function') {
-                try { c.element.remove(); } catch(e) {}
-            }
-        });
-    }
+    clearScene(systemScene);
 
     const genMode = document.getElementById('generation-mode-select') ? document.getElementById('generation-mode-select').value : 'Normal';
     const isFirstTime = !currentSystemFocus.planets;
@@ -493,25 +512,22 @@ export function renderSystem() {
         }
     });
 
-    systemGroup.add(activeSystemView);
+    systemScene.add(activeSystemView);
 }
 
 export function enterSystem(starData) {
     currentLayer = 'SYSTEM';
     currentSystemFocus = starData;
-    galaxyGroup.visible = false;
-    systemGroup.visible = true;
+    currentScene = systemScene;
+    currentScene.add(camera);
     
     document.getElementById('back-to-galaxy-btn').style.display = 'inline-block';
-    if (currentMode === 'gm') {
-        document.getElementById('system-tools-btn').style.display = 'flex';
-    }
     document.getElementById('info-panel').style.display = 'none';
     
-    // Hide galaxy labels manually since CSS2DRenderer doesn't update invisible branches
-    galaxyGroup.traverse((child) => {
-        if (child.isCSS2DObject) child.element.style.visibility = 'hidden';
-    });
+    applyModeUI();
+    
+    toggleLabels(galaxyScene, false);
+    toggleLabels(systemScene, true);
     
     // Animate camera to origin for system view
     const startPos = camera.position.clone();
@@ -542,32 +558,151 @@ export function enterSystem(starData) {
 export function exitSystem() {
     currentLayer = 'GALAXY';
     currentSystemFocus = null;
-    galaxyGroup.visible = true;
-    systemGroup.visible = false;
+    currentScene = galaxyScene;
+    currentScene.add(camera);
     activeSystemView = null;
     
-    // Restore galaxy labels
-    galaxyGroup.traverse((child) => {
-        if (child.isCSS2DObject) child.element.style.visibility = 'visible';
-    });
+    toggleLabels(galaxyScene, true);
+    toggleLabels(systemScene, false);
     
-    // Clear system group meshes
-    while(systemGroup.children.length > 0){ 
-        const child = systemGroup.children[0];
-        systemGroup.remove(child);
-        if (child.userData && child.userData.stem && child.userData.stem.parent) {
-             child.userData.stem.parent.remove(child.userData.stem);
-        }
-        child.traverse(c => {
-            if (c && c.element && typeof c.element.remove === 'function') {
-                try { c.element.remove(); } catch(e) {}
-            }
-        });
-    }
+    // Clear system scene meshes
+    clearScene(systemScene);
 
     document.getElementById('back-to-galaxy-btn').style.display = 'none';
-    document.getElementById('system-tools-btn').style.display = 'none';
-    document.getElementById('system-tools-modal').style.display = 'none';
+    
+    applyModeUI();
+}
+
+export function enterPlanet(planetData) {
+    if (currentLayer !== 'SYSTEM') return;
+    currentLayer = 'PLANET';
+    currentPlanetFocus = planetData;
+    
+    currentScene = planetScene;
+    currentScene.add(camera);
+    
+    // Clear old planet view
+    clearScene(planetScene);
+    
+    // Setup close up planet mesh
+    const pGeo = new THREE.SphereGeometry(15, 64, 64);
+    const pMat = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+    
+    let texName = planetData.tex;
+    if (!texName) {
+        const typeMap = {
+            'Gas Giant': 'gas',
+            'Ice World': 'ice',
+            'Desert World': 'desert',
+            'Molten Rock': 'molten',
+            'Ocean World': 'ocean',
+            'Rocky World': 'rocky',
+            'Eyeball World': 'eyeball',
+            'Terran World': 'terran',
+            'Natural Satellite': 'rocky'
+        };
+        texName = typeMap[planetData.type] || 'terran';
+    }
+    
+    const textureUrl = `${texName}_highres.png`;
+    const texLoader = new THREE.TextureLoader();
+    
+    texLoader.load(textureUrl, (texture) => {
+        texture.colorSpace = THREE.SRGBColorSpace; // Modern three.js uses colorSpace
+        pMat.map = texture;
+        pMat.color.setHex(0xffffff);
+        pMat.needsUpdate = true;
+    }, undefined, () => {
+        console.warn(`Failed to load texture: ${textureUrl}, falling back to terran.`);
+        pMat.map = texLoader.load('terran_highres.png');
+        pMat.color.setHex(0xffffff);
+        pMat.needsUpdate = true;
+    });
+    const pMesh = new THREE.Mesh(pGeo, pMat);
+    
+    const planetNameDiv = document.createElement('div');
+    planetNameDiv.className = 'star-label';
+    planetNameDiv.textContent = planetData.name;
+    planetNameDiv.style.fontSize = "20px";
+    planetNameDiv.style.fontWeight = "bold";
+    planetNameDiv.style.color = "#4BB5C1";
+    planetNameDiv.style.textShadow = "2px 2px 4px #000";
+    const label = new CSS2DObject(planetNameDiv);
+    label.position.set(0, 16.5, 0);
+    pMesh.add(label);
+    
+    planetScene.add(pMesh);
+    
+    toggleLabels(systemScene, false);
+    toggleLabels(planetScene, true);
+    
+    // Animate camera to origin for planet view
+    const startPos = camera.position.clone();
+    const endPos = new THREE.Vector3(0, 0, 45); // Closer than system
+    const startTarget = controls.target.clone();
+    const endTarget = new THREE.Vector3(0, 0, 0);
+    
+    const duration = 1000;
+    const startTime = performance.now();
+
+    function tweenCamera(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        
+        if (progress < 1) {
+            requestAnimationFrame(tweenCamera);
+        }
+    }
+    requestAnimationFrame(tweenCamera);
+    
+    document.getElementById('info-panel').style.display = 'none';
+    document.getElementById('planet-nav-left').style.display = 'flex';
+    document.getElementById('planet-nav-right').style.display = 'flex';
+    document.getElementById('planet-nav-esc').style.display = 'block';
+}
+
+export function exitPlanet() {
+    if (currentLayer !== 'PLANET') return;
+    currentLayer = 'SYSTEM';
+    currentPlanetFocus = null;
+    
+    currentScene = systemScene;
+    currentScene.add(camera);
+    
+    document.getElementById('planet-nav-left').style.display = 'none';
+    document.getElementById('planet-nav-right').style.display = 'none';
+    document.getElementById('planet-nav-esc').style.display = 'none';
+    
+    toggleLabels(planetScene, false);
+    toggleLabels(systemScene, true);
+    
+    clearScene(planetScene);
+    
+    const startPos = camera.position.clone();
+    const endPos = new THREE.Vector3(0, 0, 90);
+    const startTarget = controls.target.clone();
+    const endTarget = new THREE.Vector3(0, 0, 0);
+    
+    const duration = 800;
+    const startTime = performance.now();
+
+    function tweenCamera(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        camera.position.lerpVectors(startPos, endPos, ease);
+        controls.target.lerpVectors(startTarget, endTarget, ease);
+        
+        if (progress < 1) {
+            requestAnimationFrame(tweenCamera);
+        }
+    }
+    requestAnimationFrame(tweenCamera);
 }
 
 export function animateShip(ship, oldX, oldY, oldZ) {
@@ -764,13 +899,14 @@ export function animate() {
     }
 
     controls.update();
-    renderer.render(scene, camera);
-    labelRenderer.render(scene, camera);
+    renderer.render(currentScene, camera);
+    labelRenderer.render(currentScene, camera);
 }
 
 export function initScene(container) {
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050505, 0.005);
+    galaxyScene.fog = new THREE.FogExp2(0x050505, 0.005);
+    systemScene.fog = new THREE.FogExp2(0x050505, 0.005);
+    planetScene.fog = new THREE.FogExp2(0x050505, 0.005);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 90);
@@ -799,21 +935,22 @@ export function initScene(container) {
     controls.maxPolarAngle = Math.PI / 2 + Math.PI / 12;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambientLight);
+    galaxyScene.add(ambientLight);
+    
+    const ambientLightSys = new THREE.AmbientLight(0xffffff, 0.4);
+    systemScene.add(ambientLightSys);
+    
+    const ambientLightPlanet = new THREE.AmbientLight(0xffffff, 0.4);
+    planetScene.add(ambientLightPlanet);
 
     const pointLight = new THREE.PointLight(0xffffff, 1);
     camera.add(pointLight); 
-    scene.add(camera);
+    galaxyScene.add(camera);
 
     const gridHelper = new THREE.GridHelper(120, 48, 0x333333, 0x111111);
     gridHelper.rotation.x = Math.PI / 2; 
     
-    // Add layers to scene
-    scene.add(galaxyGroup);
-    scene.add(systemGroup);
-    systemGroup.visible = false;
-    
-    galaxyGroup.add(gridHelper);
+    galaxyScene.add(gridHelper);
 
     // Setup click listener for raycasting
     renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -821,13 +958,6 @@ export function initScene(container) {
     // Setup system tools UI listeners
     document.getElementById('back-to-galaxy-btn').addEventListener('click', exitSystem);
 
-    document.getElementById('system-tools-btn').addEventListener('click', () => {
-        document.getElementById('system-tools-modal').style.display = 'flex';
-    });
-
-    document.getElementById('close-system-tools-btn').addEventListener('click', () => {
-        document.getElementById('system-tools-modal').style.display = 'none';
-    });
 
     document.getElementById('regenerate-system-btn').addEventListener('click', () => {
         if (currentSystemFocus && currentMode === 'gm') {
@@ -838,8 +968,6 @@ export function initScene(container) {
             
             if (currentSessionId) updateBackendSession(currentSessionId, state.ships);
             if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(currentSystemFocus));
-            
-            document.getElementById('system-tools-modal').style.display = 'none';
         }
     });
 

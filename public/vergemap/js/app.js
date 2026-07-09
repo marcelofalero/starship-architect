@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
 import {
-    scene, camera, renderer, labelRenderer, controls,
+    currentScene, camera, renderer, labelRenderer, controls,
     activeSystemView, clock, interactiveObjects,
     currentLayer, currentSystemFocus,
-    galaxyGroup, systemGroup,
+    galaxyScene, systemScene, planetScene,
     starTexture, starGeometry, shipGeometry, shipMat,
     raycaster, pointer,
     initScene, renderStars, renderShips, renderSystem,

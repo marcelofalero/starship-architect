@@ -3,8 +3,8 @@
 import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
 import {
-    scene, camera, controls, currentLayer, currentSystemFocus,
-    galaxyGroup, systemGroup, renderStars, renderShips, renderSystem,
+    currentScene, camera, controls, currentLayer, currentSystemFocus,
+    galaxyScene, systemScene, planetScene, renderStars, renderShips, renderSystem,
     animateShip, removeMeshCompletely
 } from './scene.js';
 import {
@@ -605,7 +605,7 @@ export function calculateDistance() {
             });
             routeLine = new THREE.Line(lineGeom, lineMat);
             routeLine.computeLineDistances();
-            galaxyGroup.add(routeLine);
+            galaxyScene.add(routeLine);
         }
 
         const originIsShip = state.ships.some(s => s.name === starA.name);

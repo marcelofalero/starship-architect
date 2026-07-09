@@ -739,6 +739,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         pData.day = dayHours + " Hours";
         pData.tilt = axisTilt + "°";
         pData.type = bt.name;
+        pData.tex = bt.tex;
 
         body.userData = {
             isSystemBody: true,
@@ -830,6 +831,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             mData.day = (moonYearDays * 24).toFixed(1) + " Hours (Tidally Locked)";
             mData.tilt = moonTilt + "°";
             mData.type = "Natural Satellite";
+            mData.tex = "rocky";
             
             moon.userData = {
                 isSystemBody: true,

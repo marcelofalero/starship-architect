@@ -23,8 +23,6 @@
 
     <div id="ui-layer">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
-            <a href="../" class="back-link" data-i18n="backLink" style="margin-bottom: 0;">&larr; Back to Main Index</a>
-            <button id="back-to-galaxy-btn" style="display: none; width: auto; padding: 6px 10px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
             <button id="back-to-galaxy-btn" style="display: none; width: auto; padding: 6px 10px; border-radius: 4px; border: 1px solid #389ebd; background: #0A3D54; color: white; cursor: pointer;">&larr; Back to Galaxy Map</button>
             <select id="lang-select" style="width: auto; margin-bottom: 0; padding: 4px 8px; border-radius: 4px; border: 1px solid #444; background: #222; color: #ccc;">
                 <option value="en">English</option>
@@ -34,12 +32,6 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <h2 style="margin: 0;" data-i18n="title">The Verge Map</h2>
             <div style="display: flex; gap: 5px;">
-                <button id="system-tools-btn" title="System Tools" style="display: none; padding: 5px; cursor: pointer; background: #bd3838; border: none; color: white; border-radius: 4px; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                      <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                    </svg>
-                </button>
                 <button id="log-btn" data-i18n-title="logBtn" title="Movement Log" style="padding: 5px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -117,6 +109,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Planet View Navigation -->
+    <button id="planet-nav-left" style="display: none; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: rgba(0, 26, 51, 0.7); color: #4bb5c1; border: 1px solid #389ebd; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; z-index: 15; box-shadow: 0 4px 15px rgba(0,0,0,0.5); justify-content: center; align-items: center; backdrop-filter: blur(4px);">&larr;</button>
+    <button id="planet-nav-right" style="display: none; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: rgba(0, 26, 51, 0.7); color: #4bb5c1; border: 1px solid #389ebd; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; z-index: 15; box-shadow: 0 4px 15px rgba(0,0,0,0.5); justify-content: center; align-items: center; backdrop-filter: blur(4px);">&rarr;</button>
+    <button id="planet-nav-esc" style="display: none; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0, 26, 51, 0.7); color: #4bb5c1; border: 1px solid #389ebd; border-radius: 4px; padding: 10px 20px; font-size: 16px; cursor: pointer; z-index: 15; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(4px); text-transform: uppercase; font-family: 'Russo One', sans-serif;">Esc - Return to System</button>
 
     <!-- Info Panel overlay for clicks -->
     <div id="info-panel" style="display: none;">
@@ -419,23 +416,14 @@
         </div>
     </div>
 
-    <!-- System Tools Modal -->
-    <div id="system-tools-modal" style="display: none;">
-        <div class="modal-content" style="width: 350px;">
-            <h3>System Generation Tools</h3>
-            <div class="editor-controls">
-                <label>Generation Mode</label>
-                <select id="generation-mode-select" style="width: 100%; box-sizing: border-box; margin-bottom: 15px; padding: 6px 10px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white;">
-                    <option value="Normal">Normal</option>
-                    <option value="Viable">Viable</option>
-                    <option value="ViableHigh">Viable with high (tech)</option>
-                </select>
-                <button id="regenerate-system-btn" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold;" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button id="close-system-tools-btn" style="flex: 1; background-color: #555;">Close</button>
-            </div>
-        </div>
+    <!-- Floating System Tools -->
+    <div id="floating-system-tools" style="display: none; position: fixed; bottom: 84px; right: 24px; z-index: 10; display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+        <select id="generation-mode-select" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #bd3838; background: #540a0a; color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+            <option value="Normal">Normal Gen</option>
+            <option value="Viable">Viable Gen</option>
+            <option value="ViableHigh">High-Tech Gen</option>
+        </select>
+        <button id="regenerate-system-btn" style="padding: 10px 15px; border-radius: 20px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5);" title="Regenerate Procedural System">&#x21bb; Regenerate System</button>
     </div>
 
     <!-- Floating Action Button (+ Button) -->

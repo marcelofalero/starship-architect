@@ -11,13 +11,32 @@ const sandbox = {
     parseFloat: parseFloat,
     parseInt: parseInt,
     console: console,
+    document: {
+        createElement: (tag) => {
+            if (tag === 'canvas') {
+                return {
+                    width: 0,
+                    height: 0,
+                    getContext: () => ({
+                        beginPath: () => {},
+                        arc: () => {},
+                        fill: () => {},
+                        createRadialGradient: () => ({ addColorStop: () => {} }),
+                        fillRect: () => {}
+                    })
+                };
+            }
+            return {};
+        }
+    },
     THREE: {
+        CanvasTexture: class { constructor() {} },
         Group: class { constructor() { this.rotation = {}; this.position = { set: () => {} }; } add() {} remove() {} traverse() {} },
         Mesh: class { constructor() { this.position = { set: () => {} }; this.rotation = {}; this.userData = {}; this.add = () => {}; } },
         SphereGeometry: class {},
         IcosahedronGeometry: class {},
         RingGeometry: class {},
-        BufferGeometry: class { setFromPoints() { return this; } },
+        BufferGeometry: class { setFromPoints() { return this; } setAttribute() {} },
         ShaderMaterial: class {},
         MeshStandardMaterial: class {},
         MeshBasicMaterial: class {},
@@ -27,6 +46,9 @@ const sandbox = {
         Color: class { constructor() {} multiplyScalar() { return this; } lerp() { return this; } },
         EllipseCurve: class { getPoints() { return []; } },
         TextureLoader: class { load() { return {}; } },
+        PointsMaterial: class {},
+        Points: class { constructor() { this.rotation = {}; this.position = { set: () => {} }; this.add = () => {}; } },
+        BufferAttribute: class {},
         SRGBColorSpace: "srgb",
         DoubleSide: 2,
         BackSide: 1,
