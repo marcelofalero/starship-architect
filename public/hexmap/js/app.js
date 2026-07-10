@@ -461,9 +461,37 @@ function draw() {
             const hue = 180 - (clampedGrav * 180);
             fillColor = `hsl(${hue}, 90%, 50%)`;
             borderColor = `hsl(${hue}, 90%, 30%)`;
-        } else if (currentLens === 'scanner') {
-            fillColor = 'rgba(0, 20, 0, 0.7)';
-            borderColor = 'rgba(0, 255, 0, 0.4)';
+        } else if (currentLens === 'em') {
+            // EM Field Scan: Detects energy signatures from ruins, anomalies, ships, storms
+            // Base background EM (dark slate/purple) with slight procedural noise
+            let em = Math.abs(Math.sin(cell.center.x * 20) * Math.cos(cell.center.y * 20)) * 0.15;
+            
+            // Geological / Natural
+            if (cell.tile.biome === 11) em += 0.2; // Lava generates some EM noise
+            
+            // Features (Anomalies, Ruins, Vents)
+            const f = cell.tile.feature;
+            if (f === 1) em = 0.5; // Ancient Ruins
+            else if (f === 3) em = 0.3; // Mineral Geode
+            else if (f === 4) em = 1.0; // Energy Anomaly (Huge Spike)
+            else if (f === 5) em = 0.8; // Research Station
+            else if (f === 6) em = 0.6; // Abandoned Outpost
+            else if (f === 7) em = 0.4; // Geothermal Vent
+            else if (f === 8) em = 0.7; // Crystalline Spires
+            else if (f === 9) em = 0.9; // Alien Monolith
+            
+            // Ships
+            if (dggsData.metadata && dggsData.metadata.landingCell === i) em = 1.0;
+            
+            em = Math.max(0, Math.min(1, em));
+            
+            // Color map: 0 = Dark blue (hsl(240, 50%, 15%)) -> 1 = Bright cyan (hsl(180, 100%, 80%))
+            const hue = 240 - (em * 60);
+            const sat = 50 + (em * 50);
+            const light = 15 + (em * 65);
+            
+            fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
+            borderColor = `hsl(${hue}, ${sat}%, ${light + 10}%)`;
         } else {
             const biome = getBiomeInfo(cell.tile.biome);
             fillColor = biome.color;
