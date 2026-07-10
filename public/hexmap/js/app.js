@@ -8,19 +8,19 @@ const HEXMAP_WORKER_URL = window.location.hostname === 'localhost' || window.loc
 
 // ── Biome Styles (Rimworld-abstract) ──
 const BIOME_STYLES = {
-    0:  { name: 'Deep Ocean', color: '#162d45', border: '#1a3550', desc: 'Abyssal ocean depths.' },
-    1:  { name: 'Ocean',      color: '#1e4a74', border: '#244d70', desc: 'Open ocean waters.' },
-    2:  { name: 'Coast',      color: '#b09040', border: '#987830', desc: 'Sandy coastal lowlands.' },
-    3:  { name: 'Desert',     color: '#b87838', border: '#a06830', desc: 'Arid desert expanse.' },
-    4:  { name: 'Savanna',    color: '#6a5a20', border: '#5a4c1a', desc: 'Dry scrubland.' },
-    5:  { name: 'Plains',     color: '#3c6818', border: '#305410', desc: 'Open fertile plains.' },
-    6:  { name: 'Forest',     color: '#204c0c', border: '#183c08', desc: 'Dense deciduous forest.' },
-    7:  { name: 'Taiga',      color: '#182c10', border: '#10200a', desc: 'Cold conifer forest.' },
-    8:  { name: 'Tundra',     color: '#586050', border: '#485040', desc: 'Frozen permafrost.' },
-    9:  { name: 'Ice Cap',    color: '#98bcd8', border: '#7aaac8', desc: 'Glacial ice sheet.' },
-    10: { name: 'Mountains',  color: '#404850', border: '#323840', desc: 'High rocky terrain.' },
-    11: { name: 'Volcanic',   color: '#300a06', border: '#200604', desc: 'Active volcanic zone.' },
-    12: { name: 'Swamp',      color: '#202e10', border: '#181e0a', desc: 'Waterlogged wetlands.' }
+    0: { name: 'Deep Ocean', color: '#162d45', border: '#1a3550', desc: 'Abyssal ocean depths.' },
+    1: { name: 'Ocean', color: '#1e4a74', border: '#244d70', desc: 'Open ocean waters.' },
+    2: { name: 'Coast', color: '#b09040', border: '#987830', desc: 'Sandy coastal lowlands.' },
+    3: { name: 'Desert', color: '#b87838', border: '#a06830', desc: 'Arid desert expanse.' },
+    4: { name: 'Savanna', color: '#6a5a20', border: '#5a4c1a', desc: 'Dry scrubland.' },
+    5: { name: 'Plains', color: '#3c6818', border: '#305410', desc: 'Open fertile plains.' },
+    6: { name: 'Forest', color: '#204c0c', border: '#183c08', desc: 'Dense deciduous forest.' },
+    7: { name: 'Taiga', color: '#182c10', border: '#10200a', desc: 'Cold conifer forest.' },
+    8: { name: 'Tundra', color: '#586050', border: '#485040', desc: 'Frozen permafrost.' },
+    9: { name: 'Ice Cap', color: '#98bcd8', border: '#7aaac8', desc: 'Glacial ice sheet.' },
+    10: { name: 'Mountains', color: '#404850', border: '#323840', desc: 'High rocky terrain.' },
+    11: { name: 'Volcanic', color: '#300a06', border: '#200604', desc: 'Active volcanic zone.' },
+    12: { name: 'Swamp', color: '#202e10', border: '#181e0a', desc: 'Waterlogged wetlands.' }
 };
 
 function getBiomeInfo(id) {
@@ -30,7 +30,7 @@ function getBiomeInfo(id) {
 // ── Seeded per-cell RNG (stable — same seed = same decorations every frame) ──
 function cellRng(seed) {
     let h = (seed * 2654435761) >>> 0;
-    return function() {
+    return function () {
         h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
         return (h >>> 0) / 0xFFFFFFFF;
     };
@@ -151,17 +151,17 @@ function drawBiomeTile(ctx, biomeId, cx, cy, r, cellIdx) {
     }
     switch (biomeId) {
         case 0: case 1: drawWaves(ctx, cx, cy, r, rng); break;
-        case 2:         drawSand(ctx, pts, rng); break;
-        case 3:         drawSand(ctx, pts, rng); break; // rocks similar to sand but darker (color already differs)
-        case 4:         drawScrub(ctx, pts, rng); break;
-        case 5:         drawGrass(ctx, pts, 'rgba(35,90,12,0.6)'); break;
-        case 6:         drawTrees(ctx, pts, rng); break;
-        case 7:         drawPines(ctx, pts, rng); break;
+        case 2: drawSand(ctx, pts, rng); break;
+        case 3: drawSand(ctx, pts, rng); break; // rocks similar to sand but darker (color already differs)
+        case 4: drawScrub(ctx, pts, rng); break;
+        case 5: drawGrass(ctx, pts, 'rgba(35,90,12,0.6)'); break;
+        case 6: drawTrees(ctx, pts, rng); break;
+        case 7: drawPines(ctx, pts, rng); break;
         case 8:         /* tundra — sparse, just border */ break;
-        case 9:         drawIce(ctx, cx, cy, r, rng); break;
-        case 10:        drawPeaks(ctx, cx, cy, r, rng); break;
-        case 11:        drawLava(ctx, cx, cy, r, rng); break;
-        case 12:        drawMarsh(ctx, pts, rng); break;
+        case 9: drawIce(ctx, cx, cy, r, rng); break;
+        case 10: drawPeaks(ctx, cx, cy, r, rng); break;
+        case 11: drawLava(ctx, cx, cy, r, rng); break;
+        case 12: drawMarsh(ctx, pts, rng); break;
     }
 }
 
@@ -181,14 +181,14 @@ function initBiomeCache() {
             const dpr = window.devicePixelRatio || 1;
             canvas.width = CACHE_SIZE * dpr;
             canvas.height = CACHE_SIZE * dpr;
-            
+
             const ctx = canvas.getContext('2d', { alpha: true });
             const scaleFactor = (CACHE_SIZE / 2) / VIRTUAL_R;
             ctx.scale(scaleFactor * dpr, scaleFactor * dpr);
-            
+
             const pseudoIdx = (b * 1000) + v;
             drawBiomeTile(ctx, b, VIRTUAL_R, VIRTUAL_R, VIRTUAL_R * 0.9, pseudoIdx);
-            
+
             biomeVariantCache[b].push(canvas);
         }
     }
@@ -214,8 +214,8 @@ function precomputeEdgeNeighbors() {
                 const nc = dggsData.cells[nIdx]; if (!nc) continue;
                 let h1 = false, h2 = false;
                 for (const nv of nc.vertices) {
-                    if ((nv.x-v1.x)**2+(nv.y-v1.y)**2+(nv.z-v1.z)**2 < 1e-5) h1 = true;
-                    if ((nv.x-v2.x)**2+(nv.y-v2.y)**2+(nv.z-v2.z)**2 < 1e-5) h2 = true;
+                    if ((nv.x - v1.x) ** 2 + (nv.y - v1.y) ** 2 + (nv.z - v1.z) ** 2 < 1e-5) h1 = true;
+                    if ((nv.x - v2.x) ** 2 + (nv.y - v2.y) ** 2 + (nv.z - v2.z) ** 2 < 1e-5) h2 = true;
                     if (h1 && h2) break;
                 }
                 if (h1 && h2) { found = nIdx; break; }
@@ -232,7 +232,7 @@ function generateRivers() {
     // Use a simple seeded PRNG to ensure rivers are identical for the same map seed
     let seedVal = 1337;
     if (dggsData.metadata.seed) {
-        for(let i=0; i<dggsData.metadata.seed.length; i++) seedVal += dggsData.metadata.seed.charCodeAt(i);
+        for (let i = 0; i < dggsData.metadata.seed.length; i++) seedVal += dggsData.metadata.seed.charCodeAt(i);
     }
     const random = () => {
         const x = Math.sin(seedVal++) * 10000;
@@ -240,14 +240,14 @@ function generateRivers() {
     };
 
     const rivers = [];
-    
+
     // 1. Compute SPFA Dijkstra Distance to Sinks (Oceans or Local Minima)
     // This allows rivers to intelligently cross plateaus and even carve through small hills (uphill)
     // to reach the ocean, mimicking real-world river basin carving (like the Nile or Colorado).
     const distToOcean = new Int32Array(dggsData.cells.length).fill(999999);
     const inQueue = new Uint8Array(dggsData.cells.length).fill(0);
     let currentQueue = [];
-    
+
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
         if (t.biome === 0 || t.biome === 1) { // Ocean
@@ -272,25 +272,25 @@ function generateRivers() {
             }
         }
     }
-    
+
     while (currentQueue.length > 0) {
         const nextQueue = [];
         for (let i = 0; i < currentQueue.length; i++) {
             const curr = currentQueue[i];
             inQueue[curr] = 0;
-            
+
             const neighbors = dggsData.metadata.neighbors[curr];
             if (!neighbors) continue;
-            
+
             const currElev = dggsData.cells[curr].tile.elevation;
-            
+
             for (const n of neighbors) {
                 const nElev = dggsData.cells[n].tile.elevation;
                 // Cost for water to flow FROM n TO curr:
                 let cost = 1;
                 if (nElev === currElev) cost = 6;       // Traversing a flat plain
                 else if (nElev < currElev) cost = 45;   // Carving uphill through a higher macro-elevation hex
-                
+
                 const newDist = distToOcean[curr] + cost;
                 if (newDist < distToOcean[n]) {
                     distToOcean[n] = newDist;
@@ -303,30 +303,30 @@ function generateRivers() {
         }
         currentQueue = nextQueue;
     }
-    
+
     // 2. Create flow network
     const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
     const water = new Float32Array(dggsData.cells.length).fill(0);
-    
+
     const landCells = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
         if (t.biome !== 0 && t.biome !== 1) { // Not ocean
             landCells.push(i);
-            water[i] = t.moisture / 7.0; 
+            water[i] = t.moisture / 7.0;
         }
     }
-    
+
     // Sort land cells by distance DESCENDING (perfect topological order from inland to coast)
     landCells.sort((a, b) => distToOcean[b] - distToOcean[a]);
-    
+
     for (const curr of landCells) {
         const neighbors = dggsData.metadata.neighbors[curr];
         if (!neighbors) continue;
-        
+
         let bestNext = -1;
         let shortestDist = distToOcean[curr];
-        
+
         for (const nIdx of neighbors) {
             if (distToOcean[nIdx] < shortestDist) {
                 shortestDist = distToOcean[nIdx];
@@ -336,26 +336,27 @@ function generateRivers() {
                 bestNext = nIdx;
             }
         }
-        
+
         if (bestNext !== -1) {
             flowTo[curr] = bestNext;
             water[bestNext] += water[curr]; // Accumulate water topologically
         }
     }
-    
+
     // 3. Extract river segments
     for (let i = 0; i < dggsData.cells.length; i++) {
-        if (flowTo[i] !== -1 && water[i] > 0.4) {
+        // Require significant accumulation to draw a visible river segment, eliminating tiny scattered creeks
+        if (flowTo[i] !== -1 && water[i] > 1.2) {
             const isGlacierCurr = dggsData.cells[i].tile.biome === 9;
             const isGlacierNext = dggsData.cells[flowTo[i]].tile.biome === 9;
-            
+
             // Hide rivers entirely contained within glaciers (subglacial flows)
             if (isGlacierCurr && isGlacierNext) continue;
-            
+
             rivers.push([i, flowTo[i], water[i]]);
         }
     }
-    
+
     dggsData.metadata.rivers = rivers;
     return rivers.length > 0;
 }
@@ -364,9 +365,9 @@ function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
     if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
-    
+
     initBiomeCache();
-    
+
     let changed = false;
     for (let i = 0; i < dggsData.cells.length; i++) {
         const cell = dggsData.cells[i];
@@ -383,9 +384,9 @@ function onDataLoaded() {
             changed = true;
         }
     }
-    
+
     precomputeEdgeNeighbors();
-    
+
     if (generateRivers()) {
         changed = true;
     }
@@ -397,7 +398,7 @@ function onDataLoaded() {
 }
 
 
-const FEATURES = { 
+const FEATURES = {
     0: { name: 'None', scanLevel: 0 },
     1: { name: 'Ancient Ruins', scanLevel: 2 },
     2: { name: 'Impact Crater', scanLevel: 0 },
@@ -407,10 +408,10 @@ const FEATURES = {
     6: { name: 'Abandoned Outpost', scanLevel: 1 },
     7: { name: 'Geothermal Vent', scanLevel: 0 },
     8: { name: 'Crystalline Spires', scanLevel: 2 },
-    9: { name: 'Alien Monolith', scanLevel: 3 } 
+    9: { name: 'Alien Monolith', scanLevel: 3 }
 };
-const FEATURE_COLORS = { 1:'#e040fb',2:'#9e9e9e',3:'#00e676',4:'#00e5ff',5:'#2979ff',6:'#ff9100',7:'#ff1744',8:'#d500f9',9:'#ffd600' };
-const FACTIONS = { 0:{name:'Unclaimed Territory',color:'transparent'},1:{name:'United Colonies',color:'#00e5ff'},2:{name:'Verge Syndicate',color:'#ffaa00'},3:{name:'Precursor Remnants',color:'#d500f9'} };
+const FEATURE_COLORS = { 1: '#e040fb', 2: '#9e9e9e', 3: '#00e676', 4: '#00e5ff', 5: '#2979ff', 6: '#ff9100', 7: '#ff1744', 8: '#d500f9', 9: '#ffd600' };
+const FACTIONS = { 0: { name: 'Unclaimed Territory', color: 'transparent' }, 1: { name: 'United Colonies', color: '#00e5ff' }, 2: { name: 'Verge Syndicate', color: '#ffaa00' }, 3: { name: 'Precursor Remnants', color: '#d500f9' } };
 
 // ── State ──
 let dggsData = null;   // decoded DGGS data { cells, metadata, ... }
@@ -493,7 +494,7 @@ function findSharedVertices(cellA, cellB) {
             const dx = va.x - vb.x;
             const dy = va.y - vb.y;
             const dz = va.z - vb.z;
-            const d2 = dx*dx + dy*dy + dz*dz;
+            const d2 = dx * dx + dy * dy + dz * dz;
             if (d2 < 1e-5) {
                 shared.push(va);
                 break;
@@ -529,11 +530,11 @@ function draw() {
 
     for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
-        
+
         // Fast backface cull
         const rCenter = rotate3D(cell.center.x, cell.center.y, cell.center.z);
         if (rCenter.z < -0.05) continue;
-        
+
         const projVerts = [];
         let allFront = true;
         for (const v of cell.vertices) {
@@ -546,16 +547,16 @@ function draw() {
         const hexCx = rCenter.x * GLOBE_RADIUS;
         const hexCy = rCenter.y * GLOBE_RADIUS;
         const hexR = Math.sqrt((projVerts[0].x - hexCx) ** 2 + (projVerts[0].y - hexCy) ** 2) * 0.92;
-        
+
         const cellData = { i, cell, projVerts, hexCx, hexCy, hexR };
         visibleCells.push(cellData);
-        
+
         let fillColor, borderColor;
         if (currentLens === 'elevation') {
             const el = cell.tile.elevation || 0;
             const v = Math.min(255, Math.max(0, el * 25));
             fillColor = `rgb(${v}, ${v}, ${v})`;
-            borderColor = `rgb(${Math.min(255, v+20)}, ${Math.min(255, v+20)}, ${Math.min(255, v+20)})`;
+            borderColor = `rgb(${Math.min(255, v + 20)}, ${Math.min(255, v + 20)}, ${Math.min(255, v + 20)})`;
         } else if (currentLens === 'thermal') {
             // Map temperature heavily to biome to reflect ecological realities, rather than purely latitude
             const biomeTemps = {
@@ -574,12 +575,12 @@ function draw() {
                 9: 0.0   // Ice (Freezing)
             };
             const baseTemp = biomeTemps[cell.tile.biome] !== undefined ? biomeTemps[cell.tile.biome] : 0.5;
-            
+
             // Add a small modifier based on elevation and latitude so it's not completely uniform
             const latMod = (1.0 - Math.abs(cell.center.y) - 0.5) * 0.1;
             const elMod = ((cell.tile.elevation || 0) / 10) * 0.1;
             const finalTemp = Math.max(0, Math.min(1, baseTemp + latMod - elMod));
-            
+
             // hue 240 (blue) to 0 (red)
             const hue = (1.0 - finalTemp) * 240;
             fillColor = `hsl(${hue}, 80%, 50%)`;
@@ -589,13 +590,13 @@ function draw() {
             const el = cell.tile.elevation || 0;
             let grav = el / 10; // 0 to 1
             if (cell.tile.biome === 0) grav = 0; // Deep ocean is lowest
-            
+
             // Anomalies for features
             if (cell.tile.feature === 9) grav = 1.2; // Monolith = massive gravity spike
             if (cell.tile.feature === 4) grav = -0.2; // Energy anomaly = low gravity pocket
-            
+
             const clampedGrav = Math.max(0, Math.min(1, grav));
-            
+
             // Cyan/Blue (low) to Purple/Red (high)
             const hue = 180 - (clampedGrav * 180);
             fillColor = `hsl(${hue}, 90%, 50%)`;
@@ -604,10 +605,10 @@ function draw() {
             // EM Field Scan: Detects energy signatures from ruins, anomalies, ships, storms
             // Base background EM (dark slate/purple) with slight procedural noise
             let em = Math.abs(Math.sin(cell.center.x * 20) * Math.cos(cell.center.y * 20)) * 0.15;
-            
+
             // Geological / Natural
             if (cell.tile.biome === 11) em += 0.2; // Lava generates some EM noise
-            
+
             // Features (Anomalies, Ruins, Vents)
             const f = cell.tile.feature;
             if (f === 1) em = 0.5; // Ancient Ruins
@@ -618,17 +619,17 @@ function draw() {
             else if (f === 7) em = 0.4; // Geothermal Vent
             else if (f === 8) em = 0.7; // Crystalline Spires
             else if (f === 9) em = 0.9; // Alien Monolith
-            
+
             // Ships
             if (dggsData.metadata && dggsData.metadata.landingCell === i) em = 1.0;
-            
+
             em = Math.max(0, Math.min(1, em));
-            
+
             // Color map: 0 = Dark blue (hsl(240, 50%, 15%)) -> 1 = Bright cyan (hsl(180, 100%, 80%))
             const hue = 240 - (em * 60);
             const sat = 50 + (em * 50);
             const light = 15 + (em * 65);
-            
+
             fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
             borderColor = `hsl(${hue}, ${sat}%, ${light + 10}%)`;
         } else {
@@ -636,13 +637,13 @@ function draw() {
             fillColor = biome.color;
             borderColor = biome.border;
         }
-        
+
         const groupKey = fillColor + '|' + borderColor;
         if (!groupsByColor[groupKey]) {
             groupsByColor[groupKey] = { fillColor, borderColor, cells: [], biomeBuckets: {} };
         }
         groupsByColor[groupKey].cells.push(cellData);
-        
+
         if (!groupsByColor[groupKey].biomeBuckets[cell.tile.biome]) {
             groupsByColor[groupKey].biomeBuckets[cell.tile.biome] = [];
         }
@@ -651,20 +652,20 @@ function draw() {
 
     // ── 1. Batch Render Cells ──
     if (currentLens === 'biome' && !isCacheInitialized) initBiomeCache();
-    
+
     for (const key in groupsByColor) {
         const group = groupsByColor[key];
-        
+
         ctx.beginPath();
         for (const c of group.cells) {
             ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
             for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
             ctx.closePath();
         }
-        
+
         ctx.fillStyle = group.fillColor;
         ctx.fill();
-        
+
         ctx.strokeStyle = group.borderColor;
         ctx.lineWidth = 0.4;
         ctx.stroke();
@@ -673,7 +674,7 @@ function draw() {
             for (const b in group.biomeBuckets) {
                 const bucketCells = group.biomeBuckets[b];
                 if (bucketCells.length === 0) continue;
-                
+
                 ctx.save();
                 ctx.beginPath();
                 for (const c of bucketCells) {
@@ -681,7 +682,7 @@ function draw() {
                     for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
                     ctx.closePath();
                 }
-                ctx.clip(); 
+                ctx.clip();
                 for (const c of bucketCells) {
                     const variant = c.i % NUM_VARIANTS;
                     const cacheCanvas = biomeVariantCache[b]?.[variant];
@@ -698,7 +699,7 @@ function draw() {
     // ── 2. Overlays (Scanned, Fog of War) ──
     const scannedGroup = [];
     const fowGroup = [];
-    
+
     for (const c of visibleCells) {
         const isScanned = dggsData.metadata?.scannedCells?.includes(c.i);
         if (isScanned) {
@@ -707,7 +708,7 @@ function draw() {
             fowGroup.push(c);
         }
     }
-    
+
     if (scannedGroup.length > 0) {
         ctx.beginPath();
         for (const c of scannedGroup) {
@@ -718,7 +719,7 @@ function draw() {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
         ctx.fill();
     }
-    
+
     if (fowGroup.length > 0) {
         ctx.beginPath();
         for (const c of fowGroup) {
@@ -729,14 +730,14 @@ function draw() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fill();
     }
-    
+
     // ── 3. Features & Interactive Highlights ──
     for (const c of visibleCells) {
         const i = c.i;
         const cell = c.cell;
         const tile = cell.tile;
         const projVerts = c.projVerts;
-        
+
         if (i === hoveredIdx || i === selectedIdx) {
             ctx.beginPath();
             ctx.moveTo(projVerts[0].x, projVerts[0].y);
@@ -746,7 +747,7 @@ function draw() {
             ctx.lineWidth = i === selectedIdx ? 1.5 : 0.8;
             ctx.stroke();
         }
-        
+
         if (tile.feature > 0) {
             const isRevealed = dggsData.metadata?.revealedFeatures?.includes(i);
             const fc = FEATURE_COLORS[tile.feature] || '#fff';
@@ -778,11 +779,11 @@ function draw() {
                 ctx.fill();
             }
         }
-        
+
         if (dggsData.metadata && dggsData.metadata.landingCell === i) {
             ctx.save();
             ctx.translate(c.hexCx, c.hexCy);
-            
+
             ctx.beginPath();
             ctx.moveTo(0, -9);
             ctx.lineTo(6, 6);
@@ -790,18 +791,18 @@ function draw() {
             ctx.lineTo(-2, 4);
             ctx.lineTo(-6, 6);
             ctx.closePath();
-            
+
             ctx.fillStyle = '#ffd600';
             ctx.fill();
             ctx.strokeStyle = '#020208';
             ctx.lineWidth = 1;
             ctx.stroke();
-            
+
             ctx.beginPath();
             ctx.arc(0, 6, 2, 0, Math.PI * 2);
             ctx.fillStyle = '#ff3d00';
             ctx.fill();
-            
+
             ctx.restore();
         }
     }
@@ -812,23 +813,23 @@ function draw() {
             const c1 = seg[0];
             const c2 = seg[1];
             const waterVol = seg[2];
-            
+
             const cellA = cells[c1];
             const cellB = cells[c2];
             if (!cellA || !cellB) continue;
-            
+
             // Depth check: cull if both are on the backside
             const rotatedA = rotate3D(cellA.center.x, cellA.center.y, cellA.center.z);
             const rotatedB = rotate3D(cellB.center.x, cellB.center.y, cellB.center.z);
             if (rotatedA.z < -0.05 && rotatedB.z < -0.05) continue;
-            
+
             const v1 = cellA.center;
             const v2 = cellB.center;
-            
+
             const rv1 = rotate3D(v1.x, v1.y, v1.z);
             const rv2 = rotate3D(v2.x, v2.y, v2.z);
             if (rv1.z < -0.2 && rv2.z < -0.2) continue;
-            
+
             // Winding normal offset based on consistent seed for this edge
             const dx = v2.x - v1.x;
             const dy = v2.y - v1.y;
@@ -836,45 +837,45 @@ function draw() {
             const mx = (v1.x + v2.x) / 2;
             const my = (v1.y + v2.y) / 2;
             const mz = (v1.z + v2.z) / 2;
-            
+
             let px = my * dz - mz * dy;
             let py = mz * dx - mx * dz;
             let pz = mx * dy - my * dx;
-            const plen = Math.sqrt(px*px + py*py + pz*pz);
+            const plen = Math.sqrt(px * px + py * py + pz * pz);
             if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
-            
+
             // Stable noise unique to this edge pair
             const edgeId = c1 < c2 ? c1 * 100000 + c2 : c2 * 100000 + c1;
             const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
             const noise = (seed - Math.floor(seed)) - 0.5;
-            const segmentLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
             const offsetDist = segmentLen * 0.25 * noise;
-            
+
             const ctrlPointLocal = {
                 x: mx + px * offsetDist,
                 y: my + py * offsetDist,
                 z: mz + pz * offsetDist
             };
-            const cpLen = Math.sqrt(ctrlPointLocal.x*ctrlPointLocal.x + ctrlPointLocal.y*ctrlPointLocal.y + ctrlPointLocal.z*ctrlPointLocal.z);
+            const cpLen = Math.sqrt(ctrlPointLocal.x * ctrlPointLocal.x + ctrlPointLocal.y * ctrlPointLocal.y + ctrlPointLocal.z * ctrlPointLocal.z);
             const ctrlPoint = {
                 x: ctrlPointLocal.x / cpLen,
                 y: ctrlPointLocal.y / cpLen,
                 z: ctrlPointLocal.z / cpLen
             };
-            
+
             const rvCtrl = rotate3D(ctrlPoint.x, ctrlPoint.y, ctrlPoint.z);
-            
+
             const p1x = rv1.x * GLOBE_RADIUS;
             const p1y = rv1.y * GLOBE_RADIUS;
             const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
             const pCtrly = rvCtrl.y * GLOBE_RADIUS;
             const p2x = rv2.x * GLOBE_RADIUS;
             const p2y = rv2.y * GLOBE_RADIUS;
-            
+
             // Dynamic width based on accumulated water volume
             const innerWidth = Math.min(4.5, 1 + waterVol * 0.35);
             const outerWidth = innerWidth + 2;
-            
+
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
@@ -885,7 +886,7 @@ function draw() {
             ctx.strokeStyle = '#0a2342';
             ctx.lineWidth = outerWidth;
             ctx.stroke();
-            
+
             // Draw light blue inner river
             ctx.strokeStyle = '#3b82f6';
             ctx.lineWidth = innerWidth;
@@ -939,15 +940,15 @@ function draw() {
     const poleLength = 1.25;
     const northLocal = { x: 0, y: poleLength, z: 0 };
     const southLocal = { x: 0, y: -poleLength, z: 0 };
-    
+
     const rNorth = rotate3D(northLocal.x, northLocal.y, northLocal.z);
     const rSouth = rotate3D(southLocal.x, southLocal.y, southLocal.z);
-    
+
     const nx = rNorth.x * GLOBE_RADIUS;
     const ny = rNorth.y * GLOBE_RADIUS;
     const sx = rSouth.x * GLOBE_RADIUS;
     const sy = rSouth.y * GLOBE_RADIUS;
-    
+
     // Draw the axis line
     ctx.beginPath();
     ctx.moveTo(sx, sy);
@@ -957,7 +958,7 @@ function draw() {
     ctx.setLineDash([5, 5]);
     ctx.stroke();
     ctx.setLineDash([]); // reset
-    
+
     // Draw glowing crosshairs / dots at the poles
     ctx.beginPath();
     ctx.arc(nx, ny, 3.5, 0, Math.PI * 2);
@@ -966,11 +967,11 @@ function draw() {
     ctx.strokeStyle = '#020208';
     ctx.lineWidth = 1;
     ctx.stroke();
-    
+
     ctx.font = '9px "Chakra Petch", monospace';
     ctx.fillStyle = '#88aacc';
     ctx.fillText('N. POLE', nx + 8, ny + 3);
-    
+
     ctx.beginPath();
     ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
     ctx.fillStyle = '#00ffcc';
@@ -978,7 +979,7 @@ function draw() {
     ctx.strokeStyle = '#020208';
     ctx.lineWidth = 1;
     ctx.stroke();
-    
+
     ctx.fillText('S. POLE', sx + 8, sy + 3);
     ctx.restore();
 
@@ -997,7 +998,7 @@ function getCellUnderMouse(mx, my) {
         const sx = offsetX + r.x * GLOBE_RADIUS * scale;
         const sy = offsetY + r.y * GLOBE_RADIUS * scale;
         const dx = mx - sx, dy = my - sy;
-        const d = dx*dx + dy*dy;
+        const d = dx * dx + dy * dy;
         if (d < minD) { minD = d; closest = i; }
     }
     const threshold = 20 * scale;
@@ -1010,12 +1011,12 @@ function selectCell(idx) {
     selectedIdx = idx;
     const cell = dggsData.cells[idx];
     const t = cell.tile;
-    
+
     detailTitle.textContent = `Cell #${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
-    
+
     // Address
     detailAddress.textContent = dggsData.metadata?.addresses?.[idx] || 'N/A';
-    
+
     // Coordinates & 3D Position
     const latRad = Math.asin(cell.center.y);
     const lonRad = Math.atan2(cell.center.x, cell.center.z);
@@ -1025,28 +1026,28 @@ function selectCell(idx) {
     const lonSign = lonDeg >= 0 ? 'E' : 'W';
     detailCoords.textContent = `${Math.abs(latDeg)}° ${latSign}, ${Math.abs(lonDeg)}° ${lonSign}`;
     detailPos3D.textContent = `${cell.center.x.toFixed(3)}, ${cell.center.y.toFixed(3)}, ${cell.center.z.toFixed(3)}`;
-    
+
     const planetType = dggsData.metadata?.type || 'terrestrial';
     const biome = getBiomeInfo(t.biome);
     detailBiome.textContent = biome.name;
     detailBiome.style.color = biome.color === '#eef8ff' ? '#99ccff' : biome.color;
     detailElevation.textContent = `Level ${t.elevation}`;
     detailMoisture.textContent = `Level ${t.moisture}`;
-    
+
     const isFeatureRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
-    
+
     // Feature display based on role and reveal status
     if (userRole === 'gm') {
         editFeature.parentElement.style.display = 'flex';
         detailFeature.parentElement.style.display = 'none';
-        
+
         editFeature.value = t.feature;
-        
+
         if (t.feature > 0) {
             featureStatusRow.style.display = 'flex';
             featureStatusValue.textContent = isFeatureRevealed ? 'REVEALED' : 'HIDDEN (FOW)';
             featureStatusValue.style.color = isFeatureRevealed ? '#00e676' : '#ff1744';
-            
+
             featureActionRow.style.display = 'flex';
             featureActionBtn.textContent = isFeatureRevealed ? 'HIDE FROM PLAYERS' : 'REVEAL TO PLAYERS';
             featureActionBtn.style.borderColor = isFeatureRevealed ? '#ff1744' : '#00e5ff';
@@ -1060,7 +1061,7 @@ function selectCell(idx) {
         // Player or Viewer
         editFeature.parentElement.style.display = 'none';
         detailFeature.parentElement.style.display = 'flex';
-        
+
         if (isFeatureRevealed && t.feature > 0) {
             const featData = FEATURES[t.feature] || { name: 'None', scanLevel: 0 };
             const featColor = FEATURE_COLORS[t.feature] || '#e0f2f1';
@@ -1068,12 +1069,12 @@ function selectCell(idx) {
             featureStatusRow.style.display = 'flex';
             featureStatusValue.textContent = 'Revealed';
             featureStatusValue.style.color = '#00e676';
-            
+
             featureActionRow.style.display = 'none';
         } else {
             detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
             featureStatusRow.style.display = 'none';
-            
+
             // Player can scan unexplored tiles
             if (userRole === 'player') {
                 featureActionRow.style.display = 'flex';
@@ -1086,7 +1087,7 @@ function selectCell(idx) {
             }
         }
     }
-    
+
     let analysis = `A sector classified as ${biome.name.toLowerCase()} terrain. ${biome.desc}`;
     if (t.feature > 0 && (isFeatureRevealed || userRole === 'gm')) {
         const featData = FEATURES[t.feature] || { name: 'Unknown' };
@@ -1147,7 +1148,7 @@ async function loadDGGS(seed, type, resolution) {
         if (!res.ok) throw new Error(`Worker returned ${res.status}`);
         const buffer = await res.arrayBuffer();
         if (loadId !== currentLoadId) return; // Prevent older slow fetches from overwriting newer ones (race condition)
-        
+
         dggsData = decodeVMB(buffer);
         onDataLoaded();
 
@@ -1183,7 +1184,7 @@ canvas.addEventListener('mousemove', (e) => {
         const dx = e.clientX - lastMouseX, dy = e.clientY - lastMouseY;
         rotY += dx * 0.005;
         rotX -= dy * 0.005;
-        rotX = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, rotX));
+        rotX = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, rotX));
         if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) > 5) {
             hasMoved = true;
         }
@@ -1241,7 +1242,7 @@ vmbUpload.addEventListener('change', (e) => {
             dggsData = decodeVMB(evt.target.result);
             onDataLoaded();
 
-            
+
             hudSeed.textContent = dggsData.metadata?.seed || 'Uploaded';
             hudType.textContent = dggsData.metadata?.type || 'unknown';
             hudSize.textContent = `${dggsData.cells.length} cells`;
@@ -1284,15 +1285,15 @@ async function saveDGGSMetadata() {
         const seed = dggsData.metadata?.seed || seedParam;
         const type = dggsData.metadata?.type || typeParam;
         const res = dggsData.metadata?.resolution || resParam;
-        
+
         const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${res}`;
-        
+
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],
             scannedCells: dggsData.metadata.scannedCells || [],
             landingCell: dggsData.metadata.landingCell !== undefined ? dggsData.metadata.landingCell : null
         };
-        
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -1300,16 +1301,16 @@ async function saveDGGSMetadata() {
             },
             body: JSON.stringify(payload)
         });
-        
+
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}`);
         }
-        
+
         const buffer = await response.arrayBuffer();
         dggsData = decodeVMB(buffer);
         onDataLoaded();
 
-        
+
     } catch (err) {
         console.error("Failed to save map metadata:", err);
         alert(`Failed to save changes to server: ${err.message}`);
@@ -1329,7 +1330,7 @@ function getNearbyCells(startIdx, count) {
     const visited = new Set([startIdx]);
     const queue = [startIdx];
     const result = [startIdx];
-    
+
     let head = 0;
     while (head < queue.length && result.length < count) {
         const curr = queue[head++];
@@ -1348,44 +1349,44 @@ function getNearbyCells(startIdx, count) {
 
 featureActionBtn.addEventListener('click', async () => {
     if (selectedIdx < 0 || !dggsData) return;
-    
+
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
     if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
-    
+
     const isRevealed = dggsData.metadata.revealedFeatures.includes(selectedIdx);
-    
+
     if (userRole === 'gm') {
         if (isRevealed) {
             dggsData.metadata.revealedFeatures = dggsData.metadata.revealedFeatures.filter(idx => idx !== selectedIdx);
         } else {
             dggsData.metadata.revealedFeatures.push(selectedIdx);
         }
-        
+
         featureActionBtn.disabled = true;
         featureActionBtn.textContent = 'SAVING...';
         await saveDGGSMetadata();
         featureActionBtn.disabled = false;
-        
+
         selectCell(selectedIdx);
     } else if (userRole === 'player') {
         const countInput = document.getElementById('scan-count');
         const count = countInput ? parseInt(countInput.value) || 1 : 1;
         const cellsToScan = getNearbyCells(selectedIdx, count);
-        
+
         let scanDelay = 1500;
-        
+
         for (const idx of cellsToScan) {
             const c = dggsData.cells[idx];
             const fData = FEATURES[c.tile.feature];
             const sLevel = (c.tile.feature > 0 && fData) ? fData.scanLevel : 1;
-            
+
             if (sLevel === 2 && scanDelay < 1500) scanDelay = 1500;
             if (sLevel === 3 && dggsData.metadata.landingCell === idx) {
                 scanDelay = 4000;
             }
         }
-        
+
         // base delay for multiple hexes
         if (count > 1 && scanDelay < 1000 + count * 100) {
             scanDelay = Math.min(1000 + count * 100, 5000); // max 5s for big scans
@@ -1405,17 +1406,17 @@ featureActionBtn.addEventListener('click', async () => {
         featureActionBtn.textContent = 'SCANNING...';
         featureActionBtn.style.borderColor = '#ffd600';
         featureActionBtn.style.color = '#ffd600';
-        
+
         setTimeout(async () => {
             const foundFeatures = [];
-            
+
             for (const idx of cellsToScan) {
                 if (!dggsData.metadata.scannedCells.includes(idx)) {
                     dggsData.metadata.scannedCells.push(idx);
                 }
                 const c = dggsData.cells[idx];
                 const sLevel = (c.tile.feature > 0 && FEATURES[c.tile.feature]) ? FEATURES[c.tile.feature].scanLevel : 1;
-                
+
                 if (c.tile.feature > 0) {
                     if (sLevel === 3 && dggsData.metadata.landingCell !== idx) {
                         continue; // Requires ground presence
@@ -1426,17 +1427,17 @@ featureActionBtn.addEventListener('click', async () => {
                     }
                 }
             }
-            
+
             await saveDGGSMetadata();
             featureActionBtn.disabled = false;
             featureActionBtn.textContent = 'SCAN SECTOR';
             featureActionBtn.style.borderColor = '#00e5ff';
             featureActionBtn.style.color = '#00e5ff';
-            
+
             if (foundFeatures.length > 0) {
                 alert(`Scan Complete! Found: ${foundFeatures.join(', ')}`);
             }
-            
+
             selectCell(selectedIdx);
         }, scanDelay);
     }
@@ -1446,12 +1447,12 @@ landBtn.addEventListener('click', async () => {
     if (selectedIdx >= 0 && dggsData) {
         if (!dggsData.metadata) dggsData.metadata = {};
         dggsData.metadata.landingCell = selectedIdx;
-        
+
         landBtn.disabled = true;
         landBtn.textContent = 'SAVING...';
         await saveDGGSMetadata();
         landBtn.disabled = false;
-        
+
         selectCell(selectedIdx); // refresh details and button state
     }
 });
