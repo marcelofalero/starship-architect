@@ -243,63 +243,50 @@ function generateRivers() {
     const rivers = [];
     const numRivers = Math.floor(dggsData.cells.length / 300); 
     
-    // Find candidate starts (high elevation)
-    const candidates = [];
+    // Create flow network
+    const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
+    const water = new Float32Array(dggsData.cells.length).fill(0);
+    
+    // Sort land cells by elevation descending
+    const landCells = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
-        if (t.elevation > 4 && t.biome !== 9 && t.biome !== 11) { // Not ice, not lava
-            candidates.push(i);
+        if (t.biome !== 0 && t.biome !== 1 && t.biome !== 9) { // Not ocean, not ice
+            landCells.push(i);
+            water[i] = t.moisture / 7.0; // Base water from moisture
         }
     }
     
-    // Shuffle candidates
-    for (let i = candidates.length - 1; i > 0; i--) {
-        const j = Math.floor(random() * (i + 1));
-        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-    }
+    landCells.sort((a, b) => dggsData.cells[b].tile.elevation - dggsData.cells[a].tile.elevation);
     
-    const starts = candidates.slice(0, Math.min(numRivers, candidates.length));
-    
-    for (const startIdx of starts) {
-        const path = [startIdx];
-        let curr = startIdx;
-        const visited = new Set();
-        visited.add(curr);
+    for (const curr of landCells) {
+        const neighbors = dggsData.metadata.neighbors[curr];
+        if (!neighbors) continue;
         
-        // Follow gravity (hydraulic gradient)
-        while (true) {
-            const neighbors = dggsData.metadata.neighbors[curr];
-            if (!neighbors) break;
-            
-            let bestNext = -1;
-            let lowestElevation = Infinity;
-            
-            for (const nIdx of neighbors) {
-                if (visited.has(nIdx)) continue;
-                const nElev = dggsData.cells[nIdx].tile.elevation;
-                // Traverse down or across flat plains
-                if (nElev < lowestElevation) {
-                    lowestElevation = nElev;
-                    bestNext = nIdx;
-                }
+        let bestNext = -1;
+        let lowestElevation = dggsData.cells[curr].tile.elevation;
+        
+        for (const nIdx of neighbors) {
+            const nElev = dggsData.cells[nIdx].tile.elevation;
+            if (nElev < lowestElevation) {
+                lowestElevation = nElev;
+                bestNext = nIdx;
+            } else if (nElev === lowestElevation && nIdx < curr) {
+                // Break ties deterministically to allow plateau traversal without infinite loops
+                bestNext = nIdx;
             }
-            
-            if (bestNext === -1 || lowestElevation > dggsData.cells[curr].tile.elevation) {
-                // Local minimum basin.
-                break;
-            }
-            
-            path.push(bestNext);
-            visited.add(bestNext);
-            curr = bestNext;
-            
-            // Terminate upon reaching ocean biomes
-            const b = dggsData.cells[curr].tile.biome;
-            if (b === 0 || b === 1) break;
         }
         
-        if (path.length > 3) {
-            rivers.push(path);
+        if (bestNext !== -1) {
+            flowTo[curr] = bestNext;
+            water[bestNext] += water[curr]; // Accumulate water downhill (ramification/tributaries)
+        }
+    }
+    
+    // Extract river segments where water volume > threshold
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        if (flowTo[i] !== -1 && water[i] > 1.2) {
+            rivers.push([i, flowTo[i], water[i]]);
         }
     }
     
@@ -753,83 +740,90 @@ function draw() {
         }
     }
 
-    // ── Draw Winding Rivers ──
+    // ── Draw Branching Rivers (Fractal Ramification) ──
     if (dggsData.metadata && dggsData.metadata.rivers && (currentLens === 'biome' || currentLens === 'elevation')) {
-        for (const path of dggsData.metadata.rivers) {
-            for (let idx = 0; idx < path.length - 1; idx++) {
-                const c1 = path[idx];
-                const c2 = path[idx + 1];
-                
-                const cellA = cells[c1];
-                const cellB = cells[c2];
-                if (!cellA || !cellB) continue;
-                
-                // Depth check: cull if both are on the backside
-                const rotatedA = rotate3D(cellA.center.x, cellA.center.y, cellA.center.z);
-                const rotatedB = rotate3D(cellB.center.x, cellB.center.y, cellB.center.z);
-                if (rotatedA.z < -0.05 && rotatedB.z < -0.05) continue;
-                
-                const v1 = cellA.center;
-                const v2 = cellB.center;
-                
-                const rv1 = rotate3D(v1.x, v1.y, v1.z);
-                const rv2 = rotate3D(v2.x, v2.y, v2.z);
-                if (rv1.z < -0.2 && rv2.z < -0.2) continue;
-                
-                // Winding normal offset
-                const dx = v2.x - v1.x;
-                const dy = v2.y - v1.y;
-                const dz = v2.z - v1.z;
-                const mx = (v1.x + v2.x) / 2;
-                const my = (v1.y + v2.y) / 2;
-                const mz = (v1.z + v2.z) / 2;
-                
-                let px = my * dz - mz * dy;
-                let py = mz * dx - mx * dz;
-                let pz = mx * dy - my * dx;
-                const plen = Math.sqrt(px*px + py*py + pz*pz);
-                if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
-                
-                // Stable noise
-                const seed = Math.sin(mx * 12.9898 + my * 78.233 + mz * 437.287) * 43758.5453;
-                const noise = (seed - Math.floor(seed)) - 0.5;
-                const segmentLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                const offsetDist = segmentLen * 0.22 * noise;
-                
-                const ctrlPointLocal = {
-                    x: mx + px * offsetDist,
-                    y: my + py * offsetDist,
-                    z: mz + pz * offsetDist
-                };
-                const cpLen = Math.sqrt(ctrlPointLocal.x*ctrlPointLocal.x + ctrlPointLocal.y*ctrlPointLocal.y + ctrlPointLocal.z*ctrlPointLocal.z);
-                const ctrlPoint = {
-                    x: ctrlPointLocal.x / cpLen,
-                    y: ctrlPointLocal.y / cpLen,
-                    z: ctrlPointLocal.z / cpLen
-                };
-                
-                const rvCtrl = rotate3D(ctrlPoint.x, ctrlPoint.y, ctrlPoint.z);
-                
-                const p1x = rv1.x * GLOBE_RADIUS;
-                const p1y = rv1.y * GLOBE_RADIUS;
-                const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
-                const pCtrly = rvCtrl.y * GLOBE_RADIUS;
-                const p2x = rv2.x * GLOBE_RADIUS;
-                const p2y = rv2.y * GLOBE_RADIUS;
-                
-                // Draw dark blue outer border
-                ctx.beginPath();
-                ctx.moveTo(p1x, p1y);
-                ctx.quadraticCurveTo(pCtrlx, pCtrly, p2x, p2y);
-                ctx.strokeStyle = '#0a2342';
-                ctx.lineWidth = 4.5;
-                ctx.stroke();
-                
-                // Draw light blue inner river
-                ctx.strokeStyle = '#3b82f6';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-            }
+        for (const seg of dggsData.metadata.rivers) {
+            const c1 = seg[0];
+            const c2 = seg[1];
+            const waterVol = seg[2];
+            
+            const cellA = cells[c1];
+            const cellB = cells[c2];
+            if (!cellA || !cellB) continue;
+            
+            // Depth check: cull if both are on the backside
+            const rotatedA = rotate3D(cellA.center.x, cellA.center.y, cellA.center.z);
+            const rotatedB = rotate3D(cellB.center.x, cellB.center.y, cellB.center.z);
+            if (rotatedA.z < -0.05 && rotatedB.z < -0.05) continue;
+            
+            const v1 = cellA.center;
+            const v2 = cellB.center;
+            
+            const rv1 = rotate3D(v1.x, v1.y, v1.z);
+            const rv2 = rotate3D(v2.x, v2.y, v2.z);
+            if (rv1.z < -0.2 && rv2.z < -0.2) continue;
+            
+            // Winding normal offset based on consistent seed for this edge
+            const dx = v2.x - v1.x;
+            const dy = v2.y - v1.y;
+            const dz = v2.z - v1.z;
+            const mx = (v1.x + v2.x) / 2;
+            const my = (v1.y + v2.y) / 2;
+            const mz = (v1.z + v2.z) / 2;
+            
+            let px = my * dz - mz * dy;
+            let py = mz * dx - mx * dz;
+            let pz = mx * dy - my * dx;
+            const plen = Math.sqrt(px*px + py*py + pz*pz);
+            if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
+            
+            // Stable noise unique to this edge pair
+            const edgeId = c1 < c2 ? c1 * 100000 + c2 : c2 * 100000 + c1;
+            const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
+            const noise = (seed - Math.floor(seed)) - 0.5;
+            const segmentLen = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            const offsetDist = segmentLen * 0.25 * noise;
+            
+            const ctrlPointLocal = {
+                x: mx + px * offsetDist,
+                y: my + py * offsetDist,
+                z: mz + pz * offsetDist
+            };
+            const cpLen = Math.sqrt(ctrlPointLocal.x*ctrlPointLocal.x + ctrlPointLocal.y*ctrlPointLocal.y + ctrlPointLocal.z*ctrlPointLocal.z);
+            const ctrlPoint = {
+                x: ctrlPointLocal.x / cpLen,
+                y: ctrlPointLocal.y / cpLen,
+                z: ctrlPointLocal.z / cpLen
+            };
+            
+            const rvCtrl = rotate3D(ctrlPoint.x, ctrlPoint.y, ctrlPoint.z);
+            
+            const p1x = rv1.x * GLOBE_RADIUS;
+            const p1y = rv1.y * GLOBE_RADIUS;
+            const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
+            const pCtrly = rvCtrl.y * GLOBE_RADIUS;
+            const p2x = rv2.x * GLOBE_RADIUS;
+            const p2y = rv2.y * GLOBE_RADIUS;
+            
+            // Dynamic width based on accumulated water volume
+            const innerWidth = Math.min(4.5, 1 + waterVol * 0.35);
+            const outerWidth = innerWidth + 2;
+            
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Draw dark blue outer border
+            ctx.beginPath();
+            ctx.moveTo(p1x, p1y);
+            ctx.quadraticCurveTo(pCtrlx, pCtrly, p2x, p2y);
+            ctx.strokeStyle = '#0a2342';
+            ctx.lineWidth = outerWidth;
+            ctx.stroke();
+            
+            // Draw light blue inner river
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = innerWidth;
+            ctx.stroke();
         }
     }
 
