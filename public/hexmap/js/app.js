@@ -304,61 +304,112 @@ function generateRivers() {
         currentQueue = nextQueue;
     }
 
-    // 2. Create flow network
+    // 2. Identify Sources and Trace Paths
     const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
     const water = new Float32Array(dggsData.cells.length).fill(0);
-
-    const landCells = [];
+    
+    // Pick candidates (high elevation, moist)
+    const candidates = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
-        if (t.biome !== 0 && t.biome !== 1) { // Not ocean
-            landCells.push(i);
-            water[i] = t.moisture / 7.0;
+        if (t.biome !== 0 && t.biome !== 1 && t.elevation >= 3 && t.moisture >= 3) {
+            candidates.push(i);
         }
     }
-
-    // Sort land cells by distance DESCENDING (perfect topological order from inland to coast)
-    landCells.sort((a, b) => distToOcean[b] - distToOcean[a]);
-
-    for (const curr of landCells) {
-        const neighbors = dggsData.metadata.neighbors[curr];
-        if (!neighbors) continue;
-
-        let bestNext = -1;
-        let shortestDist = distToOcean[curr];
-
-        for (const nIdx of neighbors) {
-            if (distToOcean[nIdx] < shortestDist) {
-                shortestDist = distToOcean[nIdx];
-                bestNext = nIdx;
-            } else if (distToOcean[nIdx] === shortestDist && nIdx < bestNext) {
-                // Break exact ties deterministically
-                bestNext = nIdx;
+    
+    // Shuffle deterministically
+    for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    
+    // Take a limited number of sources based on globe size
+    const numSources = Math.max(5, Math.floor(dggsData.cells.length / 500));
+    const sources = candidates.slice(0, numSources);
+    
+    for (const source of sources) {
+        let curr = source;
+        const visited = new Set([curr]);
+        
+        while (distToOcean[curr] > 0) {
+            if (flowTo[curr] !== -1) break; // Merged into an existing river path
+            
+            const neighbors = dggsData.metadata.neighbors[curr];
+            if (!neighbors) break;
+            
+            let bestNext = -1;
+            let shortestDist = distToOcean[curr];
+            let fallbackNext = -1;
+            
+            for (const n of neighbors) {
+                if (distToOcean[n] < shortestDist) {
+                    shortestDist = distToOcean[n];
+                    bestNext = n;
+                } else if (distToOcean[n] === shortestDist && n < bestNext) {
+                    bestNext = n;
+                }
+                if (distToOcean[n] <= distToOcean[curr] && fallbackNext === -1) {
+                    fallbackNext = n;
+                }
+            }
+            
+            if (bestNext === -1) bestNext = fallbackNext;
+            if (bestNext === -1 || visited.has(bestNext)) break;
+            
+            flowTo[curr] = bestNext;
+            curr = bestNext;
+            visited.add(curr);
+        }
+    }
+    
+    // 3. Accumulate Water Flow
+    const activeCells = [];
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        if (flowTo[i] !== -1) activeCells.push(i);
+        water[i] = 0;
+    }
+    for (const s of sources) water[s] = 1.0;
+    
+    activeCells.sort((a, b) => distToOcean[b] - distToOcean[a]);
+    
+    for (const curr of activeCells) {
+        const next = flowTo[curr];
+        if (next !== -1) {
+            water[next] += water[curr] + (dggsData.cells[curr].tile.moisture / 10.0);
+        }
+    }
+    
+    // 4. Extract Continuous Branches
+    const inDegree = new Int32Array(dggsData.cells.length).fill(0);
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        if (flowTo[i] !== -1) inDegree[flowTo[i]]++;
+    }
+    
+    const branches = [];
+    const drawn = new Uint8Array(dggsData.cells.length).fill(0);
+    
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        if (flowTo[i] !== -1 && inDegree[i] === 0) {
+            const branch = [];
+            let curr = i;
+            while (curr !== -1 && !drawn[curr]) {
+                const isGlacier = dggsData.cells[curr].tile.biome === 9;
+                branch.push({ idx: curr, water: water[curr], hidden: isGlacier });
+                drawn[curr] = 1;
+                curr = flowTo[curr];
+            }
+            if (curr !== -1) {
+                const isGlacier = dggsData.cells[curr].tile.biome === 9;
+                branch.push({ idx: curr, water: water[curr], hidden: isGlacier });
+            }
+            if (branch.length > 1) {
+                branches.push(branch);
             }
         }
-
-        if (bestNext !== -1) {
-            flowTo[curr] = bestNext;
-            water[bestNext] += water[curr]; // Accumulate water topologically
-        }
     }
-
-    // 3. Extract river segments
-    for (let i = 0; i < dggsData.cells.length; i++) {
-        // Require significant accumulation to draw a visible river segment, eliminating tiny scattered creeks
-        if (flowTo[i] !== -1 && water[i] > 1.2) {
-            const isGlacierCurr = dggsData.cells[i].tile.biome === 9;
-            const isGlacierNext = dggsData.cells[flowTo[i]].tile.biome === 9;
-
-            // Hide rivers entirely contained within glaciers (subglacial flows)
-            if (isGlacierCurr && isGlacierNext) continue;
-
-            rivers.push([i, flowTo[i], water[i]]);
-        }
-    }
-
-    dggsData.metadata.rivers = rivers;
-    return rivers.length > 0;
+    
+    dggsData.metadata.rivers = branches;
+    return branches.length > 0;
 }
 
 function onDataLoaded() {
@@ -807,90 +858,72 @@ function draw() {
         }
     }
 
-    // ── Draw Branching Rivers (Fractal Ramification) ──
+    // ── Draw Vector River Overlay ──
     if (dggsData.metadata && dggsData.metadata.rivers && (currentLens === 'biome' || currentLens === 'elevation')) {
-        for (const seg of dggsData.metadata.rivers) {
-            const c1 = seg[0];
-            const c2 = seg[1];
-            const waterVol = seg[2];
-
-            const cellA = cells[c1];
-            const cellB = cells[c2];
-            if (!cellA || !cellB) continue;
-
-            // Depth check: cull if both are on the backside
-            const rotatedA = rotate3D(cellA.center.x, cellA.center.y, cellA.center.z);
-            const rotatedB = rotate3D(cellB.center.x, cellB.center.y, cellB.center.z);
-            if (rotatedA.z < -0.05 && rotatedB.z < -0.05) continue;
-
-            const v1 = cellA.center;
-            const v2 = cellB.center;
-
-            const rv1 = rotate3D(v1.x, v1.y, v1.z);
-            const rv2 = rotate3D(v2.x, v2.y, v2.z);
-            if (rv1.z < -0.2 && rv2.z < -0.2) continue;
-
-            // Winding normal offset based on consistent seed for this edge
-            const dx = v2.x - v1.x;
-            const dy = v2.y - v1.y;
-            const dz = v2.z - v1.z;
-            const mx = (v1.x + v2.x) / 2;
-            const my = (v1.y + v2.y) / 2;
-            const mz = (v1.z + v2.z) / 2;
-
-            let px = my * dz - mz * dy;
-            let py = mz * dx - mx * dz;
-            let pz = mx * dy - my * dx;
-            const plen = Math.sqrt(px * px + py * py + pz * pz);
-            if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
-
-            // Stable noise unique to this edge pair
-            const edgeId = c1 < c2 ? c1 * 100000 + c2 : c2 * 100000 + c1;
-            const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
-            const noise = (seed - Math.floor(seed)) - 0.5;
-            const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            const offsetDist = segmentLen * 0.25 * noise;
-
-            const ctrlPointLocal = {
-                x: mx + px * offsetDist,
-                y: my + py * offsetDist,
-                z: mz + pz * offsetDist
-            };
-            const cpLen = Math.sqrt(ctrlPointLocal.x * ctrlPointLocal.x + ctrlPointLocal.y * ctrlPointLocal.y + ctrlPointLocal.z * ctrlPointLocal.z);
-            const ctrlPoint = {
-                x: ctrlPointLocal.x / cpLen,
-                y: ctrlPointLocal.y / cpLen,
-                z: ctrlPointLocal.z / cpLen
-            };
-
-            const rvCtrl = rotate3D(ctrlPoint.x, ctrlPoint.y, ctrlPoint.z);
-
-            const p1x = rv1.x * GLOBE_RADIUS;
-            const p1y = rv1.y * GLOBE_RADIUS;
-            const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
-            const pCtrly = rvCtrl.y * GLOBE_RADIUS;
-            const p2x = rv2.x * GLOBE_RADIUS;
-            const p2y = rv2.y * GLOBE_RADIUS;
-
-            // Dynamic width based on accumulated water volume
-            const innerWidth = Math.min(4.5, 1 + waterVol * 0.35);
-            const outerWidth = innerWidth + 2;
-
+        const maxOffset = 1.3 / Math.sqrt(cells.length);
+        
+        for (const branch of dggsData.metadata.rivers) {
+            if (branch.length < 2) continue;
+            
+            // Calculate meandering 3D points
+            const points = [];
+            for (const node of branch) {
+                const cell = cells[node.idx];
+                if (!cell) continue;
+                
+                // Deterministic wander within the hex footprint
+                const h = node.idx;
+                const rx = (Math.sin(h * 12.9898) - 0.5) * maxOffset;
+                const ry = (Math.cos(h * 78.233) - 0.5) * maxOffset;
+                const rz = (Math.sin(h * 37.719) - 0.5) * maxOffset;
+                
+                let nx = cell.center.x + rx;
+                let ny = cell.center.y + ry;
+                let nz = cell.center.z + rz;
+                const len = Math.sqrt(nx*nx + ny*ny + nz*nz);
+                nx /= len; ny /= len; nz /= len;
+                
+                const rv = rotate3D(nx, ny, nz);
+                points.push({
+                    x: rv.x * GLOBE_RADIUS,
+                    y: rv.y * GLOBE_RADIUS,
+                    z: rv.z,
+                    water: node.water,
+                    hidden: node.hidden
+                });
+            }
+            
+            // Render the branch as a smooth sequence of line segments
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-
-            // Draw dark blue outer border
-            ctx.beginPath();
-            ctx.moveTo(p1x, p1y);
-            ctx.quadraticCurveTo(pCtrlx, pCtrly, p2x, p2y);
-            ctx.strokeStyle = '#0a2342';
-            ctx.lineWidth = outerWidth;
-            ctx.stroke();
-
-            // Draw light blue inner river
-            ctx.strokeStyle = '#3b82f6';
-            ctx.lineWidth = innerWidth;
-            ctx.stroke();
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i+1];
+                
+                if (p1.z < -0.1 && p2.z < -0.1) continue; // Backface cull
+                if (p1.hidden && p2.hidden) continue;     // Subglacial
+                
+                const avgWater = (p1.water + p2.water) / 2.0;
+                const innerWidth = Math.min(6, 1.2 + avgWater * 0.4);
+                const outerWidth = innerWidth + 2.5;
+                
+                // Outer border
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = '#0a2342';
+                ctx.lineWidth = outerWidth;
+                ctx.stroke();
+                
+                // Inner water
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = innerWidth;
+                ctx.stroke();
+            }
         }
     }
 
