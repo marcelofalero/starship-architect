@@ -296,7 +296,13 @@ function generateRivers() {
         }
     }
     
-    landCells.sort((a, b) => dggsData.cells[b].tile.elevation - dggsData.cells[a].tile.elevation);
+    landCells.sort((a, b) => {
+        const elevDiff = dggsData.cells[b].tile.elevation - dggsData.cells[a].tile.elevation;
+        if (elevDiff !== 0) return elevDiff;
+        // On plateaus (equal elevation), process cells furthest from the ocean first!
+        // This guarantees perfect topological order for downstream water accumulation.
+        return distToOcean[b] - distToOcean[a];
+    });
     
     for (const curr of landCells) {
         const neighbors = dggsData.metadata.neighbors[curr];
@@ -329,7 +335,7 @@ function generateRivers() {
     
     // 3. Extract river segments where water volume > threshold
     for (let i = 0; i < dggsData.cells.length; i++) {
-        if (flowTo[i] !== -1 && water[i] > 0.8) {
+        if (flowTo[i] !== -1 && water[i] > 0.4) {
             rivers.push([i, flowTo[i], water[i]]);
         }
     }
