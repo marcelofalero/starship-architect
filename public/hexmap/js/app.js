@@ -290,7 +290,7 @@ function generateRivers() {
     const landCells = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
-        if (t.biome !== 0 && t.biome !== 1 && t.biome !== 9 && t.biome !== 11) { // Not ocean, ice, lava
+        if (t.biome !== 0 && t.biome !== 1) { // Not ocean
             landCells.push(i);
             water[i] = t.moisture / 7.0; // Base water from moisture
         }
