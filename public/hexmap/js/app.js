@@ -272,20 +272,20 @@ function generateRivers() {
             if (!neighbors) break;
             
             let bestNext = -1;
-            let lowestElevation = dggsData.cells[curr].tile.elevation;
+            let lowestElevation = Infinity;
             
             for (const nIdx of neighbors) {
                 if (visited.has(nIdx)) continue;
                 const nElev = dggsData.cells[nIdx].tile.elevation;
-                // strict gradient descent
+                // Traverse down or across flat plains
                 if (nElev < lowestElevation) {
                     lowestElevation = nElev;
                     bestNext = nIdx;
                 }
             }
             
-            if (bestNext === -1) {
-                // Local minimum.
+            if (bestNext === -1 || lowestElevation > dggsData.cells[curr].tile.elevation) {
+                // Local minimum basin.
                 break;
             }
             
@@ -753,7 +753,7 @@ function draw() {
     }
 
     // ── Draw Winding Rivers ──
-    if (dggsData.metadata && dggsData.metadata.rivers) {
+    if (dggsData.metadata && dggsData.metadata.rivers && (currentLens === 'biome' || currentLens === 'elevation')) {
         for (const path of dggsData.metadata.rivers) {
             for (let idx = 0; idx < path.length - 1; idx++) {
                 const c1 = path[idx];
