@@ -211,6 +211,11 @@ function onDataLoaded() {
                 changed = true;
             }
         }
+        // Sync scanned cells with revealed features so auto-reveals light up
+        if (dggsData.metadata.revealedFeatures.includes(i) && !dggsData.metadata.scannedCells.includes(i)) {
+            dggsData.metadata.scannedCells.push(i);
+            changed = true;
+        }
     }
     
     precomputeEdgeNeighbors();
@@ -405,10 +410,13 @@ function draw() {
         ctx.closePath();
         
         if (isScanned) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; // bright illumination
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)'; // very bright illumination
             ctx.fill();
+            ctx.restore();
         } else if (userRole === 'player') {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'; // strong fog of war for players
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.55)'; // very strong fog of war for players
             ctx.fill();
         }
 
