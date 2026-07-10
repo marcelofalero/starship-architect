@@ -118,8 +118,9 @@
             <span class="hud-label">FOW Status:</span>
             <span id="feature-status-value" class="hud-value">-</span>
         </div>
-        <div id="feature-action-row" class="hud-row" style="display: none; margin-top: 5px; margin-bottom: 5px;">
-            <button id="feature-action-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">SCAN TILE</button>
+        <div id="feature-action-row" class="hud-row" style="display: none; margin-top: 5px; margin-bottom: 5px; gap: 5px; display: flex;">
+            <input type="number" id="scan-count" value="1" min="1" max="100" style="width: 50px; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; text-align: center; font-family: 'Russo One', sans-serif;" title="Number of hexes to scan">
+            <button id="feature-action-btn" style="flex: 1; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">SCAN SECTOR</button>
         </div>
 
         <div style="margin-top: 15px; margin-bottom: 15px;">

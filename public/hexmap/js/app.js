@@ -199,6 +199,7 @@ function precomputeEdgeNeighbors() {
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
+    if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
     
     let changed = false;
     for (let i = 0; i < dggsData.cells.length; i++) {
@@ -394,6 +395,15 @@ function draw() {
 
         // ── 2. Draw abstract biome decorations (clipped inside polygon) ──
         drawBiomeTile(ctx, tile.biome, hexCx, hexCy, hexR, i);
+
+        // Illuminate scanned cells, darken unscanned
+        if (dggsData.metadata?.scannedCells?.includes(i)) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fill();
+        } else if (userRole === 'player') {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fill();
+        }
 
         ctx.restore();
 
@@ -991,11 +1001,34 @@ editFeature.addEventListener('change', () => {
     }
 });
 
+function getNearbyCells(startIdx, count) {
+    if (count <= 1) return [startIdx];
+    const visited = new Set([startIdx]);
+    const queue = [startIdx];
+    const result = [startIdx];
+    
+    let head = 0;
+    while (head < queue.length && result.length < count) {
+        const curr = queue[head++];
+        const neighbors = cellEdgeNeighbors[curr] || [];
+        for (const nIdx of neighbors) {
+            if (nIdx !== -1 && nIdx !== undefined && !visited.has(nIdx)) {
+                visited.add(nIdx);
+                queue.push(nIdx);
+                result.push(nIdx);
+                if (result.length >= count) break;
+            }
+        }
+    }
+    return result;
+}
+
 featureActionBtn.addEventListener('click', async () => {
     if (selectedIdx < 0 || !dggsData) return;
     
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
+    if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
     
     const isRevealed = dggsData.metadata.revealedFeatures.includes(selectedIdx);
     
@@ -1013,17 +1046,36 @@ featureActionBtn.addEventListener('click', async () => {
         
         selectCell(selectedIdx);
     } else if (userRole === 'player') {
-        const cell = dggsData.cells[selectedIdx];
-        const fData = FEATURES[cell.tile.feature];
-        const scanLevel = (cell.tile.feature > 0 && fData) ? fData.scanLevel : 1;
+        const countInput = document.getElementById('scan-count');
+        const count = countInput ? parseInt(countInput.value) || 1 : 1;
+        const cellsToScan = getNearbyCells(selectedIdx, count);
         
         let scanDelay = 1500;
-        if (scanLevel === 0 || scanLevel === 1) scanDelay = 0;
-        else if (scanLevel === 3) scanDelay = 4000;
+        
+        for (const idx of cellsToScan) {
+            const c = dggsData.cells[idx];
+            const fData = FEATURES[c.tile.feature];
+            const sLevel = (c.tile.feature > 0 && fData) ? fData.scanLevel : 1;
+            
+            if (sLevel === 2 && scanDelay < 1500) scanDelay = 1500;
+            if (sLevel === 3 && dggsData.metadata.landingCell === idx) {
+                scanDelay = 4000;
+            }
+        }
+        
+        // base delay for multiple hexes
+        if (count > 1 && scanDelay < 1000 + count * 100) {
+            scanDelay = Math.min(1000 + count * 100, 5000); // max 5s for big scans
+        }
 
-        if (scanLevel === 3 && dggsData.metadata.landingCell !== selectedIdx) {
-            alert('Cannot scan: Ground presence required. You must land here first to perform a deep scan.');
-            return;
+        // If scanning a single level 3 and not landed, block
+        if (count === 1) {
+            const fData = FEATURES[dggsData.cells[selectedIdx].tile.feature];
+            const sLevel = (dggsData.cells[selectedIdx].tile.feature > 0 && fData) ? fData.scanLevel : 1;
+            if (sLevel === 3 && dggsData.metadata.landingCell !== selectedIdx) {
+                alert('Cannot scan: Ground presence required. You must land here first to perform a deep scan.');
+                return;
+            }
         }
 
         featureActionBtn.disabled = true;
@@ -1032,17 +1084,34 @@ featureActionBtn.addEventListener('click', async () => {
         featureActionBtn.style.color = '#ffd600';
         
         setTimeout(async () => {
-            if (!dggsData.metadata.revealedFeatures.includes(selectedIdx)) {
-                dggsData.metadata.revealedFeatures.push(selectedIdx);
+            const foundFeatures = [];
+            
+            for (const idx of cellsToScan) {
+                if (!dggsData.metadata.scannedCells.includes(idx)) {
+                    dggsData.metadata.scannedCells.push(idx);
+                }
+                const c = dggsData.cells[idx];
+                const sLevel = (c.tile.feature > 0 && FEATURES[c.tile.feature]) ? FEATURES[c.tile.feature].scanLevel : 1;
+                
+                if (c.tile.feature > 0) {
+                    if (sLevel === 3 && dggsData.metadata.landingCell !== idx) {
+                        continue; // Requires ground presence
+                    }
+                    if (!dggsData.metadata.revealedFeatures.includes(idx)) {
+                        dggsData.metadata.revealedFeatures.push(idx);
+                        foundFeatures.push(FEATURES[c.tile.feature].name);
+                    }
+                }
             }
             
             await saveDGGSMetadata();
             featureActionBtn.disabled = false;
+            featureActionBtn.textContent = 'SCAN SECTOR';
+            featureActionBtn.style.borderColor = '#00e5ff';
+            featureActionBtn.style.color = '#00e5ff';
             
-            if (cell.tile.feature > 0) {
-                alert(`Scan Complete! Found: ${FEATURES[cell.tile.feature]?.name || 'Unknown'}`);
-            } else {
-                alert('Scan Complete. No geological anomalies detected.');
+            if (foundFeatures.length > 0) {
+                alert(`Scan Complete! Found: ${foundFeatures.join(', ')}`);
             }
             
             selectCell(selectedIdx);
