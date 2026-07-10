@@ -226,6 +226,87 @@ function precomputeEdgeNeighbors() {
     }
 }
 
+function generateRivers() {
+    if (!dggsData || !dggsData.metadata) return false;
+    if (dggsData.metadata.rivers && dggsData.metadata.rivers.length > 0) return false; 
+
+    // Use a simple seeded PRNG to ensure rivers are identical for the same map seed
+    let seedVal = 1337;
+    if (dggsData.metadata.seed) {
+        for(let i=0; i<dggsData.metadata.seed.length; i++) seedVal += dggsData.metadata.seed.charCodeAt(i);
+    }
+    const random = () => {
+        const x = Math.sin(seedVal++) * 10000;
+        return x - Math.floor(x);
+    };
+
+    const rivers = [];
+    const numRivers = Math.floor(dggsData.cells.length / 300); 
+    
+    // Find candidate starts (high elevation)
+    const candidates = [];
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        const t = dggsData.cells[i].tile;
+        if (t.elevation > 4 && t.biome !== 9 && t.biome !== 11) { // Not ice, not lava
+            candidates.push(i);
+        }
+    }
+    
+    // Shuffle candidates
+    for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    
+    const starts = candidates.slice(0, Math.min(numRivers, candidates.length));
+    
+    for (const startIdx of starts) {
+        const path = [startIdx];
+        let curr = startIdx;
+        const visited = new Set();
+        visited.add(curr);
+        
+        // Follow gravity (hydraulic gradient)
+        while (true) {
+            const neighbors = dggsData.metadata.neighbors[curr];
+            if (!neighbors) break;
+            
+            let bestNext = -1;
+            let lowestElevation = dggsData.cells[curr].tile.elevation;
+            
+            for (const nIdx of neighbors) {
+                if (visited.has(nIdx)) continue;
+                const nElev = dggsData.cells[nIdx].tile.elevation;
+                // strict gradient descent
+                if (nElev < lowestElevation) {
+                    lowestElevation = nElev;
+                    bestNext = nIdx;
+                }
+            }
+            
+            if (bestNext === -1) {
+                // Local minimum.
+                break;
+            }
+            
+            path.push(bestNext);
+            visited.add(bestNext);
+            curr = bestNext;
+            
+            // Terminate upon reaching ocean biomes
+            const b = dggsData.cells[curr].tile.biome;
+            if (b === 0 || b === 1) break;
+        }
+        
+        if (path.length > 3) {
+            rivers.push(path);
+        }
+    }
+    
+    dggsData.metadata.rivers = rivers;
+    return rivers.length > 0;
+}
+
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
@@ -251,8 +332,12 @@ function onDataLoaded() {
     }
     
     precomputeEdgeNeighbors();
+    
+    if (generateRivers()) {
+        changed = true;
+    }
 
-    // Auto-save if we revealed level 0 features on load
+    // Auto-save if we revealed level 0 features on load or generated new rivers
     if (changed && typeof saveDGGSMetadata === 'function') {
         saveDGGSMetadata().catch(console.error);
     }
