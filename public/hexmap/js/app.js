@@ -383,26 +383,18 @@ function draw() {
 
     const cells = dggsData.cells;
 
-    // Depth sort: draw back-to-front
-    const sorted = [];
+    // ── Pre-calculate visible cells and group by biome ──
+    const visibleCellsByBiome = {};
+    for (let b = 0; b <= 12; b++) visibleCellsByBiome[b] = [];
+    const visibleCells = [];
+
     for (let i = 0; i < cells.length; i++) {
-        const c = cells[i].center;
-        const r = rotate3D(c.x, c.y, c.z);
-        sorted.push({ idx: i, z: r.z, cx: r.x, cy: r.y });
-    }
-    sorted.sort((a, b) => a.z - b.z);
-
-    for (const item of sorted) {
-        // Cull backside
-        if (item.z < -0.05) continue;
-
-        const i = item.idx;
         const cell = cells[i];
-        const tile = cell.tile;
-        const planetType = dggsData.metadata?.type || 'terrestrial';
-        const biome = getBiomeInfo(tile.biome);
-
-        // Project polygon vertices
+        
+        // Fast backface cull
+        const rCenter = rotate3D(cell.center.x, cell.center.y, cell.center.z);
+        if (rCenter.z < -0.05) continue;
+        
         const projVerts = [];
         let allFront = true;
         for (const v of cell.vertices) {
@@ -412,54 +404,95 @@ function draw() {
         }
         if (!allFront || projVerts.length < 3) continue;
 
-        // ── Hex cell centroid ──
-        const hexCx = item.cx * GLOBE_RADIUS;
-        const hexCy = item.cy * GLOBE_RADIUS;
-        const hexR = Math.sqrt(
-            (projVerts[0].x - hexCx) ** 2 + (projVerts[0].y - hexCy) ** 2
-        ) * 0.92;
+        const hexCx = rCenter.x * GLOBE_RADIUS;
+        const hexCy = rCenter.y * GLOBE_RADIUS;
+        const hexR = Math.sqrt((projVerts[0].x - hexCx) ** 2 + (projVerts[0].y - hexCy) ** 2) * 0.92;
+        
+        const cellData = { i, cell, projVerts, hexCx, hexCy, hexR };
+        visibleCells.push(cellData);
+        visibleCellsByBiome[cell.tile.biome].push(cellData);
+    }
 
-        // ── 1. Clip to polygon, fill base color ──
-        ctx.save();
+    // ── 1. Batch Render Biomes ──
+    if (!isCacheInitialized) initBiomeCache();
+    
+    for (let b = 0; b <= 12; b++) {
+        const group = visibleCellsByBiome[b];
+        if (group.length === 0) continue;
+        
+        const biome = getBiomeInfo(b);
+        
         ctx.beginPath();
-        ctx.moveTo(projVerts[0].x, projVerts[0].y);
-        for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
-        ctx.closePath();
-        ctx.clip();
-
+        for (const c of group) {
+            ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
+            for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
+            ctx.closePath();
+        }
+        
         ctx.fillStyle = biome.color;
         ctx.fill();
+        
+        ctx.strokeStyle = biome.border;
+        ctx.lineWidth = 0.4;
+        ctx.stroke();
 
-        // ── 2. Draw abstract biome decorations (clipped inside polygon) ──
         if (scale > 0.6) {
-            if (!isCacheInitialized) initBiomeCache();
-            const variant = i % NUM_VARIANTS;
-            const cacheCanvas = biomeVariantCache[tile.biome]?.[variant];
-            if (cacheCanvas) {
-                const drawSize = (hexR / 0.9) * 2;
-                ctx.drawImage(cacheCanvas, hexCx - drawSize / 2, hexCy - drawSize / 2, drawSize, drawSize);
+            ctx.save();
+            ctx.clip(); 
+            for (const c of group) {
+                const variant = c.i % NUM_VARIANTS;
+                const cacheCanvas = biomeVariantCache[b]?.[variant];
+                if (cacheCanvas) {
+                    const drawSize = (c.hexR / 0.9) * 2;
+                    ctx.drawImage(cacheCanvas, c.hexCx - drawSize / 2, c.hexCy - drawSize / 2, drawSize, drawSize);
+                }
             }
+            ctx.restore();
         }
+    }
 
-        // Illuminate scanned cells, darken unscanned
-        const isScanned = dggsData.metadata?.scannedCells?.includes(i);
-        
-        ctx.beginPath();
-        ctx.moveTo(projVerts[0].x, projVerts[0].y);
-        for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
-        ctx.closePath();
-        
+    // ── 2. Overlays (Scanned, Fog of War) ──
+    const scannedGroup = [];
+    const fowGroup = [];
+    
+    for (const c of visibleCells) {
+        const isScanned = dggsData.metadata?.scannedCells?.includes(c.i);
         if (isScanned) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.12)'; // subtle illumination
-            ctx.fill();
+            scannedGroup.push(c);
         } else if (userRole === 'player') {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // fog of war for players
-            ctx.fill();
+            fowGroup.push(c);
         }
-
-        ctx.restore();
-
-        // ── 3. Hover highlight ──
+    }
+    
+    if (scannedGroup.length > 0) {
+        ctx.beginPath();
+        for (const c of scannedGroup) {
+            ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
+            for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
+            ctx.closePath();
+        }
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.fill();
+    }
+    
+    if (fowGroup.length > 0) {
+        ctx.beginPath();
+        for (const c of fowGroup) {
+            ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
+            for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
+            ctx.closePath();
+        }
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fill();
+    }
+    
+    // ── 3. Features & Interactive Highlights ──
+    for (const c of visibleCells) {
+        const i = c.i;
+        const cell = c.cell;
+        const tile = cell.tile;
+        const projVerts = c.projVerts;
+        
         if (i === hoveredIdx || i === selectedIdx) {
             ctx.beginPath();
             ctx.moveTo(projVerts[0].x, projVerts[0].y);
@@ -468,60 +501,44 @@ function draw() {
             ctx.strokeStyle = i === selectedIdx ? '#00e5ff' : 'rgba(255,255,255,0.35)';
             ctx.lineWidth = i === selectedIdx ? 1.5 : 0.8;
             ctx.stroke();
-        } else {
-            // ── 4. Border ──
-            ctx.beginPath();
-            ctx.moveTo(projVerts[0].x, projVerts[0].y);
-            for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
-            ctx.closePath();
-            ctx.strokeStyle = biome.border;
-            ctx.lineWidth = 0.4;
-            ctx.stroke();
         }
-
-
-        // Feature marker
+        
         if (tile.feature > 0) {
             const isRevealed = dggsData.metadata?.revealedFeatures?.includes(i);
             const fc = FEATURE_COLORS[tile.feature] || '#fff';
             if (userRole === 'gm') {
                 if (isRevealed) {
                     ctx.beginPath();
-                    ctx.arc(item.cx * GLOBE_RADIUS, item.cy * GLOBE_RADIUS, 3, 0, Math.PI * 2);
+                    ctx.arc(c.hexCx, c.hexCy, 3, 0, Math.PI * 2);
                     ctx.fillStyle = fc;
                     ctx.fill();
                 } else {
-                    // Unexplored feature for GM: draw semi-transparent with a dotted ring
                     ctx.save();
                     ctx.globalAlpha = 0.4;
                     ctx.beginPath();
-                    ctx.arc(item.cx * GLOBE_RADIUS, item.cy * GLOBE_RADIUS, 3.5, 0, Math.PI * 2);
+                    ctx.arc(c.hexCx, c.hexCy, 3.5, 0, Math.PI * 2);
                     ctx.strokeStyle = fc;
                     ctx.setLineDash([1.5, 1.5]);
                     ctx.lineWidth = 1;
                     ctx.stroke();
                     ctx.beginPath();
-                    ctx.arc(item.cx * GLOBE_RADIUS, item.cy * GLOBE_RADIUS, 2, 0, Math.PI * 2);
+                    ctx.arc(c.hexCx, c.hexCy, 2, 0, Math.PI * 2);
                     ctx.fillStyle = fc;
                     ctx.fill();
                     ctx.restore();
                 }
             } else if (isRevealed) {
-                // Players and Viewers only see revealed features
                 ctx.beginPath();
-                ctx.arc(item.cx * GLOBE_RADIUS, item.cy * GLOBE_RADIUS, 3, 0, Math.PI * 2);
+                ctx.arc(c.hexCx, c.hexCy, 3, 0, Math.PI * 2);
                 ctx.fillStyle = fc;
                 ctx.fill();
             }
         }
-
-
-        // Draw landing ship
+        
         if (dggsData.metadata && dggsData.metadata.landingCell === i) {
             ctx.save();
-            ctx.translate(item.cx * GLOBE_RADIUS, item.cy * GLOBE_RADIUS);
+            ctx.translate(c.hexCx, c.hexCy);
             
-            // Draw a neat little triangular starship icon pointing upwards
             ctx.beginPath();
             ctx.moveTo(0, -9);
             ctx.lineTo(6, 6);
@@ -530,21 +547,19 @@ function draw() {
             ctx.lineTo(-6, 6);
             ctx.closePath();
             
-            ctx.fillStyle = '#ffd600'; // bright yellow starship
+            ctx.fillStyle = '#ffd600';
             ctx.fill();
             ctx.strokeStyle = '#020208';
             ctx.lineWidth = 1;
             ctx.stroke();
             
-            // Draw landing engine glow
             ctx.beginPath();
             ctx.arc(0, 6, 2, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff3d00'; // bright orange/red glow
+            ctx.fillStyle = '#ff3d00';
             ctx.fill();
             
             ctx.restore();
         }
-
     }
 
     // ── Draw Winding Rivers ──
