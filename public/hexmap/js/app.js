@@ -242,17 +242,21 @@ function generateRivers() {
 
     const rivers = [];
     
-    // 1. Compute Distance to Sinks (Oceans or Local Minima) for perfect plateau routing
+    // 1. Compute SPFA Dijkstra Distance to Sinks (Oceans or Local Minima)
+    // This allows rivers to intelligently cross plateaus and even carve through small hills (uphill)
+    // to reach the ocean, mimicking real-world river basin carving (like the Nile or Colorado).
     const distToOcean = new Int32Array(dggsData.cells.length).fill(999999);
-    const queue = [];
+    const inQueue = new Uint8Array(dggsData.cells.length).fill(0);
+    let currentQueue = [];
     
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
         if (t.biome === 0 || t.biome === 1) { // Ocean
             distToOcean[i] = 0;
-            queue.push(i);
+            currentQueue.push(i);
+            inQueue[i] = 1;
         } else {
-            // Check if it is a local minimum (endorheic basin)
+            // Local minima (endorheic basins) act as sinks if no ocean is nearby
             let isMin = true;
             const neighbors = dggsData.metadata.neighbors[i];
             if (neighbors) {
@@ -264,78 +268,91 @@ function generateRivers() {
             }
             if (isMin) {
                 distToOcean[i] = 0;
-                queue.push(i);
+                currentQueue.push(i);
+                inQueue[i] = 1;
             }
         }
     }
     
-    let head = 0;
-    while (head < queue.length) {
-        const curr = queue[head++];
-        const neighbors = dggsData.metadata.neighbors[curr];
-        if (!neighbors) continue;
-        for (const n of neighbors) {
-            if (distToOcean[curr] + 1 < distToOcean[n]) {
-                distToOcean[n] = distToOcean[curr] + 1;
-                queue.push(n);
+    while (currentQueue.length > 0) {
+        const nextQueue = [];
+        for (let i = 0; i < currentQueue.length; i++) {
+            const curr = currentQueue[i];
+            inQueue[curr] = 0;
+            
+            const neighbors = dggsData.metadata.neighbors[curr];
+            if (!neighbors) continue;
+            
+            const currElev = dggsData.cells[curr].tile.elevation;
+            
+            for (const n of neighbors) {
+                const nElev = dggsData.cells[n].tile.elevation;
+                // Cost for water to flow FROM n TO curr:
+                let cost = 1;
+                if (nElev === currElev) cost = 6;       // Traversing a flat plain
+                else if (nElev < currElev) cost = 45;   // Carving uphill through a higher macro-elevation hex
+                
+                const newDist = distToOcean[curr] + cost;
+                if (newDist < distToOcean[n]) {
+                    distToOcean[n] = newDist;
+                    if (!inQueue[n]) {
+                        nextQueue.push(n);
+                        inQueue[n] = 1;
+                    }
+                }
             }
         }
+        currentQueue = nextQueue;
     }
     
     // 2. Create flow network
     const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
     const water = new Float32Array(dggsData.cells.length).fill(0);
     
-    // Sort land cells by elevation descending
     const landCells = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
         if (t.biome !== 0 && t.biome !== 1) { // Not ocean
             landCells.push(i);
-            water[i] = t.moisture / 7.0; // Base water from moisture
+            water[i] = t.moisture / 7.0; 
         }
     }
     
-    landCells.sort((a, b) => {
-        const elevDiff = dggsData.cells[b].tile.elevation - dggsData.cells[a].tile.elevation;
-        if (elevDiff !== 0) return elevDiff;
-        // On plateaus (equal elevation), process cells furthest from the ocean first!
-        // This guarantees perfect topological order for downstream water accumulation.
-        return distToOcean[b] - distToOcean[a];
-    });
+    // Sort land cells by distance DESCENDING (perfect topological order from inland to coast)
+    landCells.sort((a, b) => distToOcean[b] - distToOcean[a]);
     
     for (const curr of landCells) {
         const neighbors = dggsData.metadata.neighbors[curr];
         if (!neighbors) continue;
         
         let bestNext = -1;
-        let lowestElevation = dggsData.cells[curr].tile.elevation;
         let shortestDist = distToOcean[curr];
         
         for (const nIdx of neighbors) {
-            const nElev = dggsData.cells[nIdx].tile.elevation;
-            const nDist = distToOcean[nIdx];
-            
-            if (nElev < lowestElevation) {
-                lowestElevation = nElev;
-                shortestDist = nDist;
+            if (distToOcean[nIdx] < shortestDist) {
+                shortestDist = distToOcean[nIdx];
                 bestNext = nIdx;
-            } else if (nElev === lowestElevation && nDist < shortestDist) {
-                // Flow across plateaus directly towards the nearest sink
-                shortestDist = nDist;
+            } else if (distToOcean[nIdx] === shortestDist && nIdx < bestNext) {
+                // Break exact ties deterministically
                 bestNext = nIdx;
             }
         }
         
         if (bestNext !== -1) {
             flowTo[curr] = bestNext;
-            water[bestNext] += water[curr]; // Accumulate water downhill (ramification/tributaries)
+            water[bestNext] += water[curr]; // Accumulate water topologically
         }
     }
     
-    // 3. Extract river segments where water volume > threshold
+    // 3. Extract river segments
     for (let i = 0; i < dggsData.cells.length; i++) {
         if (flowTo[i] !== -1 && water[i] > 0.4) {
+            const isGlacierCurr = dggsData.cells[i].tile.biome === 9;
+            const isGlacierNext = dggsData.cells[flowTo[i]].tile.biome === 9;
+            
+            // Hide rivers entirely contained within glaciers (subglacial flows)
+            if (isGlacierCurr && isGlacierNext) continue;
+            
             rivers.push([i, flowTo[i], water[i]]);
         }
     }
