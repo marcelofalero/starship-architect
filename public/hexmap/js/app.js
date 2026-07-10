@@ -397,11 +397,18 @@ function draw() {
         drawBiomeTile(ctx, tile.biome, hexCx, hexCy, hexR, i);
 
         // Illuminate scanned cells, darken unscanned
-        if (dggsData.metadata?.scannedCells?.includes(i)) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        const isScanned = dggsData.metadata?.scannedCells?.includes(i);
+        
+        ctx.beginPath();
+        ctx.moveTo(projVerts[0].x, projVerts[0].y);
+        for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
+        ctx.closePath();
+        
+        if (isScanned) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; // bright illumination
             ctx.fill();
         } else if (userRole === 'player') {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'; // strong fog of war for players
             ctx.fill();
         }
 
