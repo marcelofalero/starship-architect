@@ -228,7 +228,6 @@ function precomputeEdgeNeighbors() {
 
 function generateRivers() {
     if (!dggsData || !dggsData.metadata) return false;
-    if (dggsData.metadata.rivers && dggsData.metadata.rivers.length > 0) return false; 
 
     // Use a simple seeded PRNG to ensure rivers are identical for the same map seed
     let seedVal = 1337;
