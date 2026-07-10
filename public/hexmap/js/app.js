@@ -452,6 +452,7 @@ function findSharedVertices(cellA, cellB) {
 
 // ── Render ──
 function draw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Ensure context is fully reset to prevent smeared frames on errors
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!dggsData) { requestAnimationFrame(draw); return; }
@@ -1077,12 +1078,16 @@ function selectCell(idx) {
 }
 
 // ── Data Loading ──
+let currentLoadId = 0;
 async function loadDGGS(seed, type, resolution) {
+    const loadId = ++currentLoadId;
     try {
         const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Worker returned ${res.status}`);
         const buffer = await res.arrayBuffer();
+        if (loadId !== currentLoadId) return; // Prevent older slow fetches from overwriting newer ones (race condition)
+        
         dggsData = decodeVMB(buffer);
         onDataLoaded();
 
