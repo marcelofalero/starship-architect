@@ -308,11 +308,11 @@ function generateRivers() {
     const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
     const water = new Float32Array(dggsData.cells.length).fill(0);
     
-    // Pick candidates (high elevation, moist)
+    // Pick candidates (high elevation, moist, strictly inland)
     const candidates = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
-        if (t.biome !== 0 && t.biome !== 1 && t.elevation >= 3 && t.moisture >= 3) {
+        if (t.biome !== 0 && t.biome !== 1 && t.elevation >= 3 && t.moisture >= 3 && distToOcean[i] > 2) {
             candidates.push(i);
         }
     }
@@ -889,7 +889,8 @@ function draw() {
                     y: rv.y * GLOBE_RADIUS,
                     z: rv.z,
                     water: node.water,
-                    hidden: node.hidden
+                    hidden: node.hidden,
+                    isOcean: cell.tile.biome === 0 || cell.tile.biome === 1
                 });
             }
             
@@ -903,15 +904,24 @@ function draw() {
                 
                 if (p1.z < -0.1 && p2.z < -0.1) continue; // Backface cull
                 if (p1.hidden && p2.hidden) continue;     // Subglacial
+                if (p1.isOcean) continue;                 // Prevent drawing ocean-to-ocean
                 
                 const avgWater = (p1.water + p2.water) / 2.0;
                 const innerWidth = Math.min(6, 1.2 + avgWater * 0.4);
                 const outerWidth = innerWidth + 2.5;
                 
+                // Truncate segment exactly at the coastline if it flows into the ocean
+                let drawX = p2.x;
+                let drawY = p2.y;
+                if (p2.isOcean) {
+                    drawX = (p1.x + p2.x) / 2;
+                    drawY = (p1.y + p2.y) / 2;
+                }
+                
                 // Outer border
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
+                ctx.lineTo(drawX, drawY);
                 ctx.strokeStyle = '#0a2342';
                 ctx.lineWidth = outerWidth;
                 ctx.stroke();
@@ -919,7 +929,7 @@ function draw() {
                 // Inner water
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
+                ctx.lineTo(drawX, drawY);
                 ctx.strokeStyle = '#3b82f6';
                 ctx.lineWidth = innerWidth;
                 ctx.stroke();
