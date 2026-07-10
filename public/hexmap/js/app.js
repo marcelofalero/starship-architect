@@ -284,6 +284,7 @@ let isDragging = false, dragStartX = 0, dragStartY = 0;
 let lastMouseX = 0, lastMouseY = 0, hasMoved = false;
 let hoveredIdx = -1, selectedIdx = -1;
 let userRole = 'player';
+let currentLens = 'biome';
 
 
 // ── DOM ──
@@ -383,9 +384,8 @@ function draw() {
 
     const cells = dggsData.cells;
 
-    // ── Pre-calculate visible cells and group by biome ──
-    const visibleCellsByBiome = {};
-    for (let b = 0; b <= 12; b++) visibleCellsByBiome[b] = [];
+    // ── Pre-calculate visible cells and group by Lens color ──
+    const groupsByColor = {};
     const visibleCells = [];
 
     for (let i = 0; i < cells.length; i++) {
@@ -410,44 +410,86 @@ function draw() {
         
         const cellData = { i, cell, projVerts, hexCx, hexCy, hexR };
         visibleCells.push(cellData);
-        visibleCellsByBiome[cell.tile.biome].push(cellData);
+        
+        let fillColor, borderColor;
+        if (currentLens === 'elevation') {
+            const el = cell.tile.elevation || 0;
+            const v = Math.min(255, Math.max(0, el * 25));
+            fillColor = `rgb(${v}, ${v}, ${v})`;
+            borderColor = `rgb(${Math.min(255, v+20)}, ${Math.min(255, v+20)}, ${Math.min(255, v+20)})`;
+        } else if (currentLens === 'thermal') {
+            // Latitude-based temp modified by elevation
+            const temp = 1.0 - Math.abs(cell.center.y);
+            const elFactor = ((cell.tile.elevation || 0) / 10) * 0.2;
+            const finalTemp = Math.max(0, temp - elFactor);
+            // hue 240 (blue) to 0 (red)
+            const hue = (1.0 - finalTemp) * 240;
+            fillColor = `hsl(${hue}, 80%, 50%)`;
+            borderColor = `hsl(${hue}, 80%, 40%)`;
+        } else if (currentLens === 'scanner') {
+            fillColor = 'rgba(0, 20, 0, 0.7)';
+            borderColor = 'rgba(0, 255, 0, 0.4)';
+        } else {
+            const biome = getBiomeInfo(cell.tile.biome);
+            fillColor = biome.color;
+            borderColor = biome.border;
+        }
+        
+        const groupKey = fillColor + '|' + borderColor;
+        if (!groupsByColor[groupKey]) {
+            groupsByColor[groupKey] = { fillColor, borderColor, cells: [], biomeBuckets: {} };
+        }
+        groupsByColor[groupKey].cells.push(cellData);
+        
+        if (!groupsByColor[groupKey].biomeBuckets[cell.tile.biome]) {
+            groupsByColor[groupKey].biomeBuckets[cell.tile.biome] = [];
+        }
+        groupsByColor[groupKey].biomeBuckets[cell.tile.biome].push(cellData);
     }
 
-    // ── 1. Batch Render Biomes ──
-    if (!isCacheInitialized) initBiomeCache();
+    // ── 1. Batch Render Cells ──
+    if (currentLens === 'biome' && !isCacheInitialized) initBiomeCache();
     
-    for (let b = 0; b <= 12; b++) {
-        const group = visibleCellsByBiome[b];
-        if (group.length === 0) continue;
-        
-        const biome = getBiomeInfo(b);
+    for (const key in groupsByColor) {
+        const group = groupsByColor[key];
         
         ctx.beginPath();
-        for (const c of group) {
+        for (const c of group.cells) {
             ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
             for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
             ctx.closePath();
         }
         
-        ctx.fillStyle = biome.color;
+        ctx.fillStyle = group.fillColor;
         ctx.fill();
         
-        ctx.strokeStyle = biome.border;
+        ctx.strokeStyle = group.borderColor;
         ctx.lineWidth = 0.4;
         ctx.stroke();
 
-        if (scale > 0.6) {
-            ctx.save();
-            ctx.clip(); 
-            for (const c of group) {
-                const variant = c.i % NUM_VARIANTS;
-                const cacheCanvas = biomeVariantCache[b]?.[variant];
-                if (cacheCanvas) {
-                    const drawSize = (c.hexR / 0.9) * 2;
-                    ctx.drawImage(cacheCanvas, c.hexCx - drawSize / 2, c.hexCy - drawSize / 2, drawSize, drawSize);
+        if (currentLens === 'biome' && scale > 0.6) {
+            for (const b in group.biomeBuckets) {
+                const bucketCells = group.biomeBuckets[b];
+                if (bucketCells.length === 0) continue;
+                
+                ctx.save();
+                ctx.beginPath();
+                for (const c of bucketCells) {
+                    ctx.moveTo(c.projVerts[0].x, c.projVerts[0].y);
+                    for (let k = 1; k < c.projVerts.length; k++) ctx.lineTo(c.projVerts[k].x, c.projVerts[k].y);
+                    ctx.closePath();
                 }
+                ctx.clip(); 
+                for (const c of bucketCells) {
+                    const variant = c.i % NUM_VARIANTS;
+                    const cacheCanvas = biomeVariantCache[b]?.[variant];
+                    if (cacheCanvas) {
+                        const drawSize = (c.hexR / 0.9) * 2;
+                        ctx.drawImage(cacheCanvas, c.hexCx - drawSize / 2, c.hexCy - drawSize / 2, drawSize, drawSize);
+                    }
+                }
+                ctx.restore();
             }
-            ctx.restore();
         }
     }
 
@@ -1220,5 +1262,14 @@ exportBtn.addEventListener('click', () => {
         console.error("Failed to export map:", err);
         alert(`Failed to export map: ${err.message}`);
     }
+});
+
+const lensRadios = document.querySelectorAll('input[name="map-lens"]');
+lensRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            currentLens = e.target.value;
+        }
+    });
 });
 

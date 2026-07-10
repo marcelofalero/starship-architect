@@ -49,12 +49,30 @@
 
         <div class="panel-section">
             <h3>View Settings</h3>
-            <select id="view-mode" style="display:none"><option value="globe" selected></option></select>
-
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 15px;">
                 <input type="checkbox" id="auto-rotate" checked style="width: auto; margin-bottom: 0;">
                 <span>Auto-Rotate Globe</span>
             </label>
+
+            <label class="hud-label" style="display: block; margin-bottom: 8px;">Map Lens Overlay:</label>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 5px; font-size: 0.9em;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" name="map-lens" value="biome" checked style="width: auto; margin: 0;">
+                    <span>Terrain (Standard)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" name="map-lens" value="elevation" style="width: auto; margin: 0;">
+                    <span>Elevation</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" name="map-lens" value="thermal" style="width: auto; margin: 0;">
+                    <span>Thermal Scan</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" name="map-lens" value="scanner" style="width: auto; margin: 0;">
+                    <span>Grid Radar</span>
+                </label>
+            </div>
         </div>
 
         <div class="panel-section">
