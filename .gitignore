@@ -1,3 +1,5 @@
 .env
 .taiga
 scripts/taiga-cli/target/
+hexmap-worker/.wrangler/
+public/hexmap/textures/*/
