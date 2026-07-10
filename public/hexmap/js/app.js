@@ -165,6 +165,36 @@ function drawBiomeTile(ctx, biomeId, cx, cy, r, cellIdx) {
     }
 }
 
+// ── Offscreen Canvas Caching (LOD & Performance) ──
+const biomeVariantCache = {};
+const NUM_VARIANTS = 16;
+const CACHE_SIZE = 120;
+const VIRTUAL_R = 15;
+let isCacheInitialized = false;
+
+function initBiomeCache() {
+    if (isCacheInitialized) return;
+    for (let b = 0; b <= 12; b++) {
+        biomeVariantCache[b] = [];
+        for (let v = 0; v < NUM_VARIANTS; v++) {
+            const canvas = document.createElement('canvas');
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CACHE_SIZE * dpr;
+            canvas.height = CACHE_SIZE * dpr;
+            
+            const ctx = canvas.getContext('2d', { alpha: true });
+            const scaleFactor = (CACHE_SIZE / 2) / VIRTUAL_R;
+            ctx.scale(scaleFactor * dpr, scaleFactor * dpr);
+            
+            const pseudoIdx = (b * 1000) + v;
+            drawBiomeTile(ctx, b, VIRTUAL_R, VIRTUAL_R, VIRTUAL_R * 0.9, pseudoIdx);
+            
+            biomeVariantCache[b].push(canvas);
+        }
+    }
+    isCacheInitialized = true;
+}
+
 // ── Edge neighbor precomputation (kept for roads/rivers overlay layer) ──
 let cellEdgeNeighbors = [];
 
@@ -200,6 +230,8 @@ function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
     if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
+    
+    initBiomeCache();
     
     let changed = false;
     for (let i = 0; i < dggsData.cells.length; i++) {
@@ -399,7 +431,15 @@ function draw() {
         ctx.fill();
 
         // ── 2. Draw abstract biome decorations (clipped inside polygon) ──
-        drawBiomeTile(ctx, tile.biome, hexCx, hexCy, hexR, i);
+        if (scale > 0.6) {
+            if (!isCacheInitialized) initBiomeCache();
+            const variant = i % NUM_VARIANTS;
+            const cacheCanvas = biomeVariantCache[tile.biome]?.[variant];
+            if (cacheCanvas) {
+                const drawSize = (hexR / 0.9) * 2;
+                ctx.drawImage(cacheCanvas, hexCx - drawSize / 2, hexCy - drawSize / 2, drawSize, drawSize);
+            }
+        }
 
         // Illuminate scanned cells, darken unscanned
         const isScanned = dggsData.metadata?.scannedCells?.includes(i);
