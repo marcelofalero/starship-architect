@@ -199,11 +199,40 @@ function precomputeEdgeNeighbors() {
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
+    
+    let changed = false;
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        const cell = dggsData.cells[i];
+        if (cell.tile.feature > 0) {
+            const fData = FEATURES[cell.tile.feature];
+            if (fData && fData.scanLevel === 0 && !dggsData.metadata.revealedFeatures.includes(i)) {
+                dggsData.metadata.revealedFeatures.push(i);
+                changed = true;
+            }
+        }
+    }
+    
     precomputeEdgeNeighbors();
+
+    // Auto-save if we revealed level 0 features on load
+    if (changed && typeof saveDGGSMetadata === 'function') {
+        saveDGGSMetadata().catch(console.error);
+    }
 }
 
 
-const FEATURES = { 0:'None',1:'Ancient Ruins',2:'Impact Crater',3:'Mineral Geode',4:'Energy Anomaly',5:'Research Station',6:'Abandoned Outpost',7:'Geothermal Vent',8:'Crystalline Spires',9:'Alien Monolith' };
+const FEATURES = { 
+    0: { name: 'None', scanLevel: 0 },
+    1: { name: 'Ancient Ruins', scanLevel: 2 },
+    2: { name: 'Impact Crater', scanLevel: 0 },
+    3: { name: 'Mineral Geode', scanLevel: 2 },
+    4: { name: 'Energy Anomaly', scanLevel: 3 },
+    5: { name: 'Research Station', scanLevel: 1 },
+    6: { name: 'Abandoned Outpost', scanLevel: 1 },
+    7: { name: 'Geothermal Vent', scanLevel: 0 },
+    8: { name: 'Crystalline Spires', scanLevel: 2 },
+    9: { name: 'Alien Monolith', scanLevel: 3 } 
+};
 const FEATURE_COLORS = { 1:'#e040fb',2:'#9e9e9e',3:'#00e676',4:'#00e5ff',5:'#2979ff',6:'#ff9100',7:'#ff1744',8:'#d500f9',9:'#ffd600' };
 const FACTIONS = { 0:{name:'Unclaimed Territory',color:'transparent'},1:{name:'United Colonies',color:'#00e5ff'},2:{name:'Verge Syndicate',color:'#ffaa00'},3:{name:'Precursor Remnants',color:'#d500f9'} };
 
@@ -705,9 +734,9 @@ function selectCell(idx) {
         detailFeature.parentElement.style.display = 'flex';
         
         if (isFeatureRevealed && t.feature > 0) {
-            const feat = FEATURES[t.feature] || 'None';
+            const featData = FEATURES[t.feature] || { name: 'None', scanLevel: 0 };
             const featColor = FEATURE_COLORS[t.feature] || '#e0f2f1';
-            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${feat}</span>`;
+            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${featData.name}</span> <span style="font-size: 0.8em; color: #88aacc;">(Scan Lvl ${featData.scanLevel})</span>`;
             featureStatusRow.style.display = 'flex';
             featureStatusValue.textContent = 'Revealed';
             featureStatusValue.style.color = '#00e676';
@@ -732,7 +761,8 @@ function selectCell(idx) {
     
     let analysis = `A sector classified as ${biome.name.toLowerCase()} terrain. ${biome.desc}`;
     if (t.feature > 0 && (isFeatureRevealed || userRole === 'gm')) {
-        analysis += ` Sensors detected: ${FEATURES[t.feature]}.`;
+        const featData = FEATURES[t.feature] || { name: 'Unknown' };
+        analysis += ` Sensors detected: ${featData.name}.`;
         if (userRole === 'gm' && !isFeatureRevealed) {
             analysis += ` (Hidden from players)`;
         }
@@ -983,6 +1013,19 @@ featureActionBtn.addEventListener('click', async () => {
         
         selectCell(selectedIdx);
     } else if (userRole === 'player') {
+        const cell = dggsData.cells[selectedIdx];
+        const fData = FEATURES[cell.tile.feature];
+        const scanLevel = (cell.tile.feature > 0 && fData) ? fData.scanLevel : 1;
+        
+        let scanDelay = 1500;
+        if (scanLevel === 0 || scanLevel === 1) scanDelay = 0;
+        else if (scanLevel === 3) scanDelay = 4000;
+
+        if (scanLevel === 3 && dggsData.metadata.landingCell !== selectedIdx) {
+            alert('Cannot scan: Ground presence required. You must land here first to perform a deep scan.');
+            return;
+        }
+
         featureActionBtn.disabled = true;
         featureActionBtn.textContent = 'SCANNING...';
         featureActionBtn.style.borderColor = '#ffd600';
@@ -996,15 +1039,14 @@ featureActionBtn.addEventListener('click', async () => {
             await saveDGGSMetadata();
             featureActionBtn.disabled = false;
             
-            const cell = dggsData.cells[selectedIdx];
             if (cell.tile.feature > 0) {
-                alert(`Scan Complete! Found: ${FEATURES[cell.tile.feature]}`);
+                alert(`Scan Complete! Found: ${FEATURES[cell.tile.feature]?.name || 'Unknown'}`);
             } else {
                 alert('Scan Complete. No geological anomalies detected.');
             }
             
             selectCell(selectedIdx);
-        }, 1500);
+        }, scanDelay);
     }
 });
 
