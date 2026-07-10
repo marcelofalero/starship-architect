@@ -418,14 +418,49 @@ function draw() {
             fillColor = `rgb(${v}, ${v}, ${v})`;
             borderColor = `rgb(${Math.min(255, v+20)}, ${Math.min(255, v+20)}, ${Math.min(255, v+20)})`;
         } else if (currentLens === 'thermal') {
-            // Latitude-based temp modified by elevation
-            const temp = 1.0 - Math.abs(cell.center.y);
-            const elFactor = ((cell.tile.elevation || 0) / 10) * 0.2;
-            const finalTemp = Math.max(0, temp - elFactor);
+            // Map temperature heavily to biome to reflect ecological realities, rather than purely latitude
+            const biomeTemps = {
+                11: 1.0, // Lava (Extremely Hot)
+                2: 0.9,  // Desert (Very Hot)
+                3: 0.7,  // Sand/Beach (Warm)
+                4: 0.7,  // Scrubland (Warm)
+                5: 0.6,  // Grassland (Temperate)
+                6: 0.6,  // Forest (Temperate)
+                12: 0.6, // Marsh (Temperate)
+                0: 0.5,  // Deep Ocean (Moderate)
+                1: 0.5,  // Shallow Ocean (Moderate)
+                7: 0.3,  // Pine/Taiga (Cool)
+                10: 0.2, // Peaks (Cold)
+                8: 0.15, // Tundra (Very Cold)
+                9: 0.0   // Ice (Freezing)
+            };
+            const baseTemp = biomeTemps[cell.tile.biome] !== undefined ? biomeTemps[cell.tile.biome] : 0.5;
+            
+            // Add a small modifier based on elevation and latitude so it's not completely uniform
+            const latMod = (1.0 - Math.abs(cell.center.y) - 0.5) * 0.1;
+            const elMod = ((cell.tile.elevation || 0) / 10) * 0.1;
+            const finalTemp = Math.max(0, Math.min(1, baseTemp + latMod - elMod));
+            
             // hue 240 (blue) to 0 (red)
             const hue = (1.0 - finalTemp) * 240;
             fillColor = `hsl(${hue}, 80%, 50%)`;
             borderColor = `hsl(${hue}, 80%, 40%)`;
+        } else if (currentLens === 'gravity') {
+            // Gravity depends primarily on elevation (mass) and features (anomalies)
+            const el = cell.tile.elevation || 0;
+            let grav = el / 10; // 0 to 1
+            if (cell.tile.biome === 0) grav = 0; // Deep ocean is lowest
+            
+            // Anomalies for features
+            if (cell.tile.feature === 9) grav = 1.2; // Monolith = massive gravity spike
+            if (cell.tile.feature === 4) grav = -0.2; // Energy anomaly = low gravity pocket
+            
+            const clampedGrav = Math.max(0, Math.min(1, grav));
+            
+            // Cyan/Blue (low) to Purple/Red (high)
+            const hue = 180 - (clampedGrav * 180);
+            fillColor = `hsl(${hue}, 90%, 50%)`;
+            borderColor = `hsl(${hue}, 90%, 30%)`;
         } else if (currentLens === 'scanner') {
             fillColor = 'rgba(0, 20, 0, 0.7)';
             borderColor = 'rgba(0, 255, 0, 0.4)';
