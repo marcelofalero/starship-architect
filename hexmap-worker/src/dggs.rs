@@ -1,4 +1,4 @@
-use crate::{Tile, Rng, pack_tile};
+use crate::{Tile, pack_tile};
 use std::collections::HashMap;
 
 #[derive(Clone, Copy, Debug)]
@@ -31,27 +31,200 @@ pub struct DGGSCell {
 pub struct DGGSGrid {
     pub resolution: u8,
     pub cells: Vec<DGGSCell>,
+    pub neighbors: Vec<Vec<u32>>,
+    pub addresses: Vec<String>,
+    pub rivers: Vec<Vec<u32>>,
+}
+
+fn generate_rivers(cells: &[DGGSCell], neighbors: &[Vec<u32>]) -> Vec<Vec<u32>> {
+    let mut rivers = Vec::new();
+    
+    // Find candidate sources: high elevation and moisture (excluding polar/ice areas)
+    let mut candidates = Vec::new();
+    for i in 0..cells.len() {
+        let cell = &cells[i];
+        let abs_lat = cell.center.y.asin().abs();
+        if abs_lat < 1.15 && cell.tile.biome != 7 && cell.tile.biome != 10 {
+            if cell.tile.elevation >= 6 && cell.tile.moisture >= 3 {
+                candidates.push((i, cell.tile.elevation, cell.tile.moisture));
+            }
+        }
+    }
+    
+    // Sort candidates: highest elevation first, then highest moisture
+    candidates.sort_by(|a, b| {
+        b.1.cmp(&a.1).then_with(|| b.2.cmp(&a.2))
+    });
+    
+    // Select sources that are spaced apart
+    let mut sources = Vec::new();
+    for &(idx, _, _) in &candidates {
+        let mut too_close = false;
+        for &s in &sources {
+            if is_near(idx, s, neighbors, 3) {
+                too_close = true;
+                break;
+            }
+        }
+        if !too_close {
+            sources.push(idx);
+            if sources.len() >= 12 {
+                break;
+            }
+        }
+    }
+    
+    // Trace path for each source
+    for start in sources {
+        let mut path = Vec::new();
+        let mut curr = start;
+        path.push(curr as u32);
+        
+        let mut local_visited = vec![false; cells.len()];
+        local_visited[curr] = true;
+        
+        loop {
+            let mut best_next = None;
+            let mut min_el = u8::MAX;
+            
+            for &neigh_u32 in &neighbors[curr] {
+                let neigh = neigh_u32 as usize;
+                let neigh_abs_lat = cells[neigh].center.y.asin().abs();
+                if !local_visited[neigh] && neigh_abs_lat < 1.15 && cells[neigh].tile.biome != 7 && cells[neigh].tile.biome != 10 {
+                    let el = cells[neigh].tile.elevation;
+                    if el < min_el {
+                        min_el = el;
+                        best_next = Some(neigh);
+                    }
+                }
+            }
+            
+            if let Some(next) = best_next {
+                curr = next;
+                path.push(curr as u32);
+                local_visited[curr] = true;
+                
+                if cells[curr].tile.elevation <= 3 {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        
+        if path.len() >= 4 {
+            rivers.push(path);
+        }
+    }
+    
+    rivers
+}
+
+fn is_near(a: usize, b: usize, neighbors: &[Vec<u32>], steps: usize) -> bool {
+    if a == b { return true; }
+    if steps == 0 { return false; }
+    
+    let mut current_level = vec![a];
+    let mut visited = vec![false; neighbors.len()];
+    visited[a] = true;
+    
+    for _ in 0..steps {
+        let mut next_level = Vec::new();
+        for &curr in &current_level {
+            for &neigh in &neighbors[curr] {
+                let neigh = neigh as usize;
+                if neigh == b {
+                    return true;
+                }
+                if !visited[neigh] {
+                    visited[neigh] = true;
+                    next_level.push(neigh);
+                }
+            }
+        }
+        current_level = next_level;
+    }
+    
+    false
 }
 
 /// Generate a DGGS grid at the given resolution using icosahedral subdivision.
 pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8) -> DGGSGrid {
     // Step 1: Build icosphere
-    let (verts, faces) = build_icosphere(resolution as usize);
+    let (verts, faces, face_paths) = build_icosphere(resolution as usize);
 
     // Step 2: Compute dual (Goldberg polyhedron) - each vertex becomes a cell
     let cells_raw = compute_dual(&verts, &faces);
 
     // Step 3: Assign tile data to each cell based on its spherical position
-    let cells = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
+    let cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
         let tile = generate_tile_for_position(seed, planet_type, center, i);
         DGGSCell { center, vertices: boundary, tile }
     }).collect();
 
-    DGGSGrid { resolution, cells }
+    // Step 4: Compute adjacency graph (neighbors)
+    let n = verts.len();
+    let mut cell_neighbors = vec![Vec::new(); n];
+    for face in &faces {
+        let a = face[0];
+        let b = face[1];
+        let c = face[2];
+        for &(u, v) in &[(a, b), (b, c), (c, a)] {
+            cell_neighbors[u].push(v as u32);
+            cell_neighbors[v].push(u as u32);
+        }
+    }
+    for list in cell_neighbors.iter_mut() {
+        list.sort_unstable();
+        list.dedup();
+    }
+
+    // Step 5: Compute hierarchical addresses
+    let mut vert_faces: Vec<Vec<usize>> = vec![Vec::new(); n];
+    for (fi, face) in faces.iter().enumerate() {
+        vert_faces[face[0]].push(fi);
+        vert_faces[face[1]].push(fi);
+        vert_faces[face[2]].push(fi);
+    }
+
+    let mut addresses = Vec::with_capacity(n);
+    for vi in 0..n {
+        let adj_faces = &vert_faces[vi];
+        let mut best_path: Option<&Vec<u8>> = None;
+        let mut best_corner = 0;
+        for &fi in adj_faces {
+            let path = &face_paths[fi];
+            let face = &faces[fi];
+            let corner = if face[0] == vi {
+                0
+            } else if face[1] == vi {
+                1
+            } else {
+                2
+            };
+            if best_path.is_none() || path < best_path.unwrap() {
+                best_path = Some(path);
+                best_corner = corner;
+            }
+        }
+        
+        let path = best_path.unwrap();
+        let base_face = path[0];
+        let mut digits = String::new();
+        for &d in &path[1..] {
+            digits.push_str(&d.to_string());
+        }
+        let address = format!("{}-{}-{}", base_face, digits, best_corner);
+        addresses.push(address);
+    }
+
+    let rivers = generate_rivers(&cells, &cell_neighbors);
+
+    DGGSGrid { resolution, cells, neighbors: cell_neighbors, addresses, rivers }
 }
 
-/// Build a subdivided icosphere. Returns (vertices, triangle_faces).
-fn build_icosphere(resolution: usize) -> (Vec<V3>, Vec<[usize; 3]>) {
+/// Build a subdivided icosphere. Returns (vertices, triangle_faces, face_paths).
+fn build_icosphere(resolution: usize) -> (Vec<V3>, Vec<[usize; 3]>, Vec<Vec<u8>>) {
     let phi = (1.0 + 5.0_f64.sqrt()) / 2.0;
 
     let mut verts: Vec<V3> = vec![
@@ -75,26 +248,50 @@ fn build_icosphere(resolution: usize) -> (Vec<V3>, Vec<[usize; 3]>) {
         [3,9,4],   [3,4,2],   [3,2,6],    [3,6,8],   [3,8,9],
         [4,9,5],   [2,4,11],  [6,2,10],   [8,6,7],   [9,8,1],
     ];
+    let mut face_paths: Vec<Vec<u8>> = (0..20).map(|i| vec![i as u8]).collect();
 
     // Subdivide
     for _ in 0..resolution {
         let mut new_faces = Vec::with_capacity(faces.len() * 4);
+        let mut new_paths = Vec::with_capacity(faces.len() * 4);
         let mut midpoint_cache: HashMap<(usize, usize), usize> = HashMap::new();
 
-        for face in &faces {
+        for (fi, face) in faces.iter().enumerate() {
+            let path = &face_paths[fi];
             let a = face[0]; let b = face[1]; let c = face[2];
             let ab = get_midpoint(&mut verts, &mut midpoint_cache, a, b);
             let bc = get_midpoint(&mut verts, &mut midpoint_cache, b, c);
             let ca = get_midpoint(&mut verts, &mut midpoint_cache, c, a);
+            
+            // Child 0: [a, ab, ca]
             new_faces.push([a, ab, ca]);
+            let mut p0 = path.clone();
+            p0.push(0);
+            new_paths.push(p0);
+
+            // Child 1: [b, bc, ab]
             new_faces.push([b, bc, ab]);
+            let mut p1 = path.clone();
+            p1.push(1);
+            new_paths.push(p1);
+
+            // Child 2: [c, ca, bc]
             new_faces.push([c, ca, bc]);
+            let mut p2 = path.clone();
+            p2.push(2);
+            new_paths.push(p2);
+
+            // Child 3: [ab, bc, ca]
             new_faces.push([ab, bc, ca]);
+            let mut p3 = path.clone();
+            p3.push(3);
+            new_paths.push(p3);
         }
         faces = new_faces;
+        face_paths = new_paths;
     }
 
-    (verts, faces)
+    (verts, faces, face_paths)
 }
 
 fn get_midpoint(verts: &mut Vec<V3>, cache: &mut HashMap<(usize, usize), usize>, a: usize, b: usize) -> usize {
@@ -166,84 +363,250 @@ fn sort_around_vertex(vertex: V3, points: &mut Vec<V3>) {
     });
 }
 
-/// Generate tile data for a DGGS cell based on its position on the unit sphere.
-fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, cell_idx: usize) -> Tile {
-    // Use spherical coordinates for deterministic seeding
-    let lat = pos.y.asin();
-    let lon = pos.z.atan2(pos.x);
-    let lat_i = ((lat + std::f64::consts::FRAC_PI_2) * 1000.0) as i32;
-    let lon_i = ((lon + std::f64::consts::PI) * 1000.0) as i32;
+fn hash3d(x: i32, y: i32, z: i32, seed_hash: u32) -> f64 {
+    let mut h = seed_hash ^ (x as u32).wrapping_mul(374761393);
+    h = (h ^ (y as u32).wrapping_mul(668265263)).rotate_left(13);
+    h = (h ^ (z as u32).wrapping_mul(1234567891)).wrapping_mul(0x6D2B79F5);
+    h = h ^ (h >> 15);
+    (h as f64) / 4294967296.0
+}
 
-    let mut rng = Rng::new(&format!("{}-{}-{}-{}", seed, planet_type, lat_i, lon_i));
-    let n1 = rng.next();
-    let n2 = rng.next();
-    let n3 = rng.next();
+fn value_noise3d(x: f64, y: f64, z: f64, seed_hash: u32) -> f64 {
+    let x0 = x.floor() as i32;
+    let y0 = y.floor() as i32;
+    let z0 = z.floor() as i32;
 
-    let mut biome: u8;
-    let mut elevation: u8;
-    let mut moisture: u8;
-    let faction: u8;
-    let feature: u8;
+    let x1 = x0 + 1;
+    let y1 = y0 + 1;
+    let z1 = z0 + 1;
 
-    match planet_type {
-        "desert" => {
-            elevation = ((n1 * 4.0) as u8) + 2;
-            moisture = (n2 * 2.0) as u8;
-            if n3 < 0.05 { biome = 13; }
-            else if n3 < 0.2 { biome = 11; elevation = 6; }
-            else { biome = 2; }
-        }
-        "ocean" => {
-            elevation = (n1 * 3.0) as u8;
-            moisture = ((n2 * 2.0) as u8) + 6;
-            if elevation == 2 && n3 < 0.1 { biome = 3; elevation = 3; }
-            else if elevation == 2 { biome = 1; }
-            else { biome = 0; }
-        }
-        "ice" | "frozen" => {
-            elevation = ((n1 * 5.0) as u8) + 1;
-            moisture = ((n2 * 4.0) as u8) + 2;
-            biome = if n3 < 0.3 { 8 } else { 7 };
-        }
-        "volcanic" => {
-            elevation = ((n1 * 4.0) as u8) + 4;
-            moisture = (n2 * 2.0) as u8;
-            biome = if n3 < 0.2 { 9 } else { 10 };
-        }
-        "barren" => {
-            elevation = ((n1 * 5.0) as u8) + 2;
-            moisture = 0;
-            biome = 10;
-        }
-        _ => { // terrestrial
-            elevation = ((n1 * 5.0) as u8) + 2;
-            moisture = ((n2 * 5.0) as u8) + 2;
-            // Use latitude for climate zones
-            let abs_lat = lat.abs();
-            if abs_lat > 1.2 { // polar
-                biome = if n3 < 0.4 { 7 } else { 8 };
-            } else if elevation <= 2 {
-                biome = 0; // ocean
-            } else if elevation == 3 {
-                biome = if abs_lat < 0.3 { 3 } else { 1 }; // beach/shallow
-            } else if elevation <= 5 {
-                biome = 4; // grassland
-            } else {
-                biome = 11; // mountain
-            }
-        }
+    let tx = x - x.floor();
+    let ty = y - y.floor();
+    let tz = z - z.floor();
+
+    let sx = tx * tx * (3.0 - 2.0 * tx);
+    let sy = ty * ty * (3.0 - 2.0 * ty);
+    let sz = tz * tz * (3.0 - 2.0 * tz);
+
+    let c000 = hash3d(x0, y0, z0, seed_hash);
+    let c100 = hash3d(x1, y0, z0, seed_hash);
+    let c010 = hash3d(x0, y1, z0, seed_hash);
+    let c110 = hash3d(x1, y1, z0, seed_hash);
+    let c001 = hash3d(x0, y0, z1, seed_hash);
+    let c101 = hash3d(x1, y0, z1, seed_hash);
+    let c011 = hash3d(x0, y1, z1, seed_hash);
+    let c111 = hash3d(x1, y1, z1, seed_hash);
+
+    let c00 = c000 * (1.0 - sx) + c100 * sx;
+    let c10 = c010 * (1.0 - sx) + c110 * sx;
+    let c01 = c001 * (1.0 - sx) + c101 * sx;
+    let c11 = c011 * (1.0 - sx) + c111 * sx;
+
+    let c0 = c00 * (1.0 - sy) + c10 * sy;
+    let c1 = c01 * (1.0 - sy) + c11 * sy;
+
+    c0 * (1.0 - sz) + c1 * sz
+}
+
+fn fbm3d(pos: V3, octaves: usize, seed_hash: u32) -> f64 {
+    let mut value = 0.0;
+    let mut amplitude = 1.0;
+    let mut frequency = 1.0;
+    let mut max_value = 0.0;
+
+    for _ in 0..octaves {
+        value += amplitude * value_noise3d(pos.x * frequency, pos.y * frequency, pos.z * frequency, seed_hash);
+        max_value += amplitude;
+        amplitude *= 0.5;
+        frequency *= 2.0;
     }
 
-    // Factions & features (same logic as flat grid)
-    let f1 = rng.next();
-    let f2 = rng.next();
-    let f3 = rng.next();
-    let f4 = rng.next();
+    value / max_value
+}
 
-    let faction_val = if f1 < 0.15 { ((f2 * 3.0) as u8) + 1 } else { 0 };
-    let feature_val = if f3 < 0.08 { ((f4 * 9.0) as u8) + 1 } else { 0 };
+fn resolve_whittaker_biome(planet_type: &str, elevation: u8, moisture: u8, temp: u8, local_noise: f64) -> u8 {
+    // Volcanic planet overrides
+    if planet_type == "volcanic" {
+        if elevation <= 3 {
+            return 11; // Magma/Lava oceans are Volcanic
+        }
+        if elevation >= 6 {
+            return 11; // Volcanic Peak
+        }
+        if local_noise < 0.3 {
+            return 10; // Mountain (Basalt rock)
+        }
+        return 11; // Volcanic plains
+    }
 
-    Tile { biome, elevation, moisture, faction: faction_val, feature: feature_val }
+    // Barren planet overrides
+    if planet_type == "barren" {
+        if elevation >= 6 {
+            return 10; // Mountain peaks
+        }
+        if local_noise < 0.4 {
+            return 10; // Mountainous barren rock
+        }
+        return 3; // Desert (barren dry plains)
+    }
+
+    // Ice planet overrides
+    if planet_type == "ice" || planet_type == "frozen" {
+        if elevation <= 3 {
+            return 9; // Frozen ocean / Ice Cap
+        }
+        if elevation >= 6 {
+            return 9; // Glacial peaks / Ice Cap
+        }
+        if local_noise < 0.3 {
+            return 8; // Tundra
+        }
+        return 9; // Ice Cap
+    }
+
+    // Desert planet overrides
+    if planet_type == "desert" {
+        if elevation <= 3 {
+            return 3; // Desert basins (sand dunes / dry lakes)
+        }
+        if elevation >= 6 {
+            return 10; // Mountain
+        }
+        return 3; // Desert
+    }
+
+    // 1. Water biomes
+    if elevation <= 2 {
+        if temp == 0 {
+            return 9; // Ice Cap (Sea Ice)
+        }
+        return 0; // Deep Ocean
+    }
+    if elevation == 3 {
+        if temp == 0 {
+            return 9; // Ice Cap (Sea Ice)
+        }
+        return 1; // Ocean
+    }
+    
+    // 2. Mountain peaks (impassable/high)
+    if elevation >= 6 {
+        if temp <= 1 {
+            return 9; // Glacial Peak (Ice Cap)
+        }
+        return 10; // Mountain
+    }
+    
+    // 3. Land biomes based on Whittaker: Temperature (0..7) vs Moisture (0..7)
+    if temp == 0 {
+        return 9; // Ice Cap
+    }
+    if temp == 1 {
+        return 8; // Tundra
+    }
+    
+    // Cool/Cold temperatures (temp 2)
+    if temp == 2 {
+        if moisture <= 2 {
+            return 8; // Tundra
+        } else {
+            return 7; // Taiga
+        }
+    }
+    
+    // Moderate temperatures (temp 3 or 4)
+    if temp <= 4 {
+        if moisture <= 1 {
+            return 3; // Desert (Cold Desert)
+        } else if moisture <= 3 {
+            return 5; // Grassland
+        } else if moisture <= 5 {
+            return 6; // Forest
+        } else {
+            return 12; // Swamp
+        }
+    }
+    
+    // Warm/Hot temperatures (temp >= 5)
+    if moisture <= 1 {
+        return 3; // Desert (Hot Desert)
+    } else if moisture <= 3 {
+        return 4; // Savanna
+    } else if moisture <= 5 {
+        return 6; // Forest (Tropical/Rainforest)
+    } else {
+        return 12; // Swamp
+    }
+}
+
+/// Generate tile data for a DGGS cell based on its position on the unit sphere.
+fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx: usize) -> Tile {
+    let mut seed_hash: u32 = 0;
+    for c in seed.chars() {
+        seed_hash = seed_hash.wrapping_mul(31).wrapping_add(c as u32);
+    }
+    
+    // Scale coords to have nice feature sizes (e.g. frequency 2.2 for continents)
+    let e_noise = fbm3d(V3::new(pos.x * 2.2, pos.y * 2.2, pos.z * 2.2), 3, seed_hash);
+    let m_noise = fbm3d(V3::new(pos.x * 1.8, pos.y * 1.8, pos.z * 1.8), 3, seed_hash.wrapping_add(1000));
+    let local_noise = fbm3d(V3::new(pos.x * 6.0, pos.y * 6.0, pos.z * 6.0), 2, seed_hash.wrapping_add(2000));
+    
+    let lat = pos.y.asin();
+    let abs_lat = lat.abs();
+    
+    let mut e = e_noise;
+    let mut m = m_noise;
+    let mut temp_bias = 0.0;
+    let mut temp_scale = 1.0;
+    
+    match planet_type {
+        "desert" => {
+            // Hot and dry
+            m = m * 0.25;
+            temp_bias = 0.25;
+        }
+        "ocean" => {
+            // Flood heavily, only the highest peaks form small scattered islands
+            e = (e_noise - 0.32).max(0.0) * 1.35;
+            m = m * 1.3;
+        }
+        "ice" | "frozen" => {
+            // Cold
+            temp_scale = 0.25;
+        }
+        "volcanic" => {
+            // Hot, dry/moderate, high volcanic terrain
+            temp_bias = 0.3;
+            m = m * 0.2;
+        }
+        "barren" => {
+            // Lifeless, dry
+            m = 0.0;
+        }
+        _ => {} // terrestrial
+    }
+    
+    let elevation = (e * 8.0).clamp(0.0, 7.0) as u8;
+    let moisture = (m * 8.0).clamp(0.0, 7.0) as u8;
+    
+    let lat_factor = 1.0 - abs_lat / (std::f64::consts::PI / 2.0);
+    let elevation_penalty = (elevation as f64) * 0.08;
+    let noise_var = (local_noise - 0.5) * 0.15;
+    
+    let mut t_val = (lat_factor - elevation_penalty + noise_var) * temp_scale + temp_bias;
+    t_val = t_val.clamp(0.0, 1.0);
+    let temp = (t_val * 8.0) as u8;
+    
+    let biome = resolve_whittaker_biome(planet_type, elevation, moisture, temp, local_noise);
+    
+    // Factions & features
+    let faction_noise = fbm3d(V3::new(pos.x * 4.0, pos.y * 4.0, pos.z * 4.0), 2, seed_hash.wrapping_add(3000));
+    let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
+    
+    let faction = if faction_noise < 0.15 { ((faction_noise * 20.0) as u8).min(3) + 1 } else { 0 };
+    let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
+    
+    Tile { biome, elevation, moisture, faction, feature }
 }
 
 /// Encode a DGGS grid into the VRGD binary format.

@@ -169,14 +169,38 @@ button:active {
     top: 20px;
     right: 20px;
     width: 320px;
-    background: rgba(2, 12, 24, 0.75);
-    border: 1px solid rgba(75, 181, 193, 0.4);
-    border-radius: 4px;
+    background: rgba(2, 12, 24, 0.85);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7), inset 0 0 16px rgba(0, 255, 204, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     z-index: 10;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+#info-panel.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+#info-panel::-webkit-scrollbar {
+    width: 6px;
+}
+#info-panel::-webkit-scrollbar-track {
+    background: rgba(2, 12, 24, 0.2);
+}
+#info-panel::-webkit-scrollbar-thumb {
+    background: rgba(75, 181, 193, 0.4);
+    border-radius: 3px;
+}
+#info-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 204, 0.6);
 }
 
 #info-panel h2 {
@@ -289,4 +313,25 @@ button:active {
     text-align: center;
     margin-top: 15px;
     line-height: 1.3;
+}
+
+.neighbor-btn {
+    background: rgba(75, 181, 193, 0.15);
+    border: 1px solid rgba(75, 181, 193, 0.4);
+    color: #4BB5C1;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    cursor: pointer;
+    font-family: 'Chakra Petch', sans-serif;
+    transition: all 0.15s ease;
+    width: auto;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.neighbor-btn:hover {
+    background: rgba(0, 255, 204, 0.2);
+    border-color: #00ffcc;
+    color: #00ffcc;
+    box-shadow: 0 0 6px rgba(0, 255, 204, 0.2);
 }

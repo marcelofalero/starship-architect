@@ -40,6 +40,22 @@ export function unpackTile(val) {
 }
 
 /**
+ * Encode a map into VMB binary format.
+ * Dynamically detects format:
+ * - If called with (cells, metadata) -> VRGD (DGGS Globe)
+ * - If called with (width, height, tiles, metadata) -> VRGM (Flat Grid)
+ */
+export function encodeVMB(...args) {
+    if (args.length === 2 || (args.length === 1 && Array.isArray(args[0]))) {
+        const [cells, metadata = {}] = args;
+        return encodeDGGS(cells, metadata);
+    } else {
+        const [width, height, tiles, metadata = {}] = args;
+        return encodeFlatGrid(width, height, tiles, metadata);
+    }
+}
+
+/**
  * Decode a VMB binary payload (auto-detects VRGM vs VRGD format).
  */
 export function decodeVMB(input) {
@@ -56,7 +72,55 @@ export function decodeVMB(input) {
             return decodeFlatGrid(bytes);
         }
     }
-    throw new Error("Invalid VMB: Unrecognized magic bytes");
+    throw new Error("Invalid VMB: Incorrect magic bytes");
+}
+
+/**
+ * Encode flat grid format (VRGM).
+ */
+function encodeFlatGrid(width, height, tiles, metadata = {}) {
+    if (tiles.length !== width * height) {
+        throw new Error(`Tiles array length (${tiles.length}) does not match dimensions ${width}x${height} (${width * height})`);
+    }
+
+    const metaStr = typeof metadata === 'string' ? metadata : JSON.stringify(metadata);
+    const encoder = new TextEncoder();
+    const metaBytes = encoder.encode(metaStr);
+    const metaLen = metaBytes.length;
+
+    const bodyLen = width * height * 2;
+    const totalLen = 12 + bodyLen + metaLen;
+
+    const buffer = new ArrayBuffer(totalLen);
+    const view = new DataView(buffer);
+    const bytes = new Uint8Array(buffer);
+
+    // Magic Bytes: "VRGM"
+    bytes[0] = 0x56; bytes[1] = 0x52; bytes[2] = 0x47; bytes[3] = 0x4D;
+
+    // Width & Height
+    view.setUint16(4, width, false);
+    view.setUint16(6, height, false);
+
+    // Metadata Length
+    view.setUint32(8, metaLen, false);
+
+    // Body: Uint16 Tiles
+    for (let i = 0; i < tiles.length; i++) {
+        let val = 0;
+        const tile = tiles[i];
+        if (typeof tile === 'number') {
+            val = tile;
+        } else if (tile && typeof tile === 'object') {
+            val = packTile(tile);
+        }
+        view.setUint16(12 + i * 2, val, false);
+    }
+
+    // Trailer: Metadata
+    bytes.set(metaBytes, 12 + bodyLen);
+
+    return bytes;
 }
 
 /**
@@ -67,6 +131,12 @@ function decodeFlatGrid(bytes) {
     const width = view.getUint16(4, false);
     const height = view.getUint16(6, false);
     const metaLen = view.getUint32(8, false);
+
+    const bodyLen = width * height * 2;
+    const expectedLen = 12 + bodyLen + metaLen;
+    if (bytes.length < expectedLen) {
+        throw new Error(`Invalid VMB: File size (${bytes.length}) is smaller than expected (${expectedLen})`);
+    }
 
     const tilesCount = width * height;
     const tiles = new Array(tilesCount);
@@ -83,6 +153,72 @@ function decodeFlatGrid(bytes) {
 }
 
 /**
+ * Encode DGGS grid into VRGD binary format.
+ */
+function encodeDGGS(cells, metadata = {}) {
+    const cellCount = cells.length;
+    const metaStr = typeof metadata === 'string' ? metadata : JSON.stringify(metadata);
+    const encoder = new TextEncoder();
+    const metaBytes = encoder.encode(metaStr);
+    const metaLen = metaBytes.length;
+
+    const CELL_BLOCK = 88;
+    const bodyLen = cellCount * CELL_BLOCK;
+    const totalLen = 12 + bodyLen + metaLen;
+
+    const buffer = new ArrayBuffer(totalLen);
+    const view = new DataView(buffer);
+    const bytes = new Uint8Array(buffer);
+
+    // Magic Bytes: "VRGD"
+    bytes[0] = 0x56; bytes[1] = 0x52; bytes[2] = 0x47; bytes[3] = 0x44;
+
+    // CellCount & Metadata Length
+    view.setUint32(4, cellCount, false);
+    view.setUint32(8, metaLen, false);
+
+    // Body: Cells
+    for (let i = 0; i < cellCount; i++) {
+        const cell = cells[i];
+        const off = 12 + i * CELL_BLOCK;
+
+        // Center position (3 x f32)
+        view.setFloat32(off, cell.center ? cell.center.x : 0, false);
+        view.setFloat32(off + 4, cell.center ? cell.center.y : 0, false);
+        view.setFloat32(off + 8, cell.center ? cell.center.z : 0, false);
+
+        // Tile data (u16)
+        let val = 0;
+        if (typeof cell.tile === 'number') {
+            val = cell.tile;
+        } else if (cell.tile && typeof cell.tile === 'object') {
+            val = packTile(cell.tile);
+        }
+        view.setUint16(off + 12, val, false);
+
+        // Sides count
+        const sides = cell.vertices ? Math.min(cell.vertices.length, 6) : 0;
+        bytes[off + 14] = sides;
+        bytes[off + 15] = 0; // padding
+
+        // Polygon vertices (6 slots x 3 x f32 = 72 bytes)
+        for (let vi = 0; vi < 6; vi++) {
+            const srcVi = vi < sides ? vi : 0;
+            const v = cell.vertices ? cell.vertices[srcVi] : {x: 0, y: 0, z: 0};
+            const voff = off + 16 + vi * 12;
+            view.setFloat32(voff, v.x || 0, false);
+            view.setFloat32(voff + 4, v.y || 0, false);
+            view.setFloat32(voff + 8, v.z || 0, false);
+        }
+    }
+
+    // Trailer: Metadata
+    bytes.set(metaBytes, 12 + bodyLen);
+
+    return bytes;
+}
+
+/**
  * Decode DGGS globe format (VRGD).
  */
 function decodeDGGS(bytes) {
@@ -91,6 +227,11 @@ function decodeDGGS(bytes) {
     const metaLen = view.getUint32(8, false);
 
     const CELL_BLOCK = 88;
+    const expectedLen = 12 + cellCount * CELL_BLOCK + metaLen;
+    if (bytes.length < expectedLen) {
+        throw new Error(`Invalid VMB: File size (${bytes.length}) is smaller than expected (${expectedLen})`);
+    }
+
     const cells = [];
 
     for (let i = 0; i < cellCount; i++) {

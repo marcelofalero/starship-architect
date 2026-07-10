@@ -557,6 +557,14 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             ? (1.5 + rng() * 1.5).toFixed(2) // 1.5g to 3.0g for gas giants
             : (0.4 + rng() * 1.0).toFixed(2); // 0.4g to 1.4g for rocky
 
+        let physicalRadius;
+        if (bt.isGas) {
+            physicalRadius = Math.round((4.0 + rng() * 8.0) * 6371);
+        } else {
+            const baseFactor = 0.2 + parseFloat(surfaceGravity) * 0.8;
+            physicalRadius = Math.round(baseFactor * 6371 * (0.9 + rng() * 0.2));
+        }
+
         // Basic blackbody temperature approx
         const baseTemp = 280; // Kelvin for Earth-like at 1 AU
         let surfaceTemp = Math.floor(baseTemp * Math.pow(effectiveStarMass, 0.5) / Math.sqrt(a));
@@ -732,6 +740,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         }
 
         pData.gravity = surfaceGravity + "g";
+        pData.physicalRadius = physicalRadius;
         pData.temperature = Math.floor(surfaceTemp) + " K (" + tempC + "°C)";
         pData.atmosphere = atmosphere;
         pData.graph = currentGraph;
@@ -826,6 +835,10 @@ function generateSystemImpl(systemData, genMode = "Normal") {
                 mData = { originalName: mName, name: mName, description: mDesc };
                 systemData.planets.push(mData);
             }
+            
+            const moonBaseFactor = 0.2 + parseFloat(moonGravity) * 0.8;
+            const moonPhysicalRadius = Math.round(moonBaseFactor * 6371 * (0.9 + rng() * 0.2));
+            mData.physicalRadius = moonPhysicalRadius;
             
             mData.gravity = moonGravity + "g";
             const moonTempC = Math.floor(moonTemp - 273.15);

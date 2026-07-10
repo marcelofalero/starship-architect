@@ -328,7 +328,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 return Response::error("Resolution must be 0-6", 400);
             }
 
-            let cache_key = format!("dggs:{}:{}:{}", seed, planet_type, resolution);
+            let cache_key = format!("dggs:v16:{}:{}:{}", seed, planet_type, resolution);
             let mut headers = Headers::new();
             headers.set("Access-Control-Allow-Origin", "*")?;
             headers.set("Content-Type", "application/octet-stream")?;
@@ -343,13 +343,61 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 "type": planet_type,
                 "resolution": resolution,
                 "cellCount": grid.cells.len(),
-                "generatedAt": Date::now().to_string()
+                "generatedAt": Date::now().to_string(),
+                "neighbors": grid.neighbors,
+                "addresses": grid.addresses,
+                "rivers": grid.rivers
             });
 
             let binary = dggs::encode_dggs_vmb(&grid, &metadata);
             set_map(&ctx.env, &cache_key, binary.clone()).await?;
 
             Ok(Response::from_bytes(binary)?.with_headers(headers))
+        })
+        .post_async("/planet/:seed/dggs", |mut req, ctx| async move {
+            let seed = ctx.param("seed").unwrap().to_string();
+            let url = req.url()?;
+            let query: HashMap<String, String> = url.query_pairs().into_owned().collect();
+
+            let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
+            let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
+
+            if resolution > 6 {
+                return Response::error("Resolution must be 0-6", 400);
+            }
+
+            let cache_key = format!("dggs:v16:{}:{}:{}", seed, planet_type, resolution);
+            let mut headers = Headers::new();
+            headers.set("Access-Control-Allow-Origin", "*")?;
+            headers.set("Content-Type", "application/octet-stream")?;
+
+            let post_json: serde_json::Value = req.json().await.unwrap_or(json!({}));
+
+            let binary = if let Some(existing_binary) = get_map(&ctx.env, &cache_key).await? {
+                existing_binary
+            } else {
+                let grid = dggs::generate_dggs(&seed, planet_type, resolution);
+                let metadata = json!({
+                    "seed": seed,
+                    "type": planet_type,
+                    "resolution": resolution,
+                    "cellCount": grid.cells.len(),
+                    "generatedAt": Date::now().to_string(),
+                    "neighbors": grid.neighbors,
+                    "addresses": grid.addresses,
+                    "rivers": grid.rivers
+                });
+                dggs::encode_dggs_vmb(&grid, &metadata)
+            };
+
+            let updated_binary = match update_dggs_metadata(binary, &post_json) {
+                Ok(b) => b,
+                Err(e) => return Response::error(format!("Failed to update metadata: {}", e), 400),
+            };
+
+            set_map(&ctx.env, &cache_key, updated_binary.clone()).await?;
+
+            Ok(Response::from_bytes(updated_binary)?.with_headers(headers))
         })
         .get_async("/planet/:seed/map", |req, ctx| async move {
             let seed = ctx.param("seed").unwrap().to_string();
@@ -464,3 +512,45 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             res
         })
 }
+
+fn update_dggs_metadata(mut data: Vec<u8>, new_meta: &serde_json::Value) -> Result<Vec<u8>> {
+    if data.len() < 12 {
+        return Err(worker::Error::from("Invalid DGGS: too short"));
+    }
+    let cell_count = u32::from_be_bytes([data[4], data[5], data[6], data[7]]) as usize;
+    let meta_len = u32::from_be_bytes([data[8], data[9], data[10], data[11]]) as usize;
+    let body_len = cell_count * 88;
+    let expected_len = 12 + body_len + meta_len;
+    if data.len() < expected_len {
+        return Err(worker::Error::from("Invalid DGGS: length mismatch"));
+    }
+
+    let meta_bytes = &data[12 + body_len..12 + body_len + meta_len];
+    let meta_str = std::str::from_utf8(meta_bytes).map_err(|e| worker::Error::from(e.to_string()))?;
+    let mut metadata: serde_json::Value = serde_json::from_str(meta_str).unwrap_or(json!({}));
+
+    // Merge new_meta
+    if let serde_json::Value::Object(new_obj) = new_meta {
+        if let serde_json::Value::Object(ref mut old_obj) = metadata {
+            for (k, v) in new_obj {
+                old_obj.insert(k.clone(), v.clone());
+            }
+        }
+    }
+
+    // Serialize new metadata
+    let new_meta_str = serde_json::to_string(&metadata).map_err(|e| worker::Error::from(e.to_string()))?;
+    let new_meta_bytes = new_meta_str.as_bytes();
+    let new_meta_len = new_meta_bytes.len() as u32;
+
+    // Update MetaLen in header
+    let len_bytes = new_meta_len.to_be_bytes();
+    data[8..12].copy_from_slice(&len_bytes);
+
+    // Truncate old metadata and append new
+    data.truncate(12 + body_len);
+    data.extend_from_slice(new_meta_bytes);
+
+    Ok(data)
+}
+

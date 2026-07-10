@@ -49,13 +49,94 @@ def encode_vmb(width, height, tiles, metadata=None):
         
     return header + body + meta_bytes
 
+def decode_vrgd(data):
+    """Decode a VRGD (DGGS globe) binary payload.
+    
+    Format:
+      Header (12 bytes): Magic "VRGD" (4 bytes), CellCount (u32), MetaLen (u32)
+      Per cell (88 bytes fixed):
+        center: 3×f32 (12 bytes)
+        tile: u16 (2 bytes)
+        sides: u8 (1 byte), pad: u8 (1 byte)
+        polygon: 6 × 3×f32 = 72 bytes
+      Trailer: JSON metadata
+    """
+    if len(data) < 12:
+        raise ValueError("Invalid VRGD: Too short")
+    
+    magic = data[:4]
+    if magic != b'VRGD':
+        raise ValueError("Invalid VRGD: Bad magic")
+    
+    cell_count, = struct.unpack('>I', data[4:8])
+    meta_len, = struct.unpack('>I', data[8:12])
+    
+    CELL_BLOCK = 88
+    expected_len = 12 + cell_count * CELL_BLOCK + meta_len
+    if len(data) < expected_len:
+        raise ValueError(f"Invalid VRGD: Truncated (got {len(data)}, expected {expected_len})")
+    
+    cells = []
+    for i in range(cell_count):
+        off = 12 + i * CELL_BLOCK
+        
+        # Center position (3 × f32, big-endian)
+        cx, cy, cz = struct.unpack('>fff', data[off:off+12])
+        
+        # Tile data (u16, big-endian)
+        tile_val, = struct.unpack('>H', data[off+12:off+14])
+        tile = unpack_tile(tile_val)
+        
+        # Sides count
+        sides = data[off+14]
+        
+        # Polygon vertices (up to 6 × 3 × f32)
+        vertices = []
+        for vi in range(sides):
+            voff = off + 16 + vi * 12
+            vx, vy, vz = struct.unpack('>fff', data[voff:voff+12])
+            vertices.append({"x": vx, "y": vy, "z": vz})
+        
+        cells.append({
+            "center": {"x": cx, "y": cy, "z": cz},
+            "tile": tile,
+            "sides": sides,
+            "vertices": vertices,
+        })
+    
+    meta_start = 12 + cell_count * CELL_BLOCK
+    meta_bytes = data[meta_start:meta_start + meta_len]
+    meta_str = meta_bytes.decode('utf-8')
+    try:
+        metadata = json.loads(meta_str)
+    except Exception:
+        metadata = meta_str
+    
+    return {
+        "format": "dggs",
+        "cellCount": cell_count,
+        "cells": cells,
+        "metadata": metadata,
+    }
+
+
 def decode_vmb(data):
+    """Auto-detect and decode a VMB binary payload (VRGM flat grid or VRGD DGGS globe)."""
     if len(data) < 12:
         raise ValueError("Invalid VMB: Too short")
+    
+    # Auto-detect format by magic bytes
+    if data[0:3] == b'VRG':
+        if data[3:4] == b'D':
+            return decode_vrgd(data)
+        elif data[3:4] == b'M':
+            pass  # fall through to VRGM decode below
+        else:
+            raise ValueError("Invalid VMB: Unrecognized magic bytes")
+    else:
+        raise ValueError("Invalid VMB: Bad magic")
         
     magic, width, height, meta_len = struct.unpack('>4sHHI', data[:12])
-    if magic != b'VRGM':
-        raise ValueError("Invalid VMB: Bad magic")
         
     body_len = width * height * 2
     expected_len = 12 + body_len + meta_len
@@ -75,6 +156,7 @@ def decode_vmb(data):
         metadata = meta_str
         
     return {
+        "format": "flat",
         "width": width,
         "height": height,
         "tiles": tiles,

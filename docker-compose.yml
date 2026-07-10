@@ -33,7 +33,7 @@ services:
   hexmap-worker:
     build:
       context: .
-      dockerfile: backend-rs/Dockerfile
+      dockerfile: hexmap-worker/Dockerfile
     ports:
       - "8788:8788"
     volumes:
@@ -42,7 +42,6 @@ services:
     environment:
       - WRANGLER_LOG=info
       - WRANGLER_SEND_METRICS=false
-    entrypoint: ["wrangler", "dev", "--local", "--port", "8788", "--ip", "0.0.0.0", "--log-level", "debug"]
 
   tests:
     build:

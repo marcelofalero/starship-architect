@@ -485,6 +485,7 @@ export function showInfoPanel(userData) {
 
     if (data.graph) descHtml += `\n\n**GRAPH Rating:** ${data.graph}`;
     if (data.gravity) descHtml += `\n\n**Gravity:** ${data.gravity}`;
+    if (data.physicalRadius) descHtml += `\n**Physical Radius:** ${data.physicalRadius.toLocaleString()} km`;
     if (data.temperature) descHtml += `\n**Temperature:** ${data.temperature}`;
     if (data.atmosphere) descHtml += `\n**Atmosphere:** ${data.atmosphere}`;
     if (data.year) descHtml += `\n**Orbital Period (Year):** ${data.year}`;
@@ -576,6 +577,41 @@ export function showInfoPanel(userData) {
         enterSystemBtn.onclick = () => enterSystem(userData.data);
     } else {
         enterSystemBtn.style.display = 'none';
+    }
+
+    const viewSurfaceBtn = document.getElementById('info-view-surface-btn');
+    if ((userData.type === 'Planet' || userData.type === 'Moon') && !(data.type || '').includes('Gas')) {
+        viewSurfaceBtn.style.display = 'block';
+        
+        let planetType = 'terrestrial';
+        const typeStr = data.type || '';
+        if (typeStr.includes('Terran') || typeStr.includes('Eyeball')) {
+            planetType = 'terrestrial';
+        } else if (typeStr.includes('Desert')) {
+            planetType = 'desert';
+        } else if (typeStr.includes('Ocean')) {
+            planetType = 'ocean';
+        } else if (typeStr.includes('Ice')) {
+            planetType = 'ice';
+        } else if (typeStr.includes('Volcanic') || typeStr.includes('Scorched')) {
+            planetType = 'volcanic';
+        } else {
+            planetType = 'barren';
+        }
+        
+        const R = data.physicalRadius || 6371;
+        const nNeeded = (4 * Math.PI * R * R) / 100000;
+        let resolution = 4;
+        if (nNeeded < 1602) resolution = 3;
+        else if (nNeeded < 6402) resolution = 4;
+        else if (nNeeded < 25602) resolution = 5;
+        else resolution = 6;
+        
+        viewSurfaceBtn.onclick = () => {
+            window.open(`../hexmap/index.html?seed=${encodeURIComponent(data.name)}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`, '_blank');
+        };
+    } else {
+        viewSurfaceBtn.style.display = 'none';
     }
 
     if (currentMode === 'gm') {

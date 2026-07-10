@@ -161,6 +161,10 @@ impl TaigaClient {
             reqwest::header::CONTENT_TYPE,
             reqwest::header::HeaderValue::from_static("application/json"),
         );
+        headers.insert(
+            reqwest::header::HeaderName::from_static("x-disable-pagination"),
+            reqwest::header::HeaderValue::from_static("true"),
+        );
         headers
     }
 
