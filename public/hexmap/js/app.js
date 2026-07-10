@@ -438,11 +438,9 @@ function onDataLoaded() {
 
     precomputeEdgeNeighbors();
 
-    if (generateRivers()) {
-        changed = true;
-    }
+    generateRivers();
 
-    // Auto-save if we revealed level 0 features on load or generated new rivers
+    // Auto-save if we revealed level 0 features on load
     if (changed && typeof saveDGGSMetadata === 'function') {
         saveDGGSMetadata().catch(console.error);
     }
