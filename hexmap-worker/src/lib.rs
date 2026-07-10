@@ -1,3 +1,5 @@
+mod dggs;
+
 use worker::*;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -314,6 +316,41 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
     let router = Router::new();
     router
+        .get_async("/planet/:seed/dggs", |req, ctx| async move {
+            let seed = ctx.param("seed").unwrap().to_string();
+            let url = req.url()?;
+            let query: HashMap<String, String> = url.query_pairs().into_owned().collect();
+
+            let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
+            let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
+
+            if resolution > 6 {
+                return Response::error("Resolution must be 0-6", 400);
+            }
+
+            let cache_key = format!("dggs:{}:{}:{}", seed, planet_type, resolution);
+            let mut headers = Headers::new();
+            headers.set("Access-Control-Allow-Origin", "*")?;
+            headers.set("Content-Type", "application/octet-stream")?;
+
+            if let Some(binary) = get_map(&ctx.env, &cache_key).await? {
+                return Ok(Response::from_bytes(binary)?.with_headers(headers));
+            }
+
+            let grid = dggs::generate_dggs(&seed, planet_type, resolution);
+            let metadata = json!({
+                "seed": seed,
+                "type": planet_type,
+                "resolution": resolution,
+                "cellCount": grid.cells.len(),
+                "generatedAt": Date::now().to_string()
+            });
+
+            let binary = dggs::encode_dggs_vmb(&grid, &metadata);
+            set_map(&ctx.env, &cache_key, binary.clone()).await?;
+
+            Ok(Response::from_bytes(binary)?.with_headers(headers))
+        })
         .get_async("/planet/:seed/map", |req, ctx| async move {
             let seed = ctx.param("seed").unwrap().to_string();
             let url = req.url()?;
@@ -333,7 +370,15 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             headers.set("Content-Disposition", &format!("attachment; filename=\"{}_map.vmb\"", seed))?;
 
             if let Some(binary) = get_map(&ctx.env, &cache_key).await? {
-                return Ok(Response::from_bytes(binary)?.with_headers(headers));
+                if let Ok(decoded) = decode_vmb(&binary) {
+                    let cached_type = decoded.metadata.get("type").and_then(|v| v.as_str()).unwrap_or("terrestrial");
+                    let cached_radius = decoded.metadata.get("radius").and_then(|v| v.as_i64()).unwrap_or(10) as i32;
+                    let type_matches = !query.contains_key("type") || cached_type == planet_type;
+                    let radius_matches = !query.contains_key("radius") || cached_radius == radius;
+                    if type_matches && radius_matches {
+                        return Ok(Response::from_bytes(binary)?.with_headers(headers));
+                    }
+                }
             }
 
             let tiles = generate_tiles(&seed, planet_type, radius);

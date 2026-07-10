@@ -1,0 +1,292 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #020208;
+    color: #e0f2f1;
+    font-family: 'Chakra Petch', 'Roboto', sans-serif;
+    user-select: none;
+}
+
+#canvas-container {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#hex-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+#hex-canvas:active {
+    cursor: grabbing;
+}
+
+/* Control Panel */
+#control-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 320px;
+    background: rgba(2, 12, 24, 0.75);
+    border: 1px solid rgba(75, 181, 193, 0.4);
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+.logo-area {
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(75, 181, 193, 0.3);
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.logo-area h1 {
+    font-family: 'Russo One', sans-serif;
+    color: #00ffcc;
+    margin: 0;
+    font-size: 1.8em;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+}
+
+.logo-area .subtitle {
+    font-size: 0.8em;
+    color: #88aacc;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.panel-section {
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(75, 181, 193, 0.15);
+    padding-bottom: 15px;
+}
+
+.panel-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.panel-section h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1em;
+    color: #4BB5C1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+    color: #88aacc;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    background: rgba(10, 61, 84, 0.35);
+    border: 1px solid rgba(56, 158, 189, 0.4);
+    border-radius: 4px;
+    color: white;
+    font-family: 'Chakra Petch', sans-serif;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #00ffcc;
+    box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 255, 204, 0.1);
+    color: #00ffcc;
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    border-radius: 4px;
+    font-family: 'Russo One', sans-serif;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: rgba(0, 255, 204, 0.25);
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* File Upload custom button style */
+.file-upload-label {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background: rgba(75, 181, 193, 0.1);
+    border: 1px dashed rgba(75, 181, 193, 0.6);
+    border-radius: 4px;
+    color: #4BB5C1;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.file-upload-label:hover {
+    background: rgba(75, 181, 193, 0.2);
+    border-color: #00ffcc;
+    color: #00ffcc;
+}
+
+/* Info Panel (Hex Selection Details) */
+#info-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    background: rgba(2, 12, 24, 0.75);
+    border: 1px solid rgba(75, 181, 193, 0.4);
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+#info-panel h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-family: 'Russo One', sans-serif;
+    color: #00ffcc;
+    font-size: 1.4em;
+    border-bottom: 2px solid rgba(75, 181, 193, 0.3);
+    padding-bottom: 8px;
+    text-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+}
+
+#close-info {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    color: #88aacc;
+    border: none;
+    font-size: 1.8em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+}
+
+#close-info:hover {
+    color: #00ffcc;
+}
+
+.hud-row {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hud-label {
+    color: #88aacc;
+}
+
+.hud-value {
+    color: #e0f2f1;
+    font-weight: bold;
+}
+
+.terrain-analysis {
+    border-top: 1px solid rgba(75, 181, 193, 0.25);
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+.terrain-analysis label {
+    font-family: 'Russo One', sans-serif;
+    color: #4BB5C1;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+#hex-analysis-text {
+    font-size: 0.9em;
+    line-height: 1.45;
+    color: #b0bec5;
+    background: rgba(2, 8, 16, 0.5);
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(75, 181, 193, 0.1);
+    min-height: 80px;
+}
+
+/* Floating Tooltip */
+#tooltip {
+    position: absolute;
+    background: rgba(2, 10, 20, 0.85);
+    border: 1px solid #389ebd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: #00ffcc;
+    font-size: 0.85em;
+    pointer-events: none;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    font-family: 'Chakra Petch', monospace;
+    line-height: 1.4;
+    backdrop-filter: blur(4px);
+}
+
+/* Scrollbar Styling for Control Panel */
+#control-panel::-webkit-scrollbar {
+    width: 6px;
+}
+#control-panel::-webkit-scrollbar-track {
+    background: rgba(2, 12, 24, 0.2);
+}
+#control-panel::-webkit-scrollbar-thumb {
+    background: rgba(75, 181, 193, 0.4);
+    border-radius: 3px;
+}
+#control-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 204, 0.6);
+}
+
+.help-footer {
+    font-size: 0.75em;
+    color: #607d8b;
+    text-align: center;
+    margin-top: 15px;
+    line-height: 1.3;
+}

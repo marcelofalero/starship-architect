@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Verge - Standalone HexMap Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Chakra+Petch:400,700|Russo+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="hex-canvas"></canvas>
+    </div>
+
+    <!-- Control Panel / Generator -->
+    <div id="control-panel">
+        <div class="logo-area">
+            <h1>HEXMAP VIEW</h1>
+            <div class="subtitle">Procedural Surface Mapper</div>
+        </div>
+
+        <div class="panel-section">
+            <h3>Generate Map</h3>
+            <label for="map-seed">Planet Seed</label>
+            <input type="text" id="map-seed" value="Sol_III" placeholder="e.g. Earth_Core">
+
+            <label for="map-type">Planet Type</label>
+            <select id="map-type">
+                <option value="terrestrial">Terrestrial</option>
+                <option value="desert">Desert</option>
+                <option value="ocean">Ocean</option>
+                <option value="ice">Ice / Frozen</option>
+                <option value="volcanic">Volcanic</option>
+                <option value="barren">Barren</option>
+            </select>
+
+            <label for="map-radius">Planet Size (DGGS Resolution)</label>
+            <select id="map-radius">
+                <option value="3">Small (~642 cells)</option>
+                <option value="4" selected>Medium (~2,562 cells)</option>
+                <option value="5">Large (~10,242 cells)</option>
+            </select>
+
+            <button id="generate-btn">Generate & Render</button>
+        </div>
+
+        <div class="panel-section">
+            <h3>View Settings</h3>
+            <select id="view-mode" style="display:none"><option value="globe" selected></option></select>
+
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="auto-rotate" checked style="width: auto; margin-bottom: 0;">
+                <span>Auto-Rotate Globe</span>
+            </label>
+        </div>
+
+        <div class="panel-section">
+            <h3>Load Saved Map</h3>
+            <label for="vmb-upload" class="file-upload-label">
+                <span>Choose .vmb file</span>
+                <input type="file" id="vmb-upload" accept=".vmb" style="display: none;">
+            </label>
+            <div id="upload-status" style="font-size: 0.8em; color: #88aacc; margin-top: 5px; text-align: center;"></div>
+        </div>
+
+        <div class="panel-section info-summary">
+            <h3>Map Info</h3>
+            <div class="hud-row"><span class="hud-label">Seed:</span> <span id="info-seed" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Type:</span> <span id="info-type" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Resolution:</span> <span id="info-size" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Total Cells:</span> <span id="info-tiles" class="hud-value">-</span></div>
+        </div>
+        
+        <div class="help-footer">
+            Drag to Rotate Globe<br>
+            Scroll to Zoom<br>
+            DGGS Icosahedral Grid System
+        </div>
+    </div>
+
+    <!-- Hex Selection Details Panel -->
+    <div id="info-panel">
+        <button id="close-info">&times;</button>
+        <h2 id="hex-coord-title">Hex [0, 0]</h2>
+        
+        <div class="hud-row"><span class="hud-label">Biome:</span> <span id="hex-biome" class="hud-value">-</span></div>
+        <div class="hud-row"><span class="hud-label">Elevation:</span> <span id="hex-elevation" class="hud-value">-</span></div>
+        <div class="hud-row"><span class="hud-label">Moisture:</span> <span id="hex-moisture" class="hud-value">-</span></div>
+        <div class="hud-row"><span class="hud-label">Faction:</span> <span id="hex-faction" class="hud-value">-</span></div>
+        <div class="hud-row"><span class="hud-label">Feature:</span> <span id="hex-feature" class="hud-value">-</span></div>
+
+        <div class="terrain-analysis">
+            <label>Terrain Analysis</label>
+            <div id="hex-analysis-text">Select a hex to inspect telemetry data...</div>
+        </div>
+    </div>
+
+    <!-- Floating Hover Tooltip -->
+    <div id="tooltip"></div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
