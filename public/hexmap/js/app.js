@@ -982,6 +982,7 @@ async function saveDGGSMetadata() {
         
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],
+            scannedCells: dggsData.metadata.scannedCells || [],
             landingCell: dggsData.metadata.landingCell !== undefined ? dggsData.metadata.landingCell : null
         };
         
