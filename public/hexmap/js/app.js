@@ -905,9 +905,13 @@ function draw() {
                 
                 const rv = rotate3D(nx, ny, nz);
                 points.push({
+                    idx: node.idx,
                     x: rv.x * GLOBE_RADIUS,
                     y: rv.y * GLOBE_RADIUS,
                     z: rv.z,
+                    origX: nx,
+                    origY: ny,
+                    origZ: nz,
                     water: node.water,
                     hidden: node.hidden,
                     isOcean: node.isOcean
@@ -927,9 +931,16 @@ function draw() {
                 if (p.isOcean && currentPath.length > 0) {
                     const prev = currentPath[currentPath.length - 1];
                     currentPath.push({
+                        idx: p.idx,
                         x: (prev.x + p.x) / 2,
                         y: (prev.y + p.y) / 2,
-                        z: (prev.z + p.z) / 2
+                        z: (prev.z + p.z) / 2,
+                        origX: (prev.origX + p.origX) / 2,
+                        origY: (prev.origY + p.origY) / 2,
+                        origZ: (prev.origZ + p.origZ) / 2,
+                        water: p.water,
+                        hidden: p.hidden,
+                        isOcean: true
                     });
                     break;
                 }
@@ -954,22 +965,44 @@ function draw() {
                 const drawLine = (color, width) => {
                     ctx.beginPath();
                     ctx.moveTo(sp[0].x, sp[0].y);
-                    if (sp.length === 2) {
-                        ctx.lineTo(sp[1].x, sp[1].y);
-                    } else {
-                        ctx.lineTo((sp[0].x + sp[1].x) / 2, (sp[0].y + sp[1].y) / 2);
-                        for (let i = 1; i < sp.length - 1; i++) {
-                            const pC = sp[i];
-                            const pN = sp[i+1];
-                            if (i === sp.length - 2) {
-                                ctx.quadraticCurveTo(pC.x, pC.y, pN.x, pN.y);
-                            } else {
-                                const midX = (pC.x + pN.x) / 2;
-                                const midY = (pC.y + pN.y) / 2;
-                                ctx.quadraticCurveTo(pC.x, pC.y, midX, midY);
-                            }
-                        }
+                    
+                    for (let i = 0; i < sp.length - 1; i++) {
+                        const p1 = sp[i];
+                        const p2 = sp[i+1];
+                        
+                        // Calculate winding normal offset to create an organic curve
+                        const edgeId = p1.idx < p2.idx ? p1.idx * 100000 + p2.idx : p2.idx * 100000 + p1.idx;
+                        const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
+                        const noise = (seed - Math.floor(seed)) - 0.5;
+                        
+                        const mx = (p1.origX + p2.origX) / 2;
+                        const my = (p1.origY + p2.origY) / 2;
+                        const mz = (p1.origZ + p2.origZ) / 2;
+                        
+                        const dx = p2.origX - p1.origX;
+                        const dy = p2.origY - p1.origY;
+                        const dz = p2.origZ - p1.origZ;
+                        
+                        let px = my * dz - mz * dy;
+                        let py = mz * dx - mx * dz;
+                        let pz = mx * dy - my * dx;
+                        const plen = Math.sqrt(px * px + py * py + pz * pz);
+                        if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
+                        
+                        const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        const offsetDist = segmentLen * 0.35 * noise;
+                        
+                        const ctrlX = mx + px * offsetDist;
+                        const ctrlY = my + py * offsetDist;
+                        const ctrlZ = mz + pz * offsetDist;
+                        
+                        const rvCtrl = rotate3D(ctrlX, ctrlY, ctrlZ);
+                        const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
+                        const pCtrly = rvCtrl.y * GLOBE_RADIUS;
+                        
+                        ctx.quadraticCurveTo(pCtrlx, pCtrly, p2.x, p2.y);
                     }
+                    
                     ctx.strokeStyle = color;
                     ctx.lineWidth = width;
                     ctx.stroke();
