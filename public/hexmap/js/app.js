@@ -20,7 +20,9 @@ const BIOME_STYLES = {
     9: { name: 'Ice Cap', color: '#98bcd8', border: '#7aaac8', desc: 'Glacial ice sheet.' },
     10: { name: 'Mountains', color: '#404850', border: '#323840', desc: 'High rocky terrain.' },
     11: { name: 'Volcanic', color: '#300a06', border: '#200604', desc: 'Active volcanic zone.' },
-    12: { name: 'Swamp', color: '#202e10', border: '#181e0a', desc: 'Waterlogged wetlands.' }
+    12: { name: 'Swamp', color: '#202e10', border: '#181e0a', desc: 'Waterlogged wetlands.' },
+    13: { name: 'Scorched', color: '#1a1010', border: '#100a0a', desc: 'Dead, scorched earth.' },
+    14: { name: 'Urban Sprawl', color: '#444d56', border: '#323840', desc: 'Concrete, steel, and planetary pavement.' }
 };
 
 function getBiomeInfo(id) {

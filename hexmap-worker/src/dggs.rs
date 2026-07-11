@@ -700,7 +700,13 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
         faction = 1;
     }
     
-    Tile { biome, elevation, moisture, faction, feature }
+    // Massive cities (Level 3+) completely pave over natural land biomes, turning them into Urban Sprawl
+    let mut final_biome = biome;
+    if faction >= 3 && elevation >= 4 { // Land only, floating cities retain their ocean biome
+        final_biome = 14; 
+    }
+    
+    Tile { biome: final_biome, elevation, moisture, faction, feature }
 }
 
 /// Encode a DGGS grid into the VRGD binary format.
