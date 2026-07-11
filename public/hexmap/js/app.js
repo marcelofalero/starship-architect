@@ -443,6 +443,69 @@ function generateRivers() {
     return branches.length > 0;
 }
 
+function computePollution() {
+    if (!dggsData || !dggsData.metadata.neighbors) return;
+    
+    const pollMod = (dggsData.metadata.pollution !== undefined ? dggsData.metadata.pollution : 100) / 100.0;
+    const numCells = dggsData.cells.length;
+    
+    // 1. Calculate base pollution for all cells
+    let pollution = new Float32Array(numCells);
+    for (let i = 0; i < numCells; i++) {
+        const cell = dggsData.cells[i];
+        let p = 0;
+        if (cell.tile.biome === 11 || cell.tile.biome === 13) p += 0.4;
+        
+        let urbanPol = 0.0;
+        if (cell.tile.faction === 1) urbanPol = 0.15;
+        else if (cell.tile.faction === 2) urbanPol = 0.4;
+        else if (cell.tile.faction === 3) urbanPol = 0.9;
+        else if (cell.tile.faction === 4) urbanPol = 1.5; // Megacities vastly exceed cap natively
+        
+        pollution[i] = p + (urbanPol * pollMod);
+    }
+    
+    // 2. Diffuse/Spillover (Run for iterations to simulate propagation)
+    const MAX_CAP = 1.0;
+    const THRESHOLD = 0.7; // Needs to be this high to start spilling over
+    const iterations = 8; // How far it spreads
+    
+    for (let iter = 0; iter < iterations; iter++) {
+        let nextPollution = new Float32Array(pollution);
+        
+        for (let i = 0; i < numCells; i++) {
+            if (pollution[i] > THRESHOLD) {
+                // Calculate how much we can spill
+                const excess = pollution[i] - THRESHOLD;
+                if (excess > 0) {
+                    const neighbors = dggsData.metadata.neighbors[i];
+                    if (neighbors && neighbors.length > 0) {
+                        // Keep a portion of the excess, spill the rest equally to neighbors
+                        const spillAmount = (excess * 0.6) / neighbors.length;
+                        
+                        nextPollution[i] -= (excess * 0.6); 
+                        
+                        for (const n of neighbors) {
+                            nextPollution[n] += spillAmount;
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (let i = 0; i < numCells; i++) {
+            pollution[i] = nextPollution[i];
+        }
+    }
+    
+    // Cap all at MAX_CAP for rendering
+    for (let i = 0; i < numCells; i++) {
+        pollution[i] = Math.min(MAX_CAP, pollution[i]);
+    }
+    
+    dggsData.metadata.computedPollution = pollution;
+}
+
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
@@ -468,8 +531,8 @@ function onDataLoaded() {
     }
 
     precomputeEdgeNeighbors();
-
     generateRivers();
+    computePollution();
 
     // Auto-save if we revealed level 0 features on load
     if (changed && typeof saveDGGSMetadata === 'function') {
@@ -724,23 +787,10 @@ function draw() {
             fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
             borderColor = `hsl(${hue}, ${sat}%, ${light + 10}%)`;
         } else if (currentLens === 'pollution') {
-            // Pollution: High in heavy industry, large cities, volcanic areas
-            let pol = 0.0;
-            
-            // Base geological pollution (volcanic outgassing)
-            if (cell.tile.biome === 11 || cell.tile.biome === 13) pol += 0.4; // Volcanic / Scorched
-            
-            // Urbanization is the primary driver of pollution
-            const pollMod = (dggsData.metadata?.pollution !== undefined ? dggsData.metadata.pollution : 100) / 100.0;
-            let urbanPol = 0.0;
-            if (cell.tile.faction === 1) urbanPol = 0.15;
-            else if (cell.tile.faction === 2) urbanPol = 0.4;
-            else if (cell.tile.faction === 3) urbanPol = 0.75;
-            else if (cell.tile.faction === 4) urbanPol = 1.0; // Megacities are toxic
-            
-            pol += urbanPol * pollMod;
-            
-            pol = Math.max(0, Math.min(1, pol));
+            // Pollution: Now uses the pre-computed spillover diffusion array
+            const pol = (dggsData.metadata.computedPollution && dggsData.metadata.computedPollution[i] !== undefined) 
+                ? dggsData.metadata.computedPollution[i] 
+                : 0.0;
             
             // Color map: 0 = Clean (Light Green) -> 1 = Toxic (Deep Orange/Brown)
             const hue = 110 - (pol * 110); // 110 (green) -> 0 (red)
