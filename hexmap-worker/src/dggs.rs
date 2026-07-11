@@ -636,10 +636,16 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     
     // Urbanization suitability based on biome
     let raw_suitability = match biome {
-        4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest (Plains) - Most favored naturally
-        2 | 3 | 11 | 12 => 1.0, // Coast, Desert, Bare, Swamp - Neutral
-        0 | 1 => 0.2, // Deep Ocean, Ocean - Harsh naturally
-        7 | 8 | 9 | 10 | 13 => 0.05, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Extremely harsh naturally
+        // Prime Real Estate
+        4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest
+        // Viable Land
+        2 | 3 | 7 | 12 => 1.0, // Coast, Desert, Taiga, Swamp
+        // Harsh Land (Still better than water)
+        8 | 9 | 10 | 13 => 0.5, // Tundra, Ice Cap, Mountain, Scorched
+        // Shallow Water
+        1 => 0.2, // Ocean
+        // Extreme Environments (Very hard to build)
+        0 | 11 => 0.05, // Deep Ocean, Volcanic (Lava)
         _ => 1.0,
     };
     
