@@ -921,7 +921,7 @@ function draw() {
                 ctx.fillRect(0.5, -2, 1.5, 1.5);
                 ctx.fillRect(-2, 0.5, 1.5, 1.5);
                 ctx.fillRect(0.5, 0.5, 1.5, 1.5);
-            } else if (level >= 3) {
+            } else if (level === 3) {
                 // Metropolis (Glowing Hub)
                 ctx.beginPath();
                 ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
@@ -930,6 +930,19 @@ function draw() {
                 ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.arc(0, 0, 1, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (level >= 4) {
+                // Megacity (Planetary Capital Star-Hub)
+                ctx.beginPath();
+                ctx.moveTo(0, -4.5); ctx.lineTo(1.5, -1.5); ctx.lineTo(4.5, 0); 
+                ctx.lineTo(1.5, 1.5); ctx.lineTo(0, 4.5); ctx.lineTo(-1.5, 1.5); 
+                ctx.lineTo(-4.5, 0); ctx.lineTo(-1.5, -1.5); ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
@@ -1259,7 +1272,7 @@ function selectCell(idx) {
     const factionRow = document.getElementById('faction-row');
     const factionValue = document.getElementById('hex-faction');
     if (t.faction > 0) {
-        const factionNames = { 1: 'Outpost (Lvl 1)', 2: 'Town (Lvl 2)', 3: 'Metropolis (Lvl 3)' };
+        const factionNames = { 1: 'Outpost (Lvl 1)', 2: 'Town (Lvl 2)', 3: 'Metropolis (Lvl 3)', 4: 'Megacity (Lvl 4)' };
         factionRow.style.display = 'flex';
         factionValue.textContent = factionNames[t.faction] || `Level ${t.faction}`;
     } else {

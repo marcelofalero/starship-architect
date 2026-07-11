@@ -645,12 +645,14 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     let faction_threshold = base_threshold * 0.4 * urb_suitability;
     let faction = if faction_noise < faction_threshold { 
         let ratio = faction_noise / faction_threshold;
-        if ratio < 0.0322 {
-            3 // Metropolis (1 in 31)
-        } else if ratio < 0.1935 {
-            2 // Town (5 in 31)
+        if ratio < 0.0064 {
+            4 // Megacity (1 in 156)
+        } else if ratio < 0.0384 {
+            3 // Metropolis (5 in 156)
+        } else if ratio < 0.1987 {
+            2 // Town (25 in 156)
         } else {
-            1 // Outpost (25 in 31)
+            1 // Outpost (125 in 156)
         }
     } else { 0 };
     
