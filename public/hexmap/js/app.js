@@ -904,6 +904,37 @@ function draw() {
             }
         }
 
+        if (tile.faction > 0) {
+            ctx.save();
+            ctx.translate(c.hexCx + (tile.feature > 0 ? 3 : 0), c.hexCy + (tile.feature > 0 ? -3 : 0));
+            ctx.fillStyle = '#00e5ff'; // Neon blue for cities
+            ctx.shadowColor = '#00e5ff';
+            ctx.shadowBlur = 4;
+            
+            const level = tile.faction;
+            if (level === 1) {
+                // Outpost (Small Square)
+                ctx.fillRect(-1.5, -1.5, 3, 3);
+            } else if (level === 2) {
+                // Town (4 small squares)
+                ctx.fillRect(-2, -2, 1.5, 1.5);
+                ctx.fillRect(0.5, -2, 1.5, 1.5);
+                ctx.fillRect(-2, 0.5, 1.5, 1.5);
+                ctx.fillRect(0.5, 0.5, 1.5, 1.5);
+            } else if (level >= 3) {
+                // Metropolis (Glowing Hub)
+                ctx.beginPath();
+                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(0, 0, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
         if (dggsData.metadata && dggsData.metadata.landingCell === i) {
             ctx.save();
             ctx.translate(c.hexCx, c.hexCy);
