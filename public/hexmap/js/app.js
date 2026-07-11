@@ -1256,6 +1256,16 @@ function selectCell(idx) {
     detailElevation.textContent = `Level ${t.elevation}`;
     detailMoisture.textContent = `Level ${t.moisture}`;
 
+    const factionRow = document.getElementById('faction-row');
+    const factionValue = document.getElementById('hex-faction');
+    if (t.faction > 0) {
+        const factionNames = { 1: 'Outpost (Lvl 1)', 2: 'Town (Lvl 2)', 3: 'Metropolis (Lvl 3)' };
+        factionRow.style.display = 'flex';
+        factionValue.textContent = factionNames[t.faction] || `Level ${t.faction}`;
+    } else {
+        factionRow.style.display = 'none';
+    }
+
     const isFeatureRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
 
     // Feature display based on role and reveal status
@@ -1527,8 +1537,10 @@ async function saveDGGSMetadata() {
         const seed = dggsData.metadata?.seed || seedParam;
         const type = dggsData.metadata?.type || typeParam;
         const res = dggsData.metadata?.resolution || resParam;
+        const urbInput = document.getElementById('map-urbanization');
+        const urb = dggsData.metadata?.urbanization !== undefined ? dggsData.metadata.urbanization : (urbInput ? parseInt(urbInput.value) : 15);
 
-        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${res}`;
+        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${res}&urbanization=${urb}`;
 
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],
