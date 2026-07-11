@@ -590,17 +590,24 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
         _ => {} // terrestrial
     }
     
-    let elevation = (e * 8.0).clamp(0.0, 7.0) as u8;
-    
-    // On Eyeball planets, moisture is baked out of the day-side and freezes on the night-side.
+    // On Eyeball planets, we want a massive ocean on the day side, and solid ice on the night side.
     if is_eyeball {
+        let depth = (pos.z - 0.2).max(0.0) * 1.5; // Stronger effect closer to the center
         if pos.z > 0.2 {
-            m = m * 0.2; // Dry day side (Desert)
-        } else if pos.z < -0.2 {
-            m = m * 1.5; // Wet (frozen) night side (Ice Cap/Tundra)
+            // Day side "pupil" ocean. Lower the elevation to force an ocean.
+            e = e * (1.0 - depth) - (depth * 0.2); 
+            m = m * 2.0; 
+        } else if pos.z < -0.1 {
+            // Night side "sclera" ice cap. Raise elevation to ensure it's a solid landmass.
+            e = e * 0.6 + 0.4; 
+            m = m * 1.5; 
+        } else {
+            // Twilight zone "iris" habitable ring
+            m = m * 1.2;
         }
     }
     
+    let elevation = (e * 8.0).clamp(0.0, 7.0) as u8;
     let moisture = (m * 8.0).clamp(0.0, 7.0) as u8;
     
     let lat_factor = 1.0 - abs_lat / (std::f64::consts::PI / 2.0);
