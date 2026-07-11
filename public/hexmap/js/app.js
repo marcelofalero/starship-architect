@@ -908,14 +908,25 @@ function draw() {
                 // Deterministic wander within the hex footprint
                 const h = node.idx;
                 const rx = (Math.sin(h * 12.9898) - 0.5) * maxOffset;
-                const ry = (Math.cos(h * 78.233) - 0.5) * maxOffset;
-                const rz = (Math.sin(h * 37.719) - 0.5) * maxOffset;
+                let nx = cell.center.x;
+                let ny = cell.center.y;
+                let nz = cell.center.z;
                 
-                let nx = cell.center.x + rx;
-                let ny = cell.center.y + ry;
-                let nz = cell.center.z + rz;
-                const len = Math.sqrt(nx*nx + ny*ny + nz*nz);
-                nx /= len; ny /= len; nz /= len;
+                // Jitter the hex center node slightly to avoid grid-locking
+                if (!node.isOcean) {
+                    const seed = Math.sin(node.idx * 17.3821) * 43758.5453;
+                    const noiseX = ((seed * 1.3) % 1) - 0.5;
+                    const noiseY = ((seed * 2.7) % 1) - 0.5;
+                    const noiseZ = ((seed * 3.1) % 1) - 0.5;
+                    
+                    const edgeLen = 0.5; // roughly max movement
+                    nx += noiseX * edgeLen;
+                    ny += noiseY * edgeLen;
+                    nz += noiseZ * edgeLen;
+                    
+                    const nLen = Math.sqrt(nx*nx + ny*ny + nz*nz);
+                    nx /= nLen; ny /= nLen; nz /= nLen;
+                }
                 
                 const rv = rotate3D(nx, ny, nz);
                 points.push({
@@ -976,45 +987,71 @@ function draw() {
             
             // Draw smooth splines for each visible segment of the branch
             for (const sp of subPaths) {
+                // Subdivide the path by injecting winding-normal offset midpoints
+                const subdivided = [];
+                for (let i = 0; i < sp.length - 1; i++) {
+                    const p1 = sp[i];
+                    const p2 = sp[i+1];
+                    subdivided.push(p1);
+                    
+                    // Inject a midpoint
+                    const edgeId = p1.idx < p2.idx ? p1.idx * 100000 + p2.idx : p2.idx * 100000 + p1.idx;
+                    const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
+                    const noise = (seed - Math.floor(seed)) - 0.5;
+                    
+                    const mx = (p1.origX + p2.origX) / 2;
+                    const my = (p1.origY + p2.origY) / 2;
+                    const mz = (p1.origZ + p2.origZ) / 2;
+                    
+                    const dx = p2.origX - p1.origX;
+                    const dy = p2.origY - p1.origY;
+                    const dz = p2.origZ - p1.origZ;
+                    
+                    let px = my * dz - mz * dy;
+                    let py = mz * dx - mx * dz;
+                    let pz = mx * dy - my * dx;
+                    const plen = Math.sqrt(px * px + py * py + pz * pz);
+                    if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
+                    
+                    const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    const offsetDist = segmentLen * 0.45 * noise; // increased meandering
+                    
+                    let cx = mx + px * offsetDist;
+                    let cy = my + py * offsetDist;
+                    let cz = mz + pz * offsetDist;
+                    
+                    const cLen = Math.sqrt(cx*cx + cy*cy + cz*cz);
+                    cx /= cLen; cy /= cLen; cz /= cLen;
+                    
+                    const rvC = rotate3D(cx, cy, cz);
+                    subdivided.push({
+                        x: rvC.x * GLOBE_RADIUS,
+                        y: rvC.y * GLOBE_RADIUS,
+                        z: rvC.z
+                    });
+                }
+                subdivided.push(sp[sp.length - 1]);
+                
                 const drawLine = (color, width) => {
                     ctx.beginPath();
-                    ctx.moveTo(sp[0].x, sp[0].y);
+                    ctx.moveTo(subdivided[0].x, subdivided[0].y);
                     
-                    for (let i = 0; i < sp.length - 1; i++) {
-                        const p1 = sp[i];
-                        const p2 = sp[i+1];
-                        
-                        // Calculate winding normal offset to create an organic curve
-                        const edgeId = p1.idx < p2.idx ? p1.idx * 100000 + p2.idx : p2.idx * 100000 + p1.idx;
-                        const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
-                        const noise = (seed - Math.floor(seed)) - 0.5;
-                        
-                        const mx = (p1.origX + p2.origX) / 2;
-                        const my = (p1.origY + p2.origY) / 2;
-                        const mz = (p1.origZ + p2.origZ) / 2;
-                        
-                        const dx = p2.origX - p1.origX;
-                        const dy = p2.origY - p1.origY;
-                        const dz = p2.origZ - p1.origZ;
-                        
-                        let px = my * dz - mz * dy;
-                        let py = mz * dx - mx * dz;
-                        let pz = mx * dy - my * dx;
-                        const plen = Math.sqrt(px * px + py * py + pz * pz);
-                        if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
-                        
-                        const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                        const offsetDist = segmentLen * 0.35 * noise;
-                        
-                        const ctrlX = mx + px * offsetDist;
-                        const ctrlY = my + py * offsetDist;
-                        const ctrlZ = mz + pz * offsetDist;
-                        
-                        const rvCtrl = rotate3D(ctrlX, ctrlY, ctrlZ);
-                        const pCtrlx = rvCtrl.x * GLOBE_RADIUS;
-                        const pCtrly = rvCtrl.y * GLOBE_RADIUS;
-                        
-                        ctx.quadraticCurveTo(pCtrlx, pCtrly, p2.x, p2.y);
+                    if (subdivided.length === 2) {
+                        ctx.lineTo(subdivided[1].x, subdivided[1].y);
+                    } else {
+                        // Midpoint Bezier algorithm for perfect C1 smoothness
+                        ctx.lineTo((subdivided[0].x + subdivided[1].x) / 2, (subdivided[0].y + subdivided[1].y) / 2);
+                        for (let i = 1; i < subdivided.length - 1; i++) {
+                            const pC = subdivided[i];
+                            const pN = subdivided[i+1];
+                            if (i === subdivided.length - 2) {
+                                ctx.quadraticCurveTo(pC.x, pC.y, pN.x, pN.y);
+                            } else {
+                                const midX = (pC.x + pN.x) / 2;
+                                const midY = (pC.y + pN.y) / 2;
+                                ctx.quadraticCurveTo(pC.x, pC.y, midX, midY);
+                            }
+                        }
                     }
                     
                     ctx.strokeStyle = color;
