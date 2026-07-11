@@ -633,11 +633,13 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
     
     // Urbanization suitability based on biome
+    // We flatten the penalties because the GM's slider intent (the "reason" for urbanization) should take precedence.
+    // Floating cities and underwater domes are very possible!
     let urb_suitability = match biome {
-        4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest (Plains) - Most favored
+        4 | 5 | 6 => 1.5, // Savanna, Grassland, Forest (Plains) - Still slightly favored
         2 | 3 | 11 | 12 => 1.0, // Coast, Desert, Bare, Swamp - Neutral
-        0 | 1 => 0.4, // Deep Ocean, Ocean - Less favored
-        7 | 8 | 9 | 10 | 13 => 0.1, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Least favored
+        0 | 1 => 0.8, // Deep Ocean, Ocean - Floating/underwater cities are highly viable
+        7 | 8 | 9 | 10 | 13 => 0.5, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Harsh, but still urbanizable
         _ => 1.0,
     };
     
