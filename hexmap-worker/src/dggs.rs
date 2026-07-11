@@ -632,18 +632,27 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     let faction_noise = fbm3d(V3::new(pos.x * 4.0, pos.y * 4.0, pos.z * 4.0), 2, seed_hash.wrapping_add(3000));
     let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
     
+    let base_threshold = urban_pct / 100.0;
+    
     // Urbanization suitability based on biome
-    // We flatten the penalties because the GM's slider intent (the "reason" for urbanization) should take precedence.
-    // Floating cities and underwater domes are very possible!
-    let urb_suitability = match biome {
-        4 | 5 | 6 => 1.5, // Savanna, Grassland, Forest (Plains) - Still slightly favored
+    let raw_suitability = match biome {
+        4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest (Plains) - Most favored naturally
         2 | 3 | 11 | 12 => 1.0, // Coast, Desert, Bare, Swamp - Neutral
-        0 | 1 => 0.8, // Deep Ocean, Ocean - Floating/underwater cities are highly viable
-        7 | 8 | 9 | 10 | 13 => 0.5, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Harsh, but still urbanizable
+        0 | 1 => 0.2, // Deep Ocean, Ocean - Harsh naturally
+        7 | 8 | 9 | 10 | 13 => 0.05, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Extremely harsh naturally
         _ => 1.0,
     };
     
-    let base_threshold = urban_pct / 100.0;
+    // As the society becomes more urbanized, they are forced to build in less ideal locations.
+    // We model this using a "desperation" curve. At 100% urbanization, desperation is 1.0, and 
+    // all negative terrain penalties are completely eliminated (raised to 1.0).
+    let desperation = base_threshold.powi(2); // Quadratic curve: only spikes at high urbanization
+    let urb_suitability = if raw_suitability < 1.0 {
+        raw_suitability + (1.0 - raw_suitability) * desperation
+    } else {
+        raw_suitability
+    };
+    
     let faction_threshold = base_threshold * 0.4 * urb_suitability;
     let faction = if faction_noise < faction_threshold { 
         let ratio = faction_noise / faction_threshold;
