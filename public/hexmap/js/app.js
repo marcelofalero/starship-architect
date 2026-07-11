@@ -321,8 +321,8 @@ function generateRivers() {
     // Sort by cost-distance to ocean descending, prioritizing the deepest/hardest-to-reach inland points
     candidates.sort((a, b) => distToOcean[b] - distToOcean[a]);
     
-    // Take the top 20% furthest inland cells as our candidate pool
-    const poolSize = Math.max(10, Math.floor(candidates.length * 0.2));
+    // Take the top 30% furthest inland cells as our candidate pool
+    const poolSize = Math.max(50, Math.floor(candidates.length * 0.3));
     candidates = candidates.slice(0, poolSize);
     
     // Shuffle the candidate pool
@@ -331,8 +331,8 @@ function generateRivers() {
         [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
     
-    // Generate an abundant number of sources, we will cull the tiny ones later
-    const numSources = Math.max(12, Math.floor(dggsData.cells.length / 120));
+    // Generate an abundant number of sources for a global map
+    const numSources = Math.max(30, Math.floor(dggsData.cells.length / 30));
     const sources = candidates.slice(0, numSources);
     
     for (const source of sources) {
@@ -402,22 +402,30 @@ function generateRivers() {
             let curr = i;
             while (curr !== -1 && !drawn[curr]) {
                 const isGlacier = dggsData.cells[curr].tile.biome === 9;
-                branch.push({ idx: curr, water: water[curr], hidden: isGlacier });
+                const isOcean = dggsData.cells[curr].tile.biome === 0 || dggsData.cells[curr].tile.biome === 1;
+                branch.push({ idx: curr, water: water[curr], hidden: isGlacier, isOcean });
                 drawn[curr] = 1;
+                
+                if (isOcean) break;
                 curr = flowTo[curr];
             }
-            if (curr !== -1) {
+            
+            // Connect to merge point if it hit an existing branch
+            if (curr !== -1 && drawn[curr]) {
                 const isGlacier = dggsData.cells[curr].tile.biome === 9;
-                branch.push({ idx: curr, water: water[curr], hidden: isGlacier });
-                
-                // If this branch flows directly into the ocean and is just a tiny coastal creek, discard it
                 const isOcean = dggsData.cells[curr].tile.biome === 0 || dggsData.cells[curr].tile.biome === 1;
-                if (isOcean && branch.length < 5) {
+                branch.push({ idx: curr, water: water[curr], hidden: isGlacier, isOcean });
+            }
+            
+            if (branch.length > 0) {
+                const finalNode = branch[branch.length - 1];
+                // Cull microscopic creeks that dump directly into the sea
+                if (finalNode.isOcean && branch.length < 4) {
                     continue; 
                 }
-            }
-            if (branch.length > 1) {
-                branches.push(branch);
+                if (branch.length > 1) {
+                    branches.push(branch);
+                }
             }
         }
     }
@@ -902,49 +910,73 @@ function draw() {
                     z: rv.z,
                     water: node.water,
                     hidden: node.hidden,
-                    isOcean: cell.tile.biome === 0 || cell.tile.biome === 1
+                    isOcean: node.isOcean
                 });
             }
             
-            // Render the branch as a smooth sequence of line segments
+            // Extract visible sub-paths (to handle backface culling and subglacial hiding)
+            const subPaths = [];
+            let currentPath = [];
+            let maxWater = 0;
+            
+            for (let i = 0; i < points.length; i++) {
+                const p = points[i];
+                maxWater = Math.max(maxWater, p.water);
+                
+                // Stop rendering at the exact midpoint if hitting the ocean
+                if (p.isOcean && currentPath.length > 0) {
+                    const prev = currentPath[currentPath.length - 1];
+                    currentPath.push({
+                        x: (prev.x + p.x) / 2,
+                        y: (prev.y + p.y) / 2,
+                        z: (prev.z + p.z) / 2
+                    });
+                    break;
+                }
+                
+                if (p.z >= -0.1 && !p.hidden) {
+                    currentPath.push(p);
+                } else {
+                    if (currentPath.length > 1) subPaths.push(currentPath);
+                    currentPath = [];
+                }
+            }
+            if (currentPath.length > 1) subPaths.push(currentPath);
+            
+            const innerWidth = Math.min(6, 1.2 + maxWater * 0.4);
+            const outerWidth = innerWidth + 2.5;
+            
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             
-            for (let i = 0; i < points.length - 1; i++) {
-                const p1 = points[i];
-                const p2 = points[i+1];
+            // Draw smooth splines for each visible segment of the branch
+            for (const sp of subPaths) {
+                const drawLine = (color, width) => {
+                    ctx.beginPath();
+                    ctx.moveTo(sp[0].x, sp[0].y);
+                    if (sp.length === 2) {
+                        ctx.lineTo(sp[1].x, sp[1].y);
+                    } else {
+                        ctx.lineTo((sp[0].x + sp[1].x) / 2, (sp[0].y + sp[1].y) / 2);
+                        for (let i = 1; i < sp.length - 1; i++) {
+                            const pC = sp[i];
+                            const pN = sp[i+1];
+                            if (i === sp.length - 2) {
+                                ctx.quadraticCurveTo(pC.x, pC.y, pN.x, pN.y);
+                            } else {
+                                const midX = (pC.x + pN.x) / 2;
+                                const midY = (pC.y + pN.y) / 2;
+                                ctx.quadraticCurveTo(pC.x, pC.y, midX, midY);
+                            }
+                        }
+                    }
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = width;
+                    ctx.stroke();
+                };
                 
-                if (p1.z < -0.1 && p2.z < -0.1) continue; // Backface cull
-                if (p1.hidden && p2.hidden) continue;     // Subglacial
-                if (p1.isOcean) continue;                 // Prevent drawing ocean-to-ocean
-                
-                const avgWater = (p1.water + p2.water) / 2.0;
-                const innerWidth = Math.min(6, 1.2 + avgWater * 0.4);
-                const outerWidth = innerWidth + 2.5;
-                
-                // Truncate segment exactly at the coastline if it flows into the ocean
-                let drawX = p2.x;
-                let drawY = p2.y;
-                if (p2.isOcean) {
-                    drawX = (p1.x + p2.x) / 2;
-                    drawY = (p1.y + p2.y) / 2;
-                }
-                
-                // Outer border
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(drawX, drawY);
-                ctx.strokeStyle = '#0a2342';
-                ctx.lineWidth = outerWidth;
-                ctx.stroke();
-                
-                // Inner water
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(drawX, drawY);
-                ctx.strokeStyle = '#3b82f6';
-                ctx.lineWidth = innerWidth;
-                ctx.stroke();
+                drawLine('#0a2342', outerWidth); // Outer border
+                drawLine('#3b82f6', innerWidth); // Inner water
             }
         }
     }
