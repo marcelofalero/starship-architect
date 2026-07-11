@@ -558,6 +558,7 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
     let mut m = m_noise;
     let mut temp_bias = 0.0;
     let mut temp_scale = 1.0;
+    let mut is_eyeball = false;
     
     match planet_type {
         "desert" => {
@@ -583,17 +584,37 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
             // Lifeless, dry
             m = 0.0;
         }
+        "eyeball" => {
+            is_eyeball = true;
+        }
         _ => {} // terrestrial
     }
     
     let elevation = (e * 8.0).clamp(0.0, 7.0) as u8;
+    
+    // On Eyeball planets, moisture is baked out of the day-side and freezes on the night-side.
+    if is_eyeball {
+        if pos.z > 0.2 {
+            m = m * 0.2; // Dry day side (Desert)
+        } else if pos.z < -0.2 {
+            m = m * 1.5; // Wet (frozen) night side (Ice Cap/Tundra)
+        }
+    }
+    
     let moisture = (m * 8.0).clamp(0.0, 7.0) as u8;
     
     let lat_factor = 1.0 - abs_lat / (std::f64::consts::PI / 2.0);
     let elevation_penalty = (elevation as f64) * 0.08;
     let noise_var = (local_noise - 0.5) * 0.15;
     
-    let mut t_val = (lat_factor - elevation_penalty + noise_var) * temp_scale + temp_bias;
+    let mut t_val = if is_eyeball {
+        // Temperature strictly follows the distance to the sub-stellar point (z = 1.0)
+        let sub_stellar_dist = (pos.z + 1.0) / 2.0; 
+        (sub_stellar_dist - elevation_penalty + noise_var * 1.5).clamp(0.0, 1.0)
+    } else {
+        (lat_factor - elevation_penalty + noise_var) * temp_scale + temp_bias
+    };
+    
     t_val = t_val.clamp(0.0, 1.0);
     let temp = (t_val * 8.0) as u8;
     
