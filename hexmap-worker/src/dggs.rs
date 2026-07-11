@@ -629,7 +629,13 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
     let biome = resolve_whittaker_biome(planet_type, elevation, moisture, temp, local_noise);
     
     // Factions (Urbanization) & features
-    let faction_noise = fbm3d(V3::new(pos.x * 4.0, pos.y * 4.0, pos.z * 4.0), 2, seed_hash.wrapping_add(3000));
+    let raw_faction_noise = fbm3d(V3::new(pos.x * 4.0, pos.y * 4.0, pos.z * 4.0), 2, seed_hash.wrapping_add(3000));
+    
+    // FBM noise rarely hits the true 0.0 or 1.0 bounds (it clusters around 0.5).
+    // To ensure colonial worlds (5-20% urbanization) successfully spawn outposts,
+    // we aggressively stretch the noise curve so the lowest valleys truly hit 0.0.
+    let faction_noise = ((raw_faction_noise - 0.25) / 0.5).clamp(0.0, 1.0);
+    
     let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
     
     let base_threshold = urban_pct / 100.0;
