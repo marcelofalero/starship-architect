@@ -308,23 +308,31 @@ function generateRivers() {
     const flowTo = new Int32Array(dggsData.cells.length).fill(-1);
     const water = new Float32Array(dggsData.cells.length).fill(0);
     
-    // Pick candidates (high elevation, moist, strictly inland)
-    const candidates = [];
+    // Pick candidates (strictly inland)
+    let candidates = [];
     for (let i = 0; i < dggsData.cells.length; i++) {
         const t = dggsData.cells[i].tile;
-        if (t.biome !== 0 && t.biome !== 1 && t.elevation >= 3 && t.moisture >= 3 && distToOcean[i] > 2) {
+        // Require at least a little moisture, but don't strictly require high elevation
+        if (t.biome !== 0 && t.biome !== 1 && t.moisture >= 1 && distToOcean[i] > 2) {
             candidates.push(i);
         }
     }
     
-    // Shuffle deterministically
+    // Sort by cost-distance to ocean descending, prioritizing the deepest/hardest-to-reach inland points
+    candidates.sort((a, b) => distToOcean[b] - distToOcean[a]);
+    
+    // Take the top 20% furthest inland cells as our candidate pool
+    const poolSize = Math.max(10, Math.floor(candidates.length * 0.2));
+    candidates = candidates.slice(0, poolSize);
+    
+    // Shuffle the candidate pool
     for (let i = candidates.length - 1; i > 0; i--) {
         const j = Math.floor(random() * (i + 1));
         [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
     
-    // Take a limited number of sources based on globe size
-    const numSources = Math.max(5, Math.floor(dggsData.cells.length / 500));
+    // Generate an abundant number of sources, we will cull the tiny ones later
+    const numSources = Math.max(12, Math.floor(dggsData.cells.length / 120));
     const sources = candidates.slice(0, numSources);
     
     for (const source of sources) {
@@ -401,6 +409,12 @@ function generateRivers() {
             if (curr !== -1) {
                 const isGlacier = dggsData.cells[curr].tile.biome === 9;
                 branch.push({ idx: curr, water: water[curr], hidden: isGlacier });
+                
+                // If this branch flows directly into the ocean and is just a tiny coastal creek, discard it
+                const isOcean = dggsData.cells[curr].tile.biome === 0 || dggsData.cells[curr].tile.biome === 1;
+                if (isOcean && branch.length < 5) {
+                    continue; 
+                }
             }
             if (branch.length > 1) {
                 branches.push(branch);
