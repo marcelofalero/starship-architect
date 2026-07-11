@@ -891,14 +891,30 @@ function draw() {
             
             // Calculate meandering 3D points
             const basePoints = [];
-            for (const node of branch) {
+            for (let i = 0; i < branch.length; i++) {
+                const node = branch[i];
                 const cell = cells[node.idx];
                 if (!cell) continue;
+                
+                let nx = cell.center.x;
+                let ny = cell.center.y;
+                let nz = cell.center.z;
+                
+                // Stop the river slightly past the coastline (hex edge) rather than drawing to the center of the ocean
+                if (node.isOcean && i > 0) {
+                    const prevCell = cells[branch[i-1].idx];
+                    if (prevCell) {
+                        nx = prevCell.center.x * 0.4 + nx * 0.6;
+                        ny = prevCell.center.y * 0.4 + ny * 0.6;
+                        nz = prevCell.center.z * 0.4 + nz * 0.6;
+                    }
+                }
+                
                 basePoints.push({
                     idx: node.idx,
-                    origX: cell.center.x,
-                    origY: cell.center.y,
-                    origZ: cell.center.z,
+                    origX: nx,
+                    origY: ny,
+                    origZ: nz,
                     water: node.water,
                     hidden: node.hidden,
                     isOcean: node.isOcean
@@ -984,24 +1000,6 @@ function draw() {
             for (let i = 0; i < points.length; i++) {
                 const p = points[i];
                 maxWater = Math.max(maxWater, p.water);
-                
-                // Stop rendering at the exact midpoint if hitting the ocean
-                if (p.isOcean && currentPath.length > 0) {
-                    const prev = currentPath[currentPath.length - 1];
-                    currentPath.push({
-                        idx: p.idx,
-                        x: (prev.x + p.x) / 2,
-                        y: (prev.y + p.y) / 2,
-                        z: (prev.z + p.z) / 2,
-                        origX: (prev.origX + p.origX) / 2,
-                        origY: (prev.origY + p.origY) / 2,
-                        origZ: (prev.origZ + p.origZ) / 2,
-                        water: p.water,
-                        hidden: p.hidden,
-                        isOcean: true
-                    });
-                    break;
-                }
                 
                 if (p.z >= -0.1 && !p.hidden) {
                     currentPath.push(p);
