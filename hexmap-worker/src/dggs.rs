@@ -628,11 +628,22 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
     
     let biome = resolve_whittaker_biome(planet_type, elevation, moisture, temp, local_noise);
     
-    // Factions & features
+    // Factions (Urbanization) & features
     let faction_noise = fbm3d(V3::new(pos.x * 4.0, pos.y * 4.0, pos.z * 4.0), 2, seed_hash.wrapping_add(3000));
     let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
     
-    let faction = if faction_noise < 0.15 { ((faction_noise * 20.0) as u8).min(3) + 1 } else { 0 };
+    // Urbanization suitability based on biome
+    let urb_suitability = match biome {
+        4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest (Plains) - Most favored
+        2 | 3 | 11 | 12 => 1.0, // Coast, Desert, Bare, Swamp - Neutral
+        0 | 1 => 0.4, // Deep Ocean, Ocean - Less favored
+        7 | 8 | 9 | 10 | 13 => 0.1, // Taiga, Tundra, Ice Cap, Volcanic, Scorched - Least favored
+        _ => 1.0,
+    };
+    
+    let faction_threshold = 0.08 * urb_suitability;
+    let faction = if faction_noise < faction_threshold { ((faction_noise * 25.0) as u8).min(3).max(1) } else { 0 };
+    
     let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
     
     Tile { biome, elevation, moisture, faction, feature }

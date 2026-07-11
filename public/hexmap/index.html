@@ -49,6 +49,17 @@
         </div>
 
         <div class="panel-section">
+            <h3>Global Telemetry</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="margin:0;">Urbanization Level</label>
+                <span id="urban-percent" style="color: #00e5ff; font-family: 'Russo One', sans-serif;">0%</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                <div id="urban-bar" style="width: 0%; height: 100%; background: #00e5ff; box-shadow: 0 0 5px #00e5ff; transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+
+        <div class="panel-section">
             <h3>View Settings</h3>
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 15px;">
                 <input type="checkbox" id="auto-rotate" checked style="width: auto; margin-bottom: 0;">

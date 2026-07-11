@@ -826,32 +826,81 @@ function draw() {
         if (tile.feature > 0) {
             const isRevealed = dggsData.metadata?.revealedFeatures?.includes(i);
             const fc = FEATURE_COLORS[tile.feature] || '#fff';
-            if (userRole === 'gm') {
-                if (isRevealed) {
-                    ctx.beginPath();
-                    ctx.arc(c.hexCx, c.hexCy, 3, 0, Math.PI * 2);
-                    ctx.fillStyle = fc;
-                    ctx.fill();
-                } else {
-                    ctx.save();
+            
+            const drawFeatureIcon = (type, color, isHidden) => {
+                ctx.save();
+                ctx.translate(c.hexCx, c.hexCy);
+                if (isHidden) {
                     ctx.globalAlpha = 0.4;
-                    ctx.beginPath();
-                    ctx.arc(c.hexCx, c.hexCy, 3.5, 0, Math.PI * 2);
-                    ctx.strokeStyle = fc;
+                    ctx.strokeStyle = color;
                     ctx.setLineDash([1.5, 1.5]);
                     ctx.lineWidth = 1;
-                    ctx.stroke();
                     ctx.beginPath();
-                    ctx.arc(c.hexCx, c.hexCy, 2, 0, Math.PI * 2);
-                    ctx.fillStyle = fc;
-                    ctx.fill();
-                    ctx.restore();
+                    ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
                 }
-            } else if (isRevealed) {
+                
+                ctx.fillStyle = color;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                const size = 2.5;
+                
                 ctx.beginPath();
-                ctx.arc(c.hexCx, c.hexCy, 3, 0, Math.PI * 2);
-                ctx.fillStyle = fc;
-                ctx.fill();
+                switch(type) {
+                    case 1: // Ruins: Square
+                        ctx.rect(-size, -size, size*2, size*2);
+                        ctx.fill();
+                        break;
+                    case 2: // Crater: Empty circle with dot
+                        ctx.arc(0, 0, size, 0, Math.PI*2);
+                        ctx.stroke();
+                        ctx.beginPath(); ctx.arc(0, 0, size*0.3, 0, Math.PI*2); ctx.fill();
+                        break;
+                    case 3: // Geode: Diamond
+                        ctx.moveTo(0, -size*1.2); ctx.lineTo(size*1.2, 0); ctx.lineTo(0, size*1.2); ctx.lineTo(-size*1.2, 0);
+                        ctx.fill();
+                        break;
+                    case 4: // Anomaly: Star/Cross
+                        ctx.moveTo(-size*1.2, -size*1.2); ctx.lineTo(size*1.2, size*1.2);
+                        ctx.moveTo(size*1.2, -size*1.2); ctx.lineTo(-size*1.2, size*1.2);
+                        ctx.moveTo(0, -size*1.5); ctx.lineTo(0, size*1.5);
+                        ctx.moveTo(-size*1.5, 0); ctx.lineTo(size*1.5, 0);
+                        ctx.stroke();
+                        break;
+                    case 5: // Station: Triangle
+                        ctx.moveTo(0, -size*1.2); ctx.lineTo(size*1.2, size*0.8); ctx.lineTo(-size*1.2, size*0.8);
+                        ctx.fill();
+                        break;
+                    case 6: // Outpost: Crosshair
+                        ctx.arc(0, 0, size, 0, Math.PI*2); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(0, -size*1.5); ctx.lineTo(0, size*1.5); ctx.moveTo(-size*1.5, 0); ctx.lineTo(size*1.5, 0); ctx.stroke();
+                        break;
+                    case 7: // Vent: Triangle up empty
+                        ctx.moveTo(0, -size*1.2); ctx.lineTo(size*1.2, size*0.8); ctx.lineTo(-size*1.2, size*0.8); ctx.closePath();
+                        ctx.stroke();
+                        break;
+                    case 8: // Spires: 3 vertical spikes
+                        ctx.moveTo(-size*0.6, size); ctx.lineTo(-size*0.6, -size*0.5);
+                        ctx.moveTo(0, size); ctx.lineTo(0, -size*1.2);
+                        ctx.moveTo(size*0.6, size); ctx.lineTo(size*0.6, -size*0.2);
+                        ctx.stroke();
+                        break;
+                    case 9: // Monolith: Tall rectangle
+                        ctx.rect(-size*0.5, -size*1.5, size, size*3);
+                        ctx.fill();
+                        break;
+                    default:
+                        ctx.arc(0, 0, size, 0, Math.PI * 2);
+                        ctx.fill();
+                }
+                ctx.restore();
+            };
+
+            if (userRole === 'gm') {
+                drawFeatureIcon(tile.feature, fc, !isRevealed);
+            } else if (isRevealed) {
+                drawFeatureIcon(tile.feature, fc, false);
             }
         }
 
@@ -1389,6 +1438,17 @@ vmbUpload.addEventListener('change', (e) => {
             hudType.textContent = dggsData.metadata?.type || 'unknown';
             hudSize.textContent = `${dggsData.cells.length} cells`;
             hudTiles.textContent = dggsData.cells.length.toLocaleString();
+            
+            // Calculate Urbanization
+            let urbanCount = 0;
+            let totalLand = 0;
+            for (const cell of dggsData.cells) {
+                if (cell.tile.biome > 1) totalLand++; // Not ocean/deep ocean
+                if (cell.tile.faction > 0) urbanCount++;
+            }
+            const urbanPercent = totalLand > 0 ? ((urbanCount / totalLand) * 100).toFixed(1) : 0;
+            document.getElementById('urban-percent').textContent = `${urbanPercent}%`;
+            document.getElementById('urban-bar').style.width = `${urbanPercent}%`;
             selectedIdx = -1; hoveredIdx = -1;
             infoPanel.classList.remove('visible');
             uploadStatus.textContent = 'Loaded!';
