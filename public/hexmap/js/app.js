@@ -437,6 +437,16 @@ function generateRivers() {
     const avgLen = branches.length > 0 ? (totalLen / branches.length).toFixed(1) : 0;
     console.log(`[River Generation] Extracted ${branches.length} continuous branches.`);
     console.log(`[River Generation] Average length: ${avgLen} nodes. Tributaries (1-hex): ${singleHex}.`);
+    
+    // Log all branches to compare visual with data
+    console.log("[River Generation] Branch Data:");
+    branches.forEach((b, idx) => {
+        const pathDetails = b.map(n => {
+            const isOcean = dggsData.cells[n.idx].tile.biome === 0 || dggsData.cells[n.idx].tile.biome === 1;
+            return `${n.idx}${isOcean ? '(O)' : ''}`;
+        }).join(' -> ');
+        console.log(`  Branch ${idx} [len ${b.length}]: ${pathDetails}`);
+    });
     console.log(`[River Generation] Raw branch data:`, branches);
     
     dggsData.metadata.rivers = branches;
