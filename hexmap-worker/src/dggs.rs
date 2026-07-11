@@ -702,6 +702,12 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
         }
     } else { 0 };
     
+    // Hard restriction: Only Ocean worlds have the specialized tech/need to build massive floating Metropolises.
+    // On terrestrial worlds, restrict water settlements to small Outposts or Towns at best.
+    if planet_type != "ocean" && elevation < 4 && faction > 2 {
+        faction = 2; // Downgrade floating Megacities/Metropolises to Towns
+    }
+    
     // If civilization is established enough (urban_pct > 15%), ensure resources ALWAYS have at least a mining outpost
     if faction == 0 && is_resource && urban_pct > 15.0 {
         faction = 1;

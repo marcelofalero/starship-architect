@@ -305,14 +305,17 @@ function generateRivers() {
         }
     }
     
-    // Sort by cost-distance to ocean descending, prioritizing the deepest/hardest-to-reach inland points
-    candidates.sort((a, b) => distToOcean[b] - distToOcean[a]);
+    // Sort by cost-distance to ocean descending PLUS a heavy moisture bonus!
+    // This ensures rivers start in high-moisture inland areas (Mountains, Forests, Swamps) instead of Deserts.
+    candidates.sort((a, b) => {
+        const scoreA = distToOcean[a] + (dggsData.cells[a].tile.moisture * 3);
+        const scoreB = distToOcean[b] + (dggsData.cells[b].tile.moisture * 3);
+        return scoreB - scoreA;
+    });
     
-    // Take the top 30% furthest inland cells as our candidate pool
+    // Take the top 30% best (inland + wet) cells as our candidate pool
     const poolSize = Math.max(50, Math.floor(candidates.length * 0.3));
     candidates = candidates.slice(0, poolSize);
-    
-    // Shuffle the candidate pool
     for (let i = candidates.length - 1; i > 0; i--) {
         const j = Math.floor(random() * (i + 1));
         [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
