@@ -590,20 +590,21 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
         _ => {} // terrestrial
     }
     
-    // On Eyeball planets, we want a massive ocean on the day side, and solid ice on the night side.
+    // On Eyeball planets, we want a smaller central ocean (pupil), a dry ring (iris), and a massive ice cap (sclera).
     if is_eyeball {
-        let depth = (pos.z - 0.2).max(0.0) * 1.5; // Stronger effect closer to the center
-        if pos.z > 0.2 {
+        if pos.z > 0.75 {
             // Day side "pupil" ocean. Lower the elevation to force an ocean.
-            e = e * (1.0 - depth) - (depth * 0.2); 
+            let depth = (pos.z - 0.75) * 4.0; // 0.0 to 1.0 at the center
+            e = e * (1.0 - depth) - (depth * 0.3); 
             m = m * 2.0; 
-        } else if pos.z < -0.1 {
-            // Night side "sclera" ice cap. Raise elevation to ensure it's a solid landmass.
-            e = e * 0.6 + 0.4; 
-            m = m * 1.5; 
+        } else if pos.z > 0.3 {
+            // Twilight zone "iris" dry ground.
+            e = e * 0.8 + 0.2; // Ensure it's land
+            m = m * 0.2; // Bake the moisture out to make it dry/desert
         } else {
-            // Twilight zone "iris" habitable ring
-            m = m * 1.2;
+            // Night side "sclera" ice cap. Starts even on the edges of the day side!
+            e = e * 0.7 + 0.3; // Ensure it's land
+            m = m * 1.5; // High moisture for ice
         }
     }
     
