@@ -1016,6 +1016,7 @@ function draw() {
             // Solid RimWorld-style polylines
             ctx.lineJoin = 'miter';
             ctx.miterLimit = 2;
+            ctx.lineCap = 'round';
             
             for (const sp of subPaths) {
                 const drawLine = (color, width) => {
