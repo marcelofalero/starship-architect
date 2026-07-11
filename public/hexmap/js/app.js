@@ -254,22 +254,7 @@ function generateRivers() {
             distToOcean[i] = 0;
             currentQueue.push(i);
             inQueue[i] = 1;
-        } else {
-            // Local minima (endorheic basins) act as sinks if no ocean is nearby
-            let isMin = true;
-            const neighbors = dggsData.metadata.neighbors[i];
-            if (neighbors) {
-                for (const n of neighbors) {
-                    if (dggsData.cells[n].tile.elevation < t.elevation) {
-                        isMin = false; break;
-                    }
-                }
-            }
-            if (isMin) {
-                distToOcean[i] = 0;
-                currentQueue.push(i);
-                inQueue[i] = 1;
-            }
+            // Rivers must reach the ocean. Do not allow endorheic basins to act as sinks.
         }
     }
 
@@ -355,10 +340,10 @@ function generateRivers() {
                 if (distToOcean[n] < shortestDist) {
                     shortestDist = distToOcean[n];
                     bestNext = n;
-                } else if (distToOcean[n] === shortestDist && n < bestNext) {
+                } else if (distToOcean[n] === shortestDist && n < bestNext && !visited.has(n)) {
                     bestNext = n;
                 }
-                if (distToOcean[n] <= distToOcean[curr] && fallbackNext === -1) {
+                if (distToOcean[n] <= distToOcean[curr] && fallbackNext === -1 && !visited.has(n)) {
                     fallbackNext = n;
                 }
             }
