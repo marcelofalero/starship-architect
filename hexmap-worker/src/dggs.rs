@@ -636,7 +636,9 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
     // we aggressively stretch the noise curve so the lowest valleys truly hit 0.0.
     let faction_noise = ((raw_faction_noise - 0.25) / 0.5).clamp(0.0, 1.0);
     
-    let feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
+    let raw_feature_noise = fbm3d(V3::new(pos.x * 8.0, pos.y * 8.0, pos.z * 8.0), 2, seed_hash.wrapping_add(4000));
+    let feature_noise = ((raw_feature_noise - 0.25) / 0.5).clamp(0.0, 1.0);
+
     
     let base_threshold = urban_pct / 100.0;
     
@@ -659,7 +661,9 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
     // We model this using a "desperation" curve. At 100% urbanization, desperation is 1.0, and 
     // all negative terrain penalties are completely eliminated (raised to 1.0).
     let desperation = base_threshold.powi(2); // Quadratic curve: only spikes at high urbanization
-    let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
+    let feature = if feature_noise < 0.08 { 
+        ((seed_hash.wrapping_mul(_cell_idx as u32).wrapping_add(7777)) % 9) as u8 + 1 
+    } else { 0 };
     let is_resource = matches!(feature, 3 | 4 | 7 | 8); // Geode, Energy Anomaly, Vent, Spires
 
     let mut urb_suitability = if raw_suitability < 1.0 {
