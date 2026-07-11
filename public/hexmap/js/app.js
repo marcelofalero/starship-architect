@@ -335,6 +335,8 @@ function generateRivers() {
     const numSources = Math.max(30, Math.floor(dggsData.cells.length / 30));
     const sources = candidates.slice(0, numSources);
     
+    console.log(`[River Generation] Top candidates found: ${candidates.length}. Selected ${numSources} sources for tracing.`);
+    
     for (const source of sources) {
         let curr = source;
         const visited = new Set([curr]);
@@ -429,6 +431,18 @@ function generateRivers() {
             }
         }
     }
+    
+    // Telemetry for debugging and analysis
+    let singleHex = 0;
+    let totalLen = 0;
+    for (const b of branches) {
+        if (b.length === 2) singleHex++;
+        totalLen += b.length;
+    }
+    const avgLen = branches.length > 0 ? (totalLen / branches.length).toFixed(1) : 0;
+    console.log(`[River Generation] Extracted ${branches.length} continuous branches.`);
+    console.log(`[River Generation] Average length: ${avgLen} nodes. Tributaries (1-hex): ${singleHex}.`);
+    console.log(`[River Generation] Raw branch data:`, branches);
     
     dggsData.metadata.rivers = branches;
     return branches.length > 0;
