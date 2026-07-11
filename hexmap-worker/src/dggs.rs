@@ -656,14 +656,26 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     let faction_threshold = base_threshold * 0.4 * urb_suitability;
     let faction = if faction_noise < faction_threshold { 
         let ratio = faction_noise / faction_threshold;
-        if ratio < 0.0064 {
-            4 // Megacity (1 in 156)
-        } else if ratio < 0.0384 {
-            3 // Metropolis (5 in 156)
+        
+        let is_coastal = elevation == 4; // Elevation 4 is the first tier of land above water (Coast)
+        
+        let mut lvl4_thresh = 0.0064;
+        let mut lvl3_thresh = 0.0384;
+        
+        if is_coastal {
+            // Historic human behavior: the biggest cities are built on coastlines for trade/water access
+            lvl4_thresh *= 3.0;
+            lvl3_thresh *= 2.0;
+        }
+        
+        if ratio < lvl4_thresh {
+            4 // Megacity 
+        } else if ratio < lvl3_thresh {
+            3 // Metropolis
         } else if ratio < 0.1987 {
-            2 // Town (25 in 156)
+            2 // Town
         } else {
-            1 // Outpost (125 in 156)
+            1 // Outpost
         }
     } else { 0 };
     
