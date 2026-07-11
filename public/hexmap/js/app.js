@@ -467,24 +467,23 @@ function computePollution() {
     
     // 2. Diffuse/Spillover (Run for iterations to simulate propagation)
     const MAX_CAP = 1.0;
-    const THRESHOLD = 0.7; // Needs to be this high to start spilling over
-    const iterations = 8; // How far it spreads
+    const THRESHOLD = 0.4; // Lower threshold so smog spreads faster
+    const iterations = 8; 
     
     for (let iter = 0; iter < iterations; iter++) {
         let nextPollution = new Float32Array(pollution);
         
+        // A. Diffuse
         for (let i = 0; i < numCells; i++) {
             if (pollution[i] > THRESHOLD) {
-                // Calculate how much we can spill
                 const excess = pollution[i] - THRESHOLD;
                 if (excess > 0) {
                     const neighbors = dggsData.metadata.neighbors[i];
                     if (neighbors && neighbors.length > 0) {
-                        // Keep a portion of the excess, spill the rest equally to neighbors
-                        const spillAmount = (excess * 0.6) / neighbors.length;
+                        // 15% of excess flows to EACH neighbor (up to 90% total outward flow)
+                        const spillAmount = excess * 0.15;
                         
-                        nextPollution[i] -= (excess * 0.6); 
-                        
+                        nextPollution[i] -= (spillAmount * neighbors.length);
                         for (const n of neighbors) {
                             nextPollution[n] += spillAmount;
                         }
@@ -493,7 +492,19 @@ function computePollution() {
             }
         }
         
+        // B. Re-apply Sources (Cities constantly pump out smog, they don't just run out)
         for (let i = 0; i < numCells; i++) {
+            const cell = dggsData.cells[i];
+            let urbanPol = 0.0;
+            if (cell.tile.faction === 4) urbanPol = 1.5;
+            else if (cell.tile.faction === 3) urbanPol = 0.9;
+            else if (cell.tile.faction === 2) urbanPol = 0.4;
+            else if (cell.tile.faction === 1) urbanPol = 0.15;
+            
+            if (urbanPol > 0) {
+                // Ensure the city never drops below its base output
+                nextPollution[i] = Math.max(nextPollution[i], urbanPol * pollMod);
+            }
             pollution[i] = nextPollution[i];
         }
     }
