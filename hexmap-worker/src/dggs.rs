@@ -674,9 +674,15 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
         urb_suitability = (urb_suitability * 4.0).max(2.5);
     }
     
-    let faction_threshold = base_threshold * 0.4 * urb_suitability;
+    // Core Fix: Instead of just scaling the threshold, we directly modify the FBM noise using the terrain cost.
+    // This physically warps the noise landscape, pulling it down in Plains (causing cities to rapidly spill across them)
+    // and pushing it up in Mountains/Oceans (causing the organic sprawl to actively route around them).
+    let terrain_modifier = (1.0 - urb_suitability) * 0.25; 
+    let effective_noise = (faction_noise + terrain_modifier).clamp(0.0, 1.0);
     
-    let mut faction = if faction_noise < faction_threshold { 
+    let faction_threshold = base_threshold * 0.4; // Base threshold remains uniform globally
+    
+    let mut faction = if effective_noise < faction_threshold { 
         // Use a uniform hash to determine settlement size instead of FBM noise which rarely dips below 0.1!
         let city_roll = (seed_hash.wrapping_mul(_cell_idx as u32).wrapping_add(5555) % 10000) as f64 / 10000.0;
         
