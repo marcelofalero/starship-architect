@@ -895,46 +895,89 @@ function draw() {
             if (branch.length < 2) continue;
             
             // Calculate meandering 3D points
-            const points = [];
+            const basePoints = [];
             for (const node of branch) {
                 const cell = cells[node.idx];
                 if (!cell) continue;
-                
-                // Deterministic wander within the hex footprint
-                const h = node.idx;
-                const rx = (Math.sin(h * 12.9898) - 0.5) * maxOffset;
-                let nx = cell.center.x;
-                let ny = cell.center.y;
-                let nz = cell.center.z;
-                
-                // Jitter the hex center node slightly to avoid grid-locking
-                if (!node.isOcean) {
-                    const seed = Math.sin(node.idx * 17.3821) * 43758.5453;
-                    const noiseX = ((seed * 1.3) % 1) - 0.5;
-                    const noiseY = ((seed * 2.7) % 1) - 0.5;
-                    const noiseZ = ((seed * 3.1) % 1) - 0.5;
-                    
-                    const edgeLen = 0.5; // roughly max movement
-                    nx += noiseX * edgeLen;
-                    ny += noiseY * edgeLen;
-                    nz += noiseZ * edgeLen;
-                    
-                    const nLen = Math.sqrt(nx*nx + ny*ny + nz*nz);
-                    nx /= nLen; ny /= nLen; nz /= nLen;
-                }
-                
-                const rv = rotate3D(nx, ny, nz);
-                points.push({
+                basePoints.push({
                     idx: node.idx,
-                    x: rv.x * GLOBE_RADIUS,
-                    y: rv.y * GLOBE_RADIUS,
-                    z: rv.z,
-                    origX: nx,
-                    origY: ny,
-                    origZ: nz,
+                    origX: cell.center.x,
+                    origY: cell.center.y,
+                    origZ: cell.center.z,
                     water: node.water,
                     hidden: node.hidden,
                     isOcean: node.isOcean
+                });
+            }
+            
+            // Fractal Subdivide
+            function fractalSubdivide(p1, p2, iterations, maxDisp) {
+                if (iterations === 0) return [];
+                
+                const mx = (p1.origX + p2.origX) / 2;
+                const my = (p1.origY + p2.origY) / 2;
+                const mz = (p1.origZ + p2.origZ) / 2;
+                
+                const dx = p2.origX - p1.origX;
+                const dy = p2.origY - p1.origY;
+                const dz = p2.origZ - p1.origZ;
+                
+                let px = my * dz - mz * dy;
+                let py = mz * dx - mx * dz;
+                let pz = mx * dy - my * dx;
+                const plen = Math.sqrt(px * px + py * py + pz * pz);
+                if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
+                
+                // Deterministic seed based on coordinates and iteration depth
+                const edgeId = (p1.origX + p2.origX) * 1000 + (p1.origY + p2.origY) * 100;
+                const seed = Math.sin(edgeId * 13.9898 + iterations * 17.3) * 43758.5453;
+                const noise = (seed - Math.floor(seed)) - 0.5;
+                
+                const disp = maxDisp * noise;
+                
+                let cx = mx + px * disp;
+                let cy = my + py * disp;
+                let cz = mz + pz * disp;
+                
+                const cLen = Math.sqrt(cx*cx + cy*cy + cz*cz);
+                cx /= cLen; cy /= cLen; cz /= cLen;
+                
+                const midNode = { 
+                    origX: cx, origY: cy, origZ: cz, 
+                    water: (p1.water + p2.water) / 2, 
+                    hidden: p1.hidden && p2.hidden,
+                    isOcean: false 
+                };
+                
+                const left = fractalSubdivide(p1, midNode, iterations - 1, maxDisp * 0.5);
+                const right = fractalSubdivide(midNode, p2, iterations - 1, maxDisp * 0.5);
+                
+                return [...left, midNode, ...right];
+            }
+            
+            const fractalPoints = [];
+            for (let i = 0; i < basePoints.length - 1; i++) {
+                fractalPoints.push(basePoints[i]);
+                const segmentLen = 0.05; // average hex distance
+                const inner = fractalSubdivide(basePoints[i], basePoints[i+1], 3, segmentLen * 0.8);
+                fractalPoints.push(...inner);
+            }
+            fractalPoints.push(basePoints[basePoints.length - 1]);
+            
+            // Project to 2D
+            const points = [];
+            for (const p of fractalPoints) {
+                const rv = rotate3D(p.origX, p.origY, p.origZ);
+                points.push({
+                    x: rv.x * GLOBE_RADIUS,
+                    y: rv.y * GLOBE_RADIUS,
+                    z: rv.z,
+                    origX: p.origX,
+                    origY: p.origY,
+                    origZ: p.origZ,
+                    water: p.water,
+                    hidden: p.hidden,
+                    isOcean: p.isOcean
                 });
             }
             
@@ -974,88 +1017,27 @@ function draw() {
             }
             if (currentPath.length > 1) subPaths.push(currentPath);
             
-            const innerWidth = Math.min(4, 0.8 + maxWater * 0.3);
-            const outerWidth = innerWidth + 1.5;
+            const innerWidth = Math.min(3.5, 0.8 + maxWater * 0.2);
+            const outerWidth = innerWidth + 1.2;
             
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            // Solid RimWorld-style polylines
+            ctx.lineJoin = 'miter';
+            ctx.miterLimit = 2;
             
-            // Draw smooth splines for each visible segment of the branch
             for (const sp of subPaths) {
-                // Subdivide the path by injecting winding-normal offset midpoints
-                const subdivided = [];
-                for (let i = 0; i < sp.length - 1; i++) {
-                    const p1 = sp[i];
-                    const p2 = sp[i+1];
-                    subdivided.push(p1);
-                    
-                    // Inject a midpoint
-                    const edgeId = p1.idx < p2.idx ? p1.idx * 100000 + p2.idx : p2.idx * 100000 + p1.idx;
-                    const seed = Math.sin(edgeId * 13.9898) * 43758.5453;
-                    const noise = (seed - Math.floor(seed)) - 0.5;
-                    
-                    const mx = (p1.origX + p2.origX) / 2;
-                    const my = (p1.origY + p2.origY) / 2;
-                    const mz = (p1.origZ + p2.origZ) / 2;
-                    
-                    const dx = p2.origX - p1.origX;
-                    const dy = p2.origY - p1.origY;
-                    const dz = p2.origZ - p1.origZ;
-                    
-                    let px = my * dz - mz * dy;
-                    let py = mz * dx - mx * dz;
-                    let pz = mx * dy - my * dx;
-                    const plen = Math.sqrt(px * px + py * py + pz * pz);
-                    if (plen > 1e-6) { px /= plen; py /= plen; pz /= plen; }
-                    
-                    const segmentLen = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    const offsetDist = segmentLen * 0.45 * noise; // increased meandering
-                    
-                    let cx = mx + px * offsetDist;
-                    let cy = my + py * offsetDist;
-                    let cz = mz + pz * offsetDist;
-                    
-                    const cLen = Math.sqrt(cx*cx + cy*cy + cz*cz);
-                    cx /= cLen; cy /= cLen; cz /= cLen;
-                    
-                    const rvC = rotate3D(cx, cy, cz);
-                    subdivided.push({
-                        x: rvC.x * GLOBE_RADIUS,
-                        y: rvC.y * GLOBE_RADIUS,
-                        z: rvC.z
-                    });
-                }
-                subdivided.push(sp[sp.length - 1]);
-                
                 const drawLine = (color, width) => {
                     ctx.beginPath();
-                    ctx.moveTo(subdivided[0].x, subdivided[0].y);
-                    
-                    if (subdivided.length === 2) {
-                        ctx.lineTo(subdivided[1].x, subdivided[1].y);
-                    } else {
-                        // Midpoint Bezier algorithm for perfect C1 smoothness
-                        ctx.lineTo((subdivided[0].x + subdivided[1].x) / 2, (subdivided[0].y + subdivided[1].y) / 2);
-                        for (let i = 1; i < subdivided.length - 1; i++) {
-                            const pC = subdivided[i];
-                            const pN = subdivided[i+1];
-                            if (i === subdivided.length - 2) {
-                                ctx.quadraticCurveTo(pC.x, pC.y, pN.x, pN.y);
-                            } else {
-                                const midX = (pC.x + pN.x) / 2;
-                                const midY = (pC.y + pN.y) / 2;
-                                ctx.quadraticCurveTo(pC.x, pC.y, midX, midY);
-                            }
-                        }
+                    ctx.moveTo(sp[0].x, sp[0].y);
+                    for (let i = 1; i < sp.length; i++) {
+                        ctx.lineTo(sp[i].x, sp[i].y);
                     }
-                    
                     ctx.strokeStyle = color;
                     ctx.lineWidth = width;
                     ctx.stroke();
                 };
                 
-                drawLine('#0a2342', outerWidth); // Outer border
-                drawLine('#3b82f6', innerWidth); // Inner water
+                drawLine('#091a2e', outerWidth); // Darker border
+                drawLine('#2a6b9a', innerWidth); // Lighter muddy blue core
             }
         }
     }
