@@ -751,8 +751,13 @@ function draw() {
             borderColor = `hsl(${hue}, 90%, 30%)`;
         } else if (currentLens === 'em') {
             // EM Field Scan: Detects energy signatures from ruins, anomalies, ships, storms
-            // Base background EM (dark slate/purple) with slight procedural noise
-            let em = Math.abs(Math.sin(cell.center.x * 20) * Math.cos(cell.center.y * 20)) * 0.15;
+            
+            // Global Background Radio Noise (scales with planetary urbanization for non-local communication scatter)
+            const urb = dggsData.metadata?.urbanization !== undefined ? dggsData.metadata.urbanization : 15;
+            const globalRadioNoise = (urb / 100.0) * 0.35; // Up to 0.35 global noise floor on Ecumenopolis worlds
+            
+            // Base background EM (dark slate/purple) with slight procedural noise + global scatter
+            let em = globalRadioNoise + Math.abs(Math.sin(cell.center.x * 20) * Math.cos(cell.center.y * 20)) * 0.15;
 
             // Geological / Natural
             if (cell.tile.biome === 11) em += 0.2; // Lava generates some EM noise
