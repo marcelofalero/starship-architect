@@ -654,7 +654,12 @@ function draw() {
             // Add a small modifier based on elevation and latitude so it's not completely uniform
             const latMod = (1.0 - Math.abs(cell.center.y) - 0.5) * 0.1;
             const elMod = ((cell.tile.elevation || 0) / 10) * 0.1;
-            const finalTemp = Math.max(0, Math.min(1, baseTemp + latMod - elMod));
+            let finalTemp = Math.max(0, Math.min(1, baseTemp + latMod - elMod));
+            
+            // Urbanization generates heat (Urban Heat Island effect)
+            if (cell.tile.faction > 0) {
+                finalTemp = Math.min(1, finalTemp + (cell.tile.faction * 0.15));
+            }
 
             // hue 240 (blue) to 0 (red)
             const hue = (1.0 - finalTemp) * 240;
@@ -694,6 +699,12 @@ function draw() {
             else if (f === 7) em = 0.4; // Geothermal Vent
             else if (f === 8) em = 0.7; // Crystalline Spires
             else if (f === 9) em = 0.9; // Alien Monolith
+            
+            // Urbanization EM Output
+            if (cell.tile.faction === 1) em = Math.max(em, 0.4);
+            else if (cell.tile.faction === 2) em = Math.max(em, 0.6);
+            else if (cell.tile.faction === 3) em = Math.max(em, 0.85);
+            else if (cell.tile.faction === 4) em = Math.max(em, 1.0);
 
             // Ships
             if (dggsData.metadata && dggsData.metadata.landingCell === i) em = 1.0;
@@ -707,6 +718,28 @@ function draw() {
 
             fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
             borderColor = `hsl(${hue}, ${sat}%, ${light + 10}%)`;
+        } else if (currentLens === 'pollution') {
+            // Pollution: High in heavy industry, large cities, volcanic areas
+            let pol = 0.0;
+            
+            // Base geological pollution (volcanic outgassing)
+            if (cell.tile.biome === 11 || cell.tile.biome === 13) pol += 0.4; // Volcanic / Scorched
+            
+            // Urbanization is the primary driver of pollution
+            if (cell.tile.faction === 1) pol += 0.15;
+            else if (cell.tile.faction === 2) pol += 0.4;
+            else if (cell.tile.faction === 3) pol += 0.75;
+            else if (cell.tile.faction === 4) pol += 1.0; // Megacities are toxic
+            
+            pol = Math.max(0, Math.min(1, pol));
+            
+            // Color map: 0 = Clean (Light Green) -> 1 = Toxic (Deep Orange/Brown)
+            const hue = 110 - (pol * 110); // 110 (green) -> 0 (red)
+            const sat = 70 - (pol * 20); // 70 -> 50
+            const light = 60 - (pol * 35); // 60 -> 25
+            
+            fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
+            borderColor = `hsl(${hue}, ${sat}%, ${light - 10}%)`;
         } else {
             const biome = getBiomeInfo(cell.tile.biome);
             fillColor = biome.color;
