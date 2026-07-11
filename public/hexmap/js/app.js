@@ -728,10 +728,14 @@ function draw() {
             if (cell.tile.biome === 11 || cell.tile.biome === 13) pol += 0.4; // Volcanic / Scorched
             
             // Urbanization is the primary driver of pollution
-            if (cell.tile.faction === 1) pol += 0.15;
-            else if (cell.tile.faction === 2) pol += 0.4;
-            else if (cell.tile.faction === 3) pol += 0.75;
-            else if (cell.tile.faction === 4) pol += 1.0; // Megacities are toxic
+            const pollMod = (dggsData.metadata?.pollution !== undefined ? dggsData.metadata.pollution : 100) / 100.0;
+            let urbanPol = 0.0;
+            if (cell.tile.faction === 1) urbanPol = 0.15;
+            else if (cell.tile.faction === 2) urbanPol = 0.4;
+            else if (cell.tile.faction === 3) urbanPol = 0.75;
+            else if (cell.tile.faction === 4) urbanPol = 1.0; // Megacities are toxic
+            
+            pol += urbanPol * pollMod;
             
             pol = Math.max(0, Math.min(1, pol));
             
@@ -1420,10 +1424,10 @@ function selectCell(idx) {
 
 // ── Data Loading ──
 let currentLoadId = 0;
-async function loadDGGS(seed, type, resolution, urbanization = 15) {
+async function loadDGGS(seed, type, resolution, urbanization = 15, pollution = 100, conservation = 0) {
     const loadId = ++currentLoadId;
     try {
-        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}&urbanization=${urbanization}`;
+        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}&urbanization=${urbanization}&pollution=${pollution}&conservation=${conservation}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Worker returned ${res.status}`);
         const buffer = await res.arrayBuffer();
@@ -1515,8 +1519,10 @@ generateBtn.addEventListener('click', () => {
     const seed = seedInput.value.trim() || 'Sol_III';
     const type = typeSelect.value;
     const resolution = parseInt(radiusInput.value) || 4;
-    const urbanization = parseInt(urbanizationInput?.value || 15);
-    loadDGGS(seed, type, resolution, urbanization);
+    const urbanization = parseInt(document.getElementById('map-urbanization')?.value || 15);
+    const pollution = parseInt(document.getElementById('map-pollution')?.value || 100);
+    const conservation = parseInt(document.getElementById('map-conservation')?.value || 0);
+    loadDGGS(seed, type, resolution, urbanization, pollution, conservation);
 });
 
 closeInfoBtn.addEventListener('click', () => { selectedIdx = -1; infoPanel.classList.remove('visible'); });
@@ -1587,8 +1593,12 @@ async function saveDGGSMetadata() {
         const res = dggsData.metadata?.resolution || resParam;
         const urbInput = document.getElementById('map-urbanization');
         const urb = dggsData.metadata?.urbanization !== undefined ? dggsData.metadata.urbanization : (urbInput ? parseInt(urbInput.value) : 15);
+        const pollInput = document.getElementById('map-pollution');
+        const poll = dggsData.metadata?.pollution !== undefined ? dggsData.metadata.pollution : (pollInput ? parseInt(pollInput.value) : 100);
+        const consInput = document.getElementById('map-conservation');
+        const cons = dggsData.metadata?.conservation !== undefined ? dggsData.metadata.conservation : (consInput ? parseInt(consInput.value) : 0);
 
-        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${res}&urbanization=${urb}`;
+        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${res}&urbanization=${urb}&pollution=${poll}&conservation=${cons}`;
 
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],

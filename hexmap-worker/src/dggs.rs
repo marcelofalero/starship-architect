@@ -149,7 +149,7 @@ fn is_near(a: usize, b: usize, neighbors: &[Vec<u32>], steps: usize) -> bool {
 }
 
 /// Generate a DGGS grid at the given resolution using icosahedral subdivision.
-pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f64) -> DGGSGrid {
+pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f64, pollution: f64, conservation: f64) -> DGGSGrid {
     // Step 1: Build icosphere
     let (verts, faces, face_paths) = build_icosphere(resolution as usize);
 
@@ -158,7 +158,7 @@ pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f
 
     // Step 3: Assign tile data to each cell based on its spherical position
     let cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
-        let tile = generate_tile_for_position(seed, planet_type, urban_pct, center, i);
+        let tile = generate_tile_for_position(seed, planet_type, urban_pct, pollution, conservation, center, i);
         DGGSCell { center, vertices: boundary, tile }
     }).collect();
 
@@ -540,7 +540,7 @@ fn resolve_whittaker_biome(planet_type: &str, elevation: u8, moisture: u8, temp:
 }
 
 /// Generate tile data for a DGGS cell based on its position on the unit sphere.
-fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos: V3, _cell_idx: usize) -> Tile {
+fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pollution_pct: f64, conservation_pct: f64, pos: V3, _cell_idx: usize) -> Tile {
     let mut seed_hash: u32 = 0;
     for c in seed.chars() {
         seed_hash = seed_hash.wrapping_mul(31).wrapping_add(c as u32);
@@ -671,7 +671,8 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     let faction_threshold = base_threshold * 0.4 * urb_suitability;
     
     let mut faction = if faction_noise < faction_threshold { 
-        let ratio = faction_noise / faction_threshold;
+        // Use a uniform hash to determine settlement size instead of FBM noise which rarely dips below 0.1!
+        let city_roll = (seed_hash.wrapping_mul(_cell_idx as u32).wrapping_add(5555) % 10000) as f64 / 10000.0;
         
         let is_coastal = elevation == 4; // Elevation 4 is the first tier of land above water (Coast)
         
@@ -684,11 +685,11 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
             lvl3_thresh *= 2.0;
         }
         
-        if ratio < lvl4_thresh {
+        if city_roll < lvl4_thresh {
             4 // Megacity 
-        } else if ratio < lvl3_thresh {
+        } else if city_roll < lvl3_thresh {
             3 // Metropolis
-        } else if ratio < 0.1987 {
+        } else if city_roll < 0.1987 {
             2 // Town
         } else {
             1 // Outpost
@@ -700,13 +701,31 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
         faction = 1;
     }
     
-    // Massive cities (Level 3+) completely pave over natural land biomes, turning them into Urban Sprawl
     let mut final_biome = biome;
-    if faction >= 3 && elevation >= 4 { // Land only, floating cities retain their ocean biome
-        final_biome = 14; 
+    let mut final_elevation = elevation;
+    
+    // Conservation Mechanics
+    let is_high_conservation = conservation_pct >= 50.0;
+    
+    if faction >= 3 {
+        if elevation >= 4 {
+            // Land city
+            if !is_high_conservation {
+                // Low conservation completely paves over natural land biomes, turning them into Urban Sprawl
+                final_biome = 14; 
+            }
+        } else if elevation == 3 {
+            // Shallow water city
+            if !is_high_conservation {
+                // Low conservation terraforms shallow wastes into coastal plains to build!
+                final_elevation = 4;
+                final_biome = 14; // And paves it
+            }
+            // High conservation adapts, building floating cities that keep the shallow ocean biome!
+        }
     }
     
-    Tile { biome: final_biome, elevation, moisture, faction, feature }
+    Tile { biome: final_biome, elevation: final_elevation, moisture, faction, feature }
 }
 
 /// Encode a DGGS grid into the VRGD binary format.

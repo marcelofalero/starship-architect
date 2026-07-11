@@ -50,6 +50,17 @@
                 <span id="urban-value" style="color: #00e5ff; font-family: 'Russo One', sans-serif; font-size: 0.9em;">15%</span>
             </div>
             <input type="range" id="map-urbanization" min="0" max="100" value="15" style="width: 100%; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <label for="map-pollution" style="margin:0;">Pollution Output</label>
+                <span id="poll-value" style="color: #9ccc65; font-family: 'Russo One', sans-serif; font-size: 0.9em;">100%</span>
+            </div>
+            <input type="range" id="map-pollution" min="0" max="100" value="100" style="width: 100%; margin-bottom: 5px;" oninput="document.getElementById('poll-value').textContent = this.value + '%'">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <label for="map-conservation" style="margin:0;">Conservation</label>
+                <span id="cons-value" style="color: #66bb6a; font-family: 'Russo One', sans-serif; font-size: 0.9em;">0%</span>
+            </div>
+            <input type="range" id="map-conservation" min="0" max="100" value="0" style="width: 100%; margin-bottom: 15px;" oninput="document.getElementById('cons-value').textContent = this.value + '%'">
 
             <button id="generate-btn">Generate & Render</button>
         </div>

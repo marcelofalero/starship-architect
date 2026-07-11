@@ -324,12 +324,14 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
             let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
             let urbanization: f64 = query.get("urbanization").and_then(|s| s.parse().ok()).unwrap_or(15.0);
+            let pollution: f64 = query.get("pollution").and_then(|s| s.parse().ok()).unwrap_or(100.0);
+            let conservation: f64 = query.get("conservation").and_then(|s| s.parse().ok()).unwrap_or(0.0);
 
             if resolution > 6 {
                 return Response::error("Resolution must be 0-6", 400);
             }
 
-            let cache_key = format!("dggs:v17:{}:{}:{}:{}", seed, planet_type, resolution, urbanization);
+            let cache_key = format!("dggs:v18:{}:{}:{}:{}:{}:{}", seed, planet_type, resolution, urbanization, pollution, conservation);
             let mut headers = Headers::new();
             headers.set("Access-Control-Allow-Origin", "*")?;
             headers.set("Content-Type", "application/octet-stream")?;
@@ -338,12 +340,14 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 return Ok(Response::from_bytes(binary)?.with_headers(headers));
             }
 
-            let grid = dggs::generate_dggs(&seed, planet_type, resolution, urbanization);
+            let grid = dggs::generate_dggs(&seed, planet_type, resolution, urbanization, pollution, conservation);
             let metadata = json!({
                 "seed": seed,
                 "type": planet_type,
                 "resolution": resolution,
                 "urbanization": urbanization,
+                "pollution": pollution,
+                "conservation": conservation,
                 "cellCount": grid.cells.len(),
                 "generatedAt": Date::now().to_string(),
                 "neighbors": grid.neighbors,
@@ -364,12 +368,14 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
             let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
             let urbanization: f64 = query.get("urbanization").and_then(|s| s.parse().ok()).unwrap_or(15.0);
+            let pollution: f64 = query.get("pollution").and_then(|s| s.parse().ok()).unwrap_or(100.0);
+            let conservation: f64 = query.get("conservation").and_then(|s| s.parse().ok()).unwrap_or(0.0);
 
             if resolution > 6 {
                 return Response::error("Resolution must be 0-6", 400);
             }
 
-            let cache_key = format!("dggs:v17:{}:{}:{}:{}", seed, planet_type, resolution, urbanization);
+            let cache_key = format!("dggs:v18:{}:{}:{}:{}:{}:{}", seed, planet_type, resolution, urbanization, pollution, conservation);
             let mut headers = Headers::new();
             headers.set("Access-Control-Allow-Origin", "*")?;
             headers.set("Content-Type", "application/octet-stream")?;
@@ -379,7 +385,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             let binary = if let Some(existing_binary) = get_map(&ctx.env, &cache_key).await? {
                 existing_binary
             } else {
-                let grid = dggs::generate_dggs(&seed, planet_type, resolution, urbanization);
+                let grid = dggs::generate_dggs(&seed, planet_type, resolution, urbanization, pollution, conservation);
                 let metadata = json!({
                     "seed": seed,
                     "type": planet_type,
