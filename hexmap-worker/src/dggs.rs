@@ -647,14 +647,24 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
     // We model this using a "desperation" curve. At 100% urbanization, desperation is 1.0, and 
     // all negative terrain penalties are completely eliminated (raised to 1.0).
     let desperation = base_threshold.powi(2); // Quadratic curve: only spikes at high urbanization
-    let urb_suitability = if raw_suitability < 1.0 {
+    let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
+    let is_resource = matches!(feature, 3 | 4 | 7 | 8); // Geode, Energy Anomaly, Vent, Spires
+
+    let mut urb_suitability = if raw_suitability < 1.0 {
         raw_suitability + (1.0 - raw_suitability) * desperation
     } else {
         raw_suitability
     };
     
+    if is_resource {
+        // Highly valuable resources attract corporate and government mining/research towns.
+        // We massively boost the suitability of this specific hex.
+        urb_suitability = (urb_suitability * 4.0).max(2.5);
+    }
+    
     let faction_threshold = base_threshold * 0.4 * urb_suitability;
-    let faction = if faction_noise < faction_threshold { 
+    
+    let mut faction = if faction_noise < faction_threshold { 
         let ratio = faction_noise / faction_threshold;
         
         let is_coastal = elevation == 4; // Elevation 4 is the first tier of land above water (Coast)
@@ -679,7 +689,10 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos
         }
     } else { 0 };
     
-    let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
+    // If civilization is established enough (urban_pct > 15%), ensure resources ALWAYS have at least a mining outpost
+    if faction == 0 && is_resource && urban_pct > 15.0 {
+        faction = 1;
+    }
     
     Tile { biome, elevation, moisture, faction, feature }
 }
