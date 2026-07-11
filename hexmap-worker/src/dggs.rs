@@ -149,7 +149,7 @@ fn is_near(a: usize, b: usize, neighbors: &[Vec<u32>], steps: usize) -> bool {
 }
 
 /// Generate a DGGS grid at the given resolution using icosahedral subdivision.
-pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8) -> DGGSGrid {
+pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f64) -> DGGSGrid {
     // Step 1: Build icosphere
     let (verts, faces, face_paths) = build_icosphere(resolution as usize);
 
@@ -158,7 +158,7 @@ pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8) -> DGGSGrid 
 
     // Step 3: Assign tile data to each cell based on its spherical position
     let cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
-        let tile = generate_tile_for_position(seed, planet_type, center, i);
+        let tile = generate_tile_for_position(seed, planet_type, urban_pct, center, i);
         DGGSCell { center, vertices: boundary, tile }
     }).collect();
 
@@ -540,7 +540,7 @@ fn resolve_whittaker_biome(planet_type: &str, elevation: u8, moisture: u8, temp:
 }
 
 /// Generate tile data for a DGGS cell based on its position on the unit sphere.
-fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx: usize) -> Tile {
+fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pos: V3, _cell_idx: usize) -> Tile {
     let mut seed_hash: u32 = 0;
     for c in seed.chars() {
         seed_hash = seed_hash.wrapping_mul(31).wrapping_add(c as u32);
@@ -641,8 +641,11 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
         _ => 1.0,
     };
     
-    let faction_threshold = 0.08 * urb_suitability;
-    let faction = if faction_noise < faction_threshold { ((faction_noise * 25.0) as u8).min(3).max(1) } else { 0 };
+    let base_threshold = urban_pct / 100.0;
+    let faction_threshold = base_threshold * 0.4 * urb_suitability;
+    let faction = if faction_noise < faction_threshold { 
+        ((faction_noise / faction_threshold * 3.0) as u8).min(3).max(1) 
+    } else { 0 };
     
     let feature = if feature_noise < 0.08 { ((feature_noise * 110.0) as u8).min(9) + 1 } else { 0 };
     

@@ -1331,10 +1331,10 @@ function selectCell(idx) {
 
 // ── Data Loading ──
 let currentLoadId = 0;
-async function loadDGGS(seed, type, resolution) {
+async function loadDGGS(seed, type, resolution, urbanization = 15) {
     const loadId = ++currentLoadId;
     try {
-        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}`;
+        const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}&urbanization=${urbanization}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Worker returned ${res.status}`);
         const buffer = await res.arrayBuffer();
@@ -1413,12 +1413,21 @@ canvas.addEventListener('wheel', (e) => {
     targetScale = Math.max(0.3, Math.min(5.0, targetScale * zf));
 });
 
+const urbanizationInput = document.getElementById('map-urbanization');
+const urbanValueSpan = document.getElementById('urban-value');
+if (urbanizationInput) {
+    urbanizationInput.addEventListener('input', (e) => {
+        urbanValueSpan.textContent = `${e.target.value}%`;
+    });
+}
+
 // ── Controls ──
 generateBtn.addEventListener('click', () => {
     const seed = seedInput.value.trim() || 'Sol_III';
     const type = typeSelect.value;
     const resolution = parseInt(radiusInput.value) || 4;
-    loadDGGS(seed, type, resolution);
+    const urbanization = parseInt(urbanizationInput?.value || 15);
+    loadDGGS(seed, type, resolution, urbanization);
 });
 
 closeInfoBtn.addEventListener('click', () => { selectedIdx = -1; infoPanel.classList.remove('visible'); });
