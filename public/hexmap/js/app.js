@@ -420,11 +420,6 @@ function generateRivers() {
             }
             
             if (branch.length > 0) {
-                const finalNode = branch[branch.length - 1];
-                // Cull microscopic creeks that dump directly into the sea
-                if (finalNode.isOcean && branch.length < 4) {
-                    continue; 
-                }
                 if (branch.length > 1) {
                     branches.push(branch);
                 }
@@ -979,8 +974,8 @@ function draw() {
             }
             if (currentPath.length > 1) subPaths.push(currentPath);
             
-            const innerWidth = Math.min(6, 1.2 + maxWater * 0.4);
-            const outerWidth = innerWidth + 2.5;
+            const innerWidth = Math.min(4, 0.8 + maxWater * 0.3);
+            const outerWidth = innerWidth + 1.5;
             
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
