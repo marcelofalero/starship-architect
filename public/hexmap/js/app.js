@@ -517,10 +517,202 @@ function computePollution() {
     dggsData.metadata.computedPollution = pollution;
 }
 
+function applyMetadataOverrides() {
+    if (!dggsData || !dggsData.metadata) return;
+    
+    // 1. Mutations (terrain changes)
+    if (dggsData.metadata.mutations) {
+        for (const idx in dggsData.metadata.mutations) {
+            const mut = dggsData.metadata.mutations[idx];
+            const cell = dggsData.cells[idx];
+            if (cell) {
+                if (mut.biome !== undefined) cell.tile.biome = mut.biome;
+                if (mut.elevation !== undefined) cell.tile.elevation = mut.elevation;
+                if (mut.moisture !== undefined) cell.tile.moisture = mut.moisture;
+            }
+        }
+    }
+    
+    // 2. Custom Features
+    if (dggsData.metadata.customFeatures) {
+        for (const idx in dggsData.metadata.customFeatures) {
+            const feat = dggsData.metadata.customFeatures[idx];
+            const cell = dggsData.cells[idx];
+            if (cell) {
+                cell.tile.feature = feat;
+            }
+        }
+    }
+}
+
+function resolveSpecialization(cellIdx) {
+    const favs = dggsData.favorabilities[cellIdx];
+    if (!favs) return 'industrial'; // fallback
+    
+    let bestSpec = 'industrial';
+    let maxVal = -1;
+    for (const spec of ['agri', 'mining', 'research', 'industrial', 'tourism']) {
+        if (favs[spec] > maxVal) {
+            maxVal = favs[spec];
+            bestSpec = spec;
+        }
+    }
+    
+    const specNames = {
+        agri: 'agricultural',
+        mining: 'mining',
+        research: 'research',
+        industrial: 'industrial',
+        tourism: 'tourism'
+    };
+    return specNames[bestSpec];
+}
+
+function computeFavorabilities() {
+    if (!dggsData) return;
+    
+    dggsData.favorabilities = new Array(dggsData.cells.length);
+    
+    const riverCells = new Set();
+    if (dggsData.metadata && dggsData.metadata.rivers) {
+        for (const branch of dggsData.metadata.rivers) {
+            for (const node of branch) {
+                riverCells.add(node.idx);
+            }
+        }
+    }
+    
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        const cell = dggsData.cells[i];
+        const t = cell.tile;
+        const moisture = t.moisture;
+        const elevation = t.elevation;
+        const biome = t.biome;
+        const feature = t.feature;
+        
+        const isRiver = riverCells.has(i);
+        
+        let isCoastal = false;
+        if (elevation === 4) {
+            const neighbors = cellEdgeNeighbors[i] || [];
+            for (const nIdx of neighbors) {
+                if (nIdx !== -1 && nIdx !== undefined) {
+                    const nc = dggsData.cells[nIdx];
+                    if (nc && (nc.tile.elevation <= 3 || nc.tile.biome === 0 || nc.tile.biome === 1)) {
+                        isCoastal = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 1. Agricultural
+        let agri = 0;
+        if (biome > 1 && biome !== 11) {
+            if (biome === 5) agri += 40;
+            else if (biome === 4) agri += 30;
+            else if (biome === 6) agri += 30;
+            else if (biome === 12) agri += 25;
+            
+            if (isRiver) agri += 45;
+            if (isCoastal) agri += 10;
+            
+            agri += moisture * 5;
+            
+            if (biome === 3) agri -= 25;
+            if (biome === 10) agri -= 35;
+            if (biome === 8) agri -= 35;
+            if (biome === 9) agri -= 48;
+        }
+        agri = Math.max(0, Math.min(100, Math.round(agri)));
+        
+        // 2. Mining
+        let mining = 0;
+        if (biome > 1) {
+            if (feature === 3) mining += 65;
+            else if (feature === 8) mining += 65;
+            else if (feature === 7) mining += 20;
+            
+            if (biome === 10) mining += 40;
+            else if (biome === 13) mining += 30;
+            else if (biome === 11) mining += 25;
+            
+            mining += elevation * 5;
+            
+            if (biome === 5 || biome === 6 || biome === 12) mining -= 15;
+            if (biome === 9) mining -= 15;
+        }
+        mining = Math.max(0, Math.min(100, Math.round(mining)));
+        
+        // 3. Research
+        let research = 5;
+        if (feature > 0) {
+            if (feature === 9) research += 80;
+            else if (feature === 1) research += 70;
+            else if (feature === 4) research += 70;
+            else if (feature === 5) research += 55;
+            else if (feature === 6) research += 35;
+            else if (feature === 2) research += 20;
+        }
+        if (biome === 8 || biome === 12 || biome === 11) research += 10;
+        research = Math.max(0, Math.min(100, Math.round(research)));
+        
+        // 4. Industrial
+        let industrial = 0;
+        if (biome > 0) {
+            if (feature === 7) industrial += 60;
+            if (biome === 11) industrial += 35;
+            else if (biome === 13) industrial += 20;
+            
+            if (isCoastal) industrial += 35;
+            if (isRiver) industrial += 20;
+            
+            industrial += elevation * 3;
+            if (biome === 9) industrial -= 25;
+        }
+        industrial = Math.max(0, Math.min(100, Math.round(industrial)));
+        
+        // 5. Tourism
+        let tourism = 0;
+        if (biome > 1) {
+            if (feature === 10) tourism += 85;
+            else if (feature === 8) tourism += 45;
+            else if (feature === 1) tourism += 35;
+            
+            if (isCoastal) tourism += 35;
+            if (isRiver) tourism += 15;
+            
+            if (biome === 5 || biome === 6) tourism += 15;
+            
+            if (biome === 11 || biome === 13) tourism -= 20;
+            if (biome === 8) tourism -= 10;
+            if (biome === 9) tourism -= 25;
+        }
+        tourism = Math.max(0, Math.min(100, Math.round(tourism)));
+        
+        dggsData.favorabilities[i] = { agri, mining, research, industrial, tourism };
+    }
+}
+
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
     if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
+    if (!dggsData.metadata.mutations) dggsData.metadata.mutations = {};
+    if (!dggsData.metadata.customFeatures) dggsData.metadata.customFeatures = {};
+    if (!dggsData.metadata.names) dggsData.metadata.names = {};
+    if (!dggsData.metadata.descriptions) dggsData.metadata.descriptions = {};
+    if (!dggsData.metadata.labels) dggsData.metadata.labels = [];
+
+    // Layer metadata mutations and custom features onto the cells
+    applyMetadataOverrides();
+
+    // Map feature 5 (Research Station) to 0 (None)
+    for (let i = 0; i < dggsData.cells.length; i++) {
+        if (dggsData.cells[i].tile.feature === 5) {
+            dggsData.cells[i].tile.feature = 0;
+        }
+    }
 
     initBiomeCache();
 
@@ -534,7 +726,6 @@ function onDataLoaded() {
                 changed = true;
             }
         }
-        // Sync scanned cells with revealed features so auto-reveals light up
         if (dggsData.metadata.revealedFeatures.includes(i) && !dggsData.metadata.scannedCells.includes(i)) {
             dggsData.metadata.scannedCells.push(i);
             changed = true;
@@ -543,28 +734,107 @@ function onDataLoaded() {
 
     precomputeEdgeNeighbors();
     generateRivers();
+    computeFavorabilities();
     computePollution();
 
-    // Auto-save if we revealed level 0 features on load
-    if (changed && typeof saveDGGSMetadata === 'function') {
+    // Process factions and specializations
+    let metadataChanged = changed;
+    if (!dggsData.metadata.factions) {
+        dggsData.metadata.factions = {};
+        for (let i = 0; i < dggsData.cells.length; i++) {
+            const factionLevel = dggsData.cells[i].tile.faction;
+            if (factionLevel > 0) {
+                const spec = resolveSpecialization(i);
+                dggsData.metadata.factions[i] = { level: factionLevel, spec: 'auto' };
+                dggsData.cells[i].tile.faction = factionLevel;
+                dggsData.cells[i].tile.specialization = spec;
+            }
+        }
+        metadataChanged = true;
+    } else {
+        for (let i = 0; i < dggsData.cells.length; i++) {
+            const cell = dggsData.cells[i];
+            const fac = dggsData.metadata.factions[i];
+            if (fac) {
+                cell.tile.faction = fac.level;
+                cell.tile.specialization = fac.spec === 'auto' ? resolveSpecialization(i) : fac.spec;
+            } else {
+                cell.tile.faction = 0;
+                cell.tile.specialization = undefined;
+            }
+        }
+    }
+
+    // Update sliders to match metadata
+    const urbVal = dggsData.metadata.urbanization !== undefined ? dggsData.metadata.urbanization : 15;
+    const pollVal = dggsData.metadata.pollution !== undefined ? dggsData.metadata.pollution : 100;
+    const consVal = dggsData.metadata.conservation !== undefined ? dggsData.metadata.conservation : 0;
+
+    const urbInput = document.getElementById('map-urbanization');
+    const urbSpan = document.getElementById('urban-value');
+    if (urbInput && urbSpan) {
+        urbInput.value = urbToSlider(urbVal);
+        urbSpan.textContent = formatUrb(urbVal);
+    }
+
+    const pollInput = document.getElementById('map-pollution');
+    const pollSpan = document.getElementById('poll-value');
+    if (pollInput && pollSpan) {
+        pollInput.value = pollVal;
+        pollSpan.textContent = `${pollVal}%`;
+    }
+
+    const consInput = document.getElementById('map-conservation');
+    const consSpan = document.getElementById('cons-value');
+    if (consInput && consSpan) {
+        consInput.value = consVal;
+        consSpan.textContent = `${consVal}%`;
+    }
+
+    // Auto-save if metadata initialized/changed on load
+    if (metadataChanged && typeof saveDGGSMetadata === 'function') {
         saveDGGSMetadata().catch(console.error);
     }
 }
 
+function sliderToUrb(val) {
+    const x = parseFloat(val);
+    if (x <= 0) return 0;
+    const p = Math.pow(10, (x / 25) - 2);
+    return Math.round(p * 1000) / 1000;
+}
+
+function urbToSlider(p) {
+    if (p <= 0) return 0;
+    const x = 25 * (Math.log10(p) + 2);
+    return Math.round(x);
+}
+
+function formatUrb(p) {
+    if (p === 0) return '0%';
+    if (p < 0.01) return `${p.toFixed(3)}%`;
+    if (p < 0.1) return `${p.toFixed(2)}%`;
+    if (p < 1) return `${p.toFixed(2)}%`;
+    if (p < 10) return `${p.toFixed(1)}%`;
+    return `${Math.round(p)}%`;
+}
+
+
 
 const FEATURES = {
-    0: { name: 'None', scanLevel: 0 },
-    1: { name: 'Ancient Ruins', scanLevel: 2 },
-    2: { name: 'Impact Crater', scanLevel: 0 },
-    3: { name: 'Mineral Geode', scanLevel: 2 },
-    4: { name: 'Energy Anomaly', scanLevel: 3 },
-    5: { name: 'Research Station', scanLevel: 1 },
-    6: { name: 'Abandoned Outpost', scanLevel: 1 },
-    7: { name: 'Geothermal Vent', scanLevel: 0 },
-    8: { name: 'Crystalline Spires', scanLevel: 2 },
-    9: { name: 'Alien Monolith', scanLevel: 3 }
+    0: { name: 'None', scanLevel: 0, shielding: 0 },
+    1: { name: 'Ancient Ruins', scanLevel: 2, shielding: -1 },
+    2: { name: 'Impact Crater', scanLevel: 0, shielding: 0 },
+    3: { name: 'Mineral Geode', scanLevel: 2, shielding: 0 },
+    4: { name: 'Energy Anomaly', scanLevel: 3, shielding: -2 },
+    5: { name: 'None', scanLevel: 0, shielding: 0 },
+    6: { name: 'Abandoned Outpost', scanLevel: 1, shielding: 0 },
+    7: { name: 'Geothermal Vent', scanLevel: 0, shielding: 0 },
+    8: { name: 'Crystalline Spires', scanLevel: 2, shielding: -1 },
+    9: { name: 'Alien Monolith', scanLevel: 3, shielding: -2 },
+    10: { name: 'Natural Marvel', scanLevel: 1, shielding: 0 }
 };
-const FEATURE_COLORS = { 1: '#e040fb', 2: '#9e9e9e', 3: '#00e676', 4: '#00e5ff', 5: '#2979ff', 6: '#ff9100', 7: '#ff1744', 8: '#d500f9', 9: '#ffd600' };
+const FEATURE_COLORS = { 1: '#e040fb', 2: '#9e9e9e', 3: '#00e676', 4: '#00e5ff', 5: 'transparent', 6: '#ff9100', 7: '#ff1744', 8: '#d500f9', 9: '#ffd600', 10: '#ffd54f' };
 const FACTIONS = { 0: { name: 'Unclaimed Territory', color: 'transparent' }, 1: { name: 'United Colonies', color: '#00e5ff' }, 2: { name: 'Verge Syndicate', color: '#ffaa00' }, 3: { name: 'Precursor Remnants', color: '#d500f9' } };
 
 // ── State ──
@@ -576,7 +846,9 @@ let offsetX = 0, offsetY = 0;
 let isDragging = false, dragStartX = 0, dragStartY = 0;
 let lastMouseX = 0, lastMouseY = 0, hasMoved = false;
 let hoveredIdx = -1, selectedIdx = -1;
+let selectedIndices = [];
 let userRole = 'player';
+let originalRole = 'player';
 let currentLens = 'biome';
 
 
@@ -585,6 +857,33 @@ const canvas = document.getElementById('hex-canvas');
 const ctx = canvas.getContext('2d');
 const tooltip = document.getElementById('tooltip');
 const infoPanel = document.getElementById('info-panel');
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
+
+function activateTab(tabName) {
+    tabButtons.forEach(b => {
+        if (b.getAttribute('data-tab') === tabName) {
+            b.classList.add('active');
+        } else {
+            b.classList.remove('active');
+        }
+    });
+    tabContents.forEach(content => {
+        if (content.id === `tab-${tabName}`) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+}
+
+tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab');
+        activateTab(tabName);
+    });
+});
+
 const closeInfoBtn = document.getElementById('close-info');
 const seedInput = document.getElementById('map-seed');
 const typeSelect = document.getElementById('map-type');
@@ -608,6 +907,32 @@ const detailCoords = document.getElementById('hex-coords');
 const detailPos3D = document.getElementById('hex-pos-3d');
 
 const editFeature = document.getElementById('edit-feature');
+const editFaction = document.getElementById('edit-faction');
+const editFactionSpec = document.getElementById('edit-faction-spec');
+const editName = document.getElementById('edit-name');
+const editDesc = document.getElementById('edit-desc');
+const newLabelText = document.getElementById('new-label-text');
+const newLabelType = document.getElementById('new-label-type');
+const addLabelBtn = document.getElementById('add-label-btn');
+const activeLabelsContainer = document.getElementById('active-labels-container');
+
+const gmFactionRow = document.getElementById('gm-faction-row');
+const gmFactionSpecRow = document.getElementById('gm-faction-spec-row');
+const gmFeatureRow = document.getElementById('gm-feature-row');
+const gmNameRow = document.getElementById('gm-name-row');
+const playerNameRow = document.getElementById('player-name-row');
+const hexNameSpan = document.getElementById('hex-name');
+const gmDescRow = document.getElementById('gm-desc-row');
+const playerDescRow = document.getElementById('player-desc-row');
+const hexDescDiv = document.getElementById('hex-desc');
+const gmLabelPanel = document.getElementById('gm-label-panel');
+
+const suitAgriSpan = document.getElementById('suit-agri');
+const suitMiningSpan = document.getElementById('suit-mining');
+const suitResearchSpan = document.getElementById('suit-research');
+const suitIndustrialSpan = document.getElementById('suit-industrial');
+const suitTourismSpan = document.getElementById('suit-tourism');
+
 const detailAddress = document.getElementById('hex-address');
 const detailNeighbors = document.getElementById('hex-neighbors');
 const landBtn = document.getElementById('land-btn');
@@ -615,6 +940,11 @@ const exportBtn = document.getElementById('export-btn');
 const featureStatusRow = document.getElementById('feature-status-row');
 const featureStatusValue = document.getElementById('feature-status-value');
 const featureActionRow = document.getElementById('feature-action-row');
+const gmRevealBtn = document.getElementById('gm-reveal-btn');
+
+const playerFeatureStatusRow = document.getElementById('player-feature-status-row');
+const playerFeatureStatusValue = document.getElementById('player-feature-status-value');
+const playerFeatureActionRow = document.getElementById('player-feature-action-row');
 const featureActionBtn = document.getElementById('feature-action-btn');
 
 
@@ -921,13 +1251,14 @@ function draw() {
         const tile = cell.tile;
         const projVerts = c.projVerts;
 
-        if (i === hoveredIdx || i === selectedIdx) {
+        const isSelected = selectedIndices.includes(i);
+        if (i === hoveredIdx || isSelected) {
             ctx.beginPath();
             ctx.moveTo(projVerts[0].x, projVerts[0].y);
             for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
             ctx.closePath();
-            ctx.strokeStyle = i === selectedIdx ? '#00e5ff' : 'rgba(255,255,255,0.35)';
-            ctx.lineWidth = i === selectedIdx ? 1.5 : 0.8;
+            ctx.strokeStyle = isSelected ? '#00e5ff' : 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = isSelected ? 1.5 : 0.8;
             ctx.stroke();
         }
 
@@ -998,37 +1329,100 @@ function draw() {
                         ctx.rect(-size*0.5, -size*1.5, size, size*3);
                         ctx.fill();
                         break;
+                    case 10: // Natural Marvel: Two mountain peaks
+                        ctx.beginPath();
+                        ctx.moveTo(-size, size); ctx.lineTo(-size*0.3, -size*0.8); ctx.lineTo(size*0.4, size);
+                        ctx.moveTo(-size*0.2, size); ctx.lineTo(size*0.5, -size*1.2); ctx.lineTo(size*1.2, size);
+                        ctx.stroke();
+                        break;
                     default:
                         ctx.arc(0, 0, size, 0, Math.PI * 2);
                         ctx.fill();
                 }
                 ctx.restore();
             };
-
+ 
             if (userRole === 'gm') {
                 drawFeatureIcon(tile.feature, fc, !isRevealed);
             } else if (isRevealed) {
                 drawFeatureIcon(tile.feature, fc, false);
             }
         }
-
+ 
         if (tile.faction > 0) {
             ctx.save();
             ctx.translate(c.hexCx + (tile.feature > 0 ? 3 : 0), c.hexCy + (tile.feature > 0 ? -3 : 0));
-            ctx.fillStyle = '#00e5ff'; // Neon blue for cities
-            ctx.shadowColor = '#00e5ff';
+            
+            // Map specialization to color
+            const specColors = {
+                agricultural: '#00e676',
+                mining: '#ffd600',
+                research: '#e040fb',
+                industrial: '#00e5ff',
+                tourism: '#ff4081'
+            };
+            const spec = tile.specialization;
+            const cityColor = specColors[spec] || '#00e5ff';
+            
+            ctx.fillStyle = cityColor;
+            ctx.shadowColor = cityColor;
             ctx.shadowBlur = 4;
             
             const level = tile.faction;
             if (level === 1) {
-                // Outpost (Small Square)
-                ctx.fillRect(-1.5, -1.5, 3, 3);
+                // Outpost (Custom shape based on specialization)
+                if (spec === 'agricultural') {
+                    // Triangle
+                    ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(2, 1.5); ctx.lineTo(-2, 1.5); ctx.closePath(); ctx.fill();
+                } else if (spec === 'mining') {
+                    // Diamond
+                    ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(2, 0); ctx.lineTo(0, 2); ctx.lineTo(-2, 0); ctx.closePath(); ctx.fill();
+                } else if (spec === 'research') {
+                    // Circle
+                    ctx.beginPath(); ctx.arc(0, 0, 1.8, 0, Math.PI * 2); ctx.fill();
+                } else if (spec === 'tourism') {
+                    // Small star
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * 2.2, Math.sin((18 + i * 72) * Math.PI / 180) * 2.2);
+                        ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * 0.9, Math.sin((54 + i * 72) * Math.PI / 180) * 0.9);
+                    }
+                    ctx.closePath(); ctx.fill();
+                } else {
+                    // Default Outpost: Small Square
+                    ctx.fillRect(-1.5, -1.5, 3, 3);
+                }
             } else if (level === 2) {
-                // Town (4 small squares)
-                ctx.fillRect(-2, -2, 1.5, 1.5);
-                ctx.fillRect(0.5, -2, 1.5, 1.5);
-                ctx.fillRect(-2, 0.5, 1.5, 1.5);
-                ctx.fillRect(0.5, 0.5, 1.5, 1.5);
+                // Town (Custom shapes)
+                if (spec === 'agricultural') {
+                    // 3 small green dots (sprout cluster)
+                    ctx.beginPath(); ctx.arc(-1.2, 0.8, 1, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(1.2, 0.8, 1, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(0, -1.2, 1.1, 0, Math.PI*2); ctx.fill();
+                } else if (spec === 'mining') {
+                    // Hammer / Cross shape
+                    ctx.fillRect(-2, -0.6, 4, 1.2);
+                    ctx.fillRect(-0.6, -2, 1.2, 4);
+                } else if (spec === 'research') {
+                    // Double ring
+                    ctx.strokeStyle = cityColor;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(0, 0, 0.9, 0, Math.PI * 2); ctx.fill();
+                } else if (spec === 'tourism') {
+                    // Hexagon
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        ctx.lineTo(Math.cos(i * Math.PI / 3) * 2.2, Math.sin(i * Math.PI / 3) * 2.2);
+                    }
+                    ctx.closePath(); ctx.fill();
+                } else {
+                    // Default Town: 4 small squares
+                    ctx.fillRect(-2, -2, 1.5, 1.5);
+                    ctx.fillRect(0.5, -2, 1.5, 1.5);
+                    ctx.fillRect(-2, 0.5, 1.5, 1.5);
+                    ctx.fillRect(0.5, 0.5, 1.5, 1.5);
+                }
             } else if (level === 3) {
                 // Metropolis (Glowing Hub)
                 ctx.beginPath();
@@ -1258,24 +1652,34 @@ function draw() {
         }
     }
 
-    if (selectedIdx >= 0 && selectedIdx < cells.length) {
-        const cell = cells[selectedIdx];
-        const projVerts = [];
-        let allFront = true;
-        for (const v of cell.vertices) {
-            const rv = rotate3D(v.x, v.y, v.z);
-            if (rv.z < -0.2) { allFront = false; break; }
-            projVerts.push({ x: rv.x * GLOBE_RADIUS, y: rv.y * GLOBE_RADIUS });
-        }
-        if (allFront && projVerts.length >= 3) {
-            ctx.beginPath();
-            ctx.moveTo(projVerts[0].x, projVerts[0].y);
-            for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
-            ctx.closePath();
-            ctx.strokeStyle = '#ffd600';
-            ctx.lineWidth = 3.0;
-            ctx.stroke();
-        }
+    if (selectedIndices && selectedIndices.length > 0) {
+        selectedIndices.forEach(idx => {
+            if (idx >= 0 && idx < cells.length) {
+                const cell = cells[idx];
+                const projVerts = [];
+                let allFront = true;
+                for (const v of cell.vertices) {
+                    const rv = rotate3D(v.x, v.y, v.z);
+                    if (rv.z < -0.2) { allFront = false; break; }
+                    projVerts.push({ x: rv.x * GLOBE_RADIUS, y: rv.y * GLOBE_RADIUS });
+                }
+                if (allFront && projVerts.length >= 3) {
+                    ctx.beginPath();
+                    ctx.moveTo(projVerts[0].x, projVerts[0].y);
+                    for (let k = 1; k < projVerts.length; k++) ctx.lineTo(projVerts[k].x, projVerts[k].y);
+                    ctx.closePath();
+                    
+                    if (idx === selectedIdx) {
+                        ctx.strokeStyle = '#ffd600';
+                        ctx.lineWidth = 3.5;
+                    } else {
+                        ctx.strokeStyle = 'rgba(255, 214, 0, 0.5)';
+                        ctx.lineWidth = 2.0;
+                    }
+                    ctx.stroke();
+                }
+            }
+        });
     }
 
     // Draw rotation axis
@@ -1326,6 +1730,60 @@ function draw() {
     ctx.fillText('S. POLE', sx + 8, sy + 3);
     ctx.restore();
 
+    // ── 4. Render Region Labels & Custom Names Overlays ──
+    if (dggsData.metadata) {
+        // Draw Custom Names (if zoomed in enough)
+        if (scale > 0.5 && dggsData.metadata.names) {
+            for (const c of visibleCells) {
+                const name = dggsData.metadata.names[c.i];
+                if (name) {
+                    ctx.save();
+                    ctx.font = 'bold 9px "Chakra Petch", sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = '#000000';
+                    ctx.shadowBlur = 3;
+                    ctx.fillText(name, c.hexCx, c.hexCy - c.hexR - 5);
+                    ctx.restore();
+                }
+            }
+        }
+
+        // Draw Region Labels (always, but styled differently)
+        if (dggsData.metadata.labels) {
+            for (const label of dggsData.metadata.labels) {
+                const cell = cells[label.cell];
+                if (!cell) continue;
+                
+                const rCenter = rotate3D(cell.center.x, cell.center.y, cell.center.z);
+                if (rCenter.z >= 0) { // visible front hemisphere
+                    const lx = rCenter.x * GLOBE_RADIUS;
+                    const ly = rCenter.y * GLOBE_RADIUS;
+                    
+                    ctx.save();
+                    if (label.type === 'territory') {
+                        ctx.font = 'bold 10px "Russo One", sans-serif';
+                        ctx.fillStyle = 'rgba(255, 235, 59, 0.9)'; // Golden territory text
+                        ctx.shadowColor = '#000';
+                        ctx.shadowBlur = 4;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(label.text.toUpperCase(), lx, ly);
+                    } else {
+                        ctx.font = 'italic 10px "Chakra Petch", sans-serif';
+                        ctx.fillStyle = 'rgba(100, 200, 255, 0.8)'; // Soft blue ocean text
+                        ctx.shadowColor = '#000';
+                        ctx.shadowBlur = 4;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(label.text, lx, ly);
+                    }
+                    ctx.restore();
+                }
+            }
+        }
+    }
+
     ctx.restore();
     requestAnimationFrame(draw);
 }
@@ -1350,103 +1808,288 @@ function getCellUnderMouse(mx, my) {
 
 // ── Selection Panel ──
 function selectCell(idx) {
-    if (idx < 0 || !dggsData) { selectedIdx = -1; infoPanel.classList.remove('visible'); return; }
+    if (idx < 0 || !dggsData) {
+        selectedIdx = -1;
+        selectedIndices = [];
+        infoPanel.classList.remove('visible');
+        return;
+    }
+    
+    // Ensure selectedIndices contains at least the primary cell
+    if (!selectedIndices.includes(idx)) {
+        selectedIndices = [idx];
+    }
     selectedIdx = idx;
+    
     const cell = dggsData.cells[idx];
     const t = cell.tile;
+    
+    // Helper to extract common values across all selected cells
+    const getCommonValue = (extractor, defaultValue = '-') => {
+        if (selectedIndices.length === 0) return defaultValue;
+        const first = extractor(selectedIndices[0]);
+        for (let k = 1; k < selectedIndices.length; k++) {
+            if (extractor(selectedIndices[k]) !== first) {
+                return '<Multiple>';
+            }
+        }
+        return first;
+    };
+    
+    // Helper to update dropdowns with multiple-value option support
+    const setSelectValue = (selectElem, commonValue) => {
+        let multiOpt = selectElem.querySelector('option[value="-1"]');
+        if (commonValue === '<Multiple>') {
+            if (!multiOpt) {
+                multiOpt = document.createElement('option');
+                multiOpt.value = "-1";
+                multiOpt.disabled = true;
+                multiOpt.selected = true;
+                multiOpt.style.display = "none";
+                multiOpt.textContent = "<Multiple Values>";
+                selectElem.appendChild(multiOpt);
+            }
+            selectElem.value = "-1";
+        } else {
+            if (multiOpt) {
+                selectElem.removeChild(multiOpt);
+            }
+            selectElem.value = commonValue;
+        }
+    };
+    
+    // Helper to update input/textarea values
+    const setInputValue = (inputElem, commonValue) => {
+        if (commonValue === '<Multiple>') {
+            inputElem.value = '';
+            inputElem.placeholder = '<Multiple Values>';
+        } else {
+            inputElem.value = commonValue || '';
+            inputElem.placeholder = inputElem.tagName === 'INPUT' ? 'Rename hex...' : 'Add custom description...';
+        }
+    };
 
-    detailTitle.textContent = `Cell #${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
+    // Header Title
+    if (selectedIndices.length > 1) {
+        detailTitle.textContent = `${selectedIndices.length} Cells Selected`;
+    } else {
+        detailTitle.textContent = `Cell #${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
+    }
 
     // Address
-    detailAddress.textContent = dggsData.metadata?.addresses?.[idx] || 'N/A';
+    detailAddress.textContent = getCommonValue(i => dggsData.metadata?.addresses?.[i] || 'N/A', 'N/A');
 
     // Coordinates & 3D Position
-    const latRad = Math.asin(cell.center.y);
-    const lonRad = Math.atan2(cell.center.x, cell.center.z);
-    const latDeg = (latRad * 180 / Math.PI).toFixed(2);
-    const lonDeg = (lonRad * 180 / Math.PI).toFixed(2);
-    const latSign = latDeg >= 0 ? 'N' : 'S';
-    const lonSign = lonDeg >= 0 ? 'E' : 'W';
-    detailCoords.textContent = `${Math.abs(latDeg)}° ${latSign}, ${Math.abs(lonDeg)}° ${lonSign}`;
-    detailPos3D.textContent = `${cell.center.x.toFixed(3)}, ${cell.center.y.toFixed(3)}, ${cell.center.z.toFixed(3)}`;
+    if (selectedIndices.length > 1) {
+        detailCoords.textContent = '<Multiple>';
+        detailPos3D.textContent = '<Multiple>';
+    } else {
+        const latRad = Math.asin(cell.center.y);
+        const lonRad = Math.atan2(cell.center.x, cell.center.z);
+        const latDeg = (latRad * 180 / Math.PI).toFixed(2);
+        const lonDeg = (lonRad * 180 / Math.PI).toFixed(2);
+        const latSign = latDeg >= 0 ? 'N' : 'S';
+        const lonSign = lonDeg >= 0 ? 'E' : 'W';
+        detailCoords.textContent = `${Math.abs(latDeg)}° ${latSign}, ${Math.abs(lonDeg)}° ${lonSign}`;
+        detailPos3D.textContent = `${cell.center.x.toFixed(3)}, ${cell.center.y.toFixed(3)}, ${cell.center.z.toFixed(3)}`;
+    }
 
-    const planetType = dggsData.metadata?.type || 'terrestrial';
-    const biome = getBiomeInfo(t.biome);
-    detailBiome.textContent = biome.name;
-    detailBiome.style.color = biome.color === '#eef8ff' ? '#99ccff' : biome.color;
-    detailElevation.textContent = `Level ${t.elevation}`;
-    detailMoisture.textContent = `Level ${t.moisture}`;
+    // Biome, Elevation, Moisture
+    const commonBiome = getCommonValue(i => dggsData.cells[i].tile.biome);
+    if (commonBiome === '<Multiple>') {
+        detailBiome.textContent = '<Multiple>';
+        detailBiome.style.color = '#fff';
+    } else {
+        const biome = getBiomeInfo(commonBiome);
+        detailBiome.textContent = biome.name;
+        detailBiome.style.color = biome.color === '#eef8ff' ? '#99ccff' : biome.color;
+    }
+    const commonElev = getCommonValue(i => dggsData.cells[i].tile.elevation);
+    detailElevation.textContent = commonElev === '<Multiple>' ? '<Multiple>' : `Level ${commonElev}`;
+    const commonMoist = getCommonValue(i => dggsData.cells[i].tile.moisture);
+    detailMoisture.textContent = commonMoist === '<Multiple>' ? '<Multiple>' : `Level ${commonMoist}`;
 
     const factionRow = document.getElementById('faction-row');
     const factionValue = document.getElementById('hex-faction');
-    if (t.faction > 0) {
-        const factionNames = { 1: 'Outpost (Lvl 1)', 2: 'Town (Lvl 2)', 3: 'Metropolis (Lvl 3)', 4: 'Megacity (Lvl 4)' };
+    const commonFaction = getCommonValue(i => dggsData.cells[i].tile.faction);
+    const hasFaction = commonFaction > 0 && commonFaction !== '<Multiple>';
+    
+    // Update favorability scores
+    if (selectedIndices.length > 1) {
+        suitAgriSpan.textContent = '<Multiple>';
+        suitMiningSpan.textContent = '<Multiple>';
+        suitResearchSpan.textContent = '<Multiple>';
+        suitIndustrialSpan.textContent = '<Multiple>';
+        suitTourismSpan.textContent = '<Multiple>';
+    } else {
+        const favs = dggsData.favorabilities[idx];
+        if (favs) {
+            suitAgriSpan.textContent = `${favs.agri}%`;
+            suitMiningSpan.textContent = `${favs.mining}%`;
+            suitResearchSpan.textContent = `${favs.research}%`;
+            suitIndustrialSpan.textContent = `${favs.industrial}%`;
+            suitTourismSpan.textContent = `${favs.tourism}%`;
+        } else {
+            suitAgriSpan.textContent = '-';
+            suitMiningSpan.textContent = '-';
+            suitResearchSpan.textContent = '-';
+            suitIndustrialSpan.textContent = '-';
+            suitTourismSpan.textContent = '-';
+        }
+    }
+
+    // Configure Tabs & Roles
+    const infoTabs = document.getElementById('info-tabs');
+    if (userRole === 'gm') {
+        infoTabs.style.display = 'flex';
+    } else {
+        infoTabs.style.display = 'none';
+        activateTab('general');
+    }
+
+    // Populate GM Edit values
+    setSelectValue(editFeature, getCommonValue(i => dggsData.cells[i].tile.feature));
+    setSelectValue(editFaction, getCommonValue(i => dggsData.cells[i].tile.faction));
+    
+    const commonSpec = getCommonValue(i => dggsData.metadata.factions[i]?.spec || 'auto');
+    const anyHasFaction = selectedIndices.some(i => dggsData.cells[i].tile.faction > 0);
+    if (anyHasFaction) {
+        gmFactionSpecRow.style.display = 'flex';
+        setSelectValue(editFactionSpec, commonSpec);
+    } else {
+        gmFactionSpecRow.style.display = 'none';
+    }
+
+    setInputValue(editName, getCommonValue(i => dggsData.metadata.names?.[i] || ''));
+    setInputValue(editDesc, getCommonValue(i => dggsData.metadata.descriptions?.[i] || ''));
+
+    // Populate GM Ops label editor list
+    updateLabelEditorList(idx);
+
+    // Populate Player/General (DATA) read-only views
+    // Settlement Name with Specialization
+    if (commonFaction === '<Multiple>') {
         factionRow.style.display = 'flex';
-        factionValue.textContent = factionNames[t.faction] || `Level ${t.faction}`;
+        factionValue.textContent = '<Multiple Settlements>';
+    } else if (hasFaction) {
+        factionRow.style.display = 'flex';
+        const factionNames = { 1: 'Outpost', 2: 'Town', 3: 'Metropolis', 4: 'Megacity' };
+        let facText = factionNames[commonFaction] || `Level ${commonFaction}`;
+        const spec = dggsData.metadata.factions[idx]?.spec === 'auto' ? resolveSpecialization(idx) : (dggsData.metadata.factions[idx]?.spec);
+        if (spec) {
+            if (commonFaction === 1 && spec === 'research') {
+                facText = 'Research Station';
+            } else {
+                const capSpec = spec.charAt(0).toUpperCase() + spec.slice(1);
+                facText = `${capSpec} ${facText}`;
+            }
+        }
+        factionValue.textContent = facText;
     } else {
         factionRow.style.display = 'none';
     }
 
-    const isFeatureRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
+    // Custom Names
+    const commonName = getCommonValue(i => dggsData.metadata.names?.[i] || '');
+    if (commonName === '<Multiple>') {
+        playerNameRow.style.display = 'flex';
+        hexNameSpan.textContent = '<Multiple Custom Names>';
+    } else if (commonName) {
+        playerNameRow.style.display = 'flex';
+        hexNameSpan.textContent = commonName;
+    } else {
+        playerNameRow.style.display = 'none';
+    }
 
-    // Feature display based on role and reveal status
-    if (userRole === 'gm') {
-        editFeature.parentElement.style.display = 'flex';
-        detailFeature.parentElement.style.display = 'none';
+    // Custom Descriptions
+    const commonDesc = getCommonValue(i => dggsData.metadata.descriptions?.[i] || '');
+    if (commonDesc === '<Multiple>') {
+        playerDescRow.style.display = 'flex';
+        hexDescDiv.textContent = '<Multiple Custom Descriptions>';
+    } else if (commonDesc) {
+        playerDescRow.style.display = 'flex';
+        hexDescDiv.textContent = commonDesc;
+    } else {
+        playerDescRow.style.display = 'none';
+    }
 
-        editFeature.value = t.feature;
+    // FOW / Scan Controls Status logic:
+    // Reset all status displays first
+    featureStatusRow.style.display = 'none';
+    featureActionRow.style.display = 'none';
+    playerFeatureStatusRow.style.display = 'none';
+    playerFeatureActionRow.style.display = 'none';
 
-        if (t.feature > 0) {
+    const commonFeature = getCommonValue(i => dggsData.cells[i].tile.feature);
+    if (commonFeature > 0 && commonFeature !== '<Multiple>') {
+        const isFeatureRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
+        
+        // 1. Update GM Ops FOW controls
+        if (userRole === 'gm') {
             featureStatusRow.style.display = 'flex';
             featureStatusValue.textContent = isFeatureRevealed ? 'REVEALED' : 'HIDDEN (FOW)';
             featureStatusValue.style.color = isFeatureRevealed ? '#00e676' : '#ff1744';
 
             featureActionRow.style.display = 'flex';
-            featureActionBtn.textContent = isFeatureRevealed ? 'HIDE FROM PLAYERS' : 'REVEAL TO PLAYERS';
-            featureActionBtn.style.borderColor = isFeatureRevealed ? '#ff1744' : '#00e5ff';
-            featureActionBtn.style.color = isFeatureRevealed ? '#ff1744' : '#00e5ff';
-            featureActionBtn.style.background = isFeatureRevealed ? 'rgba(255, 23, 68, 0.15)' : 'rgba(0, 229, 255, 0.15)';
+            gmRevealBtn.textContent = isFeatureRevealed ? 'HIDE FROM PLAYERS' : 'REVEAL TO PLAYERS';
+            gmRevealBtn.style.borderColor = isFeatureRevealed ? '#ff1744' : '#00e5ff';
+            gmRevealBtn.style.color = isFeatureRevealed ? '#ff1744' : '#00e5ff';
+            gmRevealBtn.style.background = isFeatureRevealed ? 'rgba(255, 23, 68, 0.15)' : 'rgba(0, 229, 255, 0.15)';
+        }
+
+        // 2. Update Player/DATA Scan controls and read-only Feature view
+        if (isFeatureRevealed || userRole === 'gm') {
+            // Feature is known/revealed (or we are GM checking general data)
+            const featData = FEATURES[commonFeature] || { name: 'None', scanLevel: 0, shielding: 0 };
+            const featColor = FEATURE_COLORS[commonFeature] || '#e0f2f1';
+            const lvlNames = { 0: 'None', 1: 'Ordinary', 2: 'Good', 3: 'Amazing' };
+            const reqLvl = lvlNames[featData.scanLevel] || `Lvl ${featData.scanLevel}`;
+            const shieldText = featData.shielding < 0 ? ` (Shielding: ${featData.shielding})` : '';
+            
+            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${featData.name}</span> <span style="font-size: 0.8em; color: #88aacc;">(Check: ${reqLvl}${shieldText})</span>`;
+            
+            playerFeatureStatusRow.style.display = 'flex';
+            playerFeatureStatusValue.textContent = 'REVEALED';
+            playerFeatureStatusValue.style.color = '#00e676';
+            playerFeatureActionRow.style.display = 'none';
         } else {
-            featureStatusRow.style.display = 'none';
-            featureActionRow.style.display = 'none';
+            // Feature is hidden to players: show scanning UI for players/non-GM
+            detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
+            
+            playerFeatureStatusRow.style.display = 'flex';
+            playerFeatureStatusValue.textContent = 'UNEXPLORED SIGNATURE';
+            playerFeatureStatusValue.style.color = '#ffd600';
+            
+            playerFeatureActionRow.style.display = 'flex';
+            featureActionBtn.textContent = 'SCAN SECTOR';
+            featureActionBtn.style.borderColor = '#00e5ff';
+            featureActionBtn.style.color = '#00e5ff';
+            featureActionBtn.style.background = 'rgba(0, 229, 255, 0.15)';
         }
     } else {
-        // Player or Viewer
-        editFeature.parentElement.style.display = 'none';
-        detailFeature.parentElement.style.display = 'flex';
-
-        if (isFeatureRevealed && t.feature > 0) {
-            const featData = FEATURES[t.feature] || { name: 'None', scanLevel: 0 };
-            const featColor = FEATURE_COLORS[t.feature] || '#e0f2f1';
-            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${featData.name}</span> <span style="font-size: 0.8em; color: #88aacc;">(Scan Lvl ${featData.scanLevel})</span>`;
-            featureStatusRow.style.display = 'flex';
-            featureStatusValue.textContent = 'Revealed';
-            featureStatusValue.style.color = '#00e676';
-
-            featureActionRow.style.display = 'none';
-        } else {
-            detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
-            featureStatusRow.style.display = 'none';
-
-            // Player can scan unexplored tiles
-            if (userRole === 'player') {
-                featureActionRow.style.display = 'flex';
-                featureActionBtn.textContent = 'SCAN SECTOR';
-                featureActionBtn.style.borderColor = '#00e5ff';
-                featureActionBtn.style.color = '#00e5ff';
-                featureActionBtn.style.background = 'rgba(0, 229, 255, 0.15)';
-            } else {
-                featureActionRow.style.display = 'none';
-            }
-        }
+        detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
     }
 
-    let analysis = `A sector classified as ${biome.name.toLowerCase()} terrain. ${biome.desc}`;
-    if (t.feature > 0 && (isFeatureRevealed || userRole === 'gm')) {
-        const featData = FEATURES[t.feature] || { name: 'Unknown' };
-        analysis += ` Sensors detected: ${featData.name}.`;
-        if (userRole === 'gm' && !isFeatureRevealed) {
-            analysis += ` (Hidden from players)`;
+    let analysis = '';
+    if (selectedIndices.length > 1) {
+        analysis = `${selectedIndices.length} sectors selected. Batch editing enabled.`;
+    } else {
+        const biome = getBiomeInfo(t.biome);
+        analysis = `A sector classified as ${biome.name.toLowerCase()} terrain. ${biome.desc}`;
+        const isRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
+        if (t.feature > 0 && (isRevealed || userRole === 'gm')) {
+            const featData = FEATURES[t.feature] || { name: 'Unknown', scanLevel: 0, shielding: 0 };
+            analysis += ` Sensors detected: ${featData.name}.`;
+            const lvlNames = { 0: 'None', 1: 'Ordinary', 2: 'Good', 3: 'Amazing' };
+            const reqLvl = lvlNames[featData.scanLevel] || `Level ${featData.scanLevel}`;
+            analysis += ` [Sensor Check: ${reqLvl} Success Required`;
+            if (featData.shielding < 0) {
+                analysis += `, Shielding Penalty: ${featData.shielding}`;
+            }
+            analysis += `]`;
+            if (userRole === 'gm' && !isRevealed) {
+                analysis += ` (Hidden from players)`;
+            }
         }
     }
     detailAnalysis.textContent = analysis;
@@ -1469,23 +2112,27 @@ function selectCell(idx) {
         landBtn.style.display = 'none';
     }
 
-
     // Neighbors badging
     detailNeighbors.innerHTML = '';
-    const neighborsList = dggsData.metadata?.neighbors?.[idx];
-    if (neighborsList && neighborsList.length > 0) {
-        neighborsList.forEach(nIdx => {
-            const btn = document.createElement('button');
-            btn.className = 'neighbor-btn';
-            const neighborSides = dggsData.cells[nIdx]?.sides === 5 ? 'Pent' : 'Hex';
-            btn.textContent = `#${nIdx} (${neighborSides})`;
-            btn.addEventListener('click', () => {
-                selectCell(nIdx);
-            });
-            detailNeighbors.appendChild(btn);
-        });
+    if (selectedIndices.length > 1) {
+        detailNeighbors.textContent = 'Adjacency not displayed for multi-selection.';
     } else {
-        detailNeighbors.textContent = 'No adjacency data available.';
+        const neighborsList = dggsData.metadata?.neighbors?.[idx];
+        if (neighborsList && neighborsList.length > 0) {
+            neighborsList.forEach(nIdx => {
+                const btn = document.createElement('button');
+                btn.className = 'neighbor-btn';
+                const neighborSides = dggsData.cells[nIdx]?.sides === 5 ? 'Pent' : 'Hex';
+                btn.textContent = `#${nIdx} (${neighborSides})`;
+                btn.addEventListener('click', () => {
+                    selectedIndices = [nIdx];
+                    selectCell(nIdx);
+                });
+                detailNeighbors.appendChild(btn);
+            });
+        } else {
+            detailNeighbors.textContent = 'No adjacency data available.';
+        }
     }
 
     infoPanel.classList.add('visible');
@@ -1504,14 +2151,7 @@ async function loadDGGS(seed, type, resolution, urbanization = 15, pollution = 1
 
         dggsData = decodeVMB(buffer);
         onDataLoaded();
-
-
-
-        hudSeed.textContent = dggsData.metadata.seed || seed;
-        hudType.textContent = dggsData.metadata.type || type;
-        const resLabels = { 3: 'Small', 4: 'Medium', 5: 'Large', 6: 'Huge' };
-        hudSize.textContent = `${resLabels[resolution] || 'Res ' + resolution} (Res ${resolution})`;
-        hudTiles.textContent = dggsData.cells.length.toLocaleString();
+        updateMapInfoHUD();
 
         selectedIdx = -1; hoveredIdx = -1;
         infoPanel.classList.remove('visible');
@@ -1559,12 +2199,80 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
+function getPathCells(startIdx, endIdx) {
+    if (startIdx === endIdx) return [startIdx];
+    const parent = {};
+    const queue = [startIdx];
+    const visited = new Set([startIdx]);
+    
+    let head = 0;
+    let found = false;
+    while (head < queue.length) {
+        const curr = queue[head++];
+        if (curr === endIdx) {
+            found = true;
+            break;
+        }
+        const neighbors = cellEdgeNeighbors[curr] || [];
+        for (const nIdx of neighbors) {
+            if (nIdx !== -1 && nIdx !== undefined && !visited.has(nIdx)) {
+                visited.add(nIdx);
+                parent[nIdx] = curr;
+                queue.push(nIdx);
+            }
+        }
+    }
+    
+    if (!found) return [endIdx];
+    
+    const path = [];
+    let curr = endIdx;
+    while (curr !== undefined) {
+        path.push(curr);
+        curr = parent[curr];
+    }
+    return path.reverse();
+}
+
 canvas.addEventListener('mouseup', (e) => {
     isDragging = false;
     if (!hasMoved) {
         const rect = canvas.getBoundingClientRect();
         const idx = getCellUnderMouse(e.clientX - rect.left, e.clientY - rect.top);
-        selectCell(idx);
+        if (idx >= 0 && dggsData) {
+            if (userRole === 'gm') {
+                if (e.ctrlKey || e.metaKey) {
+                    const sIdx = selectedIndices.indexOf(idx);
+                    if (sIdx >= 0) {
+                        selectedIndices.splice(sIdx, 1);
+                    } else {
+                        selectedIndices.push(idx);
+                    }
+                    if (selectedIndices.length > 0) {
+                        selectCell(selectedIndices[selectedIndices.length - 1]);
+                    } else {
+                        selectCell(-1);
+                    }
+                } else if (e.shiftKey && selectedIndices.length > 0) {
+                    const path = getPathCells(selectedIndices[0], idx);
+                    for (const pIdx of path) {
+                        if (!selectedIndices.includes(pIdx)) {
+                            selectedIndices.push(pIdx);
+                        }
+                    }
+                    selectCell(idx);
+                } else {
+                    selectedIndices = [idx];
+                    selectCell(idx);
+                }
+            } else {
+                selectedIndices = [idx];
+                selectCell(idx);
+            }
+        } else {
+            selectedIndices = [];
+            selectCell(-1);
+        }
     }
 });
 canvas.addEventListener('mouseleave', () => { isDragging = false; hoveredIdx = -1; tooltip.style.display = 'none'; });
@@ -1579,7 +2287,8 @@ const urbanizationInput = document.getElementById('map-urbanization');
 const urbanValueSpan = document.getElementById('urban-value');
 if (urbanizationInput) {
     urbanizationInput.addEventListener('input', (e) => {
-        urbanValueSpan.textContent = `${e.target.value}%`;
+        const val = sliderToUrb(e.target.value);
+        urbanValueSpan.textContent = formatUrb(val);
     });
 }
 
@@ -1588,7 +2297,7 @@ generateBtn.addEventListener('click', () => {
     const seed = seedInput.value.trim() || 'Sol_III';
     const type = typeSelect.value;
     const resolution = parseInt(radiusInput.value) || 4;
-    const urbanization = parseInt(document.getElementById('map-urbanization')?.value || 15);
+    const urbanization = sliderToUrb(document.getElementById('map-urbanization')?.value || 79);
     const pollution = parseInt(document.getElementById('map-pollution')?.value || 100);
     const conservation = parseInt(document.getElementById('map-conservation')?.value || 0);
     loadDGGS(seed, type, resolution, urbanization, pollution, conservation);
@@ -1596,21 +2305,73 @@ generateBtn.addEventListener('click', () => {
 
 closeInfoBtn.addEventListener('click', () => { selectedIdx = -1; infoPanel.classList.remove('visible'); });
 
-vmbUpload.addEventListener('change', (e) => {
+function syncUrlWithCurrentPlanet() {
+    if (!dggsData || !dggsData.metadata) return;
+    const metadata = dggsData.metadata;
+    const seed = metadata.seed || 'Sol_III';
+    const type = metadata.type || 'terrestrial';
+    const resolution = metadata.resolution || 4;
+    
+    const urbValInput = document.getElementById('map-urbanization')?.value || 79;
+    const pollValInput = document.getElementById('map-pollution')?.value || 100;
+    const consValInput = document.getElementById('map-conservation')?.value || 0;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('seed', seed);
+    url.searchParams.set('type', type);
+    url.searchParams.set('resolution', resolution);
+    url.searchParams.set('urbanization', urbValInput);
+    url.searchParams.set('pollution', pollValInput);
+    url.searchParams.set('conservation', consValInput);
+    if (planetParam) {
+        url.searchParams.set('planet', planetParam);
+    }
+    
+    window.history.replaceState({}, '', url.toString());
+}
+
+function updateMapInfoHUD() {
+    if (!dggsData) return;
+    const seed = dggsData.metadata?.seed || 'unknown';
+    const type = dggsData.metadata?.type || 'unknown';
+    const res = dggsData.metadata?.resolution || 4;
+    const cellCount = dggsData.cells.length;
+    const resLabels = { 3: 'Small', 4: 'Medium', 5: 'Large', 6: 'Huge' };
+    const resStr = `${resLabels[res] || 'Res ' + res} (Res ${res})`;
+
+    // Update player HUD
+    const hudSeed = document.getElementById('info-seed');
+    const hudType = document.getElementById('info-type');
+    const hudSize = document.getElementById('info-size');
+    const hudTiles = document.getElementById('info-tiles');
+    if (hudSeed) hudSeed.textContent = seed;
+    if (hudType) hudType.textContent = type;
+    if (hudSize) hudSize.textContent = resStr;
+    if (hudTiles) hudTiles.textContent = cellCount.toLocaleString();
+
+    // Update live HUD
+    const hudSeedLive = document.getElementById('info-seed-live');
+    const hudTypeLive = document.getElementById('info-type-live');
+    const hudSizeLive = document.getElementById('info-size-live');
+    const hudTilesLive = document.getElementById('info-tiles-live');
+    if (hudSeedLive) hudSeedLive.textContent = seed;
+    if (hudTypeLive) hudTypeLive.textContent = type;
+    if (hudSizeLive) hudSizeLive.textContent = resStr;
+    if (hudTilesLive) hudTilesLive.textContent = cellCount.toLocaleString();
+
+    syncUrlWithCurrentPlanet();
+}
+
+const handleVmbUpload = (e, statusEl) => {
     const file = e.target.files[0];
     if (!file) return;
-    uploadStatus.textContent = `Loading ${file.name}...`;
+    if (statusEl) statusEl.textContent = `Loading ${file.name}...`;
     const reader = new FileReader();
     reader.onload = (evt) => {
         try {
             dggsData = decodeVMB(evt.target.result);
             onDataLoaded();
-
-
-            hudSeed.textContent = dggsData.metadata?.seed || 'Uploaded';
-            hudType.textContent = dggsData.metadata?.type || 'unknown';
-            hudSize.textContent = `${dggsData.cells.length} cells`;
-            hudTiles.textContent = dggsData.cells.length.toLocaleString();
+            updateMapInfoHUD();
             
             // Calculate Urbanization
             let urbanCount = 0;
@@ -1620,29 +2381,176 @@ vmbUpload.addEventListener('change', (e) => {
                 if (cell.tile.faction > 0) urbanCount++;
             }
             const urbanPercent = totalLand > 0 ? ((urbanCount / totalLand) * 100).toFixed(1) : 0;
-            document.getElementById('urban-percent').textContent = `${urbanPercent}%`;
-            document.getElementById('urban-bar').style.width = `${urbanPercent}%`;
+            const urbanPercentEl = document.getElementById('urban-percent');
+            if (urbanPercentEl) urbanPercentEl.textContent = `${urbanPercent}%`;
+            const urbanBarEl = document.getElementById('urban-bar');
+            if (urbanBarEl) urbanBarEl.style.width = `${urbanPercent}%`;
+            
             selectedIdx = -1; hoveredIdx = -1;
             infoPanel.classList.remove('visible');
-            uploadStatus.textContent = 'Loaded!';
+            if (statusEl) statusEl.textContent = 'Loaded!';
             centerViewport();
         } catch (err) {
-            uploadStatus.textContent = `Error: ${err.message}`;
+            console.error("VMB parse error:", err);
+            if (statusEl) statusEl.textContent = `Error: ${err.message}`;
+            alert("Error parsing .vmb file: " + err.message);
         }
     };
     reader.readAsArrayBuffer(file);
-});
+};
+
+if (vmbUpload) {
+    vmbUpload.addEventListener('change', (e) => handleVmbUpload(e, uploadStatus));
+}
+const vmbUploadLive = document.getElementById('vmb-upload-live');
+if (vmbUploadLive) {
+    vmbUploadLive.addEventListener('change', (e) => handleVmbUpload(e, null));
+}
+
+function decodeToken(token) {
+    if (!token) return null;
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return null;
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
 
 // ── Init ──
 const urlParams = new URLSearchParams(window.location.search);
 const seedParam = urlParams.get('seed') || 'Sol_III';
 const typeParam = urlParams.get('type') || 'terrestrial';
 const resParam = parseInt(urlParams.get('resolution')) || 4;
-const roleParam = urlParams.get('role') || 'player';
-userRole = roleParam.toLowerCase();
+const urbParam = urlParams.get('urbanization') !== null ? parseInt(urlParams.get('urbanization')) : 79;
+const pollParam = urlParams.get('pollution') !== null ? parseInt(urlParams.get('pollution')) : 100;
+const consParam = urlParams.get('conservation') !== null ? parseInt(urlParams.get('conservation')) : 0;
+const planetParam = urlParams.get('planet') || '';
 
-if (userRole !== 'gm') {
-    editFeature.parentElement.style.display = 'none';
+const sessionParam = urlParams.get('session');
+if (sessionParam) {
+    const decoded = decodeToken(sessionParam);
+    if (decoded && decoded.role) {
+        userRole = decoded.role.toLowerCase();
+    }
+} else {
+    const roleParam = urlParams.get('role') || 'player';
+    userRole = roleParam.toLowerCase();
+}
+originalRole = userRole;
+
+// ── Control Panel Tab System ──
+const controlTabButtons = document.querySelectorAll('.control-tab-btn');
+const controlTabContents = document.querySelectorAll('.control-tab-content');
+const cTabEditor = document.getElementById('c-tab-editor');
+const cTabLive = document.getElementById('c-tab-live');
+
+function activateControlTab(tabName) {
+    controlTabButtons.forEach(b => {
+        if (b.getAttribute('data-tab') === `c-${tabName}` || b.getAttribute('data-tab') === tabName) {
+            b.classList.add('active');
+        } else {
+            b.classList.remove('active');
+        }
+    });
+    controlTabContents.forEach(content => {
+        if (content.id === `tab-${tabName}` || content.id === `tab-c-${tabName}`) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+}
+
+controlTabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab').replace(/^c-/, '');
+        activateControlTab(tabName);
+    });
+});
+
+function updateControlPanelTabsVisibility() {
+    if (userRole === 'gm') {
+        if (cTabEditor) cTabEditor.style.display = 'block';
+        if (cTabLive) cTabLive.style.display = 'block';
+    } else {
+        if (cTabEditor) cTabEditor.style.display = 'none';
+        if (cTabLive) cTabLive.style.display = 'none';
+        activateControlTab('player');
+    }
+}
+
+// ── Sidebar Collapse Toggle ──
+const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+const controlPanel = document.getElementById('control-panel');
+
+if (toggleSidebarBtn && controlPanel) {
+    toggleSidebarBtn.addEventListener('click', () => {
+        controlPanel.classList.toggle('collapsed');
+        toggleSidebarBtn.classList.toggle('sidebar-collapsed');
+        if (controlPanel.classList.contains('collapsed')) {
+            toggleSidebarBtn.textContent = '▶';
+        } else {
+            toggleSidebarBtn.textContent = '◀';
+        }
+    });
+}
+
+// GM Mode Toggle UI setup
+const gmToggleContainer = document.getElementById('gm-toggle-container');
+const gmToggleMode = document.getElementById('gm-toggle-mode');
+
+const infoTabs = document.getElementById('info-tabs');
+
+if (originalRole === 'gm') {
+    if (gmToggleContainer) gmToggleContainer.style.display = 'flex';
+    if (gmToggleMode) {
+        gmToggleMode.checked = (userRole === 'gm');
+        gmToggleMode.addEventListener('change', () => {
+            userRole = gmToggleMode.checked ? 'gm' : 'player';
+            
+            updateControlPanelTabsVisibility();
+            if (userRole === 'gm') {
+                if (infoTabs) infoTabs.style.display = 'flex';
+                activateTab('gm-edit');
+                if (gmFeatureRow) gmFeatureRow.style.display = 'flex';
+                if (gmFactionRow) gmFactionRow.style.display = 'flex';
+                activateControlTab('editor');
+            } else {
+                if (infoTabs) infoTabs.style.display = 'none';
+                activateTab('general');
+                if (gmFeatureRow) gmFeatureRow.style.display = 'none';
+                if (gmFactionRow) gmFactionRow.style.display = 'none';
+            }
+
+            if (selectedIndices.length > 0) {
+                selectCell(selectedIndices[0]);
+            } else {
+                infoPanel.classList.remove('visible');
+            }
+        });
+    }
+}
+
+// Initial state setup based on role
+updateControlPanelTabsVisibility();
+if (userRole === 'gm') {
+    if (infoTabs) infoTabs.style.display = 'flex';
+    activateTab('gm-edit');
+    if (gmFeatureRow) gmFeatureRow.style.display = 'flex';
+    if (gmFactionRow) gmFactionRow.style.display = 'flex';
+    activateControlTab('editor');
+} else {
+    if (infoTabs) infoTabs.style.display = 'none';
+    activateTab('general');
+    if (gmFeatureRow) gmFeatureRow.style.display = 'none';
+    if (gmFactionRow) gmFactionRow.style.display = 'none';
 }
 
 
@@ -1650,7 +2558,69 @@ if (seedInput) seedInput.value = seedParam;
 if (typeSelect) typeSelect.value = typeParam;
 if (radiusInput) radiusInput.value = resParam.toString();
 
-loadDGGS(seedParam, typeParam, resParam);
+const mapUrbanizationEl = document.getElementById('map-urbanization');
+if (mapUrbanizationEl) {
+    mapUrbanizationEl.value = urbParam;
+    const urbanVal = document.getElementById('urban-value');
+    if (urbanVal) {
+        const p = sliderToUrb(urbParam);
+        urbanVal.textContent = (p < 1) ? `${p.toFixed(3)}%` : `${Math.round(p)}%`;
+    }
+}
+const mapPollutionEl = document.getElementById('map-pollution');
+if (mapPollutionEl) {
+    mapPollutionEl.value = pollParam;
+    const pollVal = document.getElementById('poll-value');
+    if (pollVal) pollVal.textContent = `${pollParam}%`;
+}
+const mapConservationEl = document.getElementById('map-conservation');
+if (mapConservationEl) {
+    mapConservationEl.value = consParam;
+    const consVal = document.getElementById('cons-value');
+    if (consVal) consVal.textContent = `${consParam}%`;
+}
+
+// Deep linking share button handler
+const copyShareBtn = document.getElementById('copy-share-btn');
+const copyStatus = document.getElementById('copy-status');
+if (copyShareBtn) {
+    copyShareBtn.addEventListener('click', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('role');
+        url.searchParams.delete('session');
+        navigator.clipboard.writeText(url.toString())
+            .then(() => {
+                if (copyStatus) {
+                    copyStatus.textContent = 'Copied share link to clipboard!';
+                    setTimeout(() => {
+                        copyStatus.textContent = '';
+                    }, 2000);
+                }
+            })
+            .catch(err => {
+                console.error('Could not copy text: ', err);
+                if (copyStatus) {
+                    copyStatus.textContent = 'Failed to copy!';
+                }
+            });
+    });
+}
+
+// Auto-collapse control panel on mobile screens
+if (window.innerWidth < 768) {
+    const controlPanel = document.getElementById('control-panel');
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+    if (controlPanel) {
+        controlPanel.classList.add('collapsed');
+    }
+    if (toggleSidebarBtn) {
+        toggleSidebarBtn.classList.add('sidebar-collapsed');
+        toggleSidebarBtn.textContent = '▶';
+    }
+}
+
+const initialUrbanization = sliderToUrb(urbParam);
+loadDGGS(seedParam, typeParam, resParam, initialUrbanization, pollParam, consParam);
 requestAnimationFrame(draw);
 
 // ── Metadata Sync Helper ──
@@ -1661,7 +2631,7 @@ async function saveDGGSMetadata() {
         const type = dggsData.metadata?.type || typeParam;
         const res = dggsData.metadata?.resolution || resParam;
         const urbInput = document.getElementById('map-urbanization');
-        const urb = dggsData.metadata?.urbanization !== undefined ? dggsData.metadata.urbanization : (urbInput ? parseInt(urbInput.value) : 15);
+        const urb = dggsData.metadata?.urbanization !== undefined ? dggsData.metadata.urbanization : (urbInput ? sliderToUrb(urbInput.value) : 15);
         const pollInput = document.getElementById('map-pollution');
         const poll = dggsData.metadata?.pollution !== undefined ? dggsData.metadata.pollution : (pollInput ? parseInt(pollInput.value) : 100);
         const consInput = document.getElementById('map-conservation');
@@ -1672,7 +2642,13 @@ async function saveDGGSMetadata() {
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],
             scannedCells: dggsData.metadata.scannedCells || [],
-            landingCell: dggsData.metadata.landingCell !== undefined ? dggsData.metadata.landingCell : null
+            landingCell: dggsData.metadata.landingCell !== undefined ? dggsData.metadata.landingCell : null,
+            factions: dggsData.metadata.factions || {},
+            customFeatures: dggsData.metadata.customFeatures || {},
+            mutations: dggsData.metadata.mutations || {},
+            names: dggsData.metadata.names || {},
+            descriptions: dggsData.metadata.descriptions || {},
+            labels: dggsData.metadata.labels || []
         };
 
         const response = await fetch(url, {
@@ -1698,11 +2674,190 @@ async function saveDGGSMetadata() {
     }
 }
 
+// Helper to update label list in editor panel
+function updateLabelEditorList(cellIdx) {
+    activeLabelsContainer.innerHTML = '';
+    if (!dggsData || !dggsData.metadata || !dggsData.metadata.labels) return;
+    
+    const cellLabels = dggsData.metadata.labels.filter(l => l.cell === cellIdx);
+    if (cellLabels.length === 0) {
+        activeLabelsContainer.innerHTML = '<span style="color: #6688aa; font-style: italic;">No region labels anchored here.</span>';
+        return;
+    }
+    
+    cellLabels.forEach((label) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.background = 'rgba(255,255,255,0.05)';
+        div.style.padding = '4px 8px';
+        div.style.borderRadius = '4px';
+        div.style.border = '1px solid rgba(255,255,255,0.1)';
+        div.style.gap = '4px';
+        
+        const span = document.createElement('span');
+        span.textContent = `"${label.text}" (${label.type === 'territory' ? 'Pol' : 'Geo'})`;
+        span.style.color = label.type === 'territory' ? '#fff' : '#00e5ff';
+        span.style.overflow = 'hidden';
+        span.style.textOverflow = 'ellipsis';
+        span.style.whiteSpace = 'nowrap';
+        
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '×';
+        delBtn.style.background = 'transparent';
+        delBtn.style.border = 'none';
+        delBtn.style.color = '#ff1744';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.fontSize = '1.2em';
+        delBtn.style.padding = '0 4px';
+        delBtn.style.lineHeight = '1';
+        delBtn.addEventListener('click', async () => {
+            dggsData.metadata.labels = dggsData.metadata.labels.filter(l => l !== label);
+            
+            delBtn.disabled = true;
+            await saveDGGSMetadata();
+            delBtn.disabled = false;
+            
+            selectCell(cellIdx);
+        });
+        
+        div.appendChild(span);
+        div.appendChild(delBtn);
+        activeLabelsContainer.appendChild(div);
+    });
+}
+
 // ── Event Handlers for Interactive Editing & Export ──
-editFeature.addEventListener('change', () => {
+editFeature.addEventListener('change', async () => {
+    if (selectedIndices.length > 0 && dggsData) {
+        const val = parseInt(editFeature.value) || 0;
+        if (val === -1) return; // Ignore placeholder Multiple option
+        
+        for (const idx of selectedIndices) {
+            dggsData.cells[idx].tile.feature = val;
+            if (!dggsData.metadata.customFeatures) dggsData.metadata.customFeatures = {};
+            dggsData.metadata.customFeatures[idx] = val;
+        }
+        
+        editFeature.disabled = true;
+        await saveDGGSMetadata();
+        editFeature.disabled = false;
+        
+        computeFavorabilities(); // Feature changes can alter mining/research suitability
+        selectCell(selectedIdx);
+    }
+});
+
+editFaction.addEventListener('change', async () => {
+    if (selectedIndices.length > 0 && dggsData) {
+        const val = parseInt(editFaction.value) || 0;
+        if (val === -1) return; // Ignore placeholder
+        
+        if (!dggsData.metadata.factions) dggsData.metadata.factions = {};
+        
+        for (const idx of selectedIndices) {
+            if (val === 0) {
+                delete dggsData.metadata.factions[idx];
+                dggsData.cells[idx].tile.faction = 0;
+                dggsData.cells[idx].tile.specialization = undefined;
+            } else {
+                const currentSpec = dggsData.metadata.factions[idx]?.spec || 'auto';
+                dggsData.metadata.factions[idx] = { level: val, spec: currentSpec };
+                dggsData.cells[idx].tile.faction = val;
+                dggsData.cells[idx].tile.specialization = currentSpec === 'auto' ? resolveSpecialization(idx) : currentSpec;
+            }
+        }
+        
+        editFaction.disabled = true;
+        await saveDGGSMetadata();
+        editFaction.disabled = false;
+        
+        selectCell(selectedIdx);
+    }
+});
+
+editFactionSpec.addEventListener('change', async () => {
+    if (selectedIndices.length > 0 && dggsData) {
+        const val = editFactionSpec.value;
+        if (val === '-1') return; // Ignore placeholder
+        
+        if (!dggsData.metadata.factions) dggsData.metadata.factions = {};
+        
+        for (const idx of selectedIndices) {
+            const currentLvl = dggsData.metadata.factions[idx]?.level || 0;
+            if (currentLvl > 0) {
+                dggsData.metadata.factions[idx] = { level: currentLvl, spec: val };
+                dggsData.cells[idx].tile.specialization = val === 'auto' ? resolveSpecialization(idx) : val;
+            }
+        }
+        
+        editFactionSpec.disabled = true;
+        await saveDGGSMetadata();
+        editFactionSpec.disabled = false;
+        
+        selectCell(selectedIdx);
+    }
+});
+
+editName.addEventListener('change', async () => {
+    if (selectedIndices.length > 0 && dggsData) {
+        const val = editName.value.trim();
+        if (!dggsData.metadata.names) dggsData.metadata.names = {};
+        
+        for (const idx of selectedIndices) {
+            if (val === '') {
+                delete dggsData.metadata.names[idx];
+            } else {
+                dggsData.metadata.names[idx] = val;
+            }
+        }
+        
+        editName.disabled = true;
+        await saveDGGSMetadata();
+        editName.disabled = false;
+        
+        selectCell(selectedIdx);
+    }
+});
+
+editDesc.addEventListener('change', async () => {
+    if (selectedIndices.length > 0 && dggsData) {
+        const val = editDesc.value.trim();
+        if (!dggsData.metadata.descriptions) dggsData.metadata.descriptions = {};
+        
+        for (const idx of selectedIndices) {
+            if (val === '') {
+                delete dggsData.metadata.descriptions[idx];
+            } else {
+                dggsData.metadata.descriptions[idx] = val;
+            }
+        }
+        
+        editDesc.disabled = true;
+        await saveDGGSMetadata();
+        editDesc.disabled = false;
+        
+        selectCell(selectedIdx);
+    }
+});
+
+addLabelBtn.addEventListener('click', async () => {
     if (selectedIdx >= 0 && dggsData) {
-        dggsData.cells[selectedIdx].tile.feature = parseInt(editFeature.value) || 0;
-        selectCell(selectedIdx); // refresh badges
+        const text = newLabelText.value.trim();
+        if (!text) return;
+        
+        const type = newLabelType.value;
+        if (!dggsData.metadata.labels) dggsData.metadata.labels = [];
+        
+        dggsData.metadata.labels.push({ cell: selectedIdx, text, type });
+        newLabelText.value = '';
+        
+        addLabelBtn.disabled = true;
+        await saveDGGSMetadata();
+        addLabelBtn.disabled = false;
+        
+        selectCell(selectedIdx);
     }
 });
 
@@ -1728,6 +2883,36 @@ function getNearbyCells(startIdx, count) {
     return result;
 }
 
+gmRevealBtn.addEventListener('click', async () => {
+    if (selectedIndices.length === 0 || !dggsData) return;
+    if (userRole !== 'gm') return;
+
+    if (!dggsData.metadata) dggsData.metadata = {};
+    if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
+
+    const featureCells = selectedIndices.filter(idx => dggsData.cells[idx].tile.feature > 0);
+    if (featureCells.length === 0) return;
+    
+    const allRevealed = featureCells.every(idx => dggsData.metadata.revealedFeatures.includes(idx));
+    
+    for (const idx of featureCells) {
+        if (allRevealed) {
+            dggsData.metadata.revealedFeatures = dggsData.metadata.revealedFeatures.filter(i => i !== idx);
+        } else {
+            if (!dggsData.metadata.revealedFeatures.includes(idx)) {
+                dggsData.metadata.revealedFeatures.push(idx);
+            }
+        }
+    }
+
+    gmRevealBtn.disabled = true;
+    gmRevealBtn.textContent = 'SAVING...';
+    await saveDGGSMetadata();
+    gmRevealBtn.disabled = false;
+
+    selectCell(selectedIdx);
+});
+
 featureActionBtn.addEventListener('click', async () => {
     if (selectedIdx < 0 || !dggsData) return;
 
@@ -1735,93 +2920,71 @@ featureActionBtn.addEventListener('click', async () => {
     if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
     if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
 
-    const isRevealed = dggsData.metadata.revealedFeatures.includes(selectedIdx);
+    const countInput = document.getElementById('scan-count');
+    const count = countInput ? parseInt(countInput.value) || 1 : 1;
+    const successLevelSelect = document.getElementById('scan-success-level');
+    const successLevel = successLevelSelect ? parseInt(successLevelSelect.value) || 1 : 1;
+    const cellsToScan = getNearbyCells(selectedIdx, count);
 
-    if (userRole === 'gm') {
-        if (isRevealed) {
-            dggsData.metadata.revealedFeatures = dggsData.metadata.revealedFeatures.filter(idx => idx !== selectedIdx);
-        } else {
-            dggsData.metadata.revealedFeatures.push(selectedIdx);
-        }
+    let scanDelay = 1500;
 
-        featureActionBtn.disabled = true;
-        featureActionBtn.textContent = 'SAVING...';
-        await saveDGGSMetadata();
-        featureActionBtn.disabled = false;
+    for (const idx of cellsToScan) {
+        const c = dggsData.cells[idx];
+        const fData = FEATURES[c.tile.feature];
+        const sLevel = (c.tile.feature > 0 && fData) ? fData.scanLevel : 1;
 
-        selectCell(selectedIdx);
-    } else if (userRole === 'player') {
-        const countInput = document.getElementById('scan-count');
-        const count = countInput ? parseInt(countInput.value) || 1 : 1;
-        const cellsToScan = getNearbyCells(selectedIdx, count);
+        if (sLevel === 2 && scanDelay < 1500) scanDelay = 1500;
+        if (sLevel === 3) scanDelay = 3000;
+    }
 
-        let scanDelay = 1500;
+    // base delay for multiple hexes
+    if (count > 1 && scanDelay < 1000 + count * 100) {
+        scanDelay = Math.min(1000 + count * 100, 5000); // max 5s for big scans
+    }
+
+    featureActionBtn.disabled = true;
+    featureActionBtn.textContent = 'SCANNING...';
+    featureActionBtn.style.borderColor = '#ffd600';
+    featureActionBtn.style.color = '#ffd600';
+
+    setTimeout(async () => {
+        const foundFeatures = [];
 
         for (const idx of cellsToScan) {
+            if (!dggsData.metadata.scannedCells.includes(idx)) {
+                dggsData.metadata.scannedCells.push(idx);
+            }
             const c = dggsData.cells[idx];
-            const fData = FEATURES[c.tile.feature];
-            const sLevel = (c.tile.feature > 0 && fData) ? fData.scanLevel : 1;
+            const featData = (c.tile.feature > 0 && FEATURES[c.tile.feature]) ? FEATURES[c.tile.feature] : null;
 
-            if (sLevel === 2 && scanDelay < 1500) scanDelay = 1500;
-            if (sLevel === 3 && dggsData.metadata.landingCell === idx) {
-                scanDelay = 4000;
-            }
-        }
-
-        // base delay for multiple hexes
-        if (count > 1 && scanDelay < 1000 + count * 100) {
-            scanDelay = Math.min(1000 + count * 100, 5000); // max 5s for big scans
-        }
-
-        // If scanning a single level 3 and not landed, block
-        if (count === 1) {
-            const fData = FEATURES[dggsData.cells[selectedIdx].tile.feature];
-            const sLevel = (dggsData.cells[selectedIdx].tile.feature > 0 && fData) ? fData.scanLevel : 1;
-            if (sLevel === 3 && dggsData.metadata.landingCell !== selectedIdx) {
-                alert('Cannot scan: Ground presence required. You must land here first to perform a deep scan.');
-                return;
-            }
-        }
-
-        featureActionBtn.disabled = true;
-        featureActionBtn.textContent = 'SCANNING...';
-        featureActionBtn.style.borderColor = '#ffd600';
-        featureActionBtn.style.color = '#ffd600';
-
-        setTimeout(async () => {
-            const foundFeatures = [];
-
-            for (const idx of cellsToScan) {
-                if (!dggsData.metadata.scannedCells.includes(idx)) {
-                    dggsData.metadata.scannedCells.push(idx);
-                }
-                const c = dggsData.cells[idx];
-                const sLevel = (c.tile.feature > 0 && FEATURES[c.tile.feature]) ? FEATURES[c.tile.feature].scanLevel : 1;
-
-                if (c.tile.feature > 0) {
-                    if (sLevel === 3 && dggsData.metadata.landingCell !== idx) {
-                        continue; // Requires ground presence
-                    }
+            if (featData) {
+                const effectiveSuccess = successLevel + (featData.shielding || 0);
+                if (effectiveSuccess >= featData.scanLevel) {
                     if (!dggsData.metadata.revealedFeatures.includes(idx)) {
                         dggsData.metadata.revealedFeatures.push(idx);
-                        foundFeatures.push(FEATURES[c.tile.feature].name);
+                        foundFeatures.push(featData.name);
                     }
                 }
             }
+        }
 
-            await saveDGGSMetadata();
-            featureActionBtn.disabled = false;
-            featureActionBtn.textContent = 'SCAN SECTOR';
-            featureActionBtn.style.borderColor = '#00e5ff';
-            featureActionBtn.style.color = '#00e5ff';
+        await saveDGGSMetadata();
+        featureActionBtn.disabled = false;
+        featureActionBtn.textContent = 'SCAN SECTOR';
+        featureActionBtn.style.borderColor = '#00e5ff';
+        featureActionBtn.style.color = '#00e5ff';
 
-            if (foundFeatures.length > 0) {
-                alert(`Scan Complete! Found: ${foundFeatures.join(', ')}`);
-            }
+        const successNames = { 1: 'Ordinary Success', 2: 'Good Success', 3: 'Amazing Success' };
+        const successText = successNames[successLevel] || `Level ${successLevel}`;
 
-            selectCell(selectedIdx);
-        }, scanDelay);
-    }
+        if (foundFeatures.length > 0) {
+            alert(`Scan Complete! (Roll Result: ${successText})\n\nDetected and localized the following features:\n- ${foundFeatures.join('\n- ')}`);
+        } else {
+            alert(`Scan Complete! (Roll Result: ${successText})\n\nNo new planetary features detected in the scanned area. Some features may require higher sensor roll results or suffer from sensor shielding penalties.`);
+        }
+
+        selectCell(selectedIdx);
+    }, scanDelay);
 });
 
 landBtn.addEventListener('click', async () => {
@@ -1859,12 +3022,55 @@ exportBtn.addEventListener('click', () => {
     }
 });
 
-const lensRadios = document.querySelectorAll('input[name="map-lens"]');
-lensRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            currentLens = e.target.value;
-        }
+const lensBtns = document.querySelectorAll('.lens-btn');
+lensBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        lensBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLens = btn.getAttribute('data-value');
     });
 });
+
+// ESC key listener to clear selection
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        selectedIndices = [];
+        selectedIdx = -1;
+        selectCell(-1);
+    }
+});
+
+
+
+// Expose variables for testing
+window.getSelectionState = () => ({
+    selectedIdx,
+    selectedIndices
+});
+window.triggerSelectCell = (idx, ctrlKey = false, shiftKey = false) => {
+    if (ctrlKey) {
+        const sIdx = selectedIndices.indexOf(idx);
+        if (sIdx >= 0) {
+            selectedIndices.splice(sIdx, 1);
+        } else {
+            selectedIndices.push(idx);
+        }
+        if (selectedIndices.length > 0) {
+            selectCell(selectedIndices[selectedIndices.length - 1]);
+        } else {
+            selectCell(-1);
+        }
+    } else if (shiftKey && selectedIndices.length > 0) {
+        const path = getPathCells(selectedIndices[0], idx);
+        for (const pIdx of path) {
+            if (!selectedIndices.includes(pIdx)) {
+                selectedIndices.push(pIdx);
+            }
+        }
+        selectCell(idx);
+    } else {
+        selectedIndices = [idx];
+        selectCell(idx);
+    }
+};
 

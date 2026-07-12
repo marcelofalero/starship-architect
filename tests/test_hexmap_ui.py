@@ -76,3 +76,59 @@ def test_hexmap_fog_of_war_and_roles(page: Page):
     expect(scan_btn).to_be_visible()
     assert scan_btn.inner_text() == "SCAN SECTOR"
 
+
+def test_hexmap_gm_toggle_and_multiselect(page: Page):
+    # Log console messages
+    page.on("console", lambda msg: print(f"\nBROWSER CONSOLE [{msg.type}]: {msg.text}"))
+    page.on("pageerror", lambda err: print(f"\nBROWSER ERROR: {err}"))
+
+    # 1. GM Role
+    page.goto("/hexmap/?role=gm&seed=Sol_III&resolution=3")
+    page.wait_for_selector("#hex-canvas", state="visible", timeout=10000)
+    page.wait_for_timeout(1000)
+
+    # GM Edit Mode checkbox container should be visible
+    gm_toggle_container = page.locator("#gm-toggle-container")
+    expect(gm_toggle_container).to_be_visible()
+
+    # The checkbox should be checked by default for GM
+    gm_toggle_mode = page.locator("#gm-toggle-mode")
+    expect(gm_toggle_mode).to_be_checked()
+
+    # Uncheck it
+    gm_toggle_mode.uncheck()
+    page.wait_for_timeout(500)
+    
+    # Programmatically select a cell
+    page.evaluate("window.triggerSelectCell(562)")
+    page.wait_for_timeout(500)
+
+    # GM edit controls should be hidden since we toggled GM mode off
+    edit_feature_row = page.locator("#edit-feature").locator("..")
+    expect(edit_feature_row).to_be_hidden()
+
+    # Toggle it back on
+    gm_toggle_mode.check()
+    page.wait_for_timeout(500)
+    expect(edit_feature_row).to_be_visible()
+
+    # Programmatically multiselect a second cell (Ctrl + select)
+    page.evaluate("window.triggerSelectCell(566, true)")
+    page.wait_for_timeout(500)
+
+    # Header Title should indicate multiple selection
+    detail_title = page.locator("#hex-coord-title")
+    expect(detail_title).to_contain_text("2 Cells Selected")
+
+    # Let's select Town (Lvl 2) in the Faction dropdown
+    edit_faction = page.locator("#edit-faction")
+    edit_faction.select_option("2")
+    page.wait_for_timeout(1000)
+
+    # Programmatically select only the first cell and verify it has Town (Lvl 2)
+    page.evaluate("window.triggerSelectCell(562)")
+    page.wait_for_timeout(500)
+    expect(edit_faction).to_have_value("2")
+
+
+

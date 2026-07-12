@@ -608,7 +608,31 @@ export function showInfoPanel(userData) {
         else resolution = 6;
         
         viewSurfaceBtn.onclick = () => {
-            window.open(`../hexmap/index.html?seed=${encodeURIComponent(data.name)}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`, '_blank');
+            const session = uiCtx.getSessionToken();
+            const planetId = data.hexmapId || '';
+            let url = `hexmap/index.html?seed=${encodeURIComponent(data.name)}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
+            if (planetId) {
+                url += `&planet=${encodeURIComponent(planetId)}`;
+            }
+            if (session) {
+                url += `&session=${encodeURIComponent(session)}`;
+            } else {
+                const mode = uiCtx.getCurrentMode();
+                const role = (mode === 'gm') ? 'gm' : 'player';
+                url += `&role=${role}`;
+            }
+            // Mark the planet as having had its surface generated
+            data.hexmapGenerated = true;
+            
+            // Set the URL search param on the current page to 'planet' so the back button resumes here
+            if (planetId) {
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('planet', planetId);
+                window.history.replaceState({}, '', newUrl.toString());
+            }
+            
+            // Open in the same tab
+            window.location.href = url;
         };
     } else {
         viewSurfaceBtn.style.display = 'none';

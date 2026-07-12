@@ -34,6 +34,9 @@ export let starTexture, starGeometry, shipGeometry, shipMat;
 export const raycaster = new THREE.Raycaster();
 export const pointer = new THREE.Vector2();
 
+export let pendingPlanetIdToFocus = null;
+export function setPendingPlanetIdToFocus(id) { pendingPlanetIdToFocus = id; }
+
 export function getStarColor(cls) {
     switch(cls) {
         case 'O': return 0x9db4ff; // Blue
@@ -543,6 +546,25 @@ export function renderSystem() {
     });
 
     systemScene.add(activeSystemView);
+
+    if (pendingPlanetIdToFocus && activeSystemView.userData && activeSystemView.userData.interactableMeshes) {
+        const mesh = activeSystemView.userData.interactableMeshes.find(m => m.userData && m.userData.data && m.userData.data.hexmapId === pendingPlanetIdToFocus);
+        if (mesh) {
+            const worldPos = new THREE.Vector3();
+            mesh.getWorldPosition(worldPos);
+            controls.target.copy(worldPos);
+            camera.position.copy(worldPos).add(new THREE.Vector3(0, 0, 20));
+            controls.update();
+            
+            if (mesh.userData.data.x === undefined) {
+                mesh.userData.data.x = 0;
+                mesh.userData.data.y = 0;
+                mesh.userData.data.z = 0;
+            }
+            showInfoPanel(mesh.userData);
+        }
+        pendingPlanetIdToFocus = null;
+    }
 }
 
 export function enterSystem(starData) {
@@ -952,6 +974,20 @@ export function initScene(container) {
 
     document.getElementById('regenerate-system-btn').addEventListener('click', () => {
         if (currentSystemFocus && currentMode === 'gm') {
+            // Check if any planets have generated hexmap surfaces
+            if (currentSystemFocus.planets && currentSystemFocus.planets.length > 0) {
+                const generatedPlanets = currentSystemFocus.planets.filter(p => p.hexmapGenerated);
+                if (generatedPlanets.length > 0) {
+                    const names = generatedPlanets.map(p => p.name).join(', ');
+                    const confirmed = confirm(
+                        `⚠ This system has ${generatedPlanets.length} planet(s) with generated surface maps:\n\n` +
+                        `${names}\n\n` +
+                        `Regenerating will permanently lose those maps. Continue?`
+                    );
+                    if (!confirmed) return;
+                }
+            }
+
             currentSystemFocus.systemSeed = Math.random().toString(36).substring(2, 15);
             delete currentSystemFocus.planets;
             renderSystem();

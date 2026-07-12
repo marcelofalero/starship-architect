@@ -11,16 +11,16 @@ import pytest
 def pack_tile(biome=0, elevation=0, moisture=0, faction=0, feature=0):
     return ((biome & 0xF) << 12) | \
            ((elevation & 0x7) << 9) | \
-           ((moisture & 0x7) << 6) | \
-           ((faction & 0x3) << 4) | \
+           (((moisture >> 1) & 0x3) << 7) | \
+           ((faction & 0x7) << 4) | \
            (feature & 0xF)
 
 def unpack_tile(val):
     return {
         "biome": (val >> 12) & 0xF,
         "elevation": (val >> 9) & 0x7,
-        "moisture": (val >> 6) & 0x7,
-        "faction": (val >> 4) & 0x3,
+        "moisture": ((val >> 7) & 0x3) << 1,
+        "faction": (val >> 4) & 0x7,
         "feature": val & 0xF
     }
 
@@ -175,11 +175,11 @@ def test_python_roundtrip():
     width = 3
     height = 2
     tiles = [
-        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 0, "feature": 5},
-        {"biome": 15, "elevation": 7, "moisture": 7, "faction": 3, "feature": 15},
+        {"biome": 1, "elevation": 2, "moisture": 2, "faction": 0, "feature": 5},
+        {"biome": 15, "elevation": 7, "moisture": 6, "faction": 3, "feature": 15},
         {"biome": 0, "elevation": 0, "moisture": 0, "faction": 0, "feature": 0},
         {"biome": 8, "elevation": 4, "moisture": 2, "faction": 1, "feature": 10},
-        {"biome": 4, "elevation": 1, "moisture": 5, "faction": 2, "feature": 12},
+        {"biome": 4, "elevation": 1, "moisture": 4, "faction": 2, "feature": 12},
         {"biome": 10, "elevation": 6, "moisture": 0, "faction": 3, "feature": 1},
     ]
     metadata = {"map_name": "Valhalla", "danger_level": "High"}
@@ -203,10 +203,10 @@ def test_cross_language_decode():
     width = 2
     height = 2
     tiles = [
-        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 1, "feature": 4},
-        {"biome": 5, "elevation": 6, "moisture": 7, "faction": 2, "feature": 8},
-        {"biome": 9, "elevation": 0, "moisture": 1, "faction": 3, "feature": 12},
-        {"biome": 13, "elevation": 4, "moisture": 5, "faction": 0, "feature": 15},
+        {"biome": 1, "elevation": 2, "moisture": 2, "faction": 1, "feature": 4},
+        {"biome": 5, "elevation": 6, "moisture": 6, "faction": 2, "feature": 8},
+        {"biome": 9, "elevation": 0, "moisture": 0, "faction": 3, "feature": 12},
+        {"biome": 13, "elevation": 4, "moisture": 4, "faction": 0, "feature": 15},
     ]
     metadata = {"source": "python"}
     

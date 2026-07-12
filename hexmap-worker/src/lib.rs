@@ -56,8 +56,8 @@ pub struct Tile {
 pub fn pack_tile(tile: &Tile) -> u16 {
     ((tile.biome as u16 & 0xF) << 12) |
     ((tile.elevation as u16 & 0x7) << 9) |
-    ((tile.moisture as u16 & 0x7) << 6) |
-    ((tile.faction as u16 & 0x3) << 4) |
+    (((tile.moisture as u16 >> 1) & 0x3) << 7) |
+    ((tile.faction as u16 & 0x7) << 4) |
     (tile.feature as u16 & 0xF)
 }
 
@@ -65,8 +65,8 @@ pub fn unpack_tile(val: u16) -> Tile {
     Tile {
         biome: ((val >> 12) & 0xF) as u8,
         elevation: ((val >> 9) & 0x7) as u8,
-        moisture: ((val >> 6) & 0x7) as u8,
-        faction: ((val >> 4) & 0x3) as u8,
+        moisture: (((val >> 7) & 0x3) << 1) as u8,
+        faction: ((val >> 4) & 0x7) as u8,
         feature: (val & 0xF) as u8,
     }
 }
@@ -188,6 +188,9 @@ pub fn generate_tiles(seed: &str, planet_type: &str, radius: i32) -> Vec<Tile> {
             }
             if tile_rng.next() < 0.08 {
                 feature = ((tile_rng.next() * 9.0) as u8) + 1;
+                if feature == 5 {
+                    feature = 0;
+                }
             }
 
             tiles.push(Tile {

@@ -223,7 +223,7 @@ def test_dggs_planet_types(run_worker):
             assert 0 <= t["biome"] <= 15
             assert 0 <= t["elevation"] <= 7
             assert 0 <= t["moisture"] <= 7
-            assert 0 <= t["faction"] <= 3
+            assert 0 <= t["faction"] <= 4
             assert 0 <= t["feature"] <= 15
 
 
@@ -345,4 +345,45 @@ def test_dggs_persistence_and_caching(run_worker):
     assert decoded_after["metadata"]["notes"] == "Custom GM notes for this DGGS map."
     assert decoded_after["metadata"]["revealedFeatures"] == [2, 4, 7]
     assert decoded_after["metadata"]["gmEditCount"] == 2
+
+
+def test_dggs_exact_urbanization(run_worker):
+    base_url = run_worker
+    
+    # 1. Test 20% urbanization on terrestrial planet
+    # Total candidates = land cells (biome > 1)
+    resp = httpx.get(f"{base_url}/planet/urb-test-20/dggs?type=terrestrial&resolution=3&urbanization=20")
+    assert resp.status_code == 200
+    decoded = decode_vrgd(resp.content)
+    
+    cells = decoded["cells"]
+    candidates = [c for c in cells if c["tile"]["biome"] > 1]
+    urban_cells = [c for c in candidates if c["tile"]["faction"] > 0]
+    
+    expected_count = round(len(candidates) * 0.20)
+    assert len(urban_cells) == expected_count, f"Expected {expected_count} urbanized cells for 20% urbanization, got {len(urban_cells)}"
+    
+    # 2. Test 0.01% urbanization
+    resp = httpx.get(f"{base_url}/planet/urb-test-low/dggs?type=terrestrial&resolution=3&urbanization=0.01")
+    assert resp.status_code == 200
+    decoded = decode_vrgd(resp.content)
+    
+    cells = decoded["cells"]
+    candidates = [c for c in cells if c["tile"]["biome"] > 1]
+    urban_cells = [c for c in candidates if c["tile"]["faction"] > 0]
+    
+    expected_count = round(len(candidates) * 0.0001)
+    assert len(urban_cells) == expected_count, f"Expected {expected_count} urbanized cells for 0.01% urbanization, got {len(urban_cells)}"
+
+    # 3. Test 100% urbanization
+    resp = httpx.get(f"{base_url}/planet/urb-test-100/dggs?type=terrestrial&resolution=3&urbanization=100")
+    assert resp.status_code == 200
+    decoded = decode_vrgd(resp.content)
+    
+    cells = decoded["cells"]
+    candidates = [c for c in cells if c["tile"]["biome"] > 1]
+    urban_cells = [c for c in candidates if c["tile"]["faction"] > 0]
+    
+    assert len(urban_cells) == len(candidates), f"Expected all {len(candidates)} candidates to be urbanized for 100% urbanization, got {len(urban_cells)}"
+
 

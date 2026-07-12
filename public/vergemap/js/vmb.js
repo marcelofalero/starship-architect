@@ -24,8 +24,8 @@
 export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, feature = 0 }) {
     return ((biome & 0xF) << 12) |
            ((elevation & 0x7) << 9) |
-           ((moisture & 0x7) << 6) |
-           ((faction & 0x3) << 4) |
+           (((moisture >> 1) & 0x3) << 7) |
+           ((faction & 0x7) << 4) |
            (feature & 0xF);
 }
 
@@ -33,8 +33,8 @@ export function unpackTile(val) {
     return {
         biome: (val >> 12) & 0xF,
         elevation: (val >> 9) & 0x7,
-        moisture: (val >> 6) & 0x7,
-        faction: (val >> 4) & 0x3,
+        moisture: ((val >> 7) & 0x3) << 1,
+        faction: (val >> 4) & 0x7,
         feature: val & 0xF
     };
 }

@@ -733,11 +733,13 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         if (!systemData.planets) systemData.planets = [];
         let pData = systemData.planets.find(p => p.originalName === pName);
         if (!pData) {
-            pData = { originalName: pName, name: pName, description: desc };
+            pData = { originalName: pName, name: pName, description: desc, hexmapId: crypto.randomUUID() };
             systemData.planets.push(pData);
         } else if (pData.type !== bt.name) {
             pData.description = desc;
         }
+        // Ensure hexmapId exists for legacy planet data migrated from older saves
+        if (!pData.hexmapId) pData.hexmapId = crypto.randomUUID();
 
         pData.gravity = surfaceGravity + "g";
         pData.physicalRadius = physicalRadius;

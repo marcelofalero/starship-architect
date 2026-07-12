@@ -1,4 +1,4 @@
-.env
+ thi.env
 .taiga
 scripts/taiga-cli/target/
 hexmap-worker/.wrangler/

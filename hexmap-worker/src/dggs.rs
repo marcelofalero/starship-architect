@@ -157,10 +157,126 @@ pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f
     let cells_raw = compute_dual(&verts, &faces);
 
     // Step 3: Assign tile data to each cell based on its spherical position
-    let cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
-        let tile = generate_tile_for_position(seed, planet_type, urban_pct, pollution, conservation, center, i);
+    let mut cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
+        let tile = generate_tile_for_position(seed, planet_type, 0.0, pollution, conservation, center, i);
         DGGSCell { center, vertices: boundary, tile }
     }).collect();
+
+    // Exact Urbanization Logic: Ensure that the count of cells with faction > 0 matches exactly urban_pct percent
+    // of all land cells (biome > 1) on terrestrial/frozen/etc. planets, or all cells on ocean planets.
+    let mut seed_hash: u32 = 0;
+    for c in seed.chars() {
+        seed_hash = seed_hash.wrapping_mul(31).wrapping_add(c as u32);
+    }
+
+    let mut candidates: Vec<(usize, f64)> = Vec::new();
+    for (i, cell) in cells.iter().enumerate() {
+        let biome = cell.tile.biome;
+        let pos = cell.center;
+        
+        let is_candidate = if planet_type == "ocean" {
+            true
+        } else {
+            biome > 1
+        };
+        
+        if is_candidate {
+            let raw_suitability = match biome {
+                4 | 5 | 6 => 2.5,
+                2 | 3 | 7 | 12 => 1.0,
+                8 => 0.8,
+                10 | 13 => 0.5,
+                9 => 0.3,
+                1 => 0.2,
+                0 | 11 => 0.05,
+                _ => 1.0,
+            };
+            
+            let mut urb_suitability = raw_suitability;
+            if planet_type == "eyeball" {
+                if pos.z < -0.1 || pos.z > 0.65 {
+                    urb_suitability = 0.0;
+                } else {
+                    let dist = (pos.z - 0.25).abs();
+                    let twilight_multiplier = (-10.0 * dist * dist).exp();
+                    urb_suitability = urb_suitability * twilight_multiplier;
+                }
+            }
+            
+            if urb_suitability > 0.0 {
+                let faction_noise = fbm3d(V3::new(pos.x * 4.5, pos.y * 4.5, pos.z * 4.5), 3, seed_hash.wrapping_add(3000));
+                let feature = cell.tile.feature;
+                let is_resource = matches!(feature, 3 | 4 | 7 | 8);
+                
+                let mut score = faction_noise / urb_suitability;
+                if is_resource && urban_pct > 15.0 {
+                    score -= 10.0;
+                }
+                candidates.push((i, score));
+            }
+        }
+    }
+
+    // Sort by score ascending (lowest score = highest suitability/priority)
+    candidates.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+
+    // Calculate exact target number of urbanized cells
+    let k = ((candidates.len() as f64 * urban_pct / 100.0).round() as usize).min(candidates.len());
+
+    // Reset all cells' faction to 0 first
+    for cell in &mut cells {
+        cell.tile.faction = 0;
+    }
+
+    // Assign faction levels to the top K candidates and apply urban sprawl biome changes
+    let is_high_conservation = conservation >= 50.0;
+
+    for &(cell_idx, _) in candidates.iter().take(k) {
+        let cell = &mut cells[cell_idx];
+        let pos = cell.center;
+        let elevation = cell.tile.elevation;
+        
+        let city_roll = (seed_hash.wrapping_mul(cell_idx as u32).wrapping_add(5555) % 10000) as f64 / 10000.0;
+        let is_coastal = elevation == 4;
+        
+        let mut lvl4_thresh = 0.0064;
+        let mut lvl3_thresh = 0.0384;
+        
+        if is_coastal {
+            lvl4_thresh *= 3.0;
+            lvl3_thresh *= 2.0;
+        }
+        
+        let faction_lvl = if city_roll < lvl4_thresh {
+            3 // Megacity (max 3 for 2-bit packing format)
+        } else if city_roll < lvl3_thresh {
+            3 // Metropolis
+        } else if city_roll < 0.1987 {
+            2 // Town
+        } else {
+            1 // Outpost
+        };
+        
+        cell.tile.faction = faction_lvl;
+
+        // Apply conservation and urban sprawl biome changes
+        if faction_lvl >= 3 {
+            if cell.tile.elevation >= 4 {
+                // Land city
+                if !is_high_conservation {
+                    // Low conservation completely paves over natural land biomes, turning them into Urban Sprawl
+                    cell.tile.biome = 14; 
+                }
+            } else if cell.tile.elevation == 3 {
+                // Shallow water city
+                if !is_high_conservation {
+                    // Low conservation terraforms shallow wastes into coastal plains to build!
+                    cell.tile.elevation = 4;
+                    cell.tile.biome = 14; // And paves it
+                }
+            }
+        }
+    }
 
     // Step 4: Compute adjacency graph (neighbors)
     let n = verts.len();
@@ -648,8 +764,12 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
         4 | 5 | 6 => 2.5, // Savanna, Grassland, Forest
         // Viable Land
         2 | 3 | 7 | 12 => 1.0, // Coast, Desert, Taiga, Swamp
+        // Tundra (Harsh but viable)
+        8 => 0.8,
         // Harsh Land (Still better than water)
-        8 | 9 | 10 | 13 => 0.5, // Tundra, Ice Cap, Mountain, Scorched
+        10 | 13 => 0.5, // Mountain, Scorched
+        // Ice Cap / Glacier (Very harsh)
+        9 => 0.3,
         // Shallow Water
         1 => 0.2, // Ocean
         // Extreme Environments (Very hard to build)
@@ -661,9 +781,12 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
     // We model this using a "desperation" curve. At 100% urbanization, desperation is 1.0, and 
     // all negative terrain penalties are completely eliminated (raised to 1.0).
     let desperation = base_threshold.powi(2); // Quadratic curve: only spikes at high urbanization
-    let feature = if feature_noise < 0.08 { 
+    let mut feature = if feature_noise < 0.08 { 
         ((seed_hash.wrapping_mul(_cell_idx as u32).wrapping_add(7777)) % 9) as u8 + 1 
     } else { 0 };
+    if feature == 5 {
+        feature = 0;
+    }
     let is_resource = matches!(feature, 3 | 4 | 7 | 8); // Geode, Energy Anomaly, Vent, Spires
 
     let mut urb_suitability = if raw_suitability < 1.0 {
@@ -678,13 +801,29 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, urban_pct: f64, pol
         urb_suitability = (urb_suitability * 4.0).max(2.5);
     }
     
+    let mut faction_threshold = base_threshold * 0.4;
+
+    if is_eyeball {
+        if pos.z < -0.1 || pos.z > 0.65 {
+            urb_suitability = 0.0;
+            faction_threshold = 0.0;
+        } else {
+            let dist = (pos.z - 0.25).abs();
+            let twilight_multiplier = (-10.0 * dist * dist).exp();
+            urb_suitability = urb_suitability * twilight_multiplier;
+            faction_threshold = faction_threshold * twilight_multiplier;
+        }
+    }
+
     // Core Fix: Instead of just scaling the threshold, we directly modify the FBM noise using the terrain cost.
-    // This physically warps the noise landscape, pulling it down in Plains (causing cities to rapidly spill across them)
-    // and pushing it up in Mountains/Oceans (causing the organic sprawl to actively route around them).
-    let terrain_modifier = (1.0 - urb_suitability) * 0.25; 
-    let effective_noise = (faction_noise + terrain_modifier).clamp(0.0, 1.0);
-    
-    let faction_threshold = base_threshold * 0.4; // Base threshold remains uniform globally
+    // We scale the noise by dividing by urb_suitability. High suitability (e.g. 2.5) compresses/pulls the noise down
+    // (making cities spawn more easily), while low suitability (e.g. 0.05) stretches/pushes the noise up.
+    // This scales cleanly to extremely small urbanization levels (e.g. 0.01%) without clamping artifacts.
+    let effective_noise = if urb_suitability > 0.0 {
+        faction_noise / urb_suitability
+    } else {
+        999.0
+    };
     
     let mut faction = if effective_noise < faction_threshold { 
         // Use a uniform hash to determine settlement size instead of FBM noise which rarely dips below 0.1!

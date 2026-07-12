@@ -8,7 +8,8 @@ import {
     starTexture, starGeometry, shipGeometry, shipMat,
     raycaster, pointer,
     initScene, renderStars, renderShips, renderSystem,
-    enterSystem, exitSystem, animateShip, onPointerDown, onWindowResize, animate, recenterMap
+    enterSystem, exitSystem, animateShip, onPointerDown, onWindowResize, animate, recenterMap,
+    setPendingPlanetIdToFocus
 } from './scene.js';
 import {
     uiCtx, currentLang, i18n, applyTranslations, applyModeUI,
@@ -372,6 +373,18 @@ async function loadData() {
         
         if (currentSessionId) {
             setupMqttPubSub(currentSessionId, handleMqttMessage);
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const planetId = urlParams.get('planet');
+        if (planetId) {
+            const foundStar = state.stars.find(star => 
+                star.planets && star.planets.some(p => p.hexmapId === planetId)
+            );
+            if (foundStar) {
+                setPendingPlanetIdToFocus(planetId);
+                enterSystem(foundStar);
+            }
         }
 
     } catch (e) {

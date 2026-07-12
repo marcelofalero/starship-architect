@@ -13,6 +13,8 @@
     <div id="canvas-container">
         <canvas id="hex-canvas"></canvas>
     </div>
+    <!-- Collapse Sidebar Button -->
+    <button id="toggle-sidebar-btn" title="Toggle Sidebar" class="sidebar-collapse-btn">◀</button>
 
     <!-- Control Panel / Generator -->
     <div id="control-panel">
@@ -21,106 +23,120 @@
             <div class="subtitle">Procedural Surface Mapper</div>
         </div>
 
-        <div class="panel-section">
-            <h3>Generate Map</h3>
-            <label for="map-seed">Planet Seed</label>
-            <input type="text" id="map-seed" value="Sol_III" placeholder="e.g. Earth_Core">
+        <!-- GM Toggle at top level (only shown to GMs) -->
+        <label id="gm-toggle-container" style="display: none; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 15px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 10px;">
+            <input type="checkbox" id="gm-toggle-mode" style="width: auto; margin-bottom: 0;">
+            <span style="color: #00e5ff; font-weight: bold; font-family: 'Russo One', sans-serif; font-size: 0.9em;">GM Edit Mode</span>
+        </label>
 
-            <label for="map-type">Planet Type</label>
-            <select id="map-type">
-                <option value="terrestrial">Terrestrial</option>
-                <option value="desert">Desert</option>
-                <option value="ocean">Ocean</option>
-                <option value="ice">Ice / Frozen</option>
-                <option value="volcanic">Volcanic</option>
-                <option value="barren">Barren</option>
-                <option value="eyeball">Eyeball (Tidally Locked)</option>
-            </select>
-
-            <label for="map-radius">Planet Size (DGGS Resolution)</label>
-            <select id="map-radius">
-                <option value="3">Small (~642 cells)</option>
-                <option value="4" selected>Medium (~2,562 cells)</option>
-                <option value="5">Large (~10,242 cells)</option>
-                <option value="6">Huge (~40,962 cells) ⚠ Slow</option>
-            </select>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <label for="map-urbanization" style="margin:0;">Urbanization</label>
-                <span id="urban-value" style="color: #00e5ff; font-family: 'Russo One', sans-serif; font-size: 0.9em;">15%</span>
-            </div>
-            <input type="range" id="map-urbanization" min="0" max="100" value="15" style="width: 100%; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <label for="map-pollution" style="margin:0;">Pollution Output</label>
-                <span id="poll-value" style="color: #9ccc65; font-family: 'Russo One', sans-serif; font-size: 0.9em;">100%</span>
-            </div>
-            <input type="range" id="map-pollution" min="0" max="100" value="100" style="width: 100%; margin-bottom: 5px;" oninput="document.getElementById('poll-value').textContent = this.value + '%'">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <label for="map-conservation" style="margin:0;">Conservation</label>
-                <span id="cons-value" style="color: #66bb6a; font-family: 'Russo One', sans-serif; font-size: 0.9em;">0%</span>
-            </div>
-            <input type="range" id="map-conservation" min="0" max="100" value="0" style="width: 100%; margin-bottom: 15px;" oninput="document.getElementById('cons-value').textContent = this.value + '%'">
-
-            <button id="generate-btn">Generate & Render</button>
+        <!-- Sidebar Tab headers -->
+        <div id="control-panel-tabs" class="tab-container" style="display: flex;">
+            <div class="control-tab-btn active" data-tab="c-player">Player</div>
+            <div class="control-tab-btn" data-tab="c-editor" id="c-tab-editor" style="display: none;">Editor</div>
+            <div class="control-tab-btn" data-tab="c-live" id="c-tab-live" style="display: none;">Live Game</div>
         </div>
 
-        <div class="panel-section">
-            <h3>View Settings</h3>
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 15px;">
-                <input type="checkbox" id="auto-rotate" checked style="width: auto; margin-bottom: 0;">
-                <span>Auto-Rotate Globe</span>
-            </label>
-
-            <label class="hud-label" style="display: block; margin-bottom: 8px;">Map Lens Overlay:</label>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-left: 5px; font-size: 0.9em;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="biome" checked style="width: auto; margin: 0;">
-                    <span>Terrain (Standard)</span>
+        <!-- Tab 1: Player (General info & settings) -->
+        <div id="tab-c-player" class="control-tab-content active">
+            <div class="panel-section">
+                <h3>View Settings</h3>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 15px;">
+                    <input type="checkbox" id="auto-rotate" checked style="width: auto; margin-bottom: 0;">
+                    <span>Auto-Rotate Globe</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="elevation" style="width: auto; margin: 0;">
-                    <span>Elevation</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="thermal" style="width: auto; margin: 0;">
-                    <span>Thermal Scan</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="gravity" style="width: auto; margin: 0;">
-                    <span>Gravity Anomaly</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="em" style="width: auto; margin: 0;">
-                    <span>EM Field Scan</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" name="map-lens" value="pollution" style="width: auto; margin: 0;">
-                    <span style="color: #9ccc65;">Pollution Index</span>
-                </label>
+            </div>
+            
+            <div class="panel-section info-summary">
+                <h3>Map Info</h3>
+                <div class="hud-row"><span class="hud-label">Seed:</span> <span id="info-seed" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Type:</span> <span id="info-type" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Resolution:</span> <span id="info-size" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Total Cells:</span> <span id="info-tiles" class="hud-value">-</span></div>
+                
+                <button id="copy-share-btn" style="margin-top: 15px; width: 100%; padding: 8px; font-size: 0.85em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">🔗 COPY SHARE LINK</button>
+                <div id="copy-status" style="font-size: 0.8em; color: #66bb6a; text-align: center; margin-top: 5px; height: 1.2em;"></div>
             </div>
         </div>
 
-        <div class="panel-section">
-            <h3>Load Saved Map</h3>
-            <label for="vmb-upload" class="file-upload-label">
-                <span>Choose .vmb file</span>
-                <input type="file" id="vmb-upload" accept=".vmb" style="display: none;">
-            </label>
-            <div id="upload-status" style="font-size: 0.8em; color: #88aacc; margin-top: 5px; text-align: center;"></div>
+        <!-- Tab 2: Editor (Generate & Load) -->
+        <div id="tab-c-editor" class="control-tab-content">
+            <div class="panel-section">
+                <h3>Generate Map</h3>
+                <label for="map-seed">Planet Seed</label>
+                <input type="text" id="map-seed" value="Sol_III" placeholder="e.g. Earth_Core">
+
+                <label for="map-type">Planet Type</label>
+                <select id="map-type">
+                    <option value="terrestrial">Terrestrial</option>
+                    <option value="desert">Desert</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="ice">Ice / Frozen</option>
+                    <option value="volcanic">Volcanic</option>
+                    <option value="barren">Barren</option>
+                    <option value="eyeball">Eyeball (Tidally Locked)</option>
+                </select>
+
+                <label for="map-radius">Planet Size (DGGS Resolution)</label>
+                <select id="map-radius">
+                    <option value="3">Small (~642 cells)</option>
+                    <option value="4" selected>Medium (~2,562 cells)</option>
+                    <option value="5">Large (~10,242 cells)</option>
+                    <option value="6">Huge (~40,962 cells) ⚠ Slow</option>
+                </select>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-urbanization" style="margin:0;">Urbanization</label>
+                    <span id="urban-value" style="color: #00e5ff; font-family: 'Russo One', sans-serif; font-size: 0.9em;">15%</span>
+                </div>
+                <input type="range" id="map-urbanization" min="0" max="100" value="79" style="width: 100%; margin-bottom: 15px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-pollution" style="margin:0;">Pollution Output</label>
+                    <span id="poll-value" style="color: #9ccc65; font-family: 'Russo One', sans-serif; font-size: 0.9em;">100%</span>
+                </div>
+                <input type="range" id="map-pollution" min="0" max="100" value="100" style="width: 100%; margin-bottom: 5px;" oninput="document.getElementById('poll-value').textContent = this.value + '%'">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-conservation" style="margin:0;">Conservation</label>
+                    <span id="cons-value" style="color: #66bb6a; font-family: 'Russo One', sans-serif; font-size: 0.9em;">0%</span>
+                </div>
+                <input type="range" id="map-conservation" min="0" max="100" value="0" style="width: 100%; margin-bottom: 15px;" oninput="document.getElementById('cons-value').textContent = this.value + '%'">
+
+                <button id="generate-btn">Generate & Render</button>
+            </div>
+
+            <div class="panel-section">
+                <h3>Load Saved Map</h3>
+                <label for="vmb-upload" class="file-upload-label">
+                    <span>Choose .vmb file</span>
+                    <input type="file" id="vmb-upload" accept=".vmb" style="display: none;">
+                </label>
+                <div id="upload-status" style="font-size: 0.8em; color: #88aacc; margin-top: 5px; text-align: center;"></div>
+            </div>
         </div>
 
-        <div class="panel-section">
-            <h3>Save Map</h3>
-            <button id="export-btn">Export Edited Map (.vmb)</button>
-        </div>
+        <!-- Tab 3: Live Game (Save, view settings, load) -->
+        <div id="tab-c-live" class="control-tab-content">
+            <div class="panel-section">
+                <h3>Save Map</h3>
+                <button id="export-btn">Export Edited Map (.vmb)</button>
+            </div>
+            
+            <div class="panel-section">
+                <h3>Live Session Load</h3>
+                <label for="vmb-upload-live" class="file-upload-label">
+                    <span>Choose .vmb file</span>
+                    <input type="file" id="vmb-upload-live" accept=".vmb" style="display: none;">
+                </label>
+            </div>
 
-        <div class="panel-section info-summary">
-            <h3>Map Info</h3>
-            <div class="hud-row"><span class="hud-label">Seed:</span> <span id="info-seed" class="hud-value">-</span></div>
-            <div class="hud-row"><span class="hud-label">Type:</span> <span id="info-type" class="hud-value">-</span></div>
-            <div class="hud-row"><span class="hud-label">Resolution:</span> <span id="info-size" class="hud-value">-</span></div>
-            <div class="hud-row"><span class="hud-label">Total Cells:</span> <span id="info-tiles" class="hud-value">-</span></div>
+            <div class="panel-section info-summary">
+                <h3>Map Info</h3>
+                <div class="hud-row"><span class="hud-label">Seed:</span> <span id="info-seed-live" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Type:</span> <span id="info-type-live" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Resolution:</span> <span id="info-size-live" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Total Cells:</span> <span id="info-tiles-live" class="hud-value">-</span></div>
+            </div>
         </div>
         
         <div class="help-footer">
@@ -135,52 +151,159 @@
         <button id="close-info">&times;</button>
         <h2 id="hex-coord-title">Hex [0, 0]</h2>
         
-        <div class="hud-row"><span class="hud-label">Address:</span> <span id="hex-address" class="hud-value">-</span></div>
-        <div class="hud-row"><span class="hud-label">Coordinates:</span> <span id="hex-coords" class="hud-value">-</span></div>
-        <div class="hud-row"><span class="hud-label">Position (X,Y,Z):</span> <span id="hex-pos-3d" class="hud-value">-</span></div>
-        <div class="hud-row"><span class="hud-label">Biome:</span> <span id="hex-biome" class="hud-value">-</span></div>
-        <div class="hud-row"><span class="hud-label">Elevation:</span> <span id="hex-elevation" class="hud-value">-</span></div>
-        <div class="hud-row"><span class="hud-label">Moisture:</span> <span id="hex-moisture" class="hud-value">-</span></div>
-        <div id="faction-row" class="hud-row" style="display: none;"><span class="hud-label">Settlement:</span> <span id="hex-faction" class="hud-value" style="color: #00e5ff; font-weight: bold;">-</span></div>
-
-        <div class="hud-row">
-            <span class="hud-label">Feature:</span>
-            <select id="edit-feature" style="width: 140px; margin-bottom: 0; padding: 4px 8px; font-size: 0.9em; height: auto;">
-                <option value="0">None</option>
-                <option value="1">Ancient Ruins (Lvl 2)</option>
-                <option value="2">Impact Crater (Lvl 0)</option>
-                <option value="3">Mineral Geode (Lvl 2)</option>
-                <option value="4">Energy Anomaly (Lvl 3)</option>
-                <option value="5">Research Station (Lvl 1)</option>
-                <option value="6">Abandoned Outpost (Lvl 1)</option>
-                <option value="7">Geothermal Vent (Lvl 0)</option>
-                <option value="8">Crystalline Spires (Lvl 2)</option>
-                <option value="9">Alien Monolith (Lvl 3)</option>
-            </select>
-        </div>
-        <div class="hud-row" style="display: none;"><span id="hex-feature">-</span></div>
-        <div id="feature-status-row" class="hud-row" style="display: none;">
-            <span class="hud-label">FOW Status:</span>
-            <span id="feature-status-value" class="hud-value">-</span>
-        </div>
-        <div id="feature-action-row" class="hud-row" style="display: none; margin-top: 5px; margin-bottom: 5px; gap: 5px; display: flex;">
-            <input type="number" id="scan-count" value="1" min="1" max="100" style="width: 50px; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; text-align: center; font-family: 'Russo One', sans-serif;" title="Number of hexes to scan">
-            <button id="feature-action-btn" style="flex: 1; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">SCAN SECTOR</button>
+        <div id="info-tabs" class="tab-container" style="display: none;">
+            <div class="tab-btn active" data-tab="general">DATA</div>
+            <div class="tab-btn" data-tab="gm-edit">EDIT</div>
+            <div class="tab-btn" data-tab="gm-ops">OPS</div>
         </div>
 
-        <div style="margin-top: 15px; margin-bottom: 15px;">
-            <button id="land-btn" style="width: 100%; padding: 10px; font-weight: bold; background: rgba(255, 214, 0, 0.15); border: 1px solid #ffd600; color: #ffd600; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">LAND SHIP HERE</button>
+        <!-- Tab 1: DATA (General / Player) -->
+        <div id="tab-general" class="tab-content active">
+            <div class="hud-row"><span class="hud-label">Address:</span> <span id="hex-address" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Coordinates:</span> <span id="hex-coords" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Position (X,Y,Z):</span> <span id="hex-pos-3d" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Biome:</span> <span id="hex-biome" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Elevation:</span> <span id="hex-elevation" class="hud-value">-</span></div>
+            <div class="hud-row"><span class="hud-label">Moisture:</span> <span id="hex-moisture" class="hud-value">-</span></div>
+            <div id="faction-row" class="hud-row" style="display: none;"><span class="hud-label">Settlement:</span> <span id="hex-faction" class="hud-value" style="color: #00e5ff; font-weight: bold;">-</span></div>
+            <div id="detail-feature-row" class="hud-row"><span class="hud-label">Feature:</span> <span id="hex-feature" class="hud-value">-</span></div>
+            
+            <div id="player-name-row" class="hud-row" style="display: none;">
+                <span class="hud-label">Custom Name:</span>
+                <span id="hex-name" class="hud-value" style="color: #00e5ff;">-</span>
+            </div>
+            <div id="player-desc-row" class="hud-row" style="display: none; flex-direction: column; gap: 4px;">
+                <span class="hud-label" style="align-self: flex-start;">Lore / Description:</span>
+                <div id="hex-desc" style="font-size: 0.85em; color: #a0c0d0; line-height: 1.4; max-height: 120px; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); width: 100%; box-sizing: border-box;"></div>
+            </div>
+
+            <!-- Player Scanning Actions -->
+            <div id="player-feature-status-row" class="hud-row" style="display: none;">
+                <span class="hud-label">Scan Status:</span>
+                <span id="player-feature-status-value" class="hud-value">-</span>
+            </div>
+            <div id="player-feature-action-row" class="hud-row" style="display: none; margin-top: 5px; margin-bottom: 5px; gap: 5px; display: flex; flex-direction: column;">
+                <div style="display: flex; gap: 5px; width: 100%;">
+                    <input type="number" id="scan-count" value="1" min="1" max="100" style="width: 50px; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; text-align: center; font-family: 'Russo One', sans-serif;" title="Number of hexes to scan">
+                    <select id="scan-success-level" style="flex: 1; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; font-family: 'Russo One', sans-serif; font-size: 0.85em; height: auto;">
+                        <option value="1">Ordinary Success (Lvl 1)</option>
+                        <option value="2">Good Success (Lvl 2)</option>
+                        <option value="3">Amazing Success (Lvl 3)</option>
+                    </select>
+                </div>
+                <button id="feature-action-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">SCAN SECTOR</button>
+            </div>
+
+            <!-- Suitability / Favorability Scores -->
+            <div id="favorability-panel" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                <h3 style="font-size: 0.85em; margin: 0 0 8px 0; color: #a0c0d0; text-transform: uppercase; letter-spacing: 1px; font-family: 'Russo One', sans-serif;">Sector Suitability</h3>
+                <div class="hud-row"><span class="hud-label">Agricultural:</span> <span id="suit-agri" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Mining:</span> <span id="suit-mining" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Research:</span> <span id="suit-research" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Industrial:</span> <span id="suit-industrial" class="hud-value">-</span></div>
+                <div class="hud-row"><span class="hud-label">Tourism:</span> <span id="suit-tourism" class="hud-value">-</span></div>
+            </div>
+
+            <div style="margin-top: 15px; margin-bottom: 15px;">
+                <button id="land-btn" style="width: 100%; padding: 10px; font-weight: bold; background: rgba(255, 214, 0, 0.15); border: 1px solid #ffd600; color: #ffd600; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">LAND SHIP HERE</button>
+            </div>
+
+            <div class="terrain-analysis">
+                <label>Terrain Analysis</label>
+                <div id="hex-analysis-text">Select a hex to inspect telemetry data...</div>
+            </div>
+
+            <div class="terrain-analysis" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(75, 181, 193, 0.25);">
+                <label>Adjacent Sectors</label>
+                <div id="hex-neighbors" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px;"></div>
+            </div>
         </div>
 
-        <div class="terrain-analysis">
-            <label>Terrain Analysis</label>
-            <div id="hex-analysis-text">Select a hex to inspect telemetry data...</div>
+        <!-- Tab 2: GM EDIT -->
+        <div id="tab-gm-edit" class="tab-content">
+            <div id="gm-faction-row" class="hud-row" style="margin-bottom: 12px;">
+                <span class="hud-label">Settlement:</span>
+                <select id="edit-faction" style="width: 140px; margin-bottom: 0; padding: 4px 8px; font-size: 0.9em; height: auto;">
+                    <option value="0">None</option>
+                    <option value="1">Lvl 1: Outpost</option>
+                    <option value="2">Lvl 2: Town</option>
+                    <option value="3">Lvl 3: Metropolis</option>
+                    <option value="4">Lvl 4: Megacity</option>
+                </select>
+            </div>
+            <div id="gm-faction-spec-row" class="hud-row" style="margin-bottom: 12px; display: none;">
+                <span class="hud-label">Specialization:</span>
+                <select id="edit-faction-spec" style="width: 140px; margin-bottom: 0; padding: 4px 8px; font-size: 0.9em; height: auto;">
+                    <option value="auto">Auto-detect</option>
+                    <option value="agricultural">Agricultural</option>
+                    <option value="mining">Mining</option>
+                    <option value="research">Research</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="tourism">Tourism</option>
+                </select>
+            </div>
+            <div class="hud-row" id="gm-feature-row" style="margin-bottom: 12px;">
+                <span class="hud-label">Feature:</span>
+                <select id="edit-feature" style="width: 140px; margin-bottom: 0; padding: 4px 8px; font-size: 0.9em; height: auto;">
+                    <option value="0">None</option>
+                    <option value="1">Ancient Ruins (Lvl 2)</option>
+                    <option value="2">Impact Crater (Lvl 0)</option>
+                    <option value="3">Mineral Geode (Lvl 2)</option>
+                    <option value="4">Energy Anomaly (Lvl 3)</option>
+                    <option value="6">Abandoned Outpost (Lvl 1)</option>
+                    <option value="7">Geothermal Vent (Lvl 0)</option>
+                    <option value="8">Crystalline Spires (Lvl 2)</option>
+                    <option value="9">Alien Monolith (Lvl 3)</option>
+                    <option value="10">Natural Marvel (Lvl 1)</option>
+                </select>
+            </div>
+            <div id="gm-name-row" class="hud-row" style="margin-bottom: 12px;">
+                <span class="hud-label">Custom Name:</span>
+                <input type="text" id="edit-name" placeholder="Rename hex..." style="width: 140px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 0.9em;">
+            </div>
+            <div id="gm-desc-row" class="hud-row" style="flex-direction: column; gap: 4px;">
+                <span class="hud-label" style="align-self: flex-start;">Lore / Description:</span>
+                <textarea id="edit-desc" placeholder="Add custom description..." style="width: 100%; height: 80px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 6px; font-size: 0.85em; resize: vertical; font-family: inherit; box-sizing: border-box;"></textarea>
+            </div>
         </div>
 
-        <div class="terrain-analysis" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(75, 181, 193, 0.25);">
-            <label>Adjacent Sectors</label>
-            <div id="hex-neighbors" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px;"></div>
+        <!-- Tab 3: GM OPS -->
+        <div id="tab-gm-ops" class="tab-content">
+            <div id="feature-status-row" class="hud-row" style="margin-bottom: 8px; display: none;">
+                <span class="hud-label">FOW Status:</span>
+                <span id="feature-status-value" class="hud-value">-</span>
+            </div>
+            <div id="feature-action-row" class="hud-row" style="display: none; margin-bottom: 15px; flex-direction: column; gap: 5px;">
+                <button id="gm-reveal-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">REVEAL TO PLAYERS</button>
+            </div>
+            
+            <div id="gm-label-panel" style="display: flex; flex-direction: column; gap: 8px;">
+                <h3 style="font-size: 0.85em; margin: 0; color: #a0c0d0; text-transform: uppercase; letter-spacing: 1px; font-family: 'Russo One', sans-serif; border-bottom: 1px solid rgba(75,181,193,0.15); padding-bottom: 4px;">Region Labels</h3>
+                <div style="display: flex; gap: 4px; flex-direction: column;">
+                    <label style="font-size: 0.75em; color: #88aacc; margin-bottom: 2px;">Label Text:</label>
+                    <input type="text" id="new-label-text" placeholder="e.g. Nore Ocean..." style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 4px 8px; font-size: 0.9em; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; gap: 4px; flex-direction: column;">
+                    <label style="font-size: 0.75em; color: #88aacc; margin-bottom: 2px;">Label Type:</label>
+                    <select id="new-label-type" style="padding: 4px 8px; font-size: 0.9em; height: auto;">
+                        <option value="territory">Political/Territory</option>
+                        <option value="ocean">Geographical/Ocean</option>
+                    </select>
+                </div>
+                <button id="add-label-btn" style="width: 100%; padding: 6px; font-size: 0.85em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">PLACE REGION LABEL</button>
+                <div id="active-labels-container" style="font-size: 0.8em; color: #88aacc; display: flex; flex-direction: column; gap: 4px; margin-top: 4px;"></div>
+            </div>
         </div>
+    </div>
+
+    <!-- Floating Map Lens Buttons at the Bottom Center -->
+    <div id="lens-bar">
+        <button class="lens-btn active" data-value="biome">🌲 Terrain</button>
+        <button class="lens-btn" data-value="elevation">🏔 Elev</button>
+        <button class="lens-btn" data-value="thermal">🌡 Temp</button>
+        <button class="lens-btn" data-value="gravity">⚛ Grav</button>
+        <button class="lens-btn" data-value="em">📡 Scan</button>
+        <button class="lens-btn" data-value="pollution">☣ Poll</button>
     </div>
 
     <!-- Floating Hover Tooltip -->
