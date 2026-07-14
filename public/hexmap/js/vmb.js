@@ -13,20 +13,21 @@
  * Header (12 bytes):
  *   Magic: "VRGD" (4 bytes)
  *   CellCount: Uint32, MetaLen: Uint32
- * Per cell (88 bytes fixed):
+ * Per cell (92 bytes fixed):
  *   center: 3×f32 (12 bytes)
- *   tile: Uint16 (2 bytes)
- *   sides: Uint8 (1 byte), pad: 1 byte
+ *   tile: Uint32 (4 bytes)
+ *   sides: Uint8 (1 byte), pad: 3 bytes
  *   polygon: 6 × 3×f32 = 72 bytes
  * Trailer: JSON metadata
  */
 
-export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, feature = 0 }) {
+export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, feature = 0, subsurface = false }) {
     return ((biome & 0xF) << 12) |
            ((elevation & 0x7) << 9) |
            ((moisture & 0x7) << 6) |
            ((faction & 0x3) << 4) |
-           (feature & 0xF);
+           (feature & 0xF) |
+           (subsurface ? (1 << 16) : 0);
 }
 
 export function unpackTile(val) {
@@ -35,7 +36,8 @@ export function unpackTile(val) {
         elevation: (val >> 9) & 0x7,
         moisture: (val >> 6) & 0x7,
         faction: (val >> 4) & 0x3,
-        feature: val & 0xF
+        feature: val & 0xF,
+        subsurface: (val & (1 << 16)) !== 0
     };
 }
 
@@ -71,11 +73,11 @@ function decodeFlatGrid(bytes) {
     const tilesCount = width * height;
     const tiles = new Array(tilesCount);
     for (let i = 0; i < tilesCount; i++) {
-        const val = view.getUint16(12 + i * 2, false);
+        const val = view.getUint32(12 + i * 4, false);
         tiles[i] = unpackTile(val);
     }
 
-    const metaStart = 12 + tilesCount * 2;
+    const metaStart = 12 + tilesCount * 4;
     const metaBytes = bytes.slice(metaStart, metaStart + metaLen);
     const metadata = parseMetadata(metaBytes);
 
@@ -90,7 +92,7 @@ function decodeDGGS(bytes) {
     const cellCount = view.getUint32(4, false);
     const metaLen = view.getUint32(8, false);
 
-    const CELL_BLOCK = 88;
+    const CELL_BLOCK = 92;
     const cells = [];
 
     for (let i = 0; i < cellCount; i++) {
@@ -102,14 +104,14 @@ function decodeDGGS(bytes) {
         const cz = view.getFloat32(off + 8, false);
 
         // Tile data
-        const tileVal = view.getUint16(off + 12, false);
+        const tileVal = view.getUint32(off + 12, false);
         const tile = unpackTile(tileVal);
 
         // Sides and polygon vertices
-        const sides = bytes[off + 14];
+        const sides = bytes[off + 16];
         const vertices = [];
         for (let vi = 0; vi < sides; vi++) {
-            const voff = off + 16 + vi * 12;
+            const voff = off + 20 + vi * 12;
             vertices.push({
                 x: view.getFloat32(voff, false),
                 y: view.getFloat32(voff + 4, false),

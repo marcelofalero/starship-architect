@@ -10,13 +10,16 @@
  * 
  * - Body:
  *   - Array of tiles of size Width * Height.
- *   - Each tile is encoded as a Uint16 (2 bytes, big-endian).
- *   - Field mapping within the 16 bits (from MSB to LSB):
- *     - Biome: 4 bits (bits 12-15)
- *     - Elevation: 3 bits (bits 9-11)
- *     - Moisture: 3 bits (bits 6-8)
- *     - Faction: 2 bits (bits 4-5)
- *     - Feature: 4 bits (bits 0-3)
+ *   - Each tile is encoded as a Uint32 (4 bytes, big-endian).
+ *   - Field mapping within the 32 bits:
+ *     - Subsurface: 1 bit (bit 28)
+ *     - Biome: 4 bits (bits 24-27)
+ *     - Elevation: 3 bits (bits 21-23)
+ *     - Moisture: 3 bits (bits 18-20)
+ *     - Faction: 6 bits (bits 12-17)
+ *     - Specialization: 4 bits (bits 8-11)
+ *     - Settlement: 3 bits (bits 5-7)
+ *     - Feature: 5 bits (bits 0-4)
  * 
  * - Trailer:
  *   - UTF-8 JSON string of length equal to Metadata Length.
@@ -32,26 +35,32 @@
  * @param {number} tile.feature (4 bits: 0-15)
  * @returns {number} 16-bit packed tile value
  */
-export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, feature = 0 }) {
-    return ((biome & 0xF) << 12) |
-           ((elevation & 0x7) << 9) |
-           ((moisture & 0x7) << 6) |
-           ((faction & 0x3) << 4) |
-           (feature & 0xF);
+export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, specialization = 0, settlement = 0, feature = 0, subsurface = false }) {
+    return ((biome & 0xF) << 24) |
+           ((elevation & 0x7) << 21) |
+           ((moisture & 0x7) << 18) |
+           ((faction & 0x3F) << 12) |
+           ((specialization & 0xF) << 8) |
+           ((settlement & 0x7) << 5) |
+           (feature & 0x1F) |
+           (subsurface ? (1 << 28) : 0);
 }
 
 /**
- * Unpack a 16-bit integer into tile fields.
- * @param {number} val 16-bit packed tile value
+ * Unpack a 32-bit integer into tile fields.
+ * @param {number} val 32-bit packed tile value
  * @returns {Object} Unpacked tile fields
  */
 export function unpackTile(val) {
     return {
-        biome: (val >> 12) & 0xF,
-        elevation: (val >> 9) & 0x7,
-        moisture: (val >> 6) & 0x7,
-        faction: (val >> 4) & 0x3,
-        feature: val & 0xF
+        biome: (val >> 24) & 0xF,
+        elevation: (val >> 21) & 0x7,
+        moisture: (val >> 18) & 0x7,
+        faction: (val >> 12) & 0x3F,
+        specialization: (val >> 8) & 0xF,
+        settlement: (val >> 5) & 0x7,
+        feature: val & 0x1F,
+        subsurface: (val & (1 << 28)) !== 0
     };
 }
 
@@ -73,7 +82,7 @@ export function encodeVMB(width, height, tiles, metadata = {}) {
     const metaBytes = encoder.encode(metaStr);
     const metaLen = metaBytes.length;
 
-    const bodyLen = width * height * 2;
+    const bodyLen = width * height * 4;
     const totalLen = 12 + bodyLen + metaLen;
 
     const buffer = new ArrayBuffer(totalLen);
@@ -93,7 +102,7 @@ export function encodeVMB(width, height, tiles, metadata = {}) {
     // Metadata Length
     view.setUint32(8, metaLen, false);
 
-    // Body: Uint16 Tiles
+    // Body: Uint32 Tiles
     for (let i = 0; i < tiles.length; i++) {
         let val = 0;
         const tile = tiles[i];
@@ -102,7 +111,7 @@ export function encodeVMB(width, height, tiles, metadata = {}) {
         } else if (tile && typeof tile === 'object') {
             val = packTile(tile);
         }
-        view.setUint16(12 + i * 2, val, false);
+        view.setUint32(12 + i * 4, val, false);
     }
 
     // Trailer: Metadata
@@ -132,7 +141,7 @@ export function decodeVMB(input) {
     const height = view.getUint16(6, false);
     const metaLen = view.getUint32(8, false);
 
-    const expectedLen = 12 + width * height * 2 + metaLen;
+    const expectedLen = 12 + width * height * 4 + metaLen;
     if (bytes.length < expectedLen) {
         throw new Error(`Invalid VMB: File size (${bytes.length}) is smaller than expected (${expectedLen})`);
     }
@@ -140,11 +149,11 @@ export function decodeVMB(input) {
     const tilesCount = width * height;
     const tiles = new Array(tilesCount);
     for (let i = 0; i < tilesCount; i++) {
-        const val = view.getUint16(12 + i * 2, false);
+        const val = view.getUint32(12 + i * 4, false);
         tiles[i] = unpackTile(val);
     }
 
-    const metaStart = 12 + tilesCount * 2;
+    const metaStart = 12 + tilesCount * 4;
     const metaBytes = bytes.slice(metaStart, metaStart + metaLen);
     const decoder = new TextDecoder();
     const metaStr = decoder.decode(metaBytes);

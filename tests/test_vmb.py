@@ -8,20 +8,26 @@ import urllib.request
 import pytest
 
 # Python implementation of VMB format spec
-def pack_tile(biome=0, elevation=0, moisture=0, faction=0, feature=0):
-    return ((biome & 0xF) << 12) | \
-           ((elevation & 0x7) << 9) | \
-           ((moisture & 0x7) << 6) | \
-           ((faction & 0x3) << 4) | \
-           (feature & 0xF)
+def pack_tile(biome=0, elevation=0, moisture=0, faction=0, specialization=0, settlement=0, feature=0, subsurface=False):
+    return ((biome & 0xF) << 24) | \
+           ((elevation & 0x7) << 21) | \
+           ((moisture & 0x7) << 18) | \
+           ((faction & 0x3F) << 12) | \
+           ((specialization & 0xF) << 8) | \
+           ((settlement & 0x7) << 5) | \
+           (feature & 0x1F) | \
+           ((1 << 28) if subsurface else 0)
 
 def unpack_tile(val):
     return {
-        "biome": (val >> 12) & 0xF,
-        "elevation": (val >> 9) & 0x7,
-        "moisture": (val >> 6) & 0x7,
-        "faction": (val >> 4) & 0x3,
-        "feature": val & 0xF
+        "biome": (val >> 24) & 0xF,
+        "elevation": (val >> 21) & 0x7,
+        "moisture": (val >> 18) & 0x7,
+        "faction": (val >> 12) & 0x3F,
+        "specialization": (val >> 8) & 0xF,
+        "settlement": (val >> 5) & 0x7,
+        "feature": val & 0x1F,
+        "subsurface": bool(val & (1 << 28))
     }
 
 def encode_vmb(width, height, tiles, metadata=None):
@@ -43,9 +49,12 @@ def encode_vmb(width, height, tiles, metadata=None):
                 elevation=tile.get("elevation", 0),
                 moisture=tile.get("moisture", 0),
                 faction=tile.get("faction", 0),
-                feature=tile.get("feature", 0)
+                specialization=tile.get("specialization", 0),
+                settlement=tile.get("settlement", 0),
+                feature=tile.get("feature", 0),
+                subsurface=tile.get("subsurface", False)
             )
-        body.extend(struct.pack('>H', val))
+        body.extend(struct.pack('>I', val))
         
     return header + body + meta_bytes
 
@@ -57,14 +66,14 @@ def decode_vmb(data):
     if magic != b'VRGM':
         raise ValueError("Invalid VMB: Bad magic")
         
-    body_len = width * height * 2
+    body_len = width * height * 4
     expected_len = 12 + body_len + meta_len
     if len(data) < expected_len:
         raise ValueError("Invalid VMB: Truncated")
         
     tiles = []
     for i in range(width * height):
-        val, = struct.unpack('>H', data[12 + i*2 : 12 + i*2 + 2])
+        val, = struct.unpack('>I', data[12 + i*4 : 12 + i*4 + 4])
         tiles.append(unpack_tile(val))
         
     meta_bytes = data[12 + body_len : 12 + body_len + meta_len]
@@ -93,12 +102,12 @@ def test_python_roundtrip():
     width = 3
     height = 2
     tiles = [
-        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 0, "feature": 5},
-        {"biome": 15, "elevation": 7, "moisture": 7, "faction": 3, "feature": 15},
-        {"biome": 0, "elevation": 0, "moisture": 0, "faction": 0, "feature": 0},
-        {"biome": 8, "elevation": 4, "moisture": 2, "faction": 1, "feature": 10},
-        {"biome": 4, "elevation": 1, "moisture": 5, "faction": 2, "feature": 12},
-        {"biome": 10, "elevation": 6, "moisture": 0, "faction": 3, "feature": 1},
+        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 0, "specialization": 0, "settlement": 0, "feature": 5, "subsurface": False},
+        {"biome": 15, "elevation": 7, "moisture": 7, "faction": 63, "specialization": 15, "settlement": 7, "feature": 31, "subsurface": True},
+        {"biome": 5, "elevation": 0, "moisture": 1, "faction": 12, "specialization": 4, "settlement": 2, "feature": 0, "subsurface": False},
+        {"biome": 0, "elevation": 0, "moisture": 0, "faction": 0, "specialization": 0, "settlement": 0, "feature": 0, "subsurface": False},
+        {"biome": 8, "elevation": 4, "moisture": 4, "faction": 50, "specialization": 1, "settlement": 1, "feature": 10, "subsurface": True},
+        {"biome": 10, "elevation": 5, "moisture": 2, "faction": 3, "specialization": 2, "settlement": 3, "feature": 2, "subsurface": False},
     ]
     metadata = {"map_name": "Valhalla", "danger_level": "High"}
     
@@ -121,10 +130,10 @@ def test_cross_language_decode():
     width = 2
     height = 2
     tiles = [
-        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 1, "feature": 4},
-        {"biome": 5, "elevation": 6, "moisture": 7, "faction": 2, "feature": 8},
-        {"biome": 9, "elevation": 0, "moisture": 1, "faction": 3, "feature": 12},
-        {"biome": 13, "elevation": 4, "moisture": 5, "faction": 0, "feature": 15},
+        {"biome": 1, "elevation": 2, "moisture": 3, "faction": 1, "specialization": 0, "settlement": 0, "feature": 4, "subsurface": False},
+        {"biome": 5, "elevation": 6, "moisture": 7, "faction": 2, "specialization": 0, "settlement": 0, "feature": 8, "subsurface": True},
+        {"biome": 9, "elevation": 0, "moisture": 1, "faction": 3, "specialization": 0, "settlement": 0, "feature": 12, "subsurface": False},
+        {"biome": 13, "elevation": 4, "moisture": 5, "faction": 0, "specialization": 0, "settlement": 0, "feature": 15, "subsurface": True},
     ]
     metadata = {"source": "python"}
     
@@ -170,10 +179,10 @@ def test_cross_language_encode():
     width = 2
     height = 2
     tiles = [
-        {"biome": 14, "elevation": 5, "moisture": 6, "faction": 2, "feature": 1},
-        {"biome": 3, "elevation": 1, "moisture": 2, "faction": 0, "feature": 11},
-        {"biome": 11, "elevation": 7, "moisture": 4, "faction": 3, "feature": 5},
-        {"biome": 6, "elevation": 3, "moisture": 0, "faction": 1, "feature": 9},
+        {"biome": 14, "elevation": 5, "moisture": 6, "faction": 2, "specialization": 0, "settlement": 0, "feature": 1, "subsurface": False},
+        {"biome": 3, "elevation": 1, "moisture": 2, "faction": 0, "specialization": 0, "settlement": 0, "feature": 11, "subsurface": True},
+        {"biome": 11, "elevation": 7, "moisture": 4, "faction": 3, "specialization": 0, "settlement": 0, "feature": 5, "subsurface": False},
+        {"biome": 6, "elevation": 3, "moisture": 0, "faction": 1, "specialization": 0, "settlement": 0, "feature": 9, "subsurface": True},
     ]
     metadata = {"source": "js"}
     
