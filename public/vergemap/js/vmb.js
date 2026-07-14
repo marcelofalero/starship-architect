@@ -1,41 +1,66 @@
 /**
  * Verge Map Binary (.vmb) encoder and decoder.
- * Supports two formats:
- *
- * === VRGM (Flat Grid) ===
- * Header (12 bytes):
- *   Magic: "VRGM" (4 bytes)
- *   Width: Uint16, Height: Uint16, MetaLen: Uint32
- * Body: width*height tiles, each Uint16
- * Trailer: JSON metadata
- *
- * === VRGD (DGGS Globe) ===
- * Header (12 bytes):
- *   Magic: "VRGD" (4 bytes)
- *   CellCount: Uint32, MetaLen: Uint32
- * Per cell (88 bytes fixed):
- *   center: 3×f32 (12 bytes)
- *   tile: Uint16 (2 bytes)
- *   sides: Uint8 (1 byte), pad: 1 byte
- *   polygon: 6 × 3×f32 = 72 bytes
- * Trailer: JSON metadata
+ * 
+ * Spec:
+ * - Header (12 bytes):
+ *   - Magic Bytes: "VRGM" (4 bytes: 0x56, 0x52, 0x47, 0x4D)
+ *   - Width: Uint16 (2 bytes, big-endian)
+ *   - Height: Uint16 (2 bytes, big-endian)
+ *   - Metadata Length: Uint32 (4 bytes, big-endian)
+ * 
+ * - Body:
+ *   - Array of tiles of size Width * Height.
+ *   - Each tile is encoded as a Uint32 (4 bytes, big-endian).
+ *   - Field mapping within the 32 bits:
+ *     - Subsurface: 1 bit (bit 28)
+ *     - Biome: 4 bits (bits 24-27)
+ *     - Elevation: 3 bits (bits 21-23)
+ *     - Moisture: 3 bits (bits 18-20)
+ *     - Faction: 6 bits (bits 12-17)
+ *     - Specialization: 4 bits (bits 8-11)
+ *     - Settlement: 3 bits (bits 5-7)
+ *     - Feature: 5 bits (bits 0-4)
+ * 
+ * - Trailer:
+ *   - UTF-8 JSON string of length equal to Metadata Length.
  */
 
-export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, feature = 0 }) {
-    return ((biome & 0xF) << 12) |
-           ((elevation & 0x7) << 9) |
-           (((moisture >> 1) & 0x3) << 7) |
-           ((faction & 0x7) << 4) |
-           (feature & 0xF);
+/**
+ * Pack tile fields into a single 16-bit integer.
+ * @param {Object} tile
+ * @param {number} tile.biome (4 bits: 0-15)
+ * @param {number} tile.elevation (3 bits: 0-7)
+ * @param {number} tile.moisture (3 bits: 0-7)
+ * @param {number} tile.faction (2 bits: 0-3)
+ * @param {number} tile.feature (4 bits: 0-15)
+ * @returns {number} 16-bit packed tile value
+ */
+export function packTile({ biome = 0, elevation = 0, moisture = 0, faction = 0, specialization = 0, settlement = 0, feature = 0, subsurface = false }) {
+    return ((biome & 0xF) << 24) |
+           ((elevation & 0x7) << 21) |
+           ((moisture & 0x7) << 18) |
+           ((faction & 0x3F) << 12) |
+           ((specialization & 0xF) << 8) |
+           ((settlement & 0x7) << 5) |
+           (feature & 0x1F) |
+           (subsurface ? (1 << 28) : 0);
 }
 
+/**
+ * Unpack a 32-bit integer into tile fields.
+ * @param {number} val 32-bit packed tile value
+ * @returns {Object} Unpacked tile fields
+ */
 export function unpackTile(val) {
     return {
-        biome: (val >> 12) & 0xF,
-        elevation: (val >> 9) & 0x7,
-        moisture: ((val >> 7) & 0x3) << 1,
-        faction: (val >> 4) & 0x7,
-        feature: val & 0xF
+        biome: (val >> 24) & 0xF,
+        elevation: (val >> 21) & 0x7,
+        moisture: (val >> 18) & 0x7,
+        faction: (val >> 12) & 0x3F,
+        specialization: (val >> 8) & 0xF,
+        settlement: (val >> 5) & 0x7,
+        feature: val & 0x1F,
+        subsurface: (val & (1 << 28)) !== 0
     };
 }
 
@@ -88,7 +113,7 @@ function encodeFlatGrid(width, height, tiles, metadata = {}) {
     const metaBytes = encoder.encode(metaStr);
     const metaLen = metaBytes.length;
 
-    const bodyLen = width * height * 2;
+    const bodyLen = width * height * 4;
     const totalLen = 12 + bodyLen + metaLen;
 
     const buffer = new ArrayBuffer(totalLen);
@@ -105,7 +130,7 @@ function encodeFlatGrid(width, height, tiles, metadata = {}) {
     // Metadata Length
     view.setUint32(8, metaLen, false);
 
-    // Body: Uint16 Tiles
+    // Body: Uint32 Tiles
     for (let i = 0; i < tiles.length; i++) {
         let val = 0;
         const tile = tiles[i];
@@ -114,7 +139,7 @@ function encodeFlatGrid(width, height, tiles, metadata = {}) {
         } else if (tile && typeof tile === 'object') {
             val = packTile(tile);
         }
-        view.setUint16(12 + i * 2, val, false);
+        view.setUint32(12 + i * 4, val, false);
     }
 
     // Trailer: Metadata
@@ -132,8 +157,7 @@ function decodeFlatGrid(bytes) {
     const height = view.getUint16(6, false);
     const metaLen = view.getUint32(8, false);
 
-    const bodyLen = width * height * 2;
-    const expectedLen = 12 + bodyLen + metaLen;
+    const expectedLen = 12 + width * height * 4 + metaLen;
     if (bytes.length < expectedLen) {
         throw new Error(`Invalid VMB: File size (${bytes.length}) is smaller than expected (${expectedLen})`);
     }
@@ -141,11 +165,11 @@ function decodeFlatGrid(bytes) {
     const tilesCount = width * height;
     const tiles = new Array(tilesCount);
     for (let i = 0; i < tilesCount; i++) {
-        const val = view.getUint16(12 + i * 2, false);
+        const val = view.getUint32(12 + i * 4, false);
         tiles[i] = unpackTile(val);
     }
 
-    const metaStart = 12 + tilesCount * 2;
+    const metaStart = 12 + tilesCount * 4;
     const metaBytes = bytes.slice(metaStart, metaStart + metaLen);
     const metadata = parseMetadata(metaBytes);
 

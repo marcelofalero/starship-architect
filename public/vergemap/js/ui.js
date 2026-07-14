@@ -1,5 +1,6 @@
 import { state, saveLogs } from './data.js';
-import { currentLayer, currentSystemFocus, enterSystem, exitSystem } from './scene.js';
+import { enterSystem, exitSystem } from './scene.js';
+import { store } from './store.js';
 
 export const uiCtx = {
     getCurrentMode: () => 'ro',
@@ -273,7 +274,7 @@ export function applyModeUI() {
     const logPanel = document.getElementById('panel-movement-log');
     const sysToolsBtn = document.getElementById('floating-system-tools');
     
-    const isGalaxy = (currentLayer === 'GALAXY');
+    const isGalaxy = (store.state.currentLayer === 'GALAXY');
     document.getElementById('panel-search').style.display = isGalaxy ? 'block' : 'none';
     document.getElementById('panel-distance').style.display = isGalaxy ? 'block' : 'none';
     
@@ -300,7 +301,7 @@ export function applyModeUI() {
         if (moveBtn) moveBtn.style.flex = '2';
         if (logPanel) logPanel.style.display = isGalaxy ? 'block' : 'none';
         if (sysToolsBtn) {
-            sysToolsBtn.style.display = currentLayer === 'SYSTEM' ? 'flex' : 'none';
+            sysToolsBtn.style.display = store.state.currentLayer === 'SYSTEM' ? 'flex' : 'none';
         }
     }
 }
@@ -474,7 +475,7 @@ export function showInfoPanel(userData) {
     }
     
     const coordsGroup = document.getElementById('info-coords').parentNode;
-    if (userData.type === 'Planet' || userData.type === 'Moon' || ((userData.type === 'Star' || userData.type === 'POI') && currentLayer === 'SYSTEM')) {
+    if (userData.type === 'Planet' || userData.type === 'Moon' || ((userData.type === 'Star' || userData.type === 'POI') && store.state.currentLayer === 'SYSTEM')) {
         coordsGroup.style.display = 'none';
     } else {
         coordsGroup.style.display = 'block';
@@ -524,7 +525,7 @@ export function showInfoPanel(userData) {
     }
     
     const moveShipBtn = document.getElementById('info-move-ship-btn');
-    if (userData.type === 'Ship' || (userData.type === 'POI' && currentLayer !== 'SYSTEM') && currentMode !== 'ro') {
+    if (userData.type === 'Ship' || (userData.type === 'POI' && store.state.currentLayer !== 'SYSTEM') && currentMode !== 'ro') {
         moveShipBtn.style.display = 'block';
         if (userData.type === 'POI') {
             moveShipBtn.textContent = i18n[currentLang].movePoiBtn;
@@ -551,7 +552,7 @@ export function showInfoPanel(userData) {
         let targetShip = allowedShips.find(s => s.name === lastMovedShipName);
         if (!targetShip && allowedShips.length > 0) targetShip = allowedShips[0];
         
-        const targetCoords = (currentLayer === 'SYSTEM') ? currentSystemFocus : data;
+        const targetCoords = (store.state.currentLayer === 'SYSTEM') ? store.state.currentSystemFocus : data;
         
         const baseText = i18n[currentLang].moveHereBtn || "Move Ship Here";
         if (targetShip && targetCoords.x !== undefined) {
@@ -571,7 +572,7 @@ export function showInfoPanel(userData) {
     }
 
     const enterSystemBtn = document.getElementById('info-enter-system-btn');
-    if (userData.type === 'Star' && currentLayer !== 'SYSTEM') {
+    if (userData.type === 'Star' && store.state.currentLayer !== 'SYSTEM') {
         enterSystemBtn.textContent = i18n[currentLang].enterSystemBtn || "Enter System";
         enterSystemBtn.style.display = 'block';
         enterSystemBtn.onclick = () => enterSystem(userData.data);
@@ -749,7 +750,7 @@ export function openMoveHereModal(userData) {
     const currentMode = uiCtx.getCurrentMode();
     const lastMovedShipName = uiCtx.getLastMovedShipName();
     currentMoveHereTarget = (userData.type === 'Planet' || userData.type === 'Moon') 
-        ? { name: userData.data.name, x: currentSystemFocus.x, y: currentSystemFocus.y, z: currentSystemFocus.z } 
+        ? { name: userData.data.name, x: store.state.currentSystemFocus.x, y: store.state.currentSystemFocus.y, z: store.state.currentSystemFocus.z } 
         : userData.data;
     
     document.getElementById('move-here-target-name').textContent = currentMoveHereTarget.name;
@@ -758,10 +759,10 @@ export function openMoveHereModal(userData) {
     let options = '';
     
     const allowedShips = state.ships.filter(ship => {
-        if (currentLayer === 'SYSTEM') {
-            const dx = ship.x - currentSystemFocus.x;
-            const dy = ship.y - currentSystemFocus.y;
-            const dz = ship.z - currentSystemFocus.z;
+        if (store.state.currentLayer === 'SYSTEM') {
+            const dx = ship.x - store.state.currentSystemFocus.x;
+            const dy = ship.y - store.state.currentSystemFocus.y;
+            const dz = ship.z - store.state.currentSystemFocus.z;
             if (Math.sqrt(dx*dx + dy*dy + dz*dz) > 0.1) return false;
         }
         
@@ -806,7 +807,7 @@ export function updateMoveHereDistance() {
     const ship = state.ships.find(s => s.name === shipName);
     if (!ship) return;
     
-    if (currentLayer === 'SYSTEM') {
+    if (store.state.currentLayer === 'SYSTEM') {
         document.getElementById('move-here-total-dist').textContent = 'Local';
         document.getElementById('move-here-distance').value = '0';
         document.getElementById('move-here-distance').style.display = 'none';
@@ -845,7 +846,7 @@ export function updateMoveCoordsFromSelectedEntity() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && currentLayer === 'SYSTEM') {
+    if (e.key === 'Escape' && store.state.currentLayer === 'SYSTEM') {
         exitSystem();
     }
 });

@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
+import { store } from './store.js';
+import { loadHexDictionary, initDictionaryEditor } from './dictionary.js';
 import {
     currentScene, camera, renderer, labelRenderer, controls,
     activeSystemView, clock, interactiveObjects,
-    currentLayer, currentSystemFocus,
     galaxyScene, systemScene,
     starTexture, starGeometry, shipGeometry, shipMat,
     raycaster, pointer,
@@ -87,7 +88,7 @@ function handleMqttMessage(remoteEntity) {
             saveStars();
             
             // If we are currently inside the system that was just regenerated/edited, re-render it live!
-            if (currentLayer === 'SYSTEM' && currentSystemFocus === localStar) {
+            if (store.state.currentLayer === 'SYSTEM' && store.state.currentSystemFocus === localStar) {
                 renderSystem();
             }
         }
@@ -166,6 +167,9 @@ function handleMqttMessage(remoteEntity) {
 init();async function init() {
     const container = document.getElementById('canvas-container');
     initScene(container);
+
+    await loadHexDictionary();
+    initDictionaryEditor();
 
     await loadData();
 

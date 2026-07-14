@@ -5,7 +5,7 @@ console.log("Starting JS VMB tests...");
 
 // Test 1: packTile and unpackTile round-trip
 {
-    const original = { biome: 12, elevation: 5, moisture: 2, faction: 2, feature: 11 };
+    const original = { biome: 12, elevation: 5, moisture: 3, faction: 2, specialization: 0, settlement: 0, feature: 11, subsurface: true };
     const packed = packTile(original);
     const unpacked = unpackTile(packed);
     assert.deepStrictEqual(unpacked, original, "Tile packing round-trip failed");
@@ -14,17 +14,16 @@ console.log("Starting JS VMB tests...");
 
 // Test 2: packTile boundary values
 {
-    const maxValues = { biome: 15, elevation: 7, moisture: 6, faction: 7, feature: 15 };
+    const maxValues = { biome: 15, elevation: 7, moisture: 7, faction: 63, specialization: 15, settlement: 7, feature: 31, subsurface: true };
     const packedMax = packTile(maxValues);
     const unpackedMax = unpackTile(packedMax);
     assert.deepStrictEqual(unpackedMax, maxValues, "Boundary values packing failed");
     
     // Ensure bit mask works (values above limit should be truncated/masked)
-    const overflowValues = { biome: 16, elevation: 8, moisture: 8, faction: 8, feature: 16 };
+    const overflowValues = { biome: 16, elevation: 8, moisture: 8, faction: 64, specialization: 16, settlement: 8, feature: 32, subsurface: false };
     const packedOverflow = packTile(overflowValues);
     const unpackedOverflow = unpackTile(packedOverflow);
-    // 16 & 0xF = 0; 8 & 0x7 = 0; (8 >> 1) & 0x3 = 0; 8 & 0x7 = 0; 16 & 0xF = 0
-    assert.deepStrictEqual(unpackedOverflow, { biome: 0, elevation: 0, moisture: 0, faction: 0, feature: 0 }, "Overflow masking failed");
+    assert.deepStrictEqual(unpackedOverflow, { biome: 0, elevation: 0, moisture: 0, faction: 0, specialization: 0, settlement: 0, feature: 0, subsurface: false }, "Overflow masking failed");
     console.log("  ✓ Test 2: Boundary values & overflow masking passed");
 }
 
@@ -37,9 +36,12 @@ console.log("Starting JS VMB tests...");
         tiles.push({
             biome: i % 16,
             elevation: i % 8,
-            moisture: (i % 4) * 2,
-            faction: i % 8,
-            feature: i % 16
+            moisture: i % 8,
+            faction: i % 64,
+            specialization: i % 16,
+            settlement: i % 8,
+            feature: i % 32,
+            subsurface: (i % 2) === 0
         });
     }
     const metadata = { name: "Aegis Prime", notes: "Volcanic activity detected", temp: [12.5, 45.0] };

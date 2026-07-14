@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
 import {
-    currentScene, camera, controls, currentLayer, currentSystemFocus,
+    currentScene, camera, controls, 
     galaxyScene, systemScene, renderStars, renderShips, renderSystem,
     animateShip, removeMeshCompletely
 } from './scene.js';
@@ -46,7 +46,7 @@ export function openCreateModal() {
     document.getElementById('create-entity-z').value = '0';
     populateCreateTokenDropdown();
     
-    if (currentLayer === 'SYSTEM') {
+    if (store.state.currentLayer === 'SYSTEM') {
         document.getElementById('create-entity-coords-label').textContent = 'Position (Radius AU, Angle °)';
         document.getElementById('create-entity-x').placeholder = 'Radius (AU)';
         document.getElementById('create-entity-y').placeholder = 'Angle (°)';
@@ -123,10 +123,10 @@ export function submitCreateEntity() {
             owner: document.getElementById('create-entity-owner').value
         };
         
-        if (currentLayer === 'SYSTEM') {
-            newShip.x = currentSystemFocus.x;
-            newShip.y = currentSystemFocus.y;
-            newShip.z = currentSystemFocus.z;
+        if (store.state.currentLayer === 'SYSTEM') {
+            newShip.x = store.state.currentSystemFocus.x;
+            newShip.y = store.state.currentSystemFocus.y;
+            newShip.z = store.state.currentSystemFocus.z;
             newShip.sysRadius = x;
             newShip.sysAngle = y * Math.PI / 180;
         } else {
@@ -141,7 +141,7 @@ export function submitCreateEntity() {
         saveShips();
         if (currentSessionId) updateBackendSession(currentSessionId, state.ships);
         
-        if (currentLayer === 'SYSTEM') {
+        if (store.state.currentLayer === 'SYSTEM') {
             renderSystem();
         } else {
             renderShips();
@@ -169,14 +169,14 @@ export function submitCreateEntity() {
         };
         if (tokenId) newPoi.tokenId = tokenId;
         
-        if (currentLayer === 'SYSTEM') {
+        if (store.state.currentLayer === 'SYSTEM') {
             newPoi.originalName = name;
             newPoi.type = 'POI';
             newPoi.radius = x;
             newPoi.angle = y * Math.PI / 180;
             
-            if (!currentSystemFocus.systemPois) currentSystemFocus.systemPois = [];
-            currentSystemFocus.systemPois.push(newPoi);
+            if (!store.state.currentSystemFocus.systemPois) store.state.currentSystemFocus.systemPois = [];
+            store.state.currentSystemFocus.systemPois.push(newPoi);
             saveStars();
             renderSystem();
         } else {
@@ -339,7 +339,7 @@ export function submitMoveHere() {
         return;
     }
     
-    if (currentLayer === 'SYSTEM') {
+    if (store.state.currentLayer === 'SYSTEM') {
         ship.localTarget = currentMoveHereTarget.name;
         ship._lastLocalMove = performance.now();
         setLastMovedShip(ship.name);
@@ -447,7 +447,7 @@ export function saveEntityEdits() {
     } else {
         saveStars();
         renderStars();
-        if (currentLayer === 'SYSTEM') renderSystem();
+        if (store.state.currentLayer === 'SYSTEM') renderSystem();
         if (currentSessionId) updateBackendSession(currentSessionId, state.ships);
         if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(data));
     }

@@ -1,0 +1,46 @@
+{
+  "factions": {
+    "0": {
+      "name": "Unclaimed / Wild",
+      "color": "#777777",
+      "desc": "No established faction controls this territory."
+    },
+    "1": {
+      "name": "Crimson Syndicate",
+      "color": "#ff3333",
+      "desc": "A ruthless conglomerate of smugglers and raiders operating on the fringes."
+    },
+    "2": {
+      "name": "Terran Accord",
+      "color": "#3377ff",
+      "desc": "The primary governing body of inner-core worlds, prioritizing law and order."
+    },
+    "3": {
+      "name": "Zealots of the Void",
+      "color": "#aa22ff",
+      "desc": "A fanatical religious order worshipping the dark matter anomalies."
+    }
+  },
+  "features": {
+    "0": {
+      "name": "Wilderness",
+      "icon": "🌲",
+      "desc": "Untamed natural terrain with no significant artificial structures."
+    },
+    "1": {
+      "name": "Mining Outpost",
+      "icon": "⛏️",
+      "desc": "An active extraction facility gathering precious ores."
+    },
+    "2": {
+      "name": "Ancient Ruins",
+      "icon": "🏛️",
+      "desc": "Crumbling remnants of a forgotten precursor civilization."
+    },
+    "3": {
+      "name": "Research Station",
+      "icon": "🔬",
+      "desc": "A high-tech facility dedicated to scientific discovery."
+    }
+  }
+}

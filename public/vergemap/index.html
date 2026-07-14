@@ -106,6 +106,9 @@
                 <input type="file" id="import-yaml-file" accept=".yaml,.yml" style="display: none;">
             </div>
             <div style="margin-top: 5px;">
+                <button id="edit-dict-btn" style="width: 100%; background-color: #389ebd; border: 1px solid #4bb5c1; color: white;">Edit World Dictionary</button>
+            </div>
+            <div style="margin-top: 5px;">
                 <button id="reset-session-btn" style="width: 100%; background-color: #aa2222; border: 1px solid #ff3333;">Reset Session</button>
             </div>
         </div>
@@ -164,6 +167,64 @@
         <button id="info-enter-system-btn" style="margin-top: 15px; width: 100%; display: none; background-color: #007bff; color: white;" data-i18n="enterSystemBtn">Enter System</button>
         <button id="info-view-surface-btn" style="margin-top: 15px; width: 100%; display: none; background-color: #28a745; color: white;">View Surface Map</button>
         <button id="edit-entity-btn" style="margin-top: 15px; width: 100%; display: none;">Edit Details</button>
+    </div>
+
+    <!-- Hex Dictionary Editor Modal -->
+    <div id="dict-editor-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="modal-content" style="width: 400px; max-height: 80vh; overflow-y: auto;">
+            <h3>World Dictionary</h3>
+            
+            <div class="tab-container" style="display: flex; gap: 5px; margin-bottom: 15px;">
+                <button type="button" class="tab-btn active" id="dict-tab-factions" style="flex: 1; padding: 8px 5px;">Factions</button>
+                <button type="button" class="tab-btn" id="dict-tab-features" style="flex: 1; padding: 8px 5px;">Features</button>
+                <button type="button" class="tab-btn" id="dict-tab-specializations" style="flex: 1; padding: 8px 5px;">Specializations</button>
+            </div>
+            
+            <div id="dict-factions-view">
+                <label>Select Faction (0-63)</label>
+                <select id="dict-faction-select" style="margin-bottom: 15px;"></select>
+                
+                <label>Name</label>
+                <input type="text" id="dict-faction-name" placeholder="Faction Name...">
+                
+                <label>Color</label>
+                <input type="color" id="dict-faction-color" style="width: 100%; height: 40px; margin-bottom: 10px; background: #222; border: 1px solid #444;">
+                
+                <label>Description</label>
+                <textarea id="dict-faction-desc" rows="3" placeholder="Faction Lore..."></textarea>
+            </div>
+
+            <div id="dict-features-view" style="display: none;">
+                <label>Select Feature (0-31)</label>
+                <select id="dict-feature-select" style="margin-bottom: 15px;"></select>
+                
+                <label>Name</label>
+                <input type="text" id="dict-feature-name" placeholder="Feature Name...">
+                
+                <label>Icon (Emoji)</label>
+                <input type="text" id="dict-feature-icon" placeholder="🌲" maxlength="5">
+                
+                <label>Description</label>
+                <textarea id="dict-feature-desc" rows="3" placeholder="Feature Description..."></textarea>
+            </div>
+
+            <div id="dict-specializations-view" style="display: none;">
+                <label>Select Specialization (0-15)</label>
+                <select id="dict-specialization-select" style="margin-bottom: 15px;"></select>
+                
+                <label>Name</label>
+                <input type="text" id="dict-specialization-name" placeholder="Specialization Name...">
+                
+                <label>Description</label>
+                <textarea id="dict-specialization-desc" rows="3" placeholder="Specialization Description..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 5px; margin-top: 15px;">
+                <button id="save-dict-btn" style="flex: 2;">Save Dictionary</button>
+                <button id="close-dict-btn" style="flex: 1; background-color: #555; border-color: #666;">Close</button>
+            </div>
+            <p style="font-size: 11px; color: #888; margin-top: 10px; text-align: center;">Changes are saved locally to your browser.</p>
+        </div>
     </div>
 
     <div id="create-entity-modal" style="display: none;">

@@ -1,23 +1,7 @@
-export const state = {
-    stars: [],
-    ships: [],
-    sceneObjects: {},
-    logs: [],
-    tokens: []
-};
+import { store } from './store.js';
 
-export function saveStars() {
-    localStorage.setItem('vergeMapStars', JSON.stringify(state.stars));
-}
-
-export function saveShips() {
-    localStorage.setItem('vergeMapShips', JSON.stringify(state.ships));
-}
-
-export function saveLogs() {
-    localStorage.setItem('vergeMapLogs', JSON.stringify(state.logs));
-}
-
-export function saveTokens() {
-    localStorage.setItem('vergeMapTokens', JSON.stringify(state.tokens));
-}
+export const state = store.state;
+export const saveStars = () => store.saveStars();
+export const saveShips = () => store.saveShips();
+export const saveLogs = () => store.saveLogs();
+export const saveTokens = () => store.saveTokens();
