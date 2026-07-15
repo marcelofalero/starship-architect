@@ -137,6 +137,26 @@ function handleMqttMessage(remoteEntity) {
     }
 
     if (localShip) {
+        let changed = false;
+        
+        // Copy system-related properties of remoteShip to localShip
+        if (localShip.localTarget !== remoteShip.localTarget) {
+            localShip.localTarget = remoteShip.localTarget;
+            changed = true;
+        }
+        if (localShip.sysRadius !== remoteShip.sysRadius) {
+            localShip.sysRadius = remoteShip.sysRadius;
+            changed = true;
+        }
+        if (localShip.sysAngle !== remoteShip.sysAngle) {
+            localShip.sysAngle = remoteShip.sysAngle;
+            changed = true;
+        }
+        if (localShip.isHidden !== remoteShip.isHidden) {
+            localShip.isHidden = remoteShip.isHidden;
+            changed = true;
+        }
+        
         // Determine if we need to animate position change
         const distSq = (localShip.x - remoteShip.x)**2 + (localShip.y - remoteShip.y)**2 + (localShip.z - remoteShip.z)**2;
         if (distSq > 0.01 || localShip.rx !== remoteShip.rx) {
@@ -167,6 +187,8 @@ function handleMqttMessage(remoteEntity) {
                     document.getElementById('ship-y').value = localShip.y.toFixed(2);
                     document.getElementById('ship-z').value = localShip.z.toFixed(2);
                 }
+                
+                changed = true;
             }
         }
         
@@ -174,6 +196,10 @@ function handleMqttMessage(remoteEntity) {
         if (localShip.tokenId !== remoteShip.tokenId || localShip.tokenScale !== remoteShip.tokenScale) {
             localShip.tokenId = remoteShip.tokenId;
             localShip.tokenScale = remoteShip.tokenScale;
+            shouldRender = true;
+        }
+        
+        if (changed) {
             shouldRender = true;
         }
     } else {
@@ -184,6 +210,9 @@ function handleMqttMessage(remoteEntity) {
     
     if (shouldRender) {
         renderShips();
+        if (store.state.currentLayer === 'SYSTEM') {
+            renderSystem();
+        }
         refreshDropdowns();
     }
     saveShips();

@@ -850,6 +850,7 @@ let selectedIndices = [];
 let userRole = 'player';
 let originalRole = 'player';
 let currentLens = 'biome';
+let ships = [];
 
 
 // ── DOM ──
@@ -2075,11 +2076,15 @@ function selectCell(idx) {
             playerFeatureStatusValue.textContent = 'UNEXPLORED SIGNATURE';
             playerFeatureStatusValue.style.color = '#ffd600';
             
-            playerFeatureActionRow.style.display = 'flex';
-            featureActionBtn.textContent = 'SCAN SECTOR';
-            featureActionBtn.style.borderColor = '#00e5ff';
-            featureActionBtn.style.color = '#00e5ff';
-            featureActionBtn.style.background = 'rgba(0, 229, 255, 0.15)';
+            if (isViewer) {
+                playerFeatureActionRow.style.display = 'none';
+            } else {
+                playerFeatureActionRow.style.display = 'flex';
+                featureActionBtn.textContent = 'SCAN SECTOR';
+                featureActionBtn.style.borderColor = '#00e5ff';
+                featureActionBtn.style.color = '#00e5ff';
+                featureActionBtn.style.background = 'rgba(0, 229, 255, 0.15)';
+            }
         }
     } else {
         detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
@@ -2110,7 +2115,11 @@ function selectCell(idx) {
     detailAnalysis.textContent = analysis;
 
     // Land btn state
-    if (userRole === 'gm') {
+    const isGm = userRole === 'gm';
+    const isPlayer = userRole === 'player';
+    const canLand = isGm || (isPlayer && hasShipInSystem());
+
+    if (canLand) {
         landBtn.style.display = 'block';
         if (dggsData.metadata && dggsData.metadata.landingCell === idx) {
             landBtn.textContent = 'SHIP LANDED';
@@ -2153,11 +2162,48 @@ function selectCell(idx) {
     infoPanel.classList.add('visible');
 }
 
+async function loadShips() {
+    if (currentSessionId) {
+        try {
+            const response = await fetch(`${HEXMAP_WORKER_URL}/session/${currentSessionId}`);
+            if (response.ok) {
+                const sessionData = await response.json();
+                if (sessionData && sessionData.ships) {
+                    ships = sessionData.ships;
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch ships from session", e);
+        }
+    }
+    const savedShips = localStorage.getItem('vergeMapShips');
+    if (savedShips) {
+        try {
+            ships = JSON.parse(savedShips) || [];
+        } catch (e) {
+            ships = [];
+        }
+    }
+}
+
+function hasShipInSystem() {
+    if (!systemX || !systemY || !systemZ) return false;
+    const sysX = parseFloat(systemX).toFixed(2);
+    const sysY = parseFloat(systemY).toFixed(2);
+    const sysZ = parseFloat(systemZ).toFixed(2);
+    return ships.some(ship => {
+        if (ship.x === undefined || ship.y === undefined || ship.z === undefined) return false;
+        return ship.x.toFixed(2) === sysX && ship.y.toFixed(2) === sysY && ship.z.toFixed(2) === sysZ;
+    });
+}
+
 // ── Data Loading ──
 let currentLoadId = 0;
 async function loadDGGS(seed, type, resolution, urbanization = 15, pollution = 100, conservation = 0) {
     const loadId = ++currentLoadId;
     try {
+        await loadShips();
         const url = `${HEXMAP_WORKER_URL}/planet/${seed}/dggs?type=${type}&resolution=${resolution}&urbanization=${urbanization}&pollution=${pollution}&conservation=${conservation}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Worker returned ${res.status}`);
@@ -2452,6 +2498,10 @@ const pollParam = urlParams.get('pollution') !== null ? parseInt(urlParams.get('
 const consParam = urlParams.get('conservation') !== null ? parseInt(urlParams.get('conservation')) : 0;
 const planetParam = urlParams.get('planet') || '';
 
+const systemX = urlParams.get('systemX');
+const systemY = urlParams.get('systemY');
+const systemZ = urlParams.get('systemZ');
+
 let currentSessionId = urlParams.get('session_id') || null;
 let sessionParam = urlParams.get('session');
 
@@ -2494,6 +2544,12 @@ if (nameParam) {
     if (titleEl) titleEl.textContent = nameParam.toUpperCase();
 }
 
+if (planetParam) {
+    if (seedInput) seedInput.disabled = true;
+    if (typeSelect) typeSelect.disabled = true;
+    if (radiusInput) radiusInput.disabled = true;
+}
+
 let mqttClient = null;
 let lastSyncTime = 0;
 let lastSyncState = '';
@@ -2519,6 +2575,21 @@ if (currentSessionId && typeof mqtt !== 'undefined') {
                     return;
                 }
                 
+                if (data.type === 'planetary_metadata_update') {
+                    if (dggsData) {
+                        dggsData.metadata = data.metadata;
+                        applyMetadataOverrides();
+                        updateMapInfoHUD();
+                        // Force immediate redraw to prevent smearing
+                        ctx.setTransform(1, 0, 0, 1, 0, 0); 
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        if (selectedIdx >= 0) {
+                            selectCell(selectedIdx);
+                        }
+                    }
+                    return;
+                }
+                
                 if (data.type === 'planetary_sync') {
                     rotX = data.rotX;
                     rotY = data.rotY;
@@ -2527,7 +2598,14 @@ if (currentSessionId && typeof mqtt !== 'undefined') {
                     
                     if (currentLens !== data.currentLens) {
                         currentLens = data.currentLens;
-                        updateColors();
+                        const lensBtns = document.querySelectorAll('.lens-btn');
+                        lensBtns.forEach(b => {
+                            if (b.getAttribute('data-value') === currentLens) {
+                                b.classList.add('active');
+                            } else {
+                                b.classList.remove('active');
+                            }
+                        });
                     }
                     
                     if (data.selectedIdx !== selectedIdx || JSON.stringify(data.selectedIndices) !== JSON.stringify(selectedIndices)) {
@@ -2816,6 +2894,12 @@ async function saveDGGSMetadata() {
         dggsData = decodeVMB(buffer);
         onDataLoaded();
 
+        if (mqttClient && currentSessionId) {
+            mqttClient.publish(`vergemap/sessions/${currentSessionId}/planetary`, JSON.stringify({
+                type: 'planetary_metadata_update',
+                metadata: dggsData.metadata
+            }));
+        }
 
     } catch (err) {
         console.error("Failed to save map metadata:", err);

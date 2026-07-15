@@ -658,7 +658,25 @@ export function showInfoPanel(userData) {
     }
 
     const viewSurfaceBtn = document.getElementById('info-view-surface-btn');
+    let showSurface = false;
     if ((userData.type === 'Planet' || userData.type === 'Moon') && !(data.type || '').includes('Gas')) {
+        if (currentMode === 'gm') {
+            showSurface = true;
+        } else if (currentMode === 'ro') {
+            showSurface = false;
+        } else {
+            // Check if player has any ships in the current system focus
+            const hasShipInSystem = store.state.currentSystemFocus && store.state.ships.some(ship => {
+                const sysX = (store.state.currentSystemFocus.x || 0).toFixed(2);
+                const sysY = (store.state.currentSystemFocus.y || 0).toFixed(2);
+                const sysZ = (store.state.currentSystemFocus.z || 0).toFixed(2);
+                return ship.x.toFixed(2) === sysX && ship.y.toFixed(2) === sysY && ship.z.toFixed(2) === sysZ;
+            });
+            showSurface = hasShipInSystem;
+        }
+    }
+
+    if (showSurface) {
         viewSurfaceBtn.style.display = 'block';
         
         let planetType = 'terrestrial';
@@ -690,6 +708,12 @@ export function showInfoPanel(userData) {
             const planetId = data.planetaryId || (store.state.currentSystemFocus.name + '-' + data.originalName).replace(/[^a-z0-9]/gi, '-').toLowerCase();
             const actualSeed = data.planetSeed || data.id || store.state.currentSystemFocus.systemSeed + "_" + data.name;
             let url = `planetary/index.html?seed=${encodeURIComponent(actualSeed)}&name=${encodeURIComponent(data.name || 'Planet')}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
+            if (store.state.currentSystemFocus) {
+                const sysX = (store.state.currentSystemFocus.x || 0).toFixed(2);
+                const sysY = (store.state.currentSystemFocus.y || 0).toFixed(2);
+                const sysZ = (store.state.currentSystemFocus.z || 0).toFixed(2);
+                url += `&systemX=${sysX}&systemY=${sysY}&systemZ=${sysZ}`;
+            }
             if (planetId) {
                 url += `&planet=${encodeURIComponent(planetId)}`;
             }
@@ -718,6 +742,12 @@ export function showInfoPanel(userData) {
                 const mode = uiCtx.getCurrentMode();
                 if (mode === 'gm' && client && currentSessionId) {
                     let safeUrl = `planetary/index.html?seed=${encodeURIComponent(actualSeed)}&name=${encodeURIComponent(data.name || 'Planet')}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
+                    if (store.state.currentSystemFocus) {
+                        const sysX = (store.state.currentSystemFocus.x || 0).toFixed(2);
+                        const sysY = (store.state.currentSystemFocus.y || 0).toFixed(2);
+                        const sysZ = (store.state.currentSystemFocus.z || 0).toFixed(2);
+                        safeUrl += `&systemX=${sysX}&systemY=${sysY}&systemZ=${sysZ}`;
+                    }
                     if (planetId) safeUrl += `&planet=${encodeURIComponent(planetId)}`;
                     safeUrl += `&role=ro&session_id=${currentSessionId}&pres=true`;
                     if (uiCtx.getCurrentSessionId()) {
