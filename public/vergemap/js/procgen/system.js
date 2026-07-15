@@ -313,10 +313,10 @@ function generateSystemImpl(systemData, genMode = "Normal") {
 
         // Create the Orbit Pivot
         const orbitPivot = new THREE.Group();
-        orbitPivot.rotation.order = 'ZXZ';
-        orbitPivot.rotation.z = lan;
-        orbitPivot.rotation.x = inc;
-        orbitPivot.rotation.y = aop; // Applying Argument of Periapsis as Y-axis rotation relative to tilted plane
+        const qLAN = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), lan);
+        const qInc = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), inc);
+        const qAoP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), aop);
+        orbitPivot.quaternion.multiplyQuaternions(qLAN, qInc).multiply(qAoP);
         group.add(orbitPivot);
 
         // Draw crisp 2D orbital line in the local X-Y plane of the pivot
@@ -328,6 +328,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         orbitPivot.add(orbitLine);
 
         const bodyGeo = new THREE.SphereGeometry(bodyRadius, 32, 32);
+        bodyGeo.rotateX(Math.PI / 2);
         const bodyMat = new THREE.MeshStandardMaterial({
             color: new THREE.Color(0xffffff),
             map: planetTextures[bt.tex] || null,
@@ -512,7 +513,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         if (!systemData.planets) systemData.planets = [];
         let pData = systemData.planets.find(p => p.originalName === pName);
         if (!pData) {
-            pData = { originalName: pName, name: pName, description: desc };
+            pData = { 
+                originalName: pName, 
+                name: pName, 
+                description: desc,
+                planetaryId: (systemData.name + '-' + pName).replace(/[^a-z0-9]/gi, '-').toLowerCase()
+            };
             systemData.planets.push(pData);
         } else if (pData.type !== bt.name) {
             pData.description = desc;
@@ -540,6 +546,9 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             planetTypeName: bt.name,
             color: bt.color,
         };
+        
+        body.rotation.x = axisTilt * Math.PI / 180;
+        
         interactableMeshes.push(body);
 
         if (bt.isGas && rng() > 0.35) {
@@ -554,23 +563,24 @@ function generateSystemImpl(systemData, genMode = "Normal") {
                 blending: THREE.NormalBlending
             });
             const gr = new THREE.Mesh(grGeo, grMat);
-            gr.rotation.x = Math.PI / 2 + (rng() - 0.5) * 0.4;
             body.add(gr);
         }
 
         body.userData.orbiters = [];
-        if (!bt.isGas && rng() > 0.55 && i > 0) {
-            const moonR = bodyRadius * 0.38;
-            const moonDst = bodyRadius * 2.8;
+        const moonChance = bt.isGas ? 0.8 : 0.45;
+        if (rng() < moonChance && i > 0) {
+            const moonR = bt.isGas ? (bodyRadius * (0.05 + rng() * 0.1)) : (bodyRadius * 0.38);
+            const moonDst = bodyRadius * (bt.isGas ? 1.5 : 2.8);
             const moonGeo = new THREE.SphereGeometry(moonR, 16, 16);
+            moonGeo.rotateX(Math.PI / 2);
             const moonMat = new THREE.MeshStandardMaterial({ color: 0x778899, roughness: 0.95, metalness: 0.05, map: planetTextures.rocky });
             const moon = new THREE.Mesh(moonGeo, moonMat);
             const moonPivot = new THREE.Group();
             const moonInc = (rng() - 0.5) * 0.4;
             const moonLan = rng() * Math.PI * 2;
-            moonPivot.rotation.order = 'ZXZ';
-            moonPivot.rotation.z = moonLan;
-            moonPivot.rotation.x = moonInc;
+            const moonQ_LAN = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), moonLan);
+            const moonQ_Inc = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), moonInc);
+            moonPivot.quaternion.multiplyQuaternions(moonQ_LAN, moonQ_Inc);
             
             // Moon orbital line
             const moonCurve = new THREE.EllipseCurve(0, 0, moonDst, moonDst, 0, 2 * Math.PI, false, 0);
@@ -610,7 +620,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             const mName = pName + "a";
             let mData = systemData.planets.find(p => p.originalName === mName);
             if (!mData) {
-                mData = { originalName: mName, name: mName, description: mDesc };
+                mData = { 
+                    originalName: mName, 
+                    name: mName, 
+                    description: mDesc,
+                    planetaryId: (systemData.name + '-' + mName).replace(/[^a-z0-9]/gi, '-').toLowerCase()
+                };
                 systemData.planets.push(mData);
             }
             

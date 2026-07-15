@@ -10,13 +10,15 @@ export const uiCtx = {
     getSavedSessionTokens: () => null,
     setSavedSessionTokens: () => {},
     updateBackendSession: () => {},
-    refreshDropdowns: () => {}
+    refreshDropdowns: () => {},
+    getMqttClient: () => null
 };
 
 export let currentLang = 'en';
 export let currentEditEntity = null;
 export let currentMoveShip = null;
 export let currentMoveHereTarget = null;
+
 
 // UI Elements
 export const infoPanel = document.getElementById('info-panel');
@@ -278,11 +280,43 @@ export function applyModeUI() {
     document.getElementById('panel-search').style.display = isGalaxy ? 'block' : 'none';
     document.getElementById('panel-distance').style.display = isGalaxy ? 'block' : 'none';
     
+    const presBtn = document.getElementById('pres-btn');
+    const modeIndicator = document.getElementById('mode-indicator');
+    
+    const isPresentation = new URLSearchParams(window.location.search).get('pres') === 'true';
+    if (presBtn) presBtn.style.display = currentMode === 'gm' ? 'flex' : 'none';
+    
+    if (modeIndicator) {
+        modeIndicator.style.display = 'block';
+        if (currentMode === 'gm') {
+            modeIndicator.textContent = 'GM';
+            modeIndicator.style.backgroundColor = '#dc3545';
+        } else if (currentMode === 'nav') {
+            modeIndicator.textContent = 'Player';
+            modeIndicator.style.backgroundColor = '#007bff';
+        } else if (currentMode === 'ro' && isPresentation) {
+            modeIndicator.textContent = 'Presentation';
+            modeIndicator.style.backgroundColor = '#9b59b6';
+        } else {
+            modeIndicator.textContent = 'Viewer';
+            modeIndicator.style.backgroundColor = '#6c757d';
+        }
+    }
+
     if (currentMode === 'ro') {
         if (shipControls) shipControls.style.display = 'none';
+        if (openCreateBtn) openCreateBtn.style.display = 'none';
+        if (tokenRow) tokenRow.style.display = 'none';
+        if (delBtn) delBtn.style.display = 'none';
         if (dataManagement) dataManagement.style.display = 'none';
         if (logPanel) logPanel.style.display = 'none';
         if (sysToolsBtn) sysToolsBtn.style.display = 'none';
+        document.getElementById('panel-search').style.display = 'none';
+        document.getElementById('panel-distance').style.display = 'none';
+        
+        // Completely hide the ui-layer container in presentation mode
+        const uiLayer = document.getElementById('ui-layer');
+        if (uiLayer && isPresentation) uiLayer.style.display = 'none';
     } else if (currentMode === 'nav') {
         if (shipControls) shipControls.style.display = isGalaxy ? 'block' : 'none';
         if (openCreateBtn) openCreateBtn.style.display = 'none';
@@ -347,9 +381,8 @@ export function showShareModal(tokens) {
     
     document.getElementById('share-gm-url').value = gmVal;
     document.getElementById('share-player-url').value = playerVal;
-    document.getElementById('share-viewer-url').value = viewerVal;
     
-    const targetShareUrl = playerVal || viewerVal || gmVal;
+    const targetShareUrl = playerVal || gmVal;
     if (targetShareUrl) {
         const encodedUrl = encodeURIComponent(targetShareUrl);
         document.getElementById('share-whatsapp-btn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("Join my Verge Map session: ")}` + encodedUrl;
@@ -381,20 +414,16 @@ export function showShareModal(tokens) {
     
     const gmRow = document.getElementById('share-gm-url').closest('div').parentElement;
     const playerRow = document.getElementById('share-player-url').closest('div').parentElement;
-    const viewerRow = document.getElementById('share-viewer-url').closest('div').parentElement;
     
     if (currentMode === 'gm') {
         gmRow.style.display = gmVal ? 'block' : 'none';
         playerRow.style.display = playerVal ? 'block' : 'none';
-        viewerRow.style.display = viewerVal ? 'block' : 'none';
     } else if (currentMode === 'nav') {
         gmRow.style.display = 'none';
         playerRow.style.display = playerVal ? 'block' : 'none';
-        viewerRow.style.display = 'none';
     } else {
         gmRow.style.display = 'none';
         playerRow.style.display = 'none';
-        viewerRow.style.display = viewerVal ? 'block' : 'none';
     }
     
     document.getElementById('share-modal').style.display = 'flex';
@@ -441,11 +470,12 @@ export function renderLogs() {
 }
 
 export function showInfoPanel(userData) {
+    if (!userData) return;
     const currentMode = uiCtx.getCurrentMode();
     const lastMovedShipName = uiCtx.getLastMovedShipName();
-    const data = userData.data;
-    infoName.textContent = data.isHidden && currentMode === 'gm' ? `${data.name} (Hidden)` : data.name;
-    infoType.textContent = data.subtype || userData.type;
+    const data = userData.data || userData;
+    infoName.textContent = data.isHidden && currentMode === 'gm' ? `${data.name || userData.name || 'Unknown'} (Hidden)` : (data.name || userData.name || 'Unknown');
+    infoType.textContent = data.subtype || userData.type || 'Unknown';
     const classGroup = document.getElementById('info-class').parentNode;
     if (data.class) {
         classGroup.style.display = 'block';
@@ -480,6 +510,53 @@ export function showInfoPanel(userData) {
     } else {
         coordsGroup.style.display = 'block';
         infoCoords.textContent = `X:${data.x !== undefined ? data.x.toFixed(2) : 0}, Y:${data.y !== undefined ? data.y.toFixed(2) : 0}, Z:${data.z !== undefined ? data.z.toFixed(2) : 0}`;
+    }
+
+    const seedGroup = document.getElementById('info-seed-group');
+    if ((userData.type === 'Planet' || userData.type === 'Moon') && store.state.currentLayer === 'SYSTEM') {
+        const seedValue = data.planetSeed || data.id || store.state.currentSystemFocus.systemSeed + "_" + data.name;
+        document.getElementById('info-seed-display').textContent = seedValue;
+        document.getElementById('info-seed-input').value = seedValue;
+        
+        if (currentMode === 'gm') {
+            seedGroup.style.display = 'block';
+            
+            const editBtn = document.getElementById('info-seed-edit-btn');
+            const saveBtn = document.getElementById('info-seed-save-btn');
+            const displaySpan = document.getElementById('info-seed-display');
+            const inputEl = document.getElementById('info-seed-input');
+            
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            displaySpan.style.display = 'inline';
+            inputEl.style.display = 'none';
+            
+            editBtn.onclick = () => {
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                displaySpan.style.display = 'none';
+                inputEl.style.display = 'inline-block';
+                inputEl.focus();
+            };
+            
+            saveBtn.onclick = () => {
+                data.planetSeed = inputEl.value.trim();
+                displaySpan.textContent = data.planetSeed;
+                
+                editBtn.style.display = 'inline-block';
+                saveBtn.style.display = 'none';
+                displaySpan.style.display = 'inline';
+                inputEl.style.display = 'none';
+                
+                // Trigger save
+                if (window.store && window.store.saveStars) window.store.saveStars();
+                else console.log('Cannot save star system changes automatically.');
+            };
+        } else {
+            seedGroup.style.display = 'none';
+        }
+    } else {
+        seedGroup.style.display = 'none';
     }
     
     let descHtml = data.description || "No description available.";
@@ -610,8 +687,9 @@ export function showInfoPanel(userData) {
         
         viewSurfaceBtn.onclick = () => {
             const session = uiCtx.getSessionToken();
-            const planetId = data.hexmapId || '';
-            let url = `hexmap/index.html?seed=${encodeURIComponent(data.name)}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
+            const planetId = data.planetaryId || (store.state.currentSystemFocus.name + '-' + data.originalName).replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            const actualSeed = data.planetSeed || data.id || store.state.currentSystemFocus.systemSeed + "_" + data.name;
+            let url = `planetary/index.html?seed=${encodeURIComponent(actualSeed)}&name=${encodeURIComponent(data.name || 'Planet')}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
             if (planetId) {
                 url += `&planet=${encodeURIComponent(planetId)}`;
             }
@@ -624,15 +702,37 @@ export function showInfoPanel(userData) {
             }
             // Mark the planet as having had its surface generated
             data.hexmapGenerated = true;
+            if (window.store && window.store.saveStars) window.store.saveStars();
+            const currentSessionId = uiCtx.getCurrentSessionId();
+            if (currentSessionId && window.store && window.store.state) {
+                uiCtx.updateBackendSession(currentSessionId, window.store.state.ships);
+            }
             
             // Set the URL search param on the current page to 'planet' so the back button resumes here
             if (planetId) {
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.set('planet', planetId);
                 window.history.replaceState({}, '', newUrl.toString());
+                
+                const client = uiCtx.getMqttClient();
+                const mode = uiCtx.getCurrentMode();
+                if (mode === 'gm' && client && currentSessionId) {
+                    let safeUrl = `planetary/index.html?seed=${encodeURIComponent(actualSeed)}&name=${encodeURIComponent(data.name || 'Planet')}&type=${planetType}&resolution=${resolution}&physicalRadius=${R}`;
+                    if (planetId) safeUrl += `&planet=${encodeURIComponent(planetId)}`;
+                    safeUrl += `&role=ro&session_id=${currentSessionId}&pres=true`;
+                    if (uiCtx.getCurrentSessionId()) {
+                        // Let the viewer's planetary page read the token from cookies
+                    }
+                    client.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify({ type: 'layer_change', layer: 'PLANETARY', planetaryUrl: safeUrl }), { qos: 1 }, () => {
+                        setTimeout(() => { window.location.href = url; }, 100);
+                    });
+                    // Fallback in case publish callback doesn't fire
+                    setTimeout(() => { window.location.href = url; }, 1000);
+                    return; // Prevent immediate navigation
+                }
             }
             
-            // Open in the same tab
+            // Open in the same tab immediately if not publishing
             window.location.href = url;
         };
     } else {

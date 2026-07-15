@@ -10,7 +10,7 @@ import {
     raycaster, pointer,
     initScene, renderStars, renderShips, renderSystem,
     enterSystem, exitSystem, animateShip, onPointerDown, onWindowResize, animate, recenterMap,
-    setPendingPlanetIdToFocus
+    setPendingPlanetIdToFocus, pushCameraSync
 } from './scene.js';
 import {
     uiCtx, currentLang, i18n, applyTranslations, applyModeUI,
@@ -59,12 +59,37 @@ uiCtx.getSavedSessionTokens = () => savedSessionTokens;
 uiCtx.setSavedSessionTokens = (tokens) => { setSavedSessionTokens(tokens); };
 uiCtx.updateBackendSession = updateBackendSession;
 uiCtx.refreshDropdowns = refreshDropdowns;
+uiCtx.getMqttClient = () => mqttClient;
 
 export async function updateBackendSession(id, ships) {
     await apiUpdateBackendSession(id, ships, state.stars, state.logs, state.tokens);
 }
 
 function handleMqttMessage(remoteEntity) {
+    if (remoteEntity.type === 'layer_change') {
+        console.log(`[MQTT] Received layer_change: ${remoteEntity.layer}`);
+        if (remoteEntity.layer === 'SYSTEM' && remoteEntity.starName) {
+            const localStar = state.stars.find(s => s.name === remoteEntity.starName);
+            if (localStar && store.state.currentLayer !== 'SYSTEM') {
+                console.log(`[MQTT] Transitioning viewer to SYSTEM for ${remoteEntity.starName}`);
+                enterSystem(localStar);
+            }
+        } else if (remoteEntity.layer === 'GALAXY' && store.state.currentLayer === 'SYSTEM') {
+            console.log(`[MQTT] Transitioning viewer to GALAXY`);
+            exitSystem();
+        } else if (remoteEntity.layer === 'PLANETARY' && remoteEntity.planetaryUrl) {
+            console.log(`[MQTT] Transitioning viewer to PLANETARY`);
+            window.location.href = remoteEntity.planetaryUrl;
+        }
+        return;
+    } else if (remoteEntity.type === 'camera_sync') {
+        const mode = uiCtx.getCurrentMode();
+        if (mode !== 'gm' && remoteEntity.state) { // Viewers and Players follow GM's camera
+            pushCameraSync(remoteEntity.state);
+        }
+        return;
+    }
+
     // Check if it's actually a Star or POI being moved/updated
     let localStar = state.stars.find(s => s.name === remoteEntity.name);
     if (localStar) {
@@ -223,6 +248,31 @@ init();async function init() {
         showShareModal();
     });
 
+    const presBtn = document.getElementById('pres-btn');
+    if (presBtn) {
+        presBtn.addEventListener('click', () => {
+            // Synchronously open a new tab to bypass popup blockers
+            const presTab = window.open('about:blank', '_blank');
+            
+            // Get the viewer token from saved session tokens
+            let viewerToken = null;
+            try {
+                const cached = sessionStorage.getItem('vergeMapSessionTokens');
+                if (cached) {
+                    const tokens = JSON.parse(cached);
+                    viewerToken = tokens.viewer;
+                }
+            } catch (e) {}
+            
+            if (viewerToken) {
+                const baseUrl = window.location.origin + window.location.pathname;
+                presTab.location.href = `${baseUrl}?session=${viewerToken}&pres=true`;
+            } else {
+                presTab.document.write('Error: No presentation token available.');
+            }
+        });
+    }
+
     document.querySelectorAll('.share-copy-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const targetId = e.currentTarget.getAttribute('data-target');
@@ -258,6 +308,7 @@ init();async function init() {
             localStorage.removeItem('vergeMapStars');
             localStorage.removeItem('vergeMapLogs');
             localStorage.removeItem('vergeMapTokens');
+            document.cookie = "vergeMapSessionToken=; path=/; max-age=0";
             window.location.href = window.location.origin + window.location.pathname;
         }
     });
@@ -383,7 +434,10 @@ async function loadData() {
         const planetId = urlParams.get('planet');
         if (planetId) {
             const foundStar = state.stars.find(star => 
-                star.planets && star.planets.some(p => p.hexmapId === planetId)
+                star.planets && star.planets.some(p => {
+                    const pid = p.planetaryId || (star.name + '-' + p.originalName).replace(/[^a-z0-9]/gi, '-').toLowerCase();
+                    return pid === planetId;
+                })
             );
             if (foundStar) {
                 setPendingPlanetIdToFocus(planetId);

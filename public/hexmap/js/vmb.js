@@ -164,7 +164,7 @@ function encodeDGGS(cells, metadata = {}) {
     const metaBytes = encoder.encode(metaStr);
     const metaLen = metaBytes.length;
 
-    const CELL_BLOCK = 88;
+    const CELL_BLOCK = 92;
     const bodyLen = cellCount * CELL_BLOCK;
     const totalLen = 12 + bodyLen + metaLen;
 
@@ -189,25 +189,27 @@ function encodeDGGS(cells, metadata = {}) {
         view.setFloat32(off + 4, cell.center ? cell.center.y : 0, false);
         view.setFloat32(off + 8, cell.center ? cell.center.z : 0, false);
 
-        // Tile data (u16)
+        // Tile data (u32)
         let val = 0;
         if (typeof cell.tile === 'number') {
             val = cell.tile;
         } else if (cell.tile && typeof cell.tile === 'object') {
             val = packTile(cell.tile);
         }
-        view.setUint16(off + 12, val, false);
+        view.setUint32(off + 12, val, false);
 
         // Sides count
         const sides = cell.vertices ? Math.min(cell.vertices.length, 6) : 0;
-        bytes[off + 14] = sides;
-        bytes[off + 15] = 0; // padding
+        bytes[off + 16] = sides;
+        bytes[off + 17] = 0; // padding
+        bytes[off + 18] = 0; // padding
+        bytes[off + 19] = 0; // padding
 
         // Polygon vertices (6 slots x 3 x f32 = 72 bytes)
         for (let vi = 0; vi < 6; vi++) {
             const srcVi = vi < sides ? vi : 0;
             const v = cell.vertices ? cell.vertices[srcVi] : {x: 0, y: 0, z: 0};
-            const voff = off + 16 + vi * 12;
+            const voff = off + 20 + vi * 12;
             view.setFloat32(voff, v.x || 0, false);
             view.setFloat32(voff + 4, v.y || 0, false);
             view.setFloat32(voff + 8, v.z || 0, false);

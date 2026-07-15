@@ -78,3 +78,47 @@ pub fn encode_dggs_vmb(grid: &DGGSGrid, metadata: &serde_json::Value) -> Vec<u8>
 
     buf
 }
+
+pub fn update_vrgd_metadata(binary: &[u8], metadata: &serde_json::Value) -> Result<Vec<u8>, &'static str> {
+    if binary.len() < 12 {
+        return Err("Invalid VRGD: Too short");
+    }
+    if binary[0] != 0x56 || binary[1] != 0x52 || binary[2] != 0x47 || binary[3] != 0x44 {
+        return Err("Invalid VRGD: Incorrect magic bytes");
+    }
+    let cell_count = u32::from_be_bytes([binary[4], binary[5], binary[6], binary[7]]);
+    let old_meta_len = u32::from_be_bytes([binary[8], binary[9], binary[10], binary[11]]);
+    let cell_block = 92;
+    let expected_len = 12 + (cell_count as usize * cell_block) + old_meta_len as usize;
+    if binary.len() < expected_len {
+        return Err("Invalid VRGD: Truncated file");
+    }
+    
+    let old_meta_start = 12 + (cell_count as usize * cell_block);
+    let old_meta_bytes = &binary[old_meta_start..old_meta_start + old_meta_len as usize];
+    let old_meta_str = std::str::from_utf8(old_meta_bytes).unwrap_or("{}");
+    let mut old_meta: serde_json::Value = serde_json::from_str(old_meta_str).unwrap_or(serde_json::json!({}));
+    
+    if let (Some(old_map), Some(new_map)) = (old_meta.as_object_mut(), metadata.as_object()) {
+        for (k, v) in new_map {
+            old_map.insert(k.clone(), v.clone());
+        }
+    }
+    
+    let meta_str = serde_json::to_string(&old_meta).unwrap_or_default();
+    let meta_bytes = meta_str.as_bytes();
+    let new_meta_len = meta_bytes.len() as u32;
+    
+    let total = 12 + (cell_count as usize * cell_block) + meta_bytes.len();
+    let mut buf = vec![0u8; total];
+    
+    let cells_end = 12 + (cell_count as usize * cell_block);
+    buf[..cells_end].copy_from_slice(&binary[..cells_end]);
+    
+    let ml = new_meta_len.to_be_bytes();
+    buf[8..12].copy_from_slice(&ml);
+    
+    buf[cells_end..].copy_from_slice(meta_bytes);
+    
+    Ok(buf)
+}

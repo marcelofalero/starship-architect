@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import { state, saveStars, saveShips, saveLogs, saveTokens } from './data.js';
+import { store } from './store.js';
 import {
     currentScene, camera, controls, 
     galaxyScene, systemScene, renderStars, renderShips, renderSystem,

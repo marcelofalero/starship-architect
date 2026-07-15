@@ -3,13 +3,30 @@ import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { generateSystem } from '../procgen/system.js';
 import { store } from '../store.js';
 import { saveStars } from '../data.js';
-import { currentMode, currentSessionId, mqttClient, updateBackendSession } from '../app.js';
-import { showInfoPanel, infoPanel, infoName, infoCoords, currentLang, i18n, applyModeUI } from '../ui.js';
+import { updateBackendSession } from '../api.js';
+import { showInfoPanel, infoPanel, infoName, infoCoords, currentLang, i18n, applyModeUI, uiCtx } from '../ui.js';
 import { camera, controls, galaxyScene, systemScene, currentScene, setScene, renderer, labelRenderer, clock } from './core.js';
 import { interactiveObjects } from '../interactions/raycaster.js';
 
 export let activeSystemView = null;
 export let starTexture, starGeometry, shipGeometry, shipMat;
+export let pendingPlanetIdToFocus = null;
+
+export function setPendingPlanetIdToFocus(id) {
+    pendingPlanetIdToFocus = id;
+}
+
+const cameraSyncBuffer = [];
+export function pushCameraSync(state) {
+    cameraSyncBuffer.push({
+        time: performance.now(),
+        state: state
+    });
+    // Keep buffer small
+    if (cameraSyncBuffer.length > 20) {
+        cameraSyncBuffer.shift();
+    }
+}
 
 export function initGeometries() {
     starTexture = createStarTexture();
@@ -95,7 +112,8 @@ export function renderStars() {
     });
 
     store.state.stars.forEach(star => {
-        if (star.isHidden && currentMode !== 'gm') return;
+        const isHidden = star.isHidden || false;
+        if (isHidden && uiCtx.getCurrentMode() !== 'gm') return;
         
         const token = star.tokenId ? store.state.tokens.find(t => t.id === star.tokenId) : null;
         const resolvedTokenUrl = token ? token.url : star.tokenUrl;
@@ -121,7 +139,7 @@ export function renderStars() {
             let geom = starGeometry;
             let mat = new THREE.MeshBasicMaterial({ 
                 color: 0xffffff,
-                transparent: star.isHidden,
+                transparent: !!star.isHidden,
                 opacity: star.isHidden ? 0.3 : 1
             });
             
@@ -129,14 +147,14 @@ export function renderStars() {
                 geom = new THREE.BoxGeometry(1.5, 1.5, 1.5);
                 mat = new THREE.MeshBasicMaterial({ 
                     color: colorHex,
-                    transparent: star.isHidden,
+                    transparent: !!star.isHidden,
                     opacity: star.isHidden ? 0.3 : 1
                 });
             } else if (star.class === 'P_DERELICT') {
                 geom = new THREE.ConeGeometry(0.8, 2, 4);
                 mat = new THREE.MeshBasicMaterial({ 
                     color: colorHex,
-                    transparent: star.isHidden,
+                    transparent: !!star.isHidden,
                     opacity: star.isHidden ? 0.3 : 1
                 });
             } else if (star.class === 'P_ANOMALY') {
@@ -229,8 +247,12 @@ export function renderShips() {
     // Group ships by coordinates to detect overlapping at stars
     const shipsAtStar = {};
     store.state.ships.forEach(ship => {
+        if (ship.x === undefined || ship.y === undefined || ship.z === undefined) return;
         const key = `${ship.x.toFixed(2)},${ship.y.toFixed(2)},${ship.z.toFixed(2)}`;
-        const star = store.state.stars.find(s => s.x.toFixed(2) === ship.x.toFixed(2) && s.y.toFixed(2) === ship.y.toFixed(2) && s.z.toFixed(2) === ship.z.toFixed(2));
+        const star = store.state.stars.find(s => 
+            s.x !== undefined && s.y !== undefined && s.z !== undefined && 
+            s.x.toFixed(2) === ship.x.toFixed(2) && s.y.toFixed(2) === ship.y.toFixed(2) && s.z.toFixed(2) === ship.z.toFixed(2)
+        );
         if (star) {
             if (!shipsAtStar[key]) shipsAtStar[key] = [];
             shipsAtStar[key].push(ship);
@@ -238,7 +260,7 @@ export function renderShips() {
     });
 
     store.state.ships.forEach(ship => {
-        if (ship.isHidden && currentMode !== 'gm') return;
+        if (ship.isHidden && uiCtx.getCurrentMode() !== 'gm') return;
         
         const token = ship.tokenId ? store.state.tokens.find(t => t.id === ship.tokenId) : null;
         const resolvedTokenUrl = token ? token.url : ship.tokenUrl;
@@ -274,7 +296,7 @@ export function renderShips() {
             }
             mesh.userData = { type: 'Ship', data: ship, hasToken: false };
         }
-        
+        if (ship.x === undefined || ship.y === undefined || ship.z === undefined) return;
         const key = `${ship.x.toFixed(2)},${ship.y.toFixed(2)},${ship.z.toFixed(2)}`;
         const orbitingShips = shipsAtStar[key];
         
@@ -340,7 +362,20 @@ export function renderShips() {
         store.state.sceneObjects[ship.name] = mesh;
     });
 }
-export function renderSystem() {
+export async function renderSystem() {
+    // Try to load predefined system data if not already loaded and not attempted
+    if (store.state.currentSystemFocus && !store.state.currentSystemFocus.planets && !store.state.currentSystemFocus._triedFetch) {
+        try {
+            const res = await fetch(`systems/${store.state.currentSystemFocus.name}.json`);
+            if (res.ok) {
+                const data = await res.json();
+                store.state.currentSystemFocus.planets = data.planets;
+                if (data.systemSeed) store.state.currentSystemFocus.systemSeed = data.systemSeed;
+            }
+        } catch (e) {}
+        store.state.currentSystemFocus._triedFetch = true;
+    }
+
     // Clear previous
     clearScene(systemScene);
 
@@ -351,28 +386,42 @@ export function renderSystem() {
     
     if (isFirstTime) {
         store.saveStars();
+        const sessionId = uiCtx.getCurrentSessionId();
+        if (sessionId) updateBackendSession(sessionId, store.state.ships);
     }
 
     // Add labels to the interactable meshes
     if (activeSystemView.userData && activeSystemView.userData.interactableMeshes) {
         activeSystemView.userData.interactableMeshes.forEach(mesh => {
-            if (mesh.userData.name && !mesh.userData.isOrbiter) {
+            if (mesh.userData.name) {
                 const labelDiv = document.createElement('div');
                 labelDiv.className = 'star-label';
                 labelDiv.textContent = mesh.userData.name;
-                labelDiv.style.color = "#FF5722";
+                
+                if (mesh.userData.isStar) {
+                    labelDiv.style.color = "#FF5722";
+                    labelDiv.style.fontSize = "16px";
+                    labelDiv.style.marginTop = "2em";
+                } else if (mesh.userData.isOrbiter) {
+                    labelDiv.style.color = "#99aaBB";
+                    labelDiv.style.fontSize = "10px";
+                    labelDiv.style.marginTop = "1em";
+                } else {
+                    labelDiv.style.color = "#FF5722";
+                    labelDiv.style.fontSize = "11px";
+                    labelDiv.style.marginTop = "1.5em";
+                }
+                
                 labelDiv.style.fontWeight = "bold";
-                labelDiv.style.fontSize = mesh.userData.isStar ? "16px" : "11px";
-                labelDiv.style.marginTop = mesh.userData.isStar ? "2em" : "1.5em";
                 labelDiv.style.pointerEvents = "auto";
                 labelDiv.style.cursor = "pointer";
+                labelDiv.style.transition = "opacity 0.2s ease";
                 
                 labelDiv.onclick = (e) => {
                     e.stopPropagation();
                     if (mesh.userData.isStar) {
                         showInfoPanel({ type: 'Star', data: store.state.currentSystemFocus });
                     } else if (mesh.userData.data) {
-                        // Make sure x/y/z are present so it doesn't crash the panel coords display
                         if (mesh.userData.data.x === undefined) {
                             mesh.userData.data.x = 0;
                             mesh.userData.data.y = 0;
@@ -385,6 +434,7 @@ export function renderSystem() {
                 const label = new CSS2DObject(labelDiv);
                 label.position.set(0, 0, 0); 
                 mesh.add(label);
+                mesh.userData.labelObject = label;
             }
         });
     }
@@ -443,7 +493,7 @@ export function renderSystem() {
         const sysZ = (store.state.currentSystemFocus.z || 0).toFixed(2);
         
         if (ship.x.toFixed(2) === sysX && ship.y.toFixed(2) === sysY && ship.z.toFixed(2) === sysZ) {
-            if (ship.isHidden && currentMode !== 'gm') return;
+            if (ship.isHidden && uiCtx.getCurrentMode() !== 'gm') return;
             
             let targetMesh = null;
             if (ship.localTarget) {
@@ -522,13 +572,35 @@ export function renderSystem() {
         }
     });
 
+    if (pendingPlanetIdToFocus && activeSystemView.userData.interactableMeshes) {
+        const targetMesh = activeSystemView.userData.interactableMeshes.find(m => {
+            if (!m.userData || !m.userData.data) return false;
+            const pid = m.userData.data.planetaryId || (store.state.currentSystemFocus.name + '-' + m.userData.data.originalName).replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            return pid === pendingPlanetIdToFocus;
+        });
+        if (targetMesh) {
+            showInfoPanel({ type: 'Planet', data: targetMesh.userData.data });
+            pendingPlanetIdToFocus = null;
+        }
+    }
+
     systemScene.add(activeSystemView);
 }
 export function enterSystem(starData) {
     store.state.currentLayer = 'SYSTEM';
     store.state.currentSystemFocus = starData;
-    currentScene = systemScene;
-    currentScene.add(camera);
+    setScene(systemScene);
+    systemScene.add(camera);
+    
+    const mode = uiCtx.getCurrentMode();
+    const sessionId = uiCtx.getCurrentSessionId();
+    const client = uiCtx.getMqttClient();
+    if (mode === 'gm' && client && sessionId) {
+        console.log(`[MQTT] Publishing layer_change to SYSTEM for star: ${starData.name}`);
+        client.publish(`vergemap/sessions/${sessionId}`, JSON.stringify({ type: 'layer_change', layer: 'SYSTEM', starName: starData.name }));
+    } else {
+        console.log(`[MQTT] Not publishing layer_change. mode=${mode}, hasClient=${!!client}, id=${sessionId}`);
+    }
     
     document.getElementById('back-to-galaxy-btn').style.display = 'inline-block';
     document.getElementById('info-panel').style.display = 'none';
@@ -585,9 +657,23 @@ export function enterSystem(starData) {
 export function exitSystem() {
     store.state.currentLayer = 'GALAXY';
     store.state.currentSystemFocus = null;
-    currentScene = galaxyScene;
-    currentScene.add(camera);
+    setScene(galaxyScene);
+    galaxyScene.add(camera);
     activeSystemView = null;
+    
+    // Clear deep link parameter so refreshing stays on the galaxy map
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('planet')) {
+        url.searchParams.delete('planet');
+        window.history.replaceState({}, '', url.toString());
+    }
+    
+    const mode = uiCtx.getCurrentMode();
+    const sessionId = uiCtx.getCurrentSessionId();
+    const client = uiCtx.getMqttClient();
+    if (mode === 'gm' && client && sessionId) {
+        client.publish(`vergemap/sessions/${sessionId}`, JSON.stringify({ type: 'layer_change', layer: 'GALAXY' }));
+    }
     
     // Restore galaxy orbit constraints
     controls.minAzimuthAngle = -Math.PI / 12;
@@ -742,23 +828,137 @@ export function recenterMap() {
     }
     requestAnimationFrame(tweenCamera);
 }
+export let isSystemAnimationPaused = false;
+export function toggleSystemAnimation() {
+    isSystemAnimationPaused = !isSystemAnimationPaused;
+}
+
+let systemAnimationTime = 0;
+let lastCameraSyncTime = 0;
+let lastCameraState = '';
+
 export function animate() {
     requestAnimationFrame(animate);
     controls.update();
 
-    if (store.state.currentLayer === 'SYSTEM' && activeSystemView && activeSystemView.userData.interactableMeshes) {
-        const time = clock.getElapsedTime();
-        activeSystemView.userData.interactableMeshes.forEach(mesh => {
-            if (mesh.userData.isOrbiter) {
-                const angle = time * mesh.userData.orbitSpeed + mesh.userData.orbitOffset;
-                mesh.position.x = Math.cos(angle) * mesh.userData.orbitRadius;
-                mesh.position.y = Math.sin(angle) * mesh.userData.orbitRadius;
-            } else if (mesh.userData.isOrbiting) {
-                const angle = time * 0.2 + mesh.userData.orbitAngle;
-                mesh.position.x = mesh.userData.orbitCenter.x + Math.cos(angle) * mesh.userData.orbitRadius;
-                mesh.position.y = mesh.userData.orbitCenter.y + Math.sin(angle) * mesh.userData.orbitRadius;
+    // Broadcast Camera Sync (GM only)
+    const mode = uiCtx.getCurrentMode();
+    const sessionId = uiCtx.getCurrentSessionId();
+    const client = uiCtx.getMqttClient();
+    
+    if (mode === 'gm' && client && sessionId) {
+        const now = Date.now();
+        if (now - lastCameraSyncTime > 50) { // Max 20 fps
+            const camState = {
+                px: Number(camera.position.x.toFixed(3)), py: Number(camera.position.y.toFixed(3)), pz: Number(camera.position.z.toFixed(3)),
+                tx: Number(controls.target.x.toFixed(3)), ty: Number(controls.target.y.toFixed(3)), tz: Number(controls.target.z.toFixed(3))
+            };
+            const stateStr = JSON.stringify(camState);
+            if (stateStr !== lastCameraState) {
+                lastCameraState = stateStr;
+                lastCameraSyncTime = now;
+                client.publish(`vergemap/sessions/${sessionId}`, JSON.stringify({
+                    type: 'camera_sync',
+                    state: camState
+                }));
             }
-        });
+        }
+    } else if (mode !== 'gm') {
+        const renderTime = performance.now() - 100; // 100ms artificial delay
+        if (cameraSyncBuffer.length > 0) {
+            let prev = null;
+            let next = null;
+            for (let i = 0; i < cameraSyncBuffer.length - 1; i++) {
+                if (cameraSyncBuffer[i].time <= renderTime && cameraSyncBuffer[i+1].time > renderTime) {
+                    prev = cameraSyncBuffer[i];
+                    next = cameraSyncBuffer[i+1];
+                    break;
+                }
+            }
+            if (prev && next) {
+                const t = (renderTime - prev.time) / (next.time - prev.time);
+                const p1 = new THREE.Vector3(prev.state.px, prev.state.py, prev.state.pz);
+                const p2 = new THREE.Vector3(next.state.px, next.state.py, next.state.pz);
+                const t1 = new THREE.Vector3(prev.state.tx, prev.state.ty, prev.state.tz);
+                const t2 = new THREE.Vector3(next.state.tx, next.state.ty, next.state.tz);
+                camera.position.lerpVectors(p1, p2, t);
+                controls.target.lerpVectors(t1, t2, t);
+            } else if (cameraSyncBuffer[cameraSyncBuffer.length - 1].time <= renderTime) {
+                // If we've passed the latest state, just lerp towards it to avoid snapping
+                const latest = cameraSyncBuffer[cameraSyncBuffer.length - 1].state;
+                const p = new THREE.Vector3(latest.px, latest.py, latest.pz);
+                const tgt = new THREE.Vector3(latest.tx, latest.ty, latest.tz);
+                camera.position.lerp(p, 0.1);
+                controls.target.lerp(tgt, 0.1);
+            }
+        }
+    }
+
+    const delta = clock.getDelta();
+
+    if (store.state.currentLayer === 'SYSTEM' && activeSystemView) {
+        if (!isSystemAnimationPaused) {
+            systemAnimationTime += delta;
+            
+            if (activeSystemView.userData.orbitBodies) {
+                activeSystemView.userData.orbitBodies.forEach(ob => {
+                    ob.orbitAngle += ob.orbitSpeed * delta;
+                    ob.mesh.position.set(
+                        ob.a * Math.cos(ob.orbitAngle) - ob.c,
+                        ob.b * Math.sin(ob.orbitAngle),
+                        0
+                    );
+                    if (!ob.isTidalLocked) {
+                        ob.mesh.rotation.z += ob.rotationSpeed * delta;
+                    }
+                    
+                    if (ob.mesh.userData.orbiters) {
+                        ob.mesh.userData.orbiters.forEach(moon => {
+                            moon.angle += moon.speed * delta;
+                            moon.mesh.position.set(
+                                Math.cos(moon.angle) * moon.dist,
+                                Math.sin(moon.angle) * moon.dist,
+                                0
+                            );
+                        });
+                    }
+                });
+            }
+            
+            if (activeSystemView.userData.beltMeshes) {
+                activeSystemView.userData.beltMeshes.forEach(belt => {
+                    belt.mesh.rotation.z += belt.speed * delta * 60;
+                });
+            }
+        }
+
+        const cameraPos = new THREE.Vector3();
+        camera.getWorldPosition(cameraPos);
+        const meshPos = new THREE.Vector3();
+
+        if (activeSystemView.userData.interactableMeshes) {
+            activeSystemView.userData.interactableMeshes.forEach(mesh => {
+                if (mesh.userData.isOrbiting) {
+                    const angle = systemAnimationTime * 0.2 + mesh.userData.orbitAngle;
+                    mesh.position.x = mesh.userData.orbitCenter.x + Math.cos(angle) * mesh.userData.orbitRadius;
+                    mesh.position.y = mesh.userData.orbitCenter.y + Math.sin(angle) * mesh.userData.orbitRadius;
+                }
+                
+                if (mesh.userData.labelObject) {
+                    mesh.getWorldPosition(meshPos);
+                    const dist = cameraPos.distanceTo(meshPos);
+                    let opacity = 1.0;
+                    if (mesh.userData.isOrbiter) {
+                        opacity = dist < 120 ? (1.0 - (dist - 60) / 60) : 0; 
+                    } else if (!mesh.userData.isStar) {
+                        opacity = dist < 450 ? (1.0 - (dist - 300) / 150) : 0; 
+                    }
+                    opacity = Math.max(0, Math.min(1, opacity));
+                    mesh.userData.labelObject.element.style.opacity = opacity;
+                    mesh.userData.labelObject.element.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
+                }
+            });
+        }
     } else if (store.state.currentLayer === 'GALAXY') {
         const time = clock.getElapsedTime();
         Object.values(store.state.sceneObjects).forEach(mesh => {

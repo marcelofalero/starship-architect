@@ -22,4 +22,5 @@ pub struct DGGSCell {
 pub struct DGGSGrid {
     pub resolution: u8,
     pub cells: Vec<DGGSCell>,
+    pub neighbors: Vec<Vec<u32>>,
 }

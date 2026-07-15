@@ -1,4 +1,4 @@
-import { decodeVMB, encodeVMB } from './vmb.js';
+import { decodeVMB, encodeVMB } from './vmb.js?v=3';
 
 const HEXMAP_WORKER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8788'
@@ -948,7 +948,14 @@ const playerFeatureActionRow = document.getElementById('player-feature-action-ro
 const featureActionBtn = document.getElementById('feature-action-btn');
 
 
-function resizeCanvas() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+function resizeCanvas() { 
+    canvas.width = canvas.clientWidth; 
+    canvas.height = canvas.clientHeight; 
+    if (typeof offsetX !== 'undefined') {
+        offsetX = canvas.width / 2;
+        offsetY = canvas.height / 2;
+    }
+}
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
@@ -995,8 +1002,8 @@ function draw() {
 
     if (!dggsData) { requestAnimationFrame(draw); return; }
 
-    // Auto-rotate
-    if (autoRotateCheckbox.checked && !isDragging) { rotY += 0.002; }
+    // Auto-rotate (only for controlling clients, viewers rely on MQTT sync)
+    if (autoRotateCheckbox.checked && !isDragging && !isViewer) { rotY += 0.002; }
 
     // Smooth zoom
     scale += (targetScale - scale) * 0.15;
@@ -1145,6 +1152,10 @@ function draw() {
             
             fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
             borderColor = `hsl(${hue}, ${sat}%, ${light - 10}%)`;
+        } else if (currentLens === 'holo') {
+            const isOcean = cell.tile.biome === 0 || cell.tile.biome === 1;
+            fillColor = isOcean ? 'rgba(0, 150, 255, 0.05)' : 'rgba(0, 229, 255, 0.05)';
+            borderColor = isOcean ? 'rgba(0, 150, 255, 0.3)' : 'rgba(0, 229, 255, 0.6)';
         } else {
             const biome = getBiomeInfo(cell.tile.biome);
             fillColor = biome.color;
@@ -1177,11 +1188,14 @@ function draw() {
         }
 
         ctx.fillStyle = group.fillColor;
+        
+        if (currentLens === 'holo') ctx.globalCompositeOperation = 'lighter';
         ctx.fill();
 
         ctx.strokeStyle = group.borderColor;
-        ctx.lineWidth = 0.4;
+        ctx.lineWidth = 0.6;
         ctx.stroke();
+        if (currentLens === 'holo') ctx.globalCompositeOperation = 'source-over';
 
         if (currentLens === 'biome' && scale > 0.6) {
             for (const b in group.biomeBuckets) {
@@ -1785,6 +1799,7 @@ function draw() {
     }
 
     ctx.restore();
+    broadcastPlanetaryState();
     requestAnimationFrame(draw);
 }
 
@@ -1873,7 +1888,7 @@ function selectCell(idx) {
     if (selectedIndices.length > 1) {
         detailTitle.textContent = `${selectedIndices.length} Cells Selected`;
     } else {
-        detailTitle.textContent = `Cell #${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
+        detailTitle.textContent = `Sector ${idx}`;
     }
 
     // Address
@@ -2164,12 +2179,14 @@ async function loadDGGS(seed, type, resolution, urbanization = 15, pollution = 1
 
 // ── Event Handlers ──
 canvas.addEventListener('mousedown', (e) => {
+    if (isViewer) return;
     isDragging = true; hasMoved = false;
     dragStartX = e.clientX; dragStartY = e.clientY;
     lastMouseX = e.clientX; lastMouseY = e.clientY;
 });
 
 canvas.addEventListener('mousemove', (e) => {
+    if (isViewer) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
 
@@ -2190,7 +2207,7 @@ canvas.addEventListener('mousemove', (e) => {
         const cell = dggsData.cells[idx];
         const planetType = dggsData.metadata?.type || 'terrestrial';
         const biome = getBiomeInfo(cell.tile.biome);
-        tooltip.innerHTML = `<strong>Cell #${idx}</strong> (${cell.sides === 5 ? 'Pent' : 'Hex'})<br><strong>Biome:</strong> ${biome.name}<br><strong>Elev:</strong> ${cell.tile.elevation} <strong>Moist:</strong> ${cell.tile.moisture}`;
+        tooltip.innerHTML = `<strong>Sector ${idx}</strong> (${cell.sides === 5 ? 'Pent' : 'Hex'})<br><strong>Biome:</strong> ${biome.name}<br><strong>Elev:</strong> ${cell.tile.elevation} <strong>Moist:</strong> ${cell.tile.moisture}`;
         tooltip.style.left = `${e.clientX + 15}px`;
         tooltip.style.top = `${e.clientY + 15}px`;
         tooltip.style.display = 'block';
@@ -2235,6 +2252,7 @@ function getPathCells(startIdx, endIdx) {
 }
 
 canvas.addEventListener('mouseup', (e) => {
+    if (isViewer) return;
     isDragging = false;
     if (!hasMoved) {
         const rect = canvas.getBoundingClientRect();
@@ -2278,6 +2296,7 @@ canvas.addEventListener('mouseup', (e) => {
 canvas.addEventListener('mouseleave', () => { isDragging = false; hoveredIdx = -1; tooltip.style.display = 'none'; });
 
 canvas.addEventListener('wheel', (e) => {
+    if (isViewer) return;
     e.preventDefault();
     const zf = e.deltaY < 0 ? 1.12 : 0.88;
     targetScale = Math.max(0.3, Math.min(5.0, targetScale * zf));
@@ -2433,17 +2452,144 @@ const pollParam = urlParams.get('pollution') !== null ? parseInt(urlParams.get('
 const consParam = urlParams.get('conservation') !== null ? parseInt(urlParams.get('conservation')) : 0;
 const planetParam = urlParams.get('planet') || '';
 
-const sessionParam = urlParams.get('session');
+let currentSessionId = urlParams.get('session_id') || null;
+let sessionParam = urlParams.get('session');
+
+// Fallback to sessionStorage if not in URL
+if (!sessionParam) {
+    sessionParam = sessionStorage.getItem('vergeMapSessionToken');
+}
+
 if (sessionParam) {
     const decoded = decodeToken(sessionParam);
     if (decoded && decoded.role) {
         userRole = decoded.role.toLowerCase();
+        if (decoded.session_id) currentSessionId = decoded.session_id;
+        // Persist back to sessionStorage just in case
+        sessionStorage.setItem('vergeMapSessionToken', sessionParam);
+    } else {
+        sessionStorage.removeItem('vergeMapSessionToken');
     }
 } else {
     const roleParam = urlParams.get('role') || 'player';
     userRole = roleParam.toLowerCase();
 }
 originalRole = userRole;
+
+const isViewer = userRole === 'viewer' || userRole === 'ro';
+
+if (isViewer) {
+    document.getElementById('control-panel').style.display = 'none';
+    document.getElementById('lens-bar').style.display = 'none';
+    document.getElementById('toggle-sidebar-btn').style.display = 'none';
+    document.getElementById('back-to-system-btn').style.display = 'none';
+    const gmToggle = document.getElementById('gm-toggle-container');
+    if (gmToggle) gmToggle.style.display = 'none';
+}
+
+const nameParam = urlParams.get('name') || '';
+
+if (nameParam) {
+    const titleEl = document.getElementById('app-title-name');
+    if (titleEl) titleEl.textContent = nameParam.toUpperCase();
+}
+
+let mqttClient = null;
+let lastSyncTime = 0;
+let lastSyncState = '';
+
+if (currentSessionId && typeof mqtt !== 'undefined') {
+    const brokerUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? `ws://${window.location.hostname}:9001`
+        : `wss://broker.hivemq.com:8884/mqtt`;
+    mqttClient = mqtt.connect(brokerUrl);
+    
+    mqttClient.on('connect', () => {
+        if (isViewer) {
+            mqttClient.subscribe(`vergemap/sessions/${currentSessionId}/planetary`);
+        }
+    });
+
+    if (isViewer) {
+        mqttClient.on('message', (topic, msg) => {
+            try {
+                const data = JSON.parse(msg.toString());
+                if (data.type === 'layer_change' && data.layer === 'SYSTEM') {
+                    if (data.url) window.location.href = data.url;
+                    return;
+                }
+                
+                if (data.type === 'planetary_sync') {
+                    rotX = data.rotX;
+                    rotY = data.rotY;
+                    scale = data.scale;
+                    targetScale = data.scale;
+                    
+                    if (currentLens !== data.currentLens) {
+                        currentLens = data.currentLens;
+                        updateColors();
+                    }
+                    
+                    if (data.selectedIdx !== selectedIdx || JSON.stringify(data.selectedIndices) !== JSON.stringify(selectedIndices)) {
+                        selectedIndices = data.selectedIndices || [];
+                        selectCell(data.selectedIdx);
+                    }
+                    
+                    hoveredIdx = data.hoveredIdx;
+                    
+                    // Force immediate redraw to prevent smearing
+                    ctx.setTransform(1, 0, 0, 1, 0, 0); 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            } catch (e) {}
+        });
+    }
+}
+
+function broadcastPlanetaryState() {
+    if (userRole === 'gm' && mqttClient && currentSessionId) {
+        const now = Date.now();
+        if (now - lastSyncTime > 50) { // Max 20fps updates
+            lastSyncTime = now;
+            const stateObj = {
+                type: 'planetary_sync',
+                rotX, rotY, scale, offsetX, offsetY, currentLens, selectedIdx, selectedIndices, hoveredIdx
+            };
+            const stateStr = JSON.stringify(stateObj);
+            if (stateStr !== lastSyncState) {
+                lastSyncState = stateStr;
+                mqttClient.publish(`vergemap/sessions/${currentSessionId}/planetary`, stateStr);
+            }
+        }
+    }
+}
+
+const backBtn = document.getElementById('back-to-system-btn');
+if (backBtn) {
+    backBtn.onclick = () => {
+        let url = '../index.html';
+        const params = new URLSearchParams();
+        if (planetParam) params.append('planet', planetParam);
+        
+        const queryString = params.toString();
+        if (queryString) {
+            url += '?' + queryString;
+        }
+        
+        if (userRole === 'gm' && mqttClient && currentSessionId) {
+            let safeUrl = '../index.html';
+            if (planetParam) safeUrl += `?planet=${encodeURIComponent(planetParam)}&role=ro`;
+            else safeUrl += `?role=ro`;
+            
+            mqttClient.publish(`vergemap/sessions/${currentSessionId}/planetary`, JSON.stringify({ type: 'layer_change', layer: 'SYSTEM', url: safeUrl }), { qos: 1 }, () => {
+                setTimeout(() => { window.location.href = url; }, 100);
+            });
+            setTimeout(() => { window.location.href = url; }, 1000);
+            return;
+        }
+        window.location.href = url;
+    };
+}
 
 // ── Control Panel Tab System ──
 const controlTabButtons = document.querySelectorAll('.control-tab-btn');
@@ -2586,8 +2732,11 @@ const copyStatus = document.getElementById('copy-status');
 if (copyShareBtn) {
     copyShareBtn.addEventListener('click', () => {
         const url = new URL(window.location.href);
-        url.searchParams.delete('role');
         url.searchParams.delete('session');
+        url.searchParams.set('role', 'viewer');
+        if (currentSessionId) {
+            url.searchParams.set('session_id', currentSessionId);
+        }
         navigator.clipboard.writeText(url.toString())
             .then(() => {
                 if (copyStatus) {
@@ -3073,215 +3222,4 @@ window.triggerSelectCell = (idx, ctrlKey = false, shiftKey = false) => {
         selectCell(idx);
     }
 };
-
-// ── Session & Planet Navigation ──
-let currentSessionData = null;
-let currentPlanetList = [];
-let currentPlanetIndex = -1;
-
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? '' // Local NGINX proxy handles API requests
-    : (window.location.hostname === 'starship.dimble.net' || window.location.hostname === 'starship-architect.pages.dev')
-        ? 'https://sa-backend.mafalero.workers.dev'
-        : 'https://sa-backend-dev.mafalero.workers.dev';
-
-async function loadSessionAndSetupNavigation() {
-    const sessionParam = urlParams.get('session');
-    if (!sessionParam) {
-        loadFallbackNavigation();
-        return;
-    }
-    
-    const decoded = decodeToken(sessionParam);
-    if (!decoded || !decoded.session_id) {
-        loadFallbackNavigation();
-        return;
-    }
-    
-    try {
-        const headers = {};
-        if (sessionParam) {
-            headers['Authorization'] = `Bearer ${sessionParam}`;
-        }
-        const res = await fetch(`${API_BASE}/sessions/${decoded.session_id}`, {
-            headers: headers
-        });
-        if (!res.ok) {
-            loadFallbackNavigation();
-            return;
-        }
-        const data = await res.json();
-        currentSessionData = data.data; // { stars, ships, logs, tokens }
-        
-        setupPlanetNavigation();
-    } catch (e) {
-        console.error("Failed to load session for navigation:", e);
-        loadFallbackNavigation();
-    }
-}
-
-function loadFallbackNavigation() {
-    try {
-        const cached = localStorage.getItem('vergeMapStars');
-        if (cached) {
-            currentSessionData = { stars: JSON.parse(cached) };
-            setupPlanetNavigation();
-        } else {
-            updateNavigationButtons();
-        }
-    } catch (e) {
-        updateNavigationButtons();
-    }
-}
-
-function setupPlanetNavigation() {
-    if (!currentSessionData || !currentSessionData.stars || !planetParam) {
-        updateNavigationButtons();
-        return;
-    }
-    
-    let foundStar = null;
-    let foundPlanetIdx = -1;
-    
-    for (const star of currentSessionData.stars) {
-        if (star.planets) {
-            const idx = star.planets.findIndex(p => p.hexmapId === planetParam);
-            if (idx !== -1) {
-                foundStar = star;
-                foundPlanetIdx = idx;
-                break;
-            }
-        }
-    }
-    
-    if (!foundStar) {
-        updateNavigationButtons();
-        return;
-    }
-    
-    currentPlanetList = foundStar.planets;
-    currentPlanetIndex = foundPlanetIdx;
-    updateNavigationButtons();
-}
-
-function goBackToSystem() {
-    const session = urlParams.get('session') || '';
-    const planetId = planetParam || '';
-    let backUrl = '../index.html';
-    const params = [];
-    if (session) params.push(`session=${session}`);
-    if (planetId) params.push(`planet=${planetId}`);
-    if (params.length > 0) backUrl += '?' + params.join('&');
-    window.location.href = backUrl;
-}
-
-async function saveSessionProgress() {
-    if (!currentSessionData) return;
-    
-    // Save to localStorage
-    try {
-        localStorage.setItem('vergeMapStars', JSON.stringify(currentSessionData.stars));
-    } catch (e) {}
-    
-    // Save to backend if GM
-    const sessionParam = urlParams.get('session');
-    if (!sessionParam) return;
-    
-    const decoded = decodeToken(sessionParam);
-    if (decoded && decoded.role === 'gm') {
-        try {
-            await fetch(`${API_BASE}/sessions/${decoded.session_id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionParam}`
-                },
-                body: JSON.stringify({
-                    name: 'Verge Map Session',
-                    visibility: 'public',
-                    data: {
-                        ships: currentSessionData.ships || [],
-                        stars: currentSessionData.stars,
-                        logs: currentSessionData.logs || [],
-                        tokens: currentSessionData.tokens || []
-                    }
-                })
-            });
-        } catch (e) {
-            console.error("Failed to update backend session from hexmap:", e);
-        }
-    }
-}
-
-function navigateToPlanet(planet) {
-    const seed = planet.name.replace(/\s+/g, '_');
-    const type = (planet.subtype || planet.type || 'terrestrial').toLowerCase();
-    const resolution = planet.subtype === 'Gas Giant' ? 3 : 4;
-    const physicalRadius = planet.physicalRadius || 6000;
-    const planetId = planet.hexmapId;
-    const session = urlParams.get('session') || '';
-    
-    planet.hexmapGenerated = true;
-    saveSessionProgress();
-    
-    const nextUrl = new URL(window.location.href);
-    nextUrl.searchParams.set('seed', seed);
-    nextUrl.searchParams.set('type', type);
-    nextUrl.searchParams.set('resolution', resolution);
-    nextUrl.searchParams.set('planet', planetId);
-    if (session) nextUrl.searchParams.set('session', session);
-    
-    // Clear dynamic params to allow loading fresh metadata/generation defaults
-    nextUrl.searchParams.delete('urbanization');
-    nextUrl.searchParams.delete('pollution');
-    nextUrl.searchParams.delete('conservation');
-    
-    window.location.href = nextUrl.toString();
-}
-
-function updateNavigationButtons() {
-    const backBtn = document.getElementById('nav-back-btn');
-    const prevBtn = document.getElementById('nav-prev-btn');
-    const nextBtn = document.getElementById('nav-next-btn');
-    
-    if (backBtn) {
-        backBtn.onclick = goBackToSystem;
-    }
-    
-    if (prevBtn) {
-        if (currentPlanetList.length > 1 && currentPlanetIndex > 0) {
-            prevBtn.disabled = false;
-            prevBtn.style.opacity = '1';
-            prevBtn.style.cursor = 'pointer';
-            prevBtn.onclick = () => {
-                navigateToPlanet(currentPlanetList[currentPlanetIndex - 1]);
-            };
-        } else {
-            prevBtn.disabled = true;
-            prevBtn.style.opacity = '0.4';
-            prevBtn.style.cursor = 'not-allowed';
-            prevBtn.onclick = null;
-        }
-    }
-    
-    if (nextBtn) {
-        if (currentPlanetList.length > 1 && currentPlanetIndex < currentPlanetList.length - 1) {
-            nextBtn.disabled = false;
-            nextBtn.style.opacity = '1';
-            nextBtn.style.cursor = 'pointer';
-            nextBtn.onclick = () => {
-                navigateToPlanet(currentPlanetList[currentPlanetIndex + 1]);
-            };
-        } else {
-            nextBtn.disabled = true;
-            nextBtn.style.opacity = '0.4';
-            nextBtn.style.cursor = 'not-allowed';
-            nextBtn.onclick = null;
-        }
-    }
-}
-
-// Trigger setup on load
-loadSessionAndSetupNavigation();
-
 

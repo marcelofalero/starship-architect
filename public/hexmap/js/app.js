@@ -1,4 +1,4 @@
-import { decodeVMB, encodeVMB } from './vmb.js';
+import { decodeVMB, encodeVMB } from './vmb.js?v=2';
 
 const HEXMAP_WORKER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8788'
@@ -995,8 +995,8 @@ function draw() {
 
     if (!dggsData) { requestAnimationFrame(draw); return; }
 
-    // Auto-rotate
-    if (autoRotateCheckbox.checked && !isDragging) { rotY += 0.002; }
+    // Auto-rotate (only for controlling clients, viewers rely on MQTT sync)
+    if (autoRotateCheckbox.checked && !isDragging && !isViewer) { rotY += 0.002; }
 
     // Smooth zoom
     scale += (targetScale - scale) * 0.15;
@@ -1145,6 +1145,10 @@ function draw() {
             
             fillColor = `hsl(${hue}, ${sat}%, ${light}%)`;
             borderColor = `hsl(${hue}, ${sat}%, ${light - 10}%)`;
+        } else if (currentLens === 'holo') {
+            const isOcean = cell.tile.biome === 0 || cell.tile.biome === 1;
+            fillColor = isOcean ? 'rgba(0, 150, 255, 0.05)' : 'rgba(0, 229, 255, 0.05)';
+            borderColor = isOcean ? 'rgba(0, 150, 255, 0.3)' : 'rgba(0, 229, 255, 0.6)';
         } else {
             const biome = getBiomeInfo(cell.tile.biome);
             fillColor = biome.color;
@@ -1177,11 +1181,14 @@ function draw() {
         }
 
         ctx.fillStyle = group.fillColor;
+        
+        if (currentLens === 'holo') ctx.globalCompositeOperation = 'lighter';
         ctx.fill();
 
         ctx.strokeStyle = group.borderColor;
-        ctx.lineWidth = 0.4;
+        ctx.lineWidth = 0.6;
         ctx.stroke();
+        if (currentLens === 'holo') ctx.globalCompositeOperation = 'source-over';
 
         if (currentLens === 'biome' && scale > 0.6) {
             for (const b in group.biomeBuckets) {
@@ -1785,6 +1792,7 @@ function draw() {
     }
 
     ctx.restore();
+    broadcastHexmapState();
     requestAnimationFrame(draw);
 }
 
@@ -1873,7 +1881,7 @@ function selectCell(idx) {
     if (selectedIndices.length > 1) {
         detailTitle.textContent = `${selectedIndices.length} Cells Selected`;
     } else {
-        detailTitle.textContent = `Cell #${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
+        detailTitle.textContent = `Sector ${idx} (${cell.sides === 5 ? 'Pentagon' : 'Hexagon'})`;
     }
 
     // Address
@@ -2164,12 +2172,14 @@ async function loadDGGS(seed, type, resolution, urbanization = 15, pollution = 1
 
 // ── Event Handlers ──
 canvas.addEventListener('mousedown', (e) => {
+    if (isViewer) return;
     isDragging = true; hasMoved = false;
     dragStartX = e.clientX; dragStartY = e.clientY;
     lastMouseX = e.clientX; lastMouseY = e.clientY;
 });
 
 canvas.addEventListener('mousemove', (e) => {
+    if (isViewer) return;
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
 
@@ -2190,7 +2200,7 @@ canvas.addEventListener('mousemove', (e) => {
         const cell = dggsData.cells[idx];
         const planetType = dggsData.metadata?.type || 'terrestrial';
         const biome = getBiomeInfo(cell.tile.biome);
-        tooltip.innerHTML = `<strong>Cell #${idx}</strong> (${cell.sides === 5 ? 'Pent' : 'Hex'})<br><strong>Biome:</strong> ${biome.name}<br><strong>Elev:</strong> ${cell.tile.elevation} <strong>Moist:</strong> ${cell.tile.moisture}`;
+        tooltip.innerHTML = `<strong>Sector ${idx}</strong> (${cell.sides === 5 ? 'Pent' : 'Hex'})<br><strong>Biome:</strong> ${biome.name}<br><strong>Elev:</strong> ${cell.tile.elevation} <strong>Moist:</strong> ${cell.tile.moisture}`;
         tooltip.style.left = `${e.clientX + 15}px`;
         tooltip.style.top = `${e.clientY + 15}px`;
         tooltip.style.display = 'block';
@@ -2235,6 +2245,7 @@ function getPathCells(startIdx, endIdx) {
 }
 
 canvas.addEventListener('mouseup', (e) => {
+    if (isViewer) return;
     isDragging = false;
     if (!hasMoved) {
         const rect = canvas.getBoundingClientRect();
@@ -2278,6 +2289,7 @@ canvas.addEventListener('mouseup', (e) => {
 canvas.addEventListener('mouseleave', () => { isDragging = false; hoveredIdx = -1; tooltip.style.display = 'none'; });
 
 canvas.addEventListener('wheel', (e) => {
+    if (isViewer) return;
     e.preventDefault();
     const zf = e.deltaY < 0 ? 1.12 : 0.88;
     targetScale = Math.max(0.3, Math.min(5.0, targetScale * zf));
@@ -2433,17 +2445,113 @@ const pollParam = urlParams.get('pollution') !== null ? parseInt(urlParams.get('
 const consParam = urlParams.get('conservation') !== null ? parseInt(urlParams.get('conservation')) : 0;
 const planetParam = urlParams.get('planet') || '';
 
+let currentSessionId = urlParams.get('session_id') || null;
 const sessionParam = urlParams.get('session');
 if (sessionParam) {
     const decoded = decodeToken(sessionParam);
     if (decoded && decoded.role) {
         userRole = decoded.role.toLowerCase();
+        if (decoded.session_id) currentSessionId = decoded.session_id;
     }
 } else {
     const roleParam = urlParams.get('role') || 'player';
     userRole = roleParam.toLowerCase();
 }
 originalRole = userRole;
+
+const isViewer = userRole === 'viewer' || userRole === 'ro';
+
+if (isViewer) {
+    document.getElementById('control-panel').style.display = 'none';
+    document.getElementById('lens-bar').style.display = 'none';
+    document.getElementById('toggle-sidebar-btn').style.display = 'none';
+    document.getElementById('back-to-system-btn').style.display = 'none';
+    const gmToggle = document.getElementById('gm-toggle-container');
+    if (gmToggle) gmToggle.style.display = 'none';
+}
+
+const nameParam = urlParams.get('name') || '';
+
+if (nameParam) {
+    const titleEl = document.getElementById('app-title-name');
+    if (titleEl) titleEl.textContent = nameParam.toUpperCase();
+}
+
+let mqttClient = null;
+let lastSyncTime = 0;
+let lastSyncState = '';
+
+if (currentSessionId && typeof mqtt !== 'undefined') {
+    const brokerUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? `ws://${window.location.hostname}:9001`
+        : `wss://broker.hivemq.com:8884/mqtt`;
+    mqttClient = mqtt.connect(brokerUrl);
+    
+    mqttClient.on('connect', () => {
+        if (isViewer) {
+            mqttClient.subscribe(`vergemap/sessions/${currentSessionId}/hexmap`);
+        }
+    });
+
+    if (isViewer) {
+        mqttClient.on('message', (topic, msg) => {
+            try {
+                const data = JSON.parse(msg.toString());
+                if (data.type === 'hexmap_sync') {
+                    rotX = data.rotX;
+                    rotY = data.rotY;
+                    scale = data.scale;
+                    targetScale = data.scale;
+                    offsetX = data.offsetX;
+                    offsetY = data.offsetY;
+                    
+                    if (currentLens !== data.currentLens) {
+                        currentLens = data.currentLens;
+                        updateColors();
+                    }
+                    
+                    if (data.selectedIdx !== selectedIdx || JSON.stringify(data.selectedIndices) !== JSON.stringify(selectedIndices)) {
+                        selectedIndices = data.selectedIndices || [];
+                        selectCell(data.selectedIdx);
+                    }
+                    
+                    hoveredIdx = data.hoveredIdx;
+                    
+                    // Force immediate redraw to prevent smearing
+                    ctx.setTransform(1, 0, 0, 1, 0, 0); 
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            } catch (e) {}
+        });
+    }
+}
+
+function broadcastHexmapState() {
+    if (userRole === 'gm' && mqttClient && currentSessionId) {
+        const now = Date.now();
+        if (now - lastSyncTime > 50) { // Max 20fps updates
+            lastSyncTime = now;
+            const stateObj = {
+                type: 'hexmap_sync',
+                rotX, rotY, scale, offsetX, offsetY, currentLens, selectedIdx, selectedIndices, hoveredIdx
+            };
+            const stateStr = JSON.stringify(stateObj);
+            if (stateStr !== lastSyncState) {
+                lastSyncState = stateStr;
+                mqttClient.publish(`vergemap/sessions/${currentSessionId}/hexmap`, stateStr);
+            }
+        }
+    }
+}
+
+const backBtn = document.getElementById('back-to-system-btn');
+if (backBtn) {
+    backBtn.onclick = () => {
+        let url = '../index.html';
+        if (planetParam) url += `?planet=${encodeURIComponent(planetParam)}`;
+        window.location.href = url;
+    };
+}
 
 // ── Control Panel Tab System ──
 const controlTabButtons = document.querySelectorAll('.control-tab-btn');
@@ -2586,8 +2694,11 @@ const copyStatus = document.getElementById('copy-status');
 if (copyShareBtn) {
     copyShareBtn.addEventListener('click', () => {
         const url = new URL(window.location.href);
-        url.searchParams.delete('role');
         url.searchParams.delete('session');
+        url.searchParams.set('role', 'viewer');
+        if (currentSessionId) {
+            url.searchParams.set('session_id', currentSessionId);
+        }
         navigator.clipboard.writeText(url.toString())
             .then(() => {
                 if (copyStatus) {

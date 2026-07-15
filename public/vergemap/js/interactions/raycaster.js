@@ -34,5 +34,9 @@ export function onPointerDown(event, activeSystemView) {
     if (intersects.length > 0) {
         const selectedMesh = intersects[0].object;
         showInfoPanel(selectedMesh.userData);
+    } else if (store.state.currentLayer === 'SYSTEM') {
+        import('../renderer/scene.js').then(module => {
+            module.toggleSystemAnimation();
+        });
     }
 }

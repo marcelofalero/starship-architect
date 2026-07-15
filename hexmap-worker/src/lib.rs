@@ -6,6 +6,7 @@ pub mod cache;
 pub mod routes;
 
 use worker::*;
+use serde_json::json;
 
 #[event(fetch)]
 async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {

@@ -21,6 +21,7 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
+    <div id="mode-indicator" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000; font-size: 0.65em; padding: 3px 8px; border-radius: 4px; background: rgba(0,0,0,0.4); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1); font-family: monospace; text-transform: uppercase; pointer-events: none;">PLAYER</div>
 
     <div id="ui-layer">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
@@ -31,11 +32,19 @@
             </select>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h2 style="margin: 0;" data-i18n="title">The Verge Map</h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h2 style="margin: 0;" data-i18n="title">The Verge Map</h2>
+                <div id="mode-indicator" style="display: none; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold; color: white;" title="Session Role"></div>
+            </div>
             <div style="display: flex; gap: 5px;">
                 <button id="log-btn" data-i18n-title="logBtn" title="Movement Log" style="padding: 5px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </button>
+                <button id="pres-btn" data-i18n-title="presBtn" title="Start Presentation" style="padding: 5px; cursor: pointer; background: #9b59b6; border: none; color: white; border-radius: 4px; display: none; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v7A1.5 1.5 0 0 0 1.5 12h5v2H4a.5.5 0 0 0-.5.5v.5h9v-.5a.5.5 0 0 0-.5-.5h-2.5v-2h5a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 14.5 2h-13z"/>
                     </svg>
                 </button>
                 <button id="share-btn" data-i18n-title="shareBtn" title="Share Link" style="padding: 5px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
@@ -159,6 +168,13 @@
         <p class="info-meta"><span data-i18n="infoClass">Class</span>: <span id="info-class"></span></p>
         <p class="info-meta" id="info-owner-group"><span data-i18n="ownerLabel">Owner</span>: <span id="info-owner"></span></p>
         <p class="info-meta"><span data-i18n="infoCoords">Coords</span>: <span id="info-coords"></span></p>
+        <p class="info-meta" id="info-seed-group" style="display: none;">
+            <span data-i18n="infoSeed">Seed</span>: 
+            <span id="info-seed-display" style="font-family: monospace; color: #aaa;"></span>
+            <input type="text" id="info-seed-input" style="display: none; width: 120px; padding: 2px; margin-left: 5px; background: #222; color: #fff; border: 1px solid #444;" />
+            <button id="info-seed-edit-btn" style="padding: 2px 5px; margin-left: 5px; font-size: 10px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 2px;">Edit</button>
+            <button id="info-seed-save-btn" style="display: none; padding: 2px 5px; margin-left: 5px; font-size: 10px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 2px;">Save</button>
+        </p>
         <div id="info-desc"></div>
         <div id="info-public-notes" style="margin-top: 10px; font-size: 12px; color: #aaddff;"></div>
         <div id="info-private-notes" style="margin-top: 10px; font-size: 12px; color: #ffaa55; display: none;"></div>
@@ -478,15 +494,7 @@
                 </div>
             </div>
             
-            <div style="margin-bottom: 15px;">
-                <label style="color: #bbb;" data-i18n="viewerLink">Viewer Link (Read-Only Spectator Access)</label>
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <input type="text" id="share-viewer-url" readonly style="margin-bottom: 0;">
-                    <button class="share-copy-btn" data-target="share-viewer-url" style="width: auto; padding: 10px;" data-i18n="copyBtn">Copy</button>
-                    <button class="share-native-btn" data-role="Viewer" data-target="share-viewer-url" style="width: auto; padding: 10px; display: none;" data-i18n="shareBtnLabel">Share</button>
-                </div>
-            </div>
-            
+
             <div id="fallback-share-actions" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center; border-top: 1px solid #0A3D54; padding-top: 15px;">
                 <a id="share-whatsapp-btn" target="_blank" class="btn-like" style="font-size: 0.85em; padding: 8px; text-decoration: none;" data-i18n="shareWhatsApp">Share Player Link via WhatsApp</a>
                 <a id="share-email-btn" class="btn-like" style="font-size: 0.85em; padding: 8px; text-decoration: none;" data-i18n="shareEmail">Share Player Link via Email</a>
@@ -522,9 +530,13 @@
                     <option value="Viable">Viable Gen</option>
                     <option value="ViableHigh">High-Tech Gen</option>
                 </select>
-                <button id="regenerate-system-btn" style="width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: inline-flex; align-items: center; justify-content: center; gap: 8px;" title="Regenerate Procedural System">
+                <button id="regenerate-system-btn" style="width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;" title="Regenerate Procedural System">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                     Regenerate System
+                </button>
+                <button id="reset-system-default-btn" style="width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid #c97f1e; background: #c97f1e; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: inline-flex; align-items: center; justify-content: center; gap: 8px;" title="Reset System to Default">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M2 12a10 10 0 1 0 10-10"></path><polyline points="12 2 12 12 16 14"></polyline></svg>
+                    Reset System to Default
                 </button>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">

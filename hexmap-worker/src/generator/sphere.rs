@@ -13,7 +13,7 @@ pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f
 
     // Step 3: Assign tile data to each cell based on its spherical position
     let mut cells: Vec<DGGSCell> = cells_raw.into_iter().enumerate().map(|(i, (center, boundary))| {
-        let tile = generate_tile_for_position(seed, planet_type, 0.0, pollution, conservation, center, i);
+        let tile = generate_tile_for_position(seed, planet_type, center, i, urban_pct);
         DGGSCell { center, vertices: boundary, tile }
     }).collect();
 
@@ -189,9 +189,7 @@ pub fn generate_dggs(seed: &str, planet_type: &str, resolution: u8, urban_pct: f
         addresses.push(address);
     }
 
-    let rivers = generate_rivers(&cells, &cell_neighbors);
-
-    DGGSGrid { resolution, cells, neighbors: cell_neighbors, addresses, rivers }
+    DGGSGrid { resolution, cells, neighbors: cell_neighbors }
 }
 
 /// Build a subdivided icosphere. Returns (vertices, triangle_faces, face_paths).
@@ -511,7 +509,7 @@ fn resolve_whittaker_biome(planet_type: &str, elevation: u8, moisture: u8, temp:
 }
 
 /// Generate tile data for a DGGS cell based on its position on the unit sphere.
-fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx: usize) -> Tile {
+fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx: usize, urban_pct: f64) -> Tile {
     // Use spherical coordinates for deterministic seeding
     let lat = pos.y.asin();
     let lon = pos.z.atan2(pos.x);
@@ -519,13 +517,24 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
     let lon_i = ((lon + std::f64::consts::PI) * 1000.0) as i32;
 
     let mut rng = Rng::new(&format!("{}-{}-{}-{}", seed, planet_type, lat_i, lon_i));
-    let n1 = rng.next();
-    let n2 = rng.next();
-    let n3 = rng.next();
 
-    let mut biome: u8;
-    let mut elevation: u8;
-    let mut moisture: u8;
+    let mut seed_hash: u32 = 0;
+    for c in seed.chars() {
+        seed_hash = seed_hash.wrapping_mul(31).wrapping_add(c as u32);
+    }
+    
+    let e_noise = fbm3d(V3::new(pos.x * 2.0, pos.y * 2.0, pos.z * 2.0), 4, seed_hash);
+    let mut e = e_noise;
+    
+    let m_noise = fbm3d(V3::new(pos.x * 2.5, pos.y * 2.5, pos.z * 2.5), 3, seed_hash.wrapping_add(1000));
+    let mut m = m_noise;
+    
+    let local_noise = fbm3d(V3::new(pos.x * 5.0, pos.y * 5.0, pos.z * 5.0), 2, seed_hash.wrapping_add(2000));
+    let abs_lat = pos.y.asin().abs();
+    
+    let mut temp_scale = 1.0;
+    let mut temp_bias = 0.0;
+    let mut is_eyeball = false;
 
     match planet_type {
         "desert" => {
@@ -649,7 +658,7 @@ fn generate_tile_for_position(seed: &str, planet_type: &str, pos: V3, _cell_idx:
     if is_resource {
         // Highly valuable resources attract corporate and government mining/research towns.
         // We massively boost the suitability of this specific hex.
-        urb_suitability = (urb_suitability * 4.0).max(2.5);
+        urb_suitability = (urb_suitability * 4.0_f64).max(2.5_f64);
     }
     
     let mut faction_threshold = base_threshold * 0.4;

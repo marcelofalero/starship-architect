@@ -5,7 +5,7 @@ use serde_json::json;
 use crate::cache::{get_map, set_map};
 use crate::generator::sphere::generate_dggs;
 use crate::generator::flat::generate_tiles;
-use crate::format::vrgd::encode_dggs_vmb;
+use crate::format::vrgd::{encode_dggs_vmb, update_vrgd_metadata};
 use crate::format::vmb::{encode_vmb, decode_vmb, DecodedVMB};
 
 pub fn setup_router() -> Router<'static, ()> {
@@ -17,12 +17,17 @@ pub fn setup_router() -> Router<'static, ()> {
 
             let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
             let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
+            let urbanization: f64 = query.get("urbanization").and_then(|s| s.parse().ok()).unwrap_or(79.0);
+            let pollution: f64 = query.get("pollution").and_then(|s| s.parse().ok()).unwrap_or(100.0);
+            let conservation: f64 = query.get("conservation").and_then(|s| s.parse().ok()).unwrap_or(0.0);
 
             if resolution > 6 {
                 return Response::error("Resolution must be 0-6", 400);
             }
 
-            let cache_key = format!("dggs:{}:{}:{}", seed, planet_type, resolution);
+            let cache_key = format!("dggs:{}:{}:{}:{}:{}:{}", seed, planet_type, resolution, urbanization, pollution, conservation);
+            println!("GET Cache Key: {}", cache_key);
+
             let mut headers = Headers::new();
             headers.set("Access-Control-Allow-Origin", "*")?;
             headers.set("Content-Type", "application/octet-stream")?;
@@ -31,12 +36,16 @@ pub fn setup_router() -> Router<'static, ()> {
                 return Ok(Response::from_bytes(binary)?.with_headers(headers));
             }
 
-            let grid = generate_dggs(&seed, planet_type, resolution);
+            let grid = generate_dggs(&seed, planet_type, resolution, urbanization, pollution, conservation);
             let metadata = json!({
                 "seed": seed,
                 "type": planet_type,
                 "resolution": resolution,
+                "urbanization": urbanization,
+                "pollution": pollution,
+                "conservation": conservation,
                 "cellCount": grid.cells.len(),
+                "neighbors": grid.neighbors,
                 "generatedAt": Date::now().to_string()
             });
 
@@ -89,6 +98,53 @@ pub fn setup_router() -> Router<'static, ()> {
             set_map(&ctx.env, &cache_key, binary.clone()).await?;
 
             Ok(Response::from_bytes(binary)?.with_headers(headers))
+        })
+        .post_async("/planet/:seed/dggs", |mut req, ctx| async move {
+            let seed = ctx.param("seed").unwrap().to_string();
+            let url = req.url()?;
+            let query: HashMap<String, String> = url.query_pairs().into_owned().collect();
+
+            let planet_type = query.get("type").map(|s| s.as_str()).unwrap_or("terrestrial");
+            let resolution: u8 = query.get("resolution").and_then(|s| s.parse().ok()).unwrap_or(4);
+            let urbanization: f64 = query.get("urbanization").and_then(|s| s.parse().ok()).unwrap_or(79.0);
+            let pollution: f64 = query.get("pollution").and_then(|s| s.parse().ok()).unwrap_or(100.0);
+            let conservation: f64 = query.get("conservation").and_then(|s| s.parse().ok()).unwrap_or(0.0);
+
+            let cache_key = format!("dggs:{}:{}:{}:{}:{}:{}", seed, planet_type, resolution, urbanization, pollution, conservation);
+            println!("POST Cache Key: {}", cache_key);
+            
+            let mut headers = Headers::new();
+            headers.set("Access-Control-Allow-Origin", "*")?;
+            headers.set("Content-Type", "application/octet-stream")?;
+
+            let post_json: serde_json::Value = req.json().await.unwrap_or(json!({}));
+
+            let existing_binary = if let Some(b) = get_map(&ctx.env, &cache_key).await? {
+                b
+            } else {
+                let grid = generate_dggs(&seed, planet_type, resolution, urbanization, pollution, conservation);
+                let metadata = json!({
+                    "seed": seed,
+                    "type": planet_type,
+                    "resolution": resolution,
+                    "urbanization": urbanization,
+                    "pollution": pollution,
+                    "conservation": conservation,
+                    "cellCount": grid.cells.len(),
+                    "neighbors": grid.neighbors,
+                    "generatedAt": Date::now().to_string()
+                });
+                encode_dggs_vmb(&grid, &metadata)
+            };
+
+            let new_binary = match update_vrgd_metadata(&existing_binary, &post_json) {
+                Ok(b) => b,
+                Err(e) => return Response::error(e, 400),
+            };
+
+            set_map(&ctx.env, &cache_key, new_binary.clone()).await?;
+
+            Ok(Response::from_bytes(new_binary)?.with_headers(headers))
         })
         .post_async("/planet/:seed/map", |mut req, ctx| async move {
             let seed = ctx.param("seed").unwrap().to_string();

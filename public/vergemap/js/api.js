@@ -36,10 +36,15 @@ export function decodeToken(token) {
 
 export function parseSessionFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionParam = urlParams.get('session');
+    let sessionParam = urlParams.get('session');
+    
+    // Read from sessionStorage if not in URL
+    if (!sessionParam) {
+        sessionParam = sessionStorage.getItem('vergeMapSessionToken');
+    }
     
     try {
-        const cached = localStorage.getItem('vergeMapSessionTokens');
+        const cached = sessionStorage.getItem('vergeMapSessionTokens');
         if (cached) savedSessionTokens = JSON.parse(cached);
     } catch (e) {}
     
@@ -49,11 +54,14 @@ export function parseSessionFromUrl() {
             currentSessionId = decoded.session_id;
             currentMode = decoded.role;
             sessionToken = sessionParam;
+            // Persist valid token to session storage
+            sessionStorage.setItem('vergeMapSessionToken', sessionToken);
         } else {
             // Any non-valid JWT should be ignored completely, triggering new session creation
             currentSessionId = null;
             currentMode = 'gm';
             sessionToken = null;
+            sessionStorage.removeItem('vergeMapSessionToken');
         }
     } else {
         // If no session in URL, default to 'gm' mode for local/new setup
@@ -154,14 +162,27 @@ export async function syncSession(fallbackShips, fallbackStars, fallbackLogs) {
             if (parsed.length > 0) ships = parsed;
         }
 
-        const resData = await createBackendSession(ships, fallbackStars, fallbackLogs, [], null);
+        const activeGm = localStorage.getItem('activeGmSessionId');
+        if (activeGm) {
+            const terminate = confirm("A GM session is already active in another tab. Do you want to terminate it and start a new one here?");
+            if (!terminate) {
+                // If they say no, just run offline mode for this tab
+                return { ships, stars: fallbackStars, logs: fallbackLogs, tokens: [] };
+            }
+        }
+
+        const generatedId = crypto.randomUUID();
+        const resData = await createBackendSession(ships, fallbackStars, fallbackLogs, [], generatedId);
         if (resData && resData.id && resData.tokens) {
             currentSessionId = resData.id;
             sessionToken = resData.tokens.gm;
             currentMode = 'gm';
-
+            sessionStorage.setItem('vergeMapSessionToken', sessionToken);
             savedSessionTokens = resData.tokens;
-            localStorage.setItem('vergeMapSessionTokens', JSON.stringify(resData.tokens));
+            sessionStorage.setItem('vergeMapSessionTokens', JSON.stringify(resData.tokens));
+            
+            // Set singleton lock
+            localStorage.setItem('activeGmSessionId', currentSessionId);
 
             const url = new URL(window.location);
             url.searchParams.set('session', resData.tokens.gm);
@@ -214,3 +235,17 @@ export function setupMqttPubSub(sessionId, onMessageCallback) {
         }
     });
 }
+
+// Listen for cross-tab GM session terminations
+window.addEventListener('storage', (e) => {
+    if (e.key === 'activeGmSessionId' && currentMode === 'gm') {
+        const newValue = e.newValue;
+        // If the active GM session changed to something else, we were terminated
+        if (newValue && newValue !== currentSessionId) {
+            alert("Your GM session has been terminated because a new one was started in another tab.");
+            sessionStorage.removeItem('vergeMapSessionToken');
+            sessionStorage.removeItem('vergeMapSessionTokens');
+            window.location.href = window.location.pathname; // Reload as disconnected/viewer
+        }
+    }
+});

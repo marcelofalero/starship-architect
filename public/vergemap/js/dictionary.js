@@ -9,15 +9,7 @@ export async function loadHexDictionary() {
             const response = await fetch('hex_dictionary.json');
             if (response.ok) {
                 store.state.hexDict = await response.json();
-                const specId = specializationSelect.value;
-        if (specId) {
-            if (!store.state.hexDict.specializations) store.state.hexDict.specializations = {};
-            store.state.hexDict.specializations[specId] = {
-                name: document.getElementById('dict-specialization-name').value,
-                desc: document.getElementById('dict-specialization-desc').value
-            };
-        }
-        store.saveHexDict();
+                store.saveHexDict();
             }
         }
     } catch (e) {
