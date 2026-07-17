@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- Three.js and plugins -->
-    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
     <script type="importmap">
         {
             "imports": {
@@ -168,13 +168,7 @@
         <p class="info-meta"><span data-i18n="infoClass">Class</span>: <span id="info-class"></span></p>
         <p class="info-meta" id="info-owner-group"><span data-i18n="ownerLabel">Owner</span>: <span id="info-owner"></span></p>
         <p class="info-meta"><span data-i18n="infoCoords">Coords</span>: <span id="info-coords"></span></p>
-        <p class="info-meta" id="info-seed-group" style="display: none;">
-            <span data-i18n="infoSeed">Seed</span>: 
-            <span id="info-seed-display" style="font-family: monospace; color: #aaa;"></span>
-            <input type="text" id="info-seed-input" style="display: none; width: 120px; padding: 2px; margin-left: 5px; background: #222; color: #fff; border: 1px solid #444;" />
-            <button id="info-seed-edit-btn" style="padding: 2px 5px; margin-left: 5px; font-size: 10px; cursor: pointer; background: #389ebd; border: none; color: white; border-radius: 2px;">Edit</button>
-            <button id="info-seed-save-btn" style="display: none; padding: 2px 5px; margin-left: 5px; font-size: 10px; cursor: pointer; background: #28a745; border: none; color: white; border-radius: 2px;">Save</button>
-        </p>
+
         <div id="info-desc"></div>
         <div id="info-public-notes" style="margin-top: 10px; font-size: 12px; color: #aaddff;"></div>
         <div id="info-private-notes" style="margin-top: 10px; font-size: 12px; color: #ffaa55; display: none;"></div>
@@ -296,8 +290,8 @@
                 <div id="create-owner-group" style="margin-bottom: 10px;">
                     <label data-i18n="ownershipLabel">Ownership</label>
                     <select id="create-entity-owner" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
-                        <option value="GM" data-i18n="ownershipGM">GM</option>
-                        <option value="Players" data-i18n="ownershipPlayers" selected>Players</option>
+                        <option value="GM" data-i18n="ownershipGM" selected>GM</option>
+                        <option value="Players" data-i18n="ownershipPlayers">Players</option>
                     </select>
                 </div>
                 
@@ -378,11 +372,37 @@
                     <label data-i18n="shipClassLabel">Ship Class</label>
                     <input type="text" id="edit-ship-class" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px;">
                 </div>
+                
+                <div id="edit-planet-container" style="margin-bottom: 10px; display: none; padding: 10px; background: #1a1a1a; border: 1px solid #444;">
+                    <h4 style="margin: 0 0 10px 0; color: #4bb5c1;">Planet Properties</h4>
+                    <label>Planet Type (Biome)</label>
+                    <select id="edit-planet-type" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                        <option value="Terran">Terran</option>
+                        <option value="Desert">Desert</option>
+                        <option value="Ocean">Ocean</option>
+                        <option value="Ice">Ice</option>
+                        <option value="Volcanic">Volcanic</option>
+                        <option value="Barren">Barren</option>
+                        <option value="Gas Giant">Gas Giant</option>
+                    </select>
+                    
+                    <label>Generation Seed</label>
+                    <input type="text" id="edit-planet-seed" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                    
+                    <label>Physical Radius (km)</label>
+                    <input type="number" id="edit-planet-radius" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                    
+                    <label>Atmosphere</label>
+                    <input type="text" id="edit-planet-atmosphere" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                    
+                    <label>Temperature (Kelvin)</label>
+                    <input type="number" id="edit-planet-temperature" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-bottom: 10px;">
+                </div>
 
                 <div id="edit-owner-group" style="margin-bottom: 10px;">
                     <label data-i18n="ownershipLabel">Ownership</label>
                     <select id="edit-entity-owner" style="width: 100%; box-sizing: border-box; padding: 5px; background: #222; color: #ccc; border: 1px solid #444; margin-top: 5px; margin-bottom: 5px;">
-                        <option value="GM" data-i18n="ownershipGM">GM</option>
+                        <option value="GM" data-i18n="ownershipGM" selected>GM</option>
                         <option value="Players" data-i18n="ownershipPlayers">Players</option>
                     </select>
                 </div>
@@ -553,6 +573,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app.js?v=24"></script>
 </body>
 </html>

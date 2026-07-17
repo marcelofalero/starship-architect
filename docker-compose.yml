@@ -39,7 +39,6 @@ services:
       - "8788:8788"
     volumes:
       - ./hexmap-worker:/app
-      - wrangler-state:/app/.wrangler
     environment:
       - WRANGLER_LOG=info
       - WRANGLER_SEND_METRICS=false
@@ -78,4 +77,5 @@ services:
 
 volumes:
   wrangler-state:
+  hexmap-wrangler-state:
 

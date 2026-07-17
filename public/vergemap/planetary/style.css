@@ -558,3 +558,45 @@ button:active {
         flex-shrink: 0;
     }
 }
+
+/* Scan Compound Button Group */
+.scan-radio-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.scan-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 6px 0;
+    font-size: 0.9em;
+    font-family: 'Russo One', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+.scan-btn:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.scan-btn:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-right: 1px solid rgba(0, 229, 255, 0.3);
+}
+.scan-btn:not(:last-child) {
+    border-right: none;
+}
+.scan-btn:hover {
+    background: rgba(0, 229, 255, 0.15);
+    color: #00e5ff;
+}
+.scan-btn.active {
+    background: rgba(0, 229, 255, 0.3);
+    color: #fff;
+    border-color: #00e5ff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    z-index: 1;
+}

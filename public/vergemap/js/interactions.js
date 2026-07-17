@@ -18,7 +18,7 @@ import {
     openMoveShipModal, openMoveHereModal, updateMoveHereDistance,
     updateMoveCoordsFromSelectedEntity, currentEditEntity,
     currentMoveShip, currentMoveHereTarget
-} from './ui.js';
+} from './ui_v2.js';
 
 // Local interaction state variables
 let lastMovedShipName = localStorage.getItem('lastMovedShipName') || null;
@@ -341,6 +341,15 @@ export function submitMoveHere() {
     }
     
     if (store.state.currentLayer === 'SYSTEM') {
+        const mesh = state.sceneObjects[ship.name];
+        let startWorldPos = new THREE.Vector3();
+        if (mesh) {
+            // Wait, in system layer, the mesh is in activeSystemView.userData.interactableMeshes!
+            // Actually, we don't need to find it here, animateSystemShip finds it.
+            // But we need the start world position BEFORE renderSystem destroys it!
+            const actMesh = document.querySelector('canvas') ? null : null; // Hacky way to just get it from scene.js
+        }
+
         ship.localTarget = currentMoveHereTarget.name;
         ship._lastLocalMove = performance.now();
         setLastMovedShip(ship.name);
@@ -351,7 +360,20 @@ export function submitMoveHere() {
         if (mqttClient) mqttClient.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(ship));
         uiCtx.refreshDropdowns();
         document.getElementById('move-here-modal').style.display = 'none';
-        renderSystem();
+        
+        // We need to animate it! But renderSystem is asynchronous. We'll let scene.js handle it.
+        // Actually I need to export animateSystemShip from scene.js and import it here.
+        import('./renderer/scene.js').then(module => {
+            const actMesh = module.activeSystemView ? module.activeSystemView.userData.interactableMeshes.find(m => m.userData && m.userData.name === ship.name) : null;
+            let wp = new THREE.Vector3();
+            if (actMesh) actMesh.getWorldPosition(wp);
+            
+            module.renderSystem().then(() => {
+                if (actMesh) {
+                    module.animateSystemShip(ship.name, wp);
+                }
+            });
+        });
         return;
     }
 
@@ -429,9 +451,21 @@ export function saveEntityEdits() {
         const cls = document.getElementById('edit-ship-class').value.trim();
         if (cls) data.class = cls;
         else delete data.class;
+    } else if (currentEditEntity.type === 'Planet' || currentEditEntity.type === 'Moon') {
+        const pType = document.getElementById('edit-planet-type');
+        const pSeed = document.getElementById('edit-planet-seed');
+        const pRadius = document.getElementById('edit-planet-radius');
+        const pAtm = document.getElementById('edit-planet-atmosphere');
+        const pTemp = document.getElementById('edit-planet-temperature');
+        
+        if (pType) data.type = pType.value;
+        if (pSeed) data.planetSeed = pSeed.value;
+        if (pRadius) data.physicalRadius = parseFloat(pRadius.value) || 6371;
+        if (pAtm) data.atmosphere = pAtm.value;
+        if (pTemp) data.temperature = parseFloat(pTemp.value) || 288;
     }
     
-    if (currentEditEntity.type === 'Ship' || currentEditEntity.type === 'POI') {
+    if (currentEditEntity.type === 'Ship' || currentEditEntity.type === 'POI' || currentEditEntity.type === 'Planet' || currentEditEntity.type === 'Moon') {
         data.owner = document.getElementById('edit-entity-owner').value;
     }
     

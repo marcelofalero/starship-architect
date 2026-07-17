@@ -18,7 +18,7 @@ import {
     closeEntityEditor, openMoveShipModal, openMoveHereModal,
     updateMoveHereDistance, updateMoveCoordsFromSelectedEntity,
     currentEditEntity, currentMoveShip, currentMoveHereTarget
-} from './ui.js';
+} from './ui_v2.js';
 import {
     currentSessionId, currentMode, sessionToken, savedSessionTokens, mqttClient,
     setCurrentSessionId, setCurrentMode, setSessionToken, setSavedSessionTokens, setMqttClient,
@@ -139,22 +139,23 @@ function handleMqttMessage(remoteEntity) {
     if (localShip) {
         let changed = false;
         
+        let shouldRenderSystemAnim = false;
         // Copy system-related properties of remoteShip to localShip
         if (localShip.localTarget !== remoteShip.localTarget) {
             localShip.localTarget = remoteShip.localTarget;
-            changed = true;
+            shouldRenderSystemAnim = true;
         }
         if (localShip.sysRadius !== remoteShip.sysRadius) {
             localShip.sysRadius = remoteShip.sysRadius;
-            changed = true;
+            shouldRenderSystemAnim = true;
         }
         if (localShip.sysAngle !== remoteShip.sysAngle) {
             localShip.sysAngle = remoteShip.sysAngle;
-            changed = true;
+            shouldRenderSystemAnim = true;
         }
         if (localShip.isHidden !== remoteShip.isHidden) {
             localShip.isHidden = remoteShip.isHidden;
-            changed = true;
+            shouldRender = true;
         }
         
         // Determine if we need to animate position change
@@ -180,6 +181,8 @@ function handleMqttMessage(remoteEntity) {
                 
                 if (state.sceneObjects[localShip.name]) {
                     animateShip(localShip, oldX, oldY, oldZ);
+                } else {
+                    shouldRender = true;
                 }
                 
                 if (document.getElementById('ship-select') && document.getElementById('ship-select').value === localShip.name) {
@@ -187,8 +190,7 @@ function handleMqttMessage(remoteEntity) {
                     document.getElementById('ship-y').value = localShip.y.toFixed(2);
                     document.getElementById('ship-z').value = localShip.z.toFixed(2);
                 }
-                
-                changed = true;
+                // Do NOT set shouldRender = true here, otherwise renderShips() destroys the mesh mid-animation
             }
         }
         
@@ -199,19 +201,28 @@ function handleMqttMessage(remoteEntity) {
             shouldRender = true;
         }
         
-        if (changed) {
-            shouldRender = true;
-        }
+        
+        // No longer using `changed = true` logic here, shouldRender is set directly for non-movement properties.
     } else {
         // It's a new ship created remotely
         state.ships.push(remoteShip);
         shouldRender = true;
     }
     
-    if (shouldRender) {
+    if (shouldRender || (typeof shouldRenderSystemAnim !== 'undefined' && shouldRenderSystemAnim)) {
         renderShips();
         if (store.state.currentLayer === 'SYSTEM') {
-            renderSystem();
+            import('./renderer/scene.js').then(module => {
+                let startPos = new THREE.Vector3();
+                let mesh = null;
+                if (typeof shouldRenderSystemAnim !== 'undefined' && shouldRenderSystemAnim && !shouldRender && module.activeSystemView) {
+                    mesh = module.activeSystemView.userData.interactableMeshes.find(m => m.userData && m.userData.name === localShip.name);
+                    if (mesh) mesh.getWorldPosition(startPos);
+                }
+                module.renderSystem().then(() => {
+                    if (mesh) module.animateSystemShip(localShip.name, startPos);
+                });
+            });
         }
         refreshDropdowns();
     }

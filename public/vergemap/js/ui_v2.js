@@ -2,6 +2,12 @@ import { state, saveLogs } from './data.js';
 import { enterSystem, exitSystem } from './scene.js';
 import { store } from './store.js';
 
+const HEXMAP_WORKER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8788'
+    : window.location.hostname === 'frontend'
+        ? 'http://hexmap-worker:8788'
+        : 'https://hexmap-worker.mafalero.workers.dev';
+
 export const uiCtx = {
     getCurrentMode: () => 'ro',
     getCurrentSessionId: () => null,
@@ -19,6 +25,18 @@ export let currentEditEntity = null;
 export let currentMoveShip = null;
 export let currentMoveHereTarget = null;
 
+export function getTranslatedText(text, lang) {
+    if (!text) return "";
+    const regex = new RegExp(`<${lang}>([\\s\\S]*?)<\\/${lang}>`, 'i');
+    const match = text.match(regex);
+    if (match) return match[1].trim();
+    if (!/<[a-z]{2}>/i.test(text)) return text;
+    if (lang !== 'en') {
+        const enMatch = text.match(/<en>([\s\S]*?)<\/en>/i);
+        if (enMatch) return enMatch[1].trim();
+    }
+    return "";
+}
 
 // UI Elements
 export const infoPanel = document.getElementById('info-panel');
@@ -337,6 +355,54 @@ export function applyModeUI() {
         if (sysToolsBtn) {
             sysToolsBtn.style.display = store.state.currentLayer === 'SYSTEM' ? 'flex' : 'none';
         }
+        
+        let toggleContainer = document.getElementById('gm-inline-edit-toggle-container');
+        if (!toggleContainer) {
+            toggleContainer = document.createElement('div');
+            toggleContainer.id = 'gm-inline-edit-toggle-container';
+            toggleContainer.style.position = 'fixed';
+            toggleContainer.style.top = '10px';
+            toggleContainer.style.right = '360px';
+            toggleContainer.style.background = 'rgba(0,0,0,0.7)';
+            toggleContainer.style.padding = '5px 10px';
+            toggleContainer.style.borderRadius = '5px';
+            toggleContainer.style.border = '1px solid rgba(0, 229, 255, 0.3)';
+            toggleContainer.style.zIndex = '1000';
+            toggleContainer.style.display = 'flex';
+            toggleContainer.style.alignItems = 'center';
+            toggleContainer.style.gap = '8px';
+            
+            toggleContainer.innerHTML = `
+                <label class="switch" style="margin: 0; font-size: 0.8em; display: inline-block; width: 34px; height: 20px; position: relative;">
+                    <input type="checkbox" id="gm-inline-edit-toggle" style="opacity: 0; width: 0; height: 0;">
+                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="color: #00e5ff; font-weight: bold; font-family: 'Russo One', sans-serif; font-size: 0.9em;">GM Edit Mode</span>
+            `;
+            document.body.appendChild(toggleContainer);
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                #gm-inline-edit-toggle:checked + span { background-color: #00e5ff; }
+                #gm-inline-edit-toggle:checked + span:before { transform: translateX(14px); }
+                #gm-inline-edit-toggle + span:before {
+                    position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.getElementById('gm-inline-edit-toggle').addEventListener('change', (e) => {
+                window.isGmInlineEditMode = e.target.checked;
+                if (document.getElementById('info-panel').style.display === 'block' && window.currentInfoUserData) {
+                    showInfoPanel(window.currentInfoUserData);
+                }
+            });
+        }
+        toggleContainer.style.display = 'flex';
+    } else {
+        const toggleContainer = document.getElementById('gm-inline-edit-toggle-container');
+        if (toggleContainer) toggleContainer.style.display = 'none';
+        window.isGmInlineEditMode = false;
     }
 }
 
@@ -471,11 +537,12 @@ export function renderLogs() {
 
 export function showInfoPanel(userData) {
     if (!userData) return;
+    window.currentInfoUserData = userData;
     const currentMode = uiCtx.getCurrentMode();
     const lastMovedShipName = uiCtx.getLastMovedShipName();
     const data = userData.data || userData;
     infoName.textContent = data.isHidden && currentMode === 'gm' ? `${data.name || userData.name || 'Unknown'} (Hidden)` : (data.name || userData.name || 'Unknown');
-    infoType.textContent = data.subtype || userData.type || 'Unknown';
+    infoType.textContent = data.type || data.subtype || userData.type || 'Unknown';
     const classGroup = document.getElementById('info-class').parentNode;
     if (data.class) {
         classGroup.style.display = 'block';
@@ -495,9 +562,9 @@ export function showInfoPanel(userData) {
     
     const ownerGroup = document.getElementById('info-owner-group');
     const infoOwner = document.getElementById('info-owner');
-    if (userData.type === 'Ship' || userData.type === 'POI') {
+    if (userData.type === 'Ship' || userData.type === 'POI' || userData.type === 'Planet' || userData.type === 'Moon') {
         ownerGroup.style.display = 'block';
-        const ownerVal = data.owner || 'Players';
+        const ownerVal = data.owner || 'GM';
         const ownerText = ownerVal === 'GM' ? (i18n[currentLang].ownershipGM || 'GM') : (i18n[currentLang].ownershipPlayers || 'Players');
         infoOwner.textContent = ownerText;
     } else {
@@ -512,54 +579,9 @@ export function showInfoPanel(userData) {
         infoCoords.textContent = `X:${data.x !== undefined ? data.x.toFixed(2) : 0}, Y:${data.y !== undefined ? data.y.toFixed(2) : 0}, Z:${data.z !== undefined ? data.z.toFixed(2) : 0}`;
     }
 
-    const seedGroup = document.getElementById('info-seed-group');
-    if ((userData.type === 'Planet' || userData.type === 'Moon') && store.state.currentLayer === 'SYSTEM') {
-        const seedValue = data.planetSeed || data.id || store.state.currentSystemFocus.systemSeed + "_" + data.name;
-        document.getElementById('info-seed-display').textContent = seedValue;
-        document.getElementById('info-seed-input').value = seedValue;
-        
-        if (currentMode === 'gm') {
-            seedGroup.style.display = 'block';
-            
-            const editBtn = document.getElementById('info-seed-edit-btn');
-            const saveBtn = document.getElementById('info-seed-save-btn');
-            const displaySpan = document.getElementById('info-seed-display');
-            const inputEl = document.getElementById('info-seed-input');
-            
-            editBtn.style.display = 'inline-block';
-            saveBtn.style.display = 'none';
-            displaySpan.style.display = 'inline';
-            inputEl.style.display = 'none';
-            
-            editBtn.onclick = () => {
-                editBtn.style.display = 'none';
-                saveBtn.style.display = 'inline-block';
-                displaySpan.style.display = 'none';
-                inputEl.style.display = 'inline-block';
-                inputEl.focus();
-            };
-            
-            saveBtn.onclick = () => {
-                data.planetSeed = inputEl.value.trim();
-                displaySpan.textContent = data.planetSeed;
-                
-                editBtn.style.display = 'inline-block';
-                saveBtn.style.display = 'none';
-                displaySpan.style.display = 'inline';
-                inputEl.style.display = 'none';
-                
-                // Trigger save
-                if (window.store && window.store.saveStars) window.store.saveStars();
-                else console.log('Cannot save star system changes automatically.');
-            };
-        } else {
-            seedGroup.style.display = 'none';
-        }
-    } else {
-        seedGroup.style.display = 'none';
-    }
+
     
-    let descHtml = data.description || "No description available.";
+    let descHtml = getTranslatedText(data.description, currentLang) || "No description available.";
 
     if (data.graph) descHtml += `\n\n**GRAPH Rating:** ${data.graph}`;
     if (data.gravity) descHtml += `\n\n**Gravity:** ${data.gravity}`;
@@ -596,9 +618,10 @@ export function showInfoPanel(userData) {
     const editBtn = document.getElementById('edit-entity-btn');
     
     if (data.publicNotes) {
-        publicNotes.innerHTML = `<strong>Public Notes:</strong><br>${parseMarkdown(data.publicNotes)}`;
+        publicNotes.style.display = 'block';
+        publicNotes.innerHTML = `<strong>Public Notes:</strong><br>${parseMarkdown(getTranslatedText(data.publicNotes, currentLang))}`;
     } else {
-        publicNotes.innerHTML = '';
+        publicNotes.style.display = 'none';
     }
     
     const moveShipBtn = document.getElementById('info-move-ship-btn');
@@ -772,7 +795,7 @@ export function showInfoPanel(userData) {
     if (currentMode === 'gm') {
         if (data.privateNotes) {
             privateNotes.style.display = 'block';
-            privateNotes.innerHTML = `<strong>Private Notes:</strong><br>${parseMarkdown(data.privateNotes)}`;
+            privateNotes.innerHTML = `<strong>Private Notes:</strong><br>${parseMarkdown(getTranslatedText(data.privateNotes, currentLang))}`;
         } else {
             privateNotes.style.display = 'none';
         }
@@ -781,6 +804,169 @@ export function showInfoPanel(userData) {
     } else {
         privateNotes.style.display = 'none';
         editBtn.style.display = 'none';
+    }
+    
+    // Inject GM Edit Mode Form
+    let saveBtn = document.getElementById('inline-save-btn');
+    if (!saveBtn) {
+        saveBtn = document.createElement('button');
+        saveBtn.id = 'inline-save-btn';
+        saveBtn.textContent = 'Save Changes';
+        saveBtn.style.cssText = 'margin-top: 10px; width: 100%; padding: 10px; background: #28a745; border: none; color: white; cursor: pointer; font-weight: bold; display: none;';
+        document.getElementById('info-panel').appendChild(saveBtn);
+    }
+    
+    if (window.isGmInlineEditMode && currentMode === 'gm') {
+        
+        infoName.innerHTML = `<input type="text" id="inline-edit-name" value="${data.name || ''}" style="width: calc(100% - 30px); margin-right: 30px; box-sizing: border-box; background: #222; color: white; border: 1px solid #444; padding: 4px; margin-bottom: 5px;">`;
+        infoClass.innerHTML = `<input type="text" id="inline-edit-class" value="${data.class || ''}" style="width: 100%; box-sizing: border-box; background: #222; color: white; border: 1px solid #444; padding: 2px;">`;
+        infoOwner.innerHTML = `<select id="inline-edit-owner" style="width: 100%; box-sizing: border-box; background: #222; color: white; border: 1px solid #444; padding: 2px;"><option value="GM" ${data.owner === 'GM' ? 'selected' : ''}>GM</option><option value="Players" ${data.owner === 'Players' ? 'selected' : ''}>Players</option></select>`;
+        
+        let customHtml = '';
+        if (userData.type === 'Planet' || userData.type === 'Moon') {
+            customHtml += `
+                 <label>Planet Type (Biome)</label>
+                 <select id="inline-edit-ptype" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px; padding: 4px;">
+                     <option value="Terran" ${data.type === 'Terran' ? 'selected' : ''}>Terran</option>
+                     <option value="Desert" ${data.type === 'Desert' ? 'selected' : ''}>Desert</option>
+                     <option value="Ocean" ${data.type === 'Ocean' ? 'selected' : ''}>Ocean</option>
+                     <option value="Ice" ${data.type === 'Ice' ? 'selected' : ''}>Ice</option>
+                     <option value="Volcanic" ${data.type === 'Volcanic' ? 'selected' : ''}>Volcanic</option>
+                     <option value="Barren" ${data.type === 'Barren' ? 'selected' : ''}>Barren</option>
+                     <option value="Gas Giant" ${data.type === 'Gas Giant' ? 'selected' : ''}>Gas Giant</option>
+                     <option value="Natural Satellite" ${data.type === 'Natural Satellite' ? 'selected' : ''}>Natural Satellite</option>
+                 </select><br>
+                 <label>Size / Category</label>
+                 <select id="inline-edit-psize" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px; padding: 4px;" onchange="
+                    const bases = { '0.05': 1500, '0.1': 3000, '0.15': 6371, '0.2': 12000, '0.3': 25000, '0.4': 60000 };
+                    const base = bases[this.value];
+                    if (base && document.getElementById('inline-edit-prad')) {
+                        const variance = base * 0.1;
+                        const randomRad = Math.floor(base - variance + Math.random() * (variance * 2));
+                        document.getElementById('inline-edit-prad').value = randomRad;
+                    }
+                 ">
+                     <option value="0.05" ${data.size === 0.05 ? 'selected' : ''}>Tiny</option>
+                     <option value="0.1" ${data.size === 0.1 || (data.size && data.size > 0.05 && data.size < 0.15) ? 'selected' : ''}>Small</option>
+                     <option value="0.15" ${data.size === 0.15 || !data.size ? 'selected' : ''}>Medium</option>
+                     <option value="0.2" ${data.size === 0.2 ? 'selected' : ''}>Large</option>
+                     <option value="0.3" ${data.size === 0.3 ? 'selected' : ''}>Giant</option>
+                     <option value="0.4" ${data.size >= 0.4 ? 'selected' : ''}>Huge</option>
+                 </select><br>
+                 <label>Seed</label><input type="text" id="inline-edit-pseed" value="${data.planetSeed || data.id || ''}" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;"><br>
+                 <label>Radius (km)</label><input type="number" id="inline-edit-prad" value="${data.physicalRadius || 6371}" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;"><br>
+                 <label>Atmosphere</label><input type="text" id="inline-edit-patm" value="${data.atmosphere || ''}" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;"><br>
+                 <label>Temp (K)</label><input type="number" id="inline-edit-ptemp" value="${data.temperature ? parseFloat(data.temperature) : 288}" style="width: 100%; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;"><br>
+            `;
+        }
+        customHtml += `
+             <label>Description</label><textarea id="inline-edit-desc" style="width: 100%; height: 60px; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;">${data.description || ''}</textarea><br>
+             <label>Public Notes</label><textarea id="inline-edit-pub" style="width: 100%; height: 40px; background: #222; color: white; border: 1px solid #444; margin-bottom: 5px;">${data.publicNotes || ''}</textarea><br>
+             <label>Private Notes (GM)</label><textarea id="inline-edit-priv" style="width: 100%; height: 40px; background: #222; color: white; border: 1px solid #ffaa55; margin-bottom: 5px;">${data.privateNotes || ''}</textarea><br>
+             <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;"><input type="checkbox" id="inline-edit-hidden" ${data.isHidden ? 'checked' : ''} style="width: auto; margin: 0;"> Hidden</label>
+        `;
+        infoDesc.innerHTML = customHtml;
+        publicNotes.innerHTML = '';
+        privateNotes.style.display = 'none';
+        
+        if (editBtn) editBtn.style.display = 'none';
+        saveBtn.style.display = 'block';
+        
+        saveBtn.onclick = async () => {
+            const newSeedInput = document.getElementById('inline-edit-pseed');
+            if (newSeedInput && (userData.type === 'Planet' || userData.type === 'Moon')) {
+                const getPlanetType = (typeStr) => {
+                    const str = (typeStr || '');
+                    if (str.includes('Terran') || str.includes('Eyeball')) return 'terrestrial';
+                    if (str.includes('Desert')) return 'desert';
+                    if (str.includes('Ocean')) return 'ocean';
+                    if (str.includes('Ice')) return 'ice';
+                    if (str.includes('Volcanic') || str.includes('Scorched')) return 'volcanic';
+                    return 'barren';
+                };
+                const getResolution = (R) => {
+                    const r = R || 6371;
+                    const nNeeded = (4 * Math.PI * r * r) / 100000;
+                    if (nNeeded < 1602) return 3;
+                    if (nNeeded < 6402) return 4;
+                    if (nNeeded < 25602) return 5;
+                    return 6;
+                };
+
+                const newSeed = newSeedInput.value.trim();
+                const oldSeed = data.planetSeed || data.id || (store.state.currentSystemFocus ? store.state.currentSystemFocus.systemSeed + "_" + data.name : '');
+                
+                const ptypeEl = document.getElementById('inline-edit-ptype');
+                const newTypeStr = ptypeEl ? ptypeEl.value : data.type;
+                const oldTypeStr = data.type;
+                
+                const pradEl = document.getElementById('inline-edit-prad');
+                const newRadStr = pradEl ? parseFloat(pradEl.value) : data.physicalRadius;
+                const oldRadStr = data.physicalRadius;
+                
+                const oldPlanetType = getPlanetType(oldTypeStr);
+                const newPlanetType = getPlanetType(newTypeStr);
+                
+                const oldRes = getResolution(oldRadStr);
+                const newRes = getResolution(newRadStr);
+
+                if (oldSeed && (newSeed !== oldSeed || oldPlanetType !== newPlanetType || oldRes !== newRes)) {
+                    let hasManualChanges = false;
+                    try {
+                        const url = `${HEXMAP_WORKER_URL}/planet/${oldSeed}/dggs?type=${oldPlanetType}`;
+                        const res = await fetch(url);
+                        if (res.ok) {
+                            const buffer = await res.arrayBuffer();
+                            const text = new TextDecoder().decode(buffer);
+                            if ((text.includes('"revealedFeatures":[') && !text.includes('"revealedFeatures":[]')) || 
+                                (text.includes('"customFeatures":{') && !text.includes('"customFeatures":{}')) ||
+                                (text.includes('"factions":{') && !text.includes('"factions":{}')) ||
+                                (text.includes('"sectorScans":{') && !text.includes('"sectorScans":{}')) ||
+                                (text.includes('"labels":[') && !text.includes('"labels":[]'))) {
+                                hasManualChanges = true;
+                            }
+                        }
+                    } catch(e) { console.warn("Failed to check for manual changes", e); }
+                    
+                    if (hasManualChanges) {
+                        const confirmMsg = "The current changes will trigger a surface map regeneration, some changes will be lost.";
+                        if (!confirm(confirmMsg)) {
+                            newSeedInput.value = oldSeed;
+                            if (ptypeEl) ptypeEl.value = oldTypeStr;
+                            if (pradEl) pradEl.value = oldRadStr;
+                            return; // Abort save
+                        }
+                    }
+                }
+            }
+            
+            if (document.getElementById('inline-edit-name')) data.name = document.getElementById('inline-edit-name').value;
+            if (document.getElementById('inline-edit-class')) data.class = document.getElementById('inline-edit-class').value;
+            if (document.getElementById('inline-edit-owner')) data.owner = document.getElementById('inline-edit-owner').value;
+            if (document.getElementById('inline-edit-ptype')) data.type = document.getElementById('inline-edit-ptype').value;
+            if (document.getElementById('inline-edit-psize')) data.size = parseFloat(document.getElementById('inline-edit-psize').value) || 0.15;
+            if (document.getElementById('inline-edit-pseed')) data.planetSeed = document.getElementById('inline-edit-pseed').value;
+            if (document.getElementById('inline-edit-prad')) data.physicalRadius = parseFloat(document.getElementById('inline-edit-prad').value) || 6371;
+            if (document.getElementById('inline-edit-patm')) data.atmosphere = document.getElementById('inline-edit-patm').value;
+            if (document.getElementById('inline-edit-ptemp')) data.temperature = parseFloat(document.getElementById('inline-edit-ptemp').value) || 288;
+            if (document.getElementById('inline-edit-desc')) data.description = document.getElementById('inline-edit-desc').value;
+            if (document.getElementById('inline-edit-pub')) data.publicNotes = document.getElementById('inline-edit-pub').value;
+            if (document.getElementById('inline-edit-priv')) data.privateNotes = document.getElementById('inline-edit-priv').value;
+            if (document.getElementById('inline-edit-hidden')) data.isHidden = document.getElementById('inline-edit-hidden').checked;
+            
+            const currentSessionId = uiCtx.getCurrentSessionId();
+            if (window.store && window.store.saveStars) window.store.saveStars();
+            if (window.store && window.store.saveShips) window.store.saveShips();
+            
+            const client = uiCtx.getMqttClient();
+            if (client && currentSessionId) {
+                client.publish(`vergemap/sessions/${currentSessionId}`, JSON.stringify(data));
+            }
+            
+            showInfoPanel(userData); // Re-render in read-only or edit mode
+        };
+    } else {
+        saveBtn.style.display = 'none';
     }
     
     infoPanel.style.display = 'block';
@@ -793,34 +979,71 @@ export function openEntityEditor(userData) {
     document.getElementById('edit-entity-name').value = data.name || '';
     
     const classContainer = document.getElementById('edit-class-container');
-    const classSelect = document.getElementById('edit-star-class');
-    const typeSelect = document.getElementById('edit-poi-type');
-    const ownerContainer = document.getElementById('edit-owner-container');
-    const ownerSelect = document.getElementById('edit-ownership');
+    const entityClassSelect = document.getElementById('edit-entity-class') || document.getElementById('edit-star-class') || document.getElementById('edit-poi-type');
+    const shipClassContainer = document.getElementById('edit-ship-class-container');
+    const shipClassInput = document.getElementById('edit-ship-class');
+    const ownerContainer = document.getElementById('edit-owner-group') || document.getElementById('edit-owner-container');
+    const ownerSelect = document.getElementById('edit-entity-owner') || document.getElementById('edit-ownership');
+    
+    const planetContainer = document.getElementById('edit-planet-container');
+    const pType = document.getElementById('edit-planet-type');
+    const pSeed = document.getElementById('edit-planet-seed');
+    const pRadius = document.getElementById('edit-planet-radius');
+    const pAtm = document.getElementById('edit-planet-atmosphere');
+    const pTemp = document.getElementById('edit-planet-temperature');
     
     if (userData.type === 'Star') {
-        classContainer.style.display = 'block';
-        classSelect.value = data.class || 'G';
-        ownerContainer.style.display = 'none';
+        if (planetContainer) planetContainer.style.display = 'none';
+        if (classContainer) classContainer.style.display = 'block';
+        if (shipClassContainer) shipClassContainer.style.display = 'none';
+        if (entityClassSelect) entityClassSelect.value = data.class || 'G';
+        if (ownerContainer) ownerContainer.style.display = 'none';
     } else if (userData.type === 'POI') {
-        classContainer.style.display = 'block';
-        classSelect.style.display = 'none';
-        typeSelect.style.display = 'block';
-        typeSelect.value = data.class || 'P';
-        ownerContainer.style.display = 'block';
-        ownerSelect.value = data.owner || 'Players';
+        if (planetContainer) planetContainer.style.display = 'none';
+        if (classContainer) classContainer.style.display = 'block';
+        if (shipClassContainer) shipClassContainer.style.display = 'none';
+        if (entityClassSelect) entityClassSelect.value = data.class || 'P';
+        if (ownerContainer) ownerContainer.style.display = 'block';
+        if (ownerSelect) ownerSelect.value = data.owner || 'GM';
+    } else if (userData.type === 'Ship') {
+        if (planetContainer) planetContainer.style.display = 'none';
+        if (classContainer) classContainer.style.display = 'none';
+        if (shipClassContainer) shipClassContainer.style.display = 'block';
+        if (shipClassInput) shipClassInput.value = data.class || '';
+        if (ownerContainer) ownerContainer.style.display = 'block';
+        if (ownerSelect) ownerSelect.value = data.owner || 'GM';
     } else {
-        classContainer.style.display = 'none';
-        ownerContainer.style.display = 'block';
-        ownerSelect.value = data.owner || 'Players';
+        if (classContainer) classContainer.style.display = 'none';
+        if (shipClassContainer) shipClassContainer.style.display = 'none';
+        if (ownerContainer) ownerContainer.style.display = 'block';
+        if (ownerSelect) ownerSelect.value = data.owner || 'GM';
+        
+        if (planetContainer) {
+            planetContainer.style.display = 'block';
+            if (pType) {
+                let currentType = data.type || '';
+                if (currentType.includes('Terran') || currentType.includes('Eyeball')) currentType = 'Terran';
+                else if (currentType.includes('Desert')) currentType = 'Desert';
+                else if (currentType.includes('Ocean')) currentType = 'Ocean';
+                else if (currentType.includes('Ice')) currentType = 'Ice';
+                else if (currentType.includes('Volcanic') || currentType.includes('Scorched')) currentType = 'Volcanic';
+                else if (currentType.includes('Gas')) currentType = 'Gas Giant';
+                else currentType = 'Barren';
+                pType.value = currentType;
+            }
+            if (pSeed) pSeed.value = data.planetSeed || data.id || (store.state.currentSystemFocus ? store.state.currentSystemFocus.systemSeed + "_" + data.name : '');
+            if (pRadius) pRadius.value = data.physicalRadius || 6371;
+            if (pAtm) pAtm.value = data.atmosphere || '';
+            if (pTemp) pTemp.value = data.temperature ? parseFloat(data.temperature) : 288;
+        }
     }
     
-    document.getElementById('edit-coord-x').value = data.x || 0;
-    document.getElementById('edit-coord-y').value = data.y || 0;
-    document.getElementById('edit-coord-z').value = data.z || 0;
-    document.getElementById('edit-entity-desc').value = data.description || '';
-    document.getElementById('edit-public-notes').value = data.publicNotes || '';
-    document.getElementById('edit-private-notes').value = data.privateNotes || '';
+    const cx = document.getElementById('edit-coord-x'); if (cx) cx.value = data.x || 0;
+    const cy = document.getElementById('edit-coord-y'); if (cy) cy.value = data.y || 0;
+    const cz = document.getElementById('edit-coord-z'); if (cz) cz.value = data.z || 0;
+    const ed = document.getElementById('edit-entity-desc'); if (ed) ed.value = data.description || '';
+    const epu = document.getElementById('edit-entity-public'); if (epu) epu.value = data.publicNotes || '';
+    const epr = document.getElementById('edit-entity-private'); if (epr) epr.value = data.privateNotes || '';
     
     document.getElementById('entity-editor-modal').style.display = 'flex';
 }

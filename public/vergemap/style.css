@@ -153,6 +153,9 @@ button:active, .btn-like:active {
     top: 20px;
     right: 20px;
     width: 320px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    box-sizing: border-box;
     background: rgba(0, 26, 51, 0.55);
     border: 1px solid rgba(75, 181, 193, 0.4);
     border-radius: 4px;

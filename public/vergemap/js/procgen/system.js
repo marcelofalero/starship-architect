@@ -4,7 +4,7 @@ import { STAR_TYPES, BODY_TYPES, planetTextures } from './data.js';
 import { calculateGRAPH } from './planets.js';
 import { starVS, starFS } from './shaders.js';
 
-export function generateSystem(systemData, genMode = "Normal") {
+export function generateSystem(systemData, genMode = "Normal", currentSystemTime = 0) {
     const isNewGeneration = !systemData.planets;
     let attempt = 0;
     const maxAttempts = 100;
@@ -18,7 +18,7 @@ export function generateSystem(systemData, genMode = "Normal") {
             delete systemData.planets; 
         }
         
-        group = generateSystemImpl(systemData, genMode);
+        group = generateSystemImpl(systemData, genMode, currentSystemTime);
         
         if (!isNewGeneration || genMode === "Normal") {
             break; 
@@ -55,7 +55,7 @@ export function generateSystem(systemData, genMode = "Normal") {
     return group;
 }
 
-function generateSystemImpl(systemData, genMode = "Normal") {
+function generateSystemImpl(systemData, genMode = "Normal", currentSystemTime = 0) {
     const group = new THREE.Group();
     // Using star seed/id to reliably seed the RNG so it looks the same every time
     const seed = systemData.systemSeed || systemData.id || systemData.name || "DefaultSystem";
@@ -300,12 +300,12 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             aop = rng() * Math.PI * 2;
             
             orbitSpeed = Math.sqrt(starMass / a) * (0.35 + rng() * 0.15) * 0.5;
-            orbitAngle = rng() * Math.PI * 2;
+            orbitAngle = rng() * Math.PI * 2 + (orbitSpeed * currentSystemTime);
         }
 
         const rotationSpeed = (0.2 + rng() * 0.5);
 
-        const bodyRadius = bt.isGas ? 0.35 + rng() * 0.2 : 0.1 + rng() * 0.15;
+        const bodyRadius = bt.isGas ? 0.7 + rng() * 0.4 : 0.2 + rng() * 0.3;
 
         // Calculate Keplerian ellipse dimensions
         const b = a * Math.sqrt(1 - e * e); // semi-minor axis
@@ -548,6 +548,9 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         };
         
         body.rotation.x = axisTilt * Math.PI / 180;
+        if (!bt.isTidalLocked) {
+            body.rotation.z = rotationSpeed * currentSystemTime;
+        }
         
         interactableMeshes.push(body);
 
@@ -569,7 +572,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         body.userData.orbiters = [];
         const moonChance = bt.isGas ? 0.8 : 0.45;
         if (rng() < moonChance && i > 0) {
-            const moonR = bt.isGas ? (bodyRadius * (0.05 + rng() * 0.1)) : (bodyRadius * 0.38);
+            const moonR = bt.isGas ? (bodyRadius * (0.1 + rng() * 0.15)) : (bodyRadius * 0.45);
             const moonDst = bodyRadius * (bt.isGas ? 1.5 : 2.8);
             const moonGeo = new THREE.SphereGeometry(moonR, 16, 16);
             moonGeo.rotateX(Math.PI / 2);
@@ -592,7 +595,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
             
             // Setup moon data
             const moonSpeed = (0.8 + rng() * 0.4) * (rng() > 0.5 ? 1 : -1);
-            const moonAngle = rng() * Math.PI * 2;
+            const moonAngle = rng() * Math.PI * 2 + (moonSpeed * currentSystemTime);
 
             moon.position.set(Math.cos(moonAngle) * moonDst, Math.sin(moonAngle) * moonDst, 0);
             moonPivot.add(moon);
@@ -748,6 +751,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         });
 
         const beltPoints1 = new THREE.Points(beltGeo1, beltMat1);
+        beltPoints1.rotation.z = -0.005 * currentSystemTime;
         beltMeshes.push({ mesh: beltPoints1, speed: 0.005 });
         group.add(beltPoints1);
 
@@ -795,6 +799,7 @@ function generateSystemImpl(systemData, genMode = "Normal") {
         });
 
         const beltPoints2 = new THREE.Points(beltGeo2, beltMat2);
+        beltPoints2.rotation.z = -0.007 * currentSystemTime;
         beltMeshes.push({ mesh: beltPoints2, speed: 0.007 });
         group.add(beltPoints2);
     }

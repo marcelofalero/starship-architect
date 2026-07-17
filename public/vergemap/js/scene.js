@@ -6,7 +6,7 @@ import { initCore, onWindowResize } from './renderer/core.js';
 import { onPointerDown } from './interactions/raycaster.js';
 import { initGeometries, exitSystem, renderSystem, activeSystemView } from './renderer/scene.js';
 import { store } from './store.js';
-import { uiCtx } from './ui.js';
+import { uiCtx } from './ui_v2.js';
 import { updateBackendSession } from './api.js';
 import { saveStars } from './data.js';
 

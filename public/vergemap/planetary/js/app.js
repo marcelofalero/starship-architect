@@ -696,8 +696,8 @@ function computeFavorabilities() {
 
 function onDataLoaded() {
     if (!dggsData.metadata) dggsData.metadata = {};
-    if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
-    if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
+    if (!dggsData.metadata.sectorScans) dggsData.metadata.sectorScans = {};
+    if (!dggsData.metadata.stealthOverrides) dggsData.metadata.stealthOverrides = {};
     if (!dggsData.metadata.mutations) dggsData.metadata.mutations = {};
     if (!dggsData.metadata.customFeatures) dggsData.metadata.customFeatures = {};
     if (!dggsData.metadata.names) dggsData.metadata.names = {};
@@ -717,6 +717,16 @@ function onDataLoaded() {
     initBiomeCache();
 
     let changed = false;
+    
+    if (!dggsData.metadata.revealedFeatures) {
+        dggsData.metadata.revealedFeatures = [];
+        changed = true;
+    }
+    if (!dggsData.metadata.scannedCells) {
+        dggsData.metadata.scannedCells = [];
+        changed = true;
+    }
+
     for (let i = 0; i < dggsData.cells.length; i++) {
         const cell = dggsData.cells[i];
         if (cell.tile.feature > 0) {
@@ -835,6 +845,27 @@ const FEATURES = {
     10: { name: 'Natural Marvel', scanLevel: 1, shielding: 0 }
 };
 const FEATURE_COLORS = { 1: '#e040fb', 2: '#9e9e9e', 3: '#00e676', 4: '#00e5ff', 5: 'transparent', 6: '#ff9100', 7: '#ff1744', 8: '#d500f9', 9: '#ffd600', 10: '#ffd54f' };
+
+
+function getUrbStealth(factionLevel, isUnderground, isAbandoned) {
+    let stealth = 1;
+    if (isUnderground) stealth += 1;
+    if (isAbandoned) {
+        if (factionLevel === 1) stealth += 2;
+        else if (factionLevel === 2) stealth += 1;
+    }
+    return Math.min(stealth, 5);
+}
+
+function getFeatureBaseStealth(type) {
+    switch(type) {
+        case 2: case 7: return 1;
+        case 6: case 10: return 2;
+        case 1: case 3: case 8: return 3;
+        case 4: case 9: return 4;
+        default: return 1;
+    }
+}
 const FACTIONS = { 0: { name: 'Unclaimed Territory', color: 'transparent' }, 1: { name: 'United Colonies', color: '#00e5ff' }, 2: { name: 'Verge Syndicate', color: '#ffaa00' }, 3: { name: 'Precursor Remnants', color: '#d500f9' } };
 
 // ── State ──
@@ -890,6 +921,9 @@ const seedInput = document.getElementById('map-seed');
 const typeSelect = document.getElementById('map-type');
 const radiusInput = document.getElementById('map-radius');
 const generateBtn = document.getElementById('generate-btn');
+const mapToolsModal = document.getElementById('map-tools-modal');
+const floatingMapToolsBtn = document.getElementById('floating-map-tools');
+const closeMapToolsBtn = document.getElementById('close-map-tools-btn');
 const vmbUpload = document.getElementById('vmb-upload');
 const uploadStatus = document.getElementById('upload-status');
 const viewModeSelect = document.getElementById('view-mode');
@@ -941,7 +975,25 @@ const exportBtn = document.getElementById('export-btn');
 const featureStatusRow = document.getElementById('feature-status-row');
 const featureStatusValue = document.getElementById('feature-status-value');
 const featureActionRow = document.getElementById('feature-action-row');
-const gmRevealBtn = document.getElementById('gm-reveal-btn');
+
+function setupCompoundGroup(groupId, onChange) {
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    const buttons = group.querySelectorAll('.scan-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (onChange) onChange(parseInt(btn.getAttribute('data-level')));
+        });
+    });
+}
+
+const playerScanLevel = document.getElementById('player-scan-level');
+const gmNeededLevel = document.getElementById('gm-needed-level');
+const gmCurrentLevel = document.getElementById('gm-current-level');
+const scanSizeSelect = document.getElementById('scan-size');
+
 
 const playerFeatureStatusRow = document.getElementById('player-feature-status-row');
 const playerFeatureStatusValue = document.getElementById('player-feature-status-value');
@@ -1229,7 +1281,7 @@ function draw() {
     const fowGroup = [];
 
     for (const c of visibleCells) {
-        const isScanned = dggsData.metadata?.scannedCells?.includes(c.i);
+        const isScanned = (dggsData.metadata?.sectorScans?.[c.i] || 0) >= 1;
         if (isScanned) {
             scannedGroup.push(c);
         } else if (userRole === 'player') {
@@ -1278,7 +1330,14 @@ function draw() {
         }
 
         if (tile.feature > 0) {
-            const isRevealed = dggsData.metadata?.revealedFeatures?.includes(i);
+            const currentScanLevel = dggsData.metadata?.sectorScans?.[i] || 0;
+            const overrideLevel = dggsData.metadata?.stealthOverrides?.[i];
+            const isUnderground = dggsData.metadata?.underground?.[i];
+            let defaultNeeded = getFeatureBaseStealth(tile.feature) + (isUnderground ? 1 : 0);
+            defaultNeeded = Math.min(defaultNeeded, 5);
+            
+            const neededLevel = overrideLevel !== undefined ? overrideLevel : defaultNeeded;
+            const isRevealedToPlayers = currentScanLevel >= neededLevel;
             const fc = FEATURE_COLORS[tile.feature] || '#fff';
             
             const drawFeatureIcon = (type, color, isHidden) => {
@@ -1358,14 +1417,29 @@ function draw() {
             };
  
             if (userRole === 'gm') {
-                drawFeatureIcon(tile.feature, fc, !isRevealed);
-            } else if (isRevealed) {
+                drawFeatureIcon(tile.feature, fc, !isRevealedToPlayers);
+            } else if (isRevealedToPlayers) {
                 drawFeatureIcon(tile.feature, fc, false);
             }
         }
  
         if (tile.faction > 0) {
+            const isUnderground = dggsData.metadata?.underground?.[i];
+            const isAbandoned = dggsData.metadata?.abandoned?.[i];
+            const urbNeeded = getUrbStealth(tile.faction, isUnderground, isAbandoned);
+            const currentScanLevel = dggsData.metadata?.sectorScans?.[i] || 0;
+            const isUrbRevealed = currentScanLevel >= urbNeeded;
+
+            if (!isUrbRevealed && userRole !== 'gm') {
+                // Players don't see hidden urbanization
+                continue;
+            }
+
             ctx.save();
+            if (!isUrbRevealed) {
+                ctx.globalAlpha = 0.4;
+            }
+            
             ctx.translate(c.hexCx + (tile.feature > 0 ? 3 : 0), c.hexCy + (tile.feature > 0 ? -3 : 0));
             
             // Map specialization to color
@@ -1967,6 +2041,12 @@ function selectCell(idx) {
     setSelectValue(editFeature, getCommonValue(i => dggsData.cells[i].tile.feature));
     setSelectValue(editFaction, getCommonValue(i => dggsData.cells[i].tile.faction));
     
+    const editUnderground = document.getElementById('edit-underground');
+    if (editUnderground) editUnderground.checked = getCommonValue(i => dggsData.metadata.underground?.[i]) === true;
+    
+    const editAbandoned = document.getElementById('edit-abandoned');
+    if (editAbandoned) editAbandoned.checked = getCommonValue(i => dggsData.metadata.abandoned?.[i]) === true;
+    
     const commonSpec = getCommonValue(i => dggsData.metadata.factions[i]?.spec || 'auto');
     const anyHasFaction = selectedIndices.some(i => dggsData.cells[i].tile.faction > 0);
     if (anyHasFaction) {
@@ -2030,65 +2110,86 @@ function selectCell(idx) {
     }
 
     // FOW / Scan Controls Status logic:
-    // Reset all status displays first
     featureStatusRow.style.display = 'none';
-    featureActionRow.style.display = 'none';
     playerFeatureStatusRow.style.display = 'none';
     playerFeatureActionRow.style.display = 'none';
 
-    const commonFeature = getCommonValue(i => dggsData.cells[i].tile.feature);
-    if (commonFeature > 0 && commonFeature !== '<Multiple>') {
-        const isFeatureRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
-        
-        // 1. Update GM Ops FOW controls
-        if (userRole === 'gm') {
-            featureStatusRow.style.display = 'flex';
-            featureStatusValue.textContent = isFeatureRevealed ? 'REVEALED' : 'HIDDEN (FOW)';
-            featureStatusValue.style.color = isFeatureRevealed ? '#00e676' : '#ff1744';
+    const currentScanLevel = dggsData.metadata?.sectorScans?.[idx] || 0;
+    const isUnderground = dggsData.metadata?.underground?.[idx] || false;
+    const isAbandoned = dggsData.metadata?.abandoned?.[idx] || false;
+    
+    const lvlNames = { 0: 'Unscanned', 1: 'Marginal', 2: 'Ordinary', 3: 'Good', 4: 'Amazing', 5: 'Impossible' };
 
-            featureActionRow.style.display = 'flex';
-            gmRevealBtn.textContent = isFeatureRevealed ? 'HIDE FROM PLAYERS' : 'REVEAL TO PLAYERS';
-            gmRevealBtn.style.borderColor = isFeatureRevealed ? '#ff1744' : '#00e5ff';
-            gmRevealBtn.style.color = isFeatureRevealed ? '#ff1744' : '#00e5ff';
-            gmRevealBtn.style.background = isFeatureRevealed ? 'rgba(255, 23, 68, 0.15)' : 'rgba(0, 229, 255, 0.15)';
+    const commonFeature = getCommonValue(i => dggsData.cells[i].tile.feature);
+    let neededLevel = 1;
+    let overrideLevel = dggsData.metadata?.stealthOverrides?.[idx];
+    
+    if (commonFeature > 0 && commonFeature !== '<Multiple>') {
+        let defaultNeeded = getFeatureBaseStealth(commonFeature) + (isUnderground ? 1 : 0);
+        defaultNeeded = Math.min(defaultNeeded, 5);
+        neededLevel = overrideLevel !== undefined ? overrideLevel : defaultNeeded;
+    }
+
+    const isFeatureRevealedToPlayers = (commonFeature > 0 && commonFeature !== '<Multiple>') ? (currentScanLevel >= neededLevel) : false;
+
+    if (userRole === 'gm') {
+        featureStatusRow.style.display = 'flex';
+        
+        const neededContainer = document.getElementById('gm-needed-container');
+        if (neededContainer) {
+            if (commonFeature > 0 && commonFeature !== '<Multiple>') {
+                neededContainer.style.display = 'flex';
+            } else {
+                neededContainer.style.display = 'none';
+            }
+        }
+        
+        // Update Needed Level UI
+        const neededBtns = document.getElementById('gm-needed-level')?.querySelectorAll('.scan-btn');
+        if (neededBtns) {
+            neededBtns.forEach(b => b.classList.remove('active'));
+            const neededVal = neededLevel;
+            const btnToActivate = Array.from(neededBtns).find(b => parseInt(b.getAttribute('data-level')) === neededVal);
+            if (btnToActivate) btnToActivate.classList.add('active');
         }
 
-        // 2. Update Player/DATA Scan controls and read-only Feature view
-        if (isFeatureRevealed || userRole === 'gm') {
-            // Feature is known/revealed (or we are GM checking general data)
-            const featData = FEATURES[commonFeature] || { name: 'None', scanLevel: 0, shielding: 0 };
+        // Update Current Level UI
+        const currentBtns = document.getElementById('gm-current-level')?.querySelectorAll('.scan-btn');
+        if (currentBtns) {
+            currentBtns.forEach(b => b.classList.remove('active'));
+            const btnToActivate = Array.from(currentBtns).find(b => parseInt(b.getAttribute('data-level')) === currentScanLevel);
+            if (btnToActivate) btnToActivate.classList.add('active');
+        }
+    }
+
+    if (commonFeature > 0 && commonFeature !== '<Multiple>') {
+        if (isFeatureRevealedToPlayers || userRole === 'gm') {
+            const featData = FEATURES[commonFeature] || { name: 'None' };
             const featColor = FEATURE_COLORS[commonFeature] || '#e0f2f1';
-            const lvlNames = { 0: 'None', 1: 'Ordinary', 2: 'Good', 3: 'Amazing' };
-            const reqLvl = lvlNames[featData.scanLevel] || `Lvl ${featData.scanLevel}`;
-            const shieldText = featData.shielding < 0 ? ` (Shielding: ${featData.shielding})` : '';
+            const reqLvl = lvlNames[neededLevel] || `Lvl ${neededLevel}`;
             
-            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${featData.name}</span> <span style="font-size: 0.8em; color: #88aacc;">(Check: ${reqLvl}${shieldText})</span>`;
+            detailFeature.innerHTML = `<span style="color: ${featColor}; font-weight: bold;">${featData.name}</span> <span style="font-size: 0.8em; color: #88aacc;">(Check: ${reqLvl})</span>`;
             
             playerFeatureStatusRow.style.display = 'flex';
-            playerFeatureStatusValue.textContent = 'REVEALED';
-            playerFeatureStatusValue.style.color = '#00e676';
-            playerFeatureActionRow.style.display = 'none';
+            playerFeatureStatusValue.textContent = lvlNames[currentScanLevel].toUpperCase();
+            playerFeatureStatusValue.style.color = currentScanLevel > 0 ? '#00e676' : '#88aacc';
         } else {
-            // Feature is hidden to players: show scanning UI for players/non-GM
             detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
-            
             playerFeatureStatusRow.style.display = 'flex';
-            playerFeatureStatusValue.textContent = 'UNEXPLORED SIGNATURE';
-            playerFeatureStatusValue.style.color = '#ffd600';
-            
-            if (isViewer) {
-                playerFeatureActionRow.style.display = 'none';
-            } else {
-                playerFeatureActionRow.style.display = 'flex';
-                featureActionBtn.textContent = 'SCAN SECTOR';
-                featureActionBtn.style.borderColor = '#00e5ff';
-                featureActionBtn.style.color = '#00e5ff';
-                featureActionBtn.style.background = 'rgba(0, 229, 255, 0.15)';
-            }
+            playerFeatureStatusValue.textContent = lvlNames[currentScanLevel].toUpperCase();
+            playerFeatureStatusValue.style.color = currentScanLevel > 0 ? '#00e676' : '#88aacc';
         }
     } else {
         detailFeature.innerHTML = `<span style="color: #88aacc;">None</span>`;
+        playerFeatureStatusRow.style.display = 'flex';
+        playerFeatureStatusValue.textContent = lvlNames[currentScanLevel].toUpperCase();
+        playerFeatureStatusValue.style.color = currentScanLevel > 0 ? '#00e676' : '#88aacc';
     }
+
+    if (!isViewer && userRole !== 'gm') {
+        playerFeatureActionRow.style.display = 'flex';
+    }
+
 
     let analysis = '';
     if (selectedIndices.length > 1) {
@@ -2096,7 +2197,11 @@ function selectCell(idx) {
     } else {
         const biome = getBiomeInfo(t.biome);
         analysis = `A sector classified as ${biome.name.toLowerCase()} terrain. ${biome.desc}`;
-        const isRevealed = dggsData.metadata?.revealedFeatures?.includes(idx);
+        const currentScan = dggsData.metadata?.sectorScans?.[idx] || 0;
+        const override = dggsData.metadata?.stealthOverrides?.[idx];
+        const needed = override !== undefined ? override : getFeatureBaseStealth(t.feature);
+        const isRevealed = (currentScan >= needed);
+
         if (t.feature > 0 && (isRevealed || userRole === 'gm')) {
             const featData = FEATURES[t.feature] || { name: 'Unknown', scanLevel: 0, shielding: 0 };
             analysis += ` Sensors detected: ${featData.name}.`;
@@ -2117,7 +2222,7 @@ function selectCell(idx) {
     // Land btn state
     const isGm = userRole === 'gm';
     const isPlayer = userRole === 'player';
-    const canLand = isGm || (isPlayer && hasShipInSystem());
+    const canLand = isGm || (isPlayer && hasShipAtPlanet());
 
     if (canLand) {
         landBtn.style.display = 'block';
@@ -2187,14 +2292,15 @@ async function loadShips() {
     }
 }
 
-function hasShipInSystem() {
+function hasShipAtPlanet() {
     if (!systemX || !systemY || !systemZ) return false;
     const sysX = parseFloat(systemX).toFixed(2);
     const sysY = parseFloat(systemY).toFixed(2);
     const sysZ = parseFloat(systemZ).toFixed(2);
     return ships.some(ship => {
         if (ship.x === undefined || ship.y === undefined || ship.z === undefined) return false;
-        return ship.x.toFixed(2) === sysX && ship.y.toFixed(2) === sysY && ship.z.toFixed(2) === sysZ;
+        const inSystem = ship.x.toFixed(2) === sysX && ship.y.toFixed(2) === sysY && ship.z.toFixed(2) === sysZ;
+        return inSystem && ship.localTarget === planetParam;
     });
 }
 
@@ -2366,7 +2472,19 @@ generateBtn.addEventListener('click', () => {
     const pollution = parseInt(document.getElementById('map-pollution')?.value || 100);
     const conservation = parseInt(document.getElementById('map-conservation')?.value || 0);
     loadDGGS(seed, type, resolution, urbanization, pollution, conservation);
+    if (mapToolsModal) mapToolsModal.style.display = 'none';
 });
+
+if (floatingMapToolsBtn) {
+    floatingMapToolsBtn.addEventListener('click', () => {
+        if (mapToolsModal) mapToolsModal.style.display = 'flex';
+    });
+}
+if (closeMapToolsBtn) {
+    closeMapToolsBtn.addEventListener('click', () => {
+        if (mapToolsModal) mapToolsModal.style.display = 'none';
+    });
+}
 
 closeInfoBtn.addEventListener('click', () => { selectedIdx = -1; infoPanel.classList.remove('visible'); });
 
@@ -2703,9 +2821,11 @@ function updateControlPanelTabsVisibility() {
     if (userRole === 'gm') {
         if (cTabEditor) cTabEditor.style.display = 'block';
         if (cTabLive) cTabLive.style.display = 'block';
+        if (floatingMapToolsBtn) floatingMapToolsBtn.style.display = 'block';
     } else {
         if (cTabEditor) cTabEditor.style.display = 'none';
         if (cTabLive) cTabLive.style.display = 'none';
+        if (floatingMapToolsBtn) floatingMapToolsBtn.style.display = 'none';
         activateControlTab('player');
     }
 }
@@ -2869,6 +2989,10 @@ async function saveDGGSMetadata() {
         const payload = {
             revealedFeatures: dggsData.metadata.revealedFeatures || [],
             scannedCells: dggsData.metadata.scannedCells || [],
+            sectorScans: dggsData.metadata.sectorScans || {},
+            stealthOverrides: dggsData.metadata.stealthOverrides || {},
+            underground: dggsData.metadata.underground || {},
+            abandoned: dggsData.metadata.abandoned || {},
             landingCell: dggsData.metadata.landingCell !== undefined ? dggsData.metadata.landingCell : null,
             factions: dggsData.metadata.factions || {},
             customFeatures: dggsData.metadata.customFeatures || {},
@@ -2971,6 +3095,7 @@ editFeature.addEventListener('change', async () => {
             dggsData.cells[idx].tile.feature = val;
             if (!dggsData.metadata.customFeatures) dggsData.metadata.customFeatures = {};
             dggsData.metadata.customFeatures[idx] = val;
+            if (dggsData.metadata.stealthOverrides) delete dggsData.metadata.stealthOverrides[idx]; // Clear GM override on feature change
         }
         
         editFeature.disabled = true;
@@ -3009,6 +3134,39 @@ editFaction.addEventListener('change', async () => {
         selectCell(selectedIdx);
     }
 });
+
+const editUnderground = document.getElementById('edit-underground');
+if (editUnderground) {
+    editUnderground.addEventListener('change', async (e) => {
+        if (selectedIndices.length === 0 || !dggsData) return;
+        if (!dggsData.metadata) dggsData.metadata = {};
+        if (!dggsData.metadata.underground) dggsData.metadata.underground = {};
+        if (!dggsData.metadata.stealthOverrides) dggsData.metadata.stealthOverrides = {};
+        for (const idx of selectedIndices) {
+            if (e.target.checked) dggsData.metadata.underground[idx] = true;
+            else delete dggsData.metadata.underground[idx];
+            
+            delete dggsData.metadata.stealthOverrides[idx]; // Clear GM override on underground change
+        }
+        await saveDGGSMetadata();
+        selectCell(selectedIdx);
+    });
+}
+
+const editAbandoned = document.getElementById('edit-abandoned');
+if (editAbandoned) {
+    editAbandoned.addEventListener('change', async (e) => {
+        if (selectedIndices.length === 0 || !dggsData) return;
+        if (!dggsData.metadata) dggsData.metadata = {};
+        if (!dggsData.metadata.abandoned) dggsData.metadata.abandoned = {};
+        for (const idx of selectedIndices) {
+            if (e.target.checked) dggsData.metadata.abandoned[idx] = true;
+            else delete dggsData.metadata.abandoned[idx];
+        }
+        await saveDGGSMetadata();
+        selectCell(selectedIdx);
+    });
+}
 
 editFactionSpec.addEventListener('change', async () => {
     if (selectedIndices.length > 0 && dggsData) {
@@ -3094,6 +3252,30 @@ addLabelBtn.addEventListener('click', async () => {
     }
 });
 
+
+function getCellsByRadius(startIdx, rings) {
+    if (rings === 0) return [startIdx];
+    const visited = new Set([startIdx]);
+    let currentRing = [startIdx];
+    const result = [startIdx];
+    
+    for (let r = 1; r <= rings; r++) {
+        const nextRing = [];
+        for (const curr of currentRing) {
+            const neighbors = cellEdgeNeighbors[curr] || [];
+            for (const nIdx of neighbors) {
+                if (nIdx !== -1 && nIdx !== undefined && !visited.has(nIdx)) {
+                    visited.add(nIdx);
+                    nextRing.push(nIdx);
+                    result.push(nIdx);
+                }
+            }
+        }
+        currentRing = nextRing;
+    }
+    return result;
+}
+
 function getNearbyCells(startIdx, count) {
     if (count <= 1) return [startIdx];
     const visited = new Set([startIdx]);
@@ -3116,63 +3298,49 @@ function getNearbyCells(startIdx, count) {
     return result;
 }
 
-gmRevealBtn.addEventListener('click', async () => {
-    if (selectedIndices.length === 0 || !dggsData) return;
-    if (userRole !== 'gm') return;
 
+setupCompoundGroup('gm-needed-level', async (level) => {
+    if (selectedIdx < 0 || !dggsData || userRole !== 'gm') return;
     if (!dggsData.metadata) dggsData.metadata = {};
-    if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
-
-    const featureCells = selectedIndices.filter(idx => dggsData.cells[idx].tile.feature > 0);
-    if (featureCells.length === 0) return;
+    if (!dggsData.metadata.stealthOverrides) dggsData.metadata.stealthOverrides = {};
     
-    const allRevealed = featureCells.every(idx => dggsData.metadata.revealedFeatures.includes(idx));
-    
-    for (const idx of featureCells) {
-        if (allRevealed) {
-            dggsData.metadata.revealedFeatures = dggsData.metadata.revealedFeatures.filter(i => i !== idx);
-        } else {
-            if (!dggsData.metadata.revealedFeatures.includes(idx)) {
-                dggsData.metadata.revealedFeatures.push(idx);
-            }
-        }
+    if (level === 0) {
+        delete dggsData.metadata.stealthOverrides[selectedIdx];
+    } else {
+        dggsData.metadata.stealthOverrides[selectedIdx] = level;
     }
-
-    gmRevealBtn.disabled = true;
-    gmRevealBtn.textContent = 'SAVING...';
     await saveDGGSMetadata();
-    gmRevealBtn.disabled = false;
-
     selectCell(selectedIdx);
+});
+
+setupCompoundGroup('gm-current-level', async (level) => {
+    if (selectedIdx < 0 || !dggsData || userRole !== 'gm') return;
+    if (!dggsData.metadata) dggsData.metadata = {};
+    if (!dggsData.metadata.sectorScans) dggsData.metadata.sectorScans = {};
+    
+    dggsData.metadata.sectorScans[selectedIdx] = level;
+    await saveDGGSMetadata();
+    selectCell(selectedIdx);
+});
+
+let currentPlayerScanIntensity = 1;
+setupCompoundGroup('player-scan-level', (level) => {
+    currentPlayerScanIntensity = level;
 });
 
 featureActionBtn.addEventListener('click', async () => {
     if (selectedIdx < 0 || !dggsData) return;
 
     if (!dggsData.metadata) dggsData.metadata = {};
-    if (!dggsData.metadata.revealedFeatures) dggsData.metadata.revealedFeatures = [];
-    if (!dggsData.metadata.scannedCells) dggsData.metadata.scannedCells = [];
+    if (!dggsData.metadata.sectorScans) dggsData.metadata.sectorScans = {};
 
-    const countInput = document.getElementById('scan-count');
-    const count = countInput ? parseInt(countInput.value) || 1 : 1;
-    const successLevelSelect = document.getElementById('scan-success-level');
-    const successLevel = successLevelSelect ? parseInt(successLevelSelect.value) || 1 : 1;
-    const cellsToScan = getNearbyCells(selectedIdx, count);
-
-    let scanDelay = 1500;
-
-    for (const idx of cellsToScan) {
-        const c = dggsData.cells[idx];
-        const fData = FEATURES[c.tile.feature];
-        const sLevel = (c.tile.feature > 0 && fData) ? fData.scanLevel : 1;
-
-        if (sLevel === 2 && scanDelay < 1500) scanDelay = 1500;
-        if (sLevel === 3) scanDelay = 3000;
-    }
-
-    // base delay for multiple hexes
-    if (count > 1 && scanDelay < 1000 + count * 100) {
-        scanDelay = Math.min(1000 + count * 100, 5000); // max 5s for big scans
+    const scanSize = scanSizeSelect ? parseInt(scanSizeSelect.value) : 0;
+    
+    let cellsToScan = [];
+    if (scanSize === 99) {
+        cellsToScan = dggsData.cells.map((_, i) => i);
+    } else {
+        cellsToScan = getCellsByRadius(selectedIdx, scanSize);
     }
 
     featureActionBtn.disabled = true;
@@ -3180,22 +3348,47 @@ featureActionBtn.addEventListener('click', async () => {
     featureActionBtn.style.borderColor = '#ffd600';
     featureActionBtn.style.color = '#ffd600';
 
+    let scanDelay = 1500 + (cellsToScan.length * 10);
+    scanDelay = Math.min(scanDelay, 5000); // max 5 seconds
+
     setTimeout(async () => {
-        const foundFeatures = [];
+        let newFeaturesFound = [];
 
         for (const idx of cellsToScan) {
-            if (!dggsData.metadata.scannedCells.includes(idx)) {
-                dggsData.metadata.scannedCells.push(idx);
-            }
-            const c = dggsData.cells[idx];
-            const featData = (c.tile.feature > 0 && FEATURES[c.tile.feature]) ? FEATURES[c.tile.feature] : null;
-
-            if (featData) {
-                const effectiveSuccess = successLevel + (featData.shielding || 0);
-                if (effectiveSuccess >= featData.scanLevel) {
-                    if (!dggsData.metadata.revealedFeatures.includes(idx)) {
-                        dggsData.metadata.revealedFeatures.push(idx);
-                        foundFeatures.push(featData.name);
+            const currentLvl = dggsData.metadata.sectorScans[idx] || 0;
+            if (currentPlayerScanIntensity > currentLvl) {
+                dggsData.metadata.sectorScans[idx] = currentPlayerScanIntensity;
+                
+                const c = dggsData.cells[idx];
+                if (c) {
+                    // Check Feature
+                    if (c.tile.feature > 0) {
+                        const overrideLevel = dggsData.metadata?.stealthOverrides?.[idx];
+                        const isUnder = dggsData.metadata?.underground?.[idx];
+                        let defNeeded = getFeatureBaseStealth(c.tile.feature) + (isUnder ? 1 : 0);
+                        defNeeded = Math.min(defNeeded, 5);
+                        const neededLevel = overrideLevel !== undefined ? overrideLevel : defNeeded;
+                        
+                        if (currentLvl < neededLevel && currentPlayerScanIntensity >= neededLevel) {
+                            const featData = FEATURES[c.tile.feature];
+                            if (featData) {
+                                newFeaturesFound.push(featData.name);
+                            }
+                        }
+                    }
+                    // Check Settlement
+                    if (c.tile.faction > 0) {
+                        const isUnder = dggsData.metadata?.underground?.[idx];
+                        const isAband = dggsData.metadata?.abandoned?.[idx];
+                        const urbNeeded = getUrbStealth(c.tile.faction, isUnder, isAband);
+                        
+                        if (currentLvl < urbNeeded && currentPlayerScanIntensity >= urbNeeded) {
+                            const factionNames = {1: 'Outpost', 2: 'Town', 3: 'Metropolis', 4: 'Megacity'};
+                            let name = factionNames[c.tile.faction] || 'Settlement';
+                            if (isAband) name = 'Abandoned ' + name;
+                            if (isUnder) name = 'Underground ' + name;
+                            newFeaturesFound.push(name);
+                        }
                     }
                 }
             }
@@ -3203,17 +3396,14 @@ featureActionBtn.addEventListener('click', async () => {
 
         await saveDGGSMetadata();
         featureActionBtn.disabled = false;
-        featureActionBtn.textContent = 'SCAN SECTOR';
+        featureActionBtn.textContent = 'EXECUTE SCAN';
         featureActionBtn.style.borderColor = '#00e5ff';
         featureActionBtn.style.color = '#00e5ff';
 
-        const successNames = { 1: 'Ordinary Success', 2: 'Good Success', 3: 'Amazing Success' };
-        const successText = successNames[successLevel] || `Level ${successLevel}`;
-
-        if (foundFeatures.length > 0) {
-            alert(`Scan Complete! (Roll Result: ${successText})\n\nDetected and localized the following features:\n- ${foundFeatures.join('\n- ')}`);
+        if (newFeaturesFound.length > 0) {
+            alert(`Scan Complete!\n\nNew planetary features detected:\n- ${newFeaturesFound.join('\n- ')}`);
         } else {
-            alert(`Scan Complete! (Roll Result: ${successText})\n\nNo new planetary features detected in the scanned area. Some features may require higher sensor roll results or suffer from sensor shielding penalties.`);
+            alert(`Scan Complete!\n\nNo new planetary features detected in the scanned area.`);
         }
 
         selectCell(selectedIdx);

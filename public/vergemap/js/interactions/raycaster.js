@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { store } from '../store.js';
 import { camera } from '../renderer/core.js';
-import { showInfoPanel } from '../ui.js';
+import { showInfoPanel } from '../ui_v2.js';
 
 export const raycaster = new THREE.Raycaster();
 export const pointer = new THREE.Vector2();
@@ -29,7 +29,7 @@ export function onPointerDown(event, activeSystemView) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects(interactiveObjects);
+    const intersects = raycaster.intersectObjects(interactiveObjects, false);
 
     if (intersects.length > 0) {
         const selectedMesh = intersects[0].object;

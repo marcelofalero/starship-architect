@@ -12,6 +12,7 @@
 <body>
 
     <button id="back-to-system-btn" style="position: absolute; top: 15px; left: 15px; width: auto; z-index: 1000; padding: 10px 15px; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">&larr; BACK TO SYSTEM</button>
+    <button id="center-map-btn" style="position: absolute; bottom: 15px; left: 15px; width: auto; z-index: 1000; padding: 10px 15px; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">⌖ CENTER MAP</button>
 
     <div id="canvas-container">
         <canvas id="hex-canvas"></canvas>
@@ -62,51 +63,6 @@
 
         <!-- Tab 2: Editor (Generate & Load) -->
         <div id="tab-c-editor" class="control-tab-content">
-            <div class="panel-section">
-                <h3>Generate Map</h3>
-                <label for="map-seed">Planet Seed</label>
-                <input type="text" id="map-seed" value="Sol_III" placeholder="e.g. Earth_Core">
-
-                <label for="map-type">Planet Type</label>
-                <select id="map-type">
-                    <option value="terrestrial">Terrestrial</option>
-                    <option value="desert">Desert</option>
-                    <option value="ocean">Ocean</option>
-                    <option value="ice">Ice / Frozen</option>
-                    <option value="volcanic">Volcanic</option>
-                    <option value="barren">Barren</option>
-                    <option value="eyeball">Eyeball (Tidally Locked)</option>
-                </select>
-
-                <label for="map-radius">Planet Size (DGGS Resolution)</label>
-                <select id="map-radius">
-                    <option value="3">Small (~642 sectors)</option>
-                    <option value="4" selected>Medium (~2,562 sectors)</option>
-                    <option value="5">Large (~10,242 sectors)</option>
-                    <option value="6">Huge (~40,962 sectors) ⚠ Slow</option>
-                </select>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                    <label for="map-urbanization" style="margin:0;">Urbanization</label>
-                    <span id="urban-value" style="color: #00e5ff; font-family: 'Russo One', sans-serif; font-size: 0.9em;">15%</span>
-                </div>
-                <input type="range" id="map-urbanization" min="0" max="100" value="79" style="width: 100%; margin-bottom: 15px;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                    <label for="map-pollution" style="margin:0;">Pollution Output</label>
-                    <span id="poll-value" style="color: #9ccc65; font-family: 'Russo One', sans-serif; font-size: 0.9em;">100%</span>
-                </div>
-                <input type="range" id="map-pollution" min="0" max="100" value="100" style="width: 100%; margin-bottom: 5px;" oninput="document.getElementById('poll-value').textContent = this.value + '%'">
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                    <label for="map-conservation" style="margin:0;">Conservation</label>
-                    <span id="cons-value" style="color: #66bb6a; font-family: 'Russo One', sans-serif; font-size: 0.9em;">0%</span>
-                </div>
-                <input type="range" id="map-conservation" min="0" max="100" value="0" style="width: 100%; margin-bottom: 15px;" oninput="document.getElementById('cons-value').textContent = this.value + '%'">
-
-                <button id="generate-btn">Generate & Render</button>
-            </div>
-
             <div class="panel-section">
                 <h3>Load Saved Map</h3>
                 <label for="vmb-upload" class="file-upload-label">
@@ -180,20 +136,27 @@
             </div>
 
             <!-- Player Scanning Actions -->
-            <div id="player-feature-status-row" class="hud-row" style="display: none;">
-                <span class="hud-label">Scan Status:</span>
-                <span id="player-feature-status-value" class="hud-value">-</span>
+            <div id="player-feature-status-row" class="hud-row" style="display: none; flex-direction: column; gap: 5px;">
+                <span class="hud-label" style="font-size: 0.85em; text-transform: uppercase;">Sector Scan:</span>
+                <span id="player-feature-status-value" class="hud-value" style="font-size: 1.1em; font-weight: bold;">-</span>
             </div>
             <div id="player-feature-action-row" class="hud-row" style="display: none; margin-top: 5px; margin-bottom: 5px; gap: 5px; display: flex; flex-direction: column;">
                 <div style="display: flex; gap: 5px; width: 100%;">
-                    <input type="number" id="scan-count" value="1" min="1" max="100" style="width: 50px; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; text-align: center; font-family: 'Russo One', sans-serif;" title="Number of hexes to scan">
-                    <select id="scan-success-level" style="flex: 1; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; font-family: 'Russo One', sans-serif; font-size: 0.85em; height: auto;">
-                        <option value="1">Ordinary Success (Lvl 1)</option>
-                        <option value="2">Good Success (Lvl 2)</option>
-                        <option value="3">Amazing Success (Lvl 3)</option>
+                    <select id="scan-size" style="flex: 1; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; padding: 4px; font-family: 'Russo One', sans-serif; font-size: 0.85em; height: auto;">
+                        <option value="0">Hex (Target Only)</option>
+                        <option value="1">Hex+ (1 Ring)</option>
+                        <option value="2">Hex++ (2 Rings)</option>
+                        <option value="99">Global (Entire Planet)</option>
                     </select>
                 </div>
-                <button id="feature-action-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">SCAN SECTOR</button>
+                
+                <div style="display: flex; width: 100%; margin-top: 5px; margin-bottom: 5px;" class="scan-radio-group" id="player-scan-level">
+                    <button class="scan-btn" data-level="1">M</button>
+                    <button class="scan-btn" data-level="2">O</button>
+                    <button class="scan-btn" data-level="3">G</button>
+                    <button class="scan-btn" data-level="4">A</button>
+                </div>
+                <button id="feature-action-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">EXECUTE SCAN</button>
             </div>
 
             <!-- Suitability / Favorability Scores -->
@@ -223,7 +186,7 @@
 
         <!-- Tab 2: GM EDIT -->
         <div id="tab-gm-edit" class="tab-content">
-            <div id="gm-faction-row" class="hud-row" style="margin-bottom: 12px;">
+            <div id="gm-faction-row" class="hud-row" style="margin-bottom: 8px;">
                 <span class="hud-label">Settlement:</span>
                 <select id="edit-faction" style="width: 140px; margin-bottom: 0; padding: 4px 8px; font-size: 0.9em; height: auto;">
                     <option value="0">None</option>
@@ -232,6 +195,14 @@
                     <option value="3">Lvl 3: Metropolis</option>
                     <option value="4">Lvl 4: Megacity</option>
                 </select>
+            </div>
+            <div id="gm-modifiers-row" class="hud-row" style="margin-bottom: 12px; justify-content: flex-end; gap: 15px;">
+                <label style="color: #88aacc; font-size: 0.8em; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <input type="checkbox" id="edit-underground" style="margin: 0; cursor: pointer;"> Underground
+                </label>
+                <label style="color: #88aacc; font-size: 0.8em; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <input type="checkbox" id="edit-abandoned" style="margin: 0; cursor: pointer;"> Abandoned
+                </label>
             </div>
             <div id="gm-faction-spec-row" class="hud-row" style="margin-bottom: 12px; display: none;">
                 <span class="hud-label">Specialization:</span>
@@ -271,12 +242,30 @@
 
         <!-- Tab 3: GM OPS -->
         <div id="tab-gm-ops" class="tab-content">
-            <div id="feature-status-row" class="hud-row" style="margin-bottom: 8px; display: none;">
-                <span class="hud-label">FOW Status:</span>
-                <span id="feature-status-value" class="hud-value">-</span>
-            </div>
-            <div id="feature-action-row" class="hud-row" style="display: none; margin-bottom: 15px; flex-direction: column; gap: 5px;">
-                <button id="gm-reveal-btn" style="width: 100%; padding: 6px; font-size: 0.9em; font-weight: bold; background: rgba(0, 229, 255, 0.15); border: 1px solid #00e5ff; color: #00e5ff; border-radius: 4px; cursor: pointer; font-family: 'Russo One', sans-serif;">REVEAL TO PLAYERS</button>
+            <div id="feature-status-row" class="hud-row" style="display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: flex-start;">
+                
+                <div id="gm-needed-container" style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                    <span class="hud-label" style="font-size: 0.8em; text-transform: uppercase;">Needed Level (GM Override):</span>
+                    <div style="display: flex; width: 100%;" class="scan-radio-group" id="gm-needed-level">
+                        <button class="scan-btn" data-level="1" title="Marginal">M</button>
+                        <button class="scan-btn" data-level="2" title="Ordinary">O</button>
+                        <button class="scan-btn" data-level="3" title="Good">G</button>
+                        <button class="scan-btn" data-level="4" title="Amazing">A</button>
+                        <button class="scan-btn" data-level="5" title="Impossible">I</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                    <span class="hud-label" style="font-size: 0.8em; text-transform: uppercase;">Current Level (Player Progress):</span>
+                    <div style="display: flex; width: 100%;" class="scan-radio-group" id="gm-current-level">
+                        <button class="scan-btn" data-level="0" title="Unscanned (FOW)">U</button>
+                        <button class="scan-btn" data-level="1" title="Marginal">M</button>
+                        <button class="scan-btn" data-level="2" title="Ordinary">O</button>
+                        <button class="scan-btn" data-level="3" title="Good">G</button>
+                        <button class="scan-btn" data-level="4" title="Amazing">A</button>
+                        <button class="scan-btn" disabled style="opacity: 0.3; cursor: default;">-</button>
+                    </div>
+                </div>
             </div>
             
             <div id="gm-label-panel" style="display: flex; flex-direction: column; gap: 8px;">
@@ -312,6 +301,69 @@
     <!-- Floating Hover Tooltip -->
     <div id="tooltip"></div>
 
-    <script type="module" src="js/app.js?v=8"></script>
+    <!-- Map Generation Tools Modal -->
+    <div id="map-tools-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="modal-content" style="width: 350px;">
+            <h3>Generate Map</h3>
+            <div class="editor-controls">
+                <label for="map-seed">Planet Seed</label>
+                <input type="text" id="map-seed" value="Sol_III" placeholder="e.g. Earth_Core" style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 4px; border: 1px solid rgba(56, 158, 189, 0.5); background: rgba(10, 61, 84, 0.45); color: white;">
+
+                <label for="map-type">Planet Type</label>
+                <select id="map-type" style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 4px; border: 1px solid rgba(56, 158, 189, 0.5); background: rgba(10, 61, 84, 0.45); color: white;">
+                    <option value="terrestrial">Terrestrial</option>
+                    <option value="desert">Desert</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="ice">Ice / Frozen</option>
+                    <option value="volcanic">Volcanic</option>
+                    <option value="barren">Barren</option>
+                    <option value="eyeball">Eyeball (Tidally Locked)</option>
+                </select>
+
+                <label for="map-radius">Planet Size (DGGS Resolution)</label>
+                <select id="map-radius" style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 4px; border: 1px solid rgba(56, 158, 189, 0.5); background: rgba(10, 61, 84, 0.45); color: white;">
+                    <option value="3">Small (~642 sectors)</option>
+                    <option value="4" selected>Medium (~2,562 sectors)</option>
+                    <option value="5">Large (~10,242 sectors)</option>
+                    <option value="6">Huge (~40,962 sectors) ⚠ Slow</option>
+                </select>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-urbanization" style="margin:0;">Urbanization</label>
+                    <span id="urban-value" style="color: #00e5ff; font-family: 'Russo One', sans-serif; font-size: 0.9em;">15%</span>
+                </div>
+                <input type="range" id="map-urbanization" min="0" max="100" value="79" style="width: 100%; margin-bottom: 15px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-pollution" style="margin:0;">Pollution Output</label>
+                    <span id="poll-value" style="color: #9ccc65; font-family: 'Russo One', sans-serif; font-size: 0.9em;">100%</span>
+                </div>
+                <input type="range" id="map-pollution" min="0" max="100" value="100" style="width: 100%; margin-bottom: 5px;" oninput="document.getElementById('poll-value').textContent = this.value + '%'">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <label for="map-conservation" style="margin:0;">Conservation</label>
+                    <span id="cons-value" style="color: #66bb6a; font-family: 'Russo One', sans-serif; font-size: 0.9em;">0%</span>
+                </div>
+                <input type="range" id="map-conservation" min="0" max="100" value="0" style="width: 100%; margin-bottom: 15px;" oninput="document.getElementById('cons-value').textContent = this.value + '%'">
+
+                <button id="generate-btn" style="width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid #bd3838; background: #bd3838; color: white; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    Generate Map
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button id="close-map-tools-btn" style="flex: 1; background-color: #555;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons Container -->
+    <div style="position: fixed; bottom: 24px; right: 24px; display: flex; gap: 10px; z-index: 1000; pointer-events: none;">
+        <button id="floating-map-tools" class="floating-btn" title="Map Generation Tools" style="display: none; pointer-events: auto;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        </button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script type="module" src="js/app.js?v=25"></script>
 </body>
 </html>

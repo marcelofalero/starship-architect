@@ -4,7 +4,7 @@ import { generateSystem } from '../procgen/system.js';
 import { store } from '../store.js';
 import { saveStars } from '../data.js';
 import { updateBackendSession } from '../api.js';
-import { showInfoPanel, infoPanel, infoName, infoCoords, currentLang, i18n, applyModeUI, uiCtx } from '../ui.js';
+import { showInfoPanel, infoPanel, infoName, infoCoords, currentLang, i18n, applyModeUI, uiCtx } from '../ui_v2.js';
 import { camera, controls, galaxyScene, systemScene, currentScene, setScene, renderer, labelRenderer, clock } from './core.js';
 import { interactiveObjects } from '../interactions/raycaster.js';
 
@@ -363,26 +363,19 @@ export function renderShips() {
     });
 }
 export async function renderSystem() {
-    // Try to load predefined system data if not already loaded and not attempted
     if (store.state.currentSystemFocus && !store.state.currentSystemFocus.planets && !store.state.currentSystemFocus._triedFetch) {
-        try {
-            const res = await fetch(`systems/${store.state.currentSystemFocus.name}.json`);
-            if (res.ok) {
-                const data = await res.json();
-                store.state.currentSystemFocus.planets = data.planets;
-                if (data.systemSeed) store.state.currentSystemFocus.systemSeed = data.systemSeed;
-            }
-        } catch (e) {}
         store.state.currentSystemFocus._triedFetch = true;
     }
+
 
     // Clear previous
     clearScene(systemScene);
 
     const genMode = document.getElementById('generation-mode-select') ? document.getElementById('generation-mode-select').value : 'Normal';
     const isFirstTime = !store.state.currentSystemFocus.planets;
-    activeSystemView = generateSystem(store.state.currentSystemFocus, genMode);
+    activeSystemView = generateSystem(store.state.currentSystemFocus, genMode, systemAnimationTime);
     activeSystemView.position.set(0, 0, 0);
+    systemScene.add(activeSystemView);
     
     if (isFirstTime) {
         store.saveStars();
@@ -804,6 +797,81 @@ export function animateShip(ship, oldX, oldY, oldZ) {
     }
     requestAnimationFrame(tweenShip);
 }
+export function animateSystemShip(shipName, startWorldPos) {
+    if (!activeSystemView || !activeSystemView.userData.interactableMeshes) return;
+    const mesh = activeSystemView.userData.interactableMeshes.find(m => m.userData && m.userData.name === shipName);
+    if (!mesh) return;
+
+    const endWorldPos = new THREE.Vector3();
+    mesh.getWorldPosition(endWorldPos);
+    
+    const parent = mesh.parent;
+    systemScene.attach(mesh);
+    mesh.position.copy(startWorldPos);
+
+    const startTime = performance.now();
+    const duration = 2500;
+    
+    const moveDir = endWorldPos.clone().sub(startWorldPos);
+    let startQuat, endQuat;
+    if (moveDir.lengthSq() > 0.001) {
+        startQuat = mesh.quaternion.clone();
+        const dummy = new THREE.Object3D();
+        const angle = Math.atan2(moveDir.y, moveDir.x) - Math.PI / 2;
+        dummy.rotation.set(0, 0, angle);
+        endQuat = dummy.quaternion.clone();
+    }
+
+    function tweenShip(time) {
+        const elapsed = time - startTime;
+        
+        const rotDuration = 800;
+        let rotProgress = 0;
+        let rotEase = 0;
+        
+        if (startQuat && endQuat) {
+            rotProgress = Math.min(elapsed / rotDuration, 1);
+            rotEase = 1 - Math.pow(1 - rotProgress, 3);
+            mesh.quaternion.slerpQuaternions(startQuat, endQuat, rotEase);
+        }
+        
+        const moveDuration = duration - rotDuration;
+        const moveProgress = Math.max(0, Math.min((elapsed - rotDuration) / moveDuration, 1));
+        const moveEase = 1 - Math.pow(1 - moveProgress, 3);
+        
+        const targetWorldPos = new THREE.Vector3();
+        const dummyTarget = new THREE.Vector3(0.4, 0.4, 0); 
+        if (parent.type !== 'Scene') {
+            parent.localToWorld(dummyTarget);
+        } else {
+            // Free roaming system ships
+            const ship = store.state.ships.find(s => s.name === shipName);
+            if (ship) {
+                dummyTarget.set(Math.cos(ship.sysAngle) * ship.sysRadius, Math.sin(ship.sysAngle) * ship.sysRadius, 0);
+            }
+        }
+        targetWorldPos.copy(dummyTarget);
+        
+        mesh.position.lerpVectors(startWorldPos, targetWorldPos, moveEase);
+        
+        if (elapsed < duration) {
+            requestAnimationFrame(tweenShip);
+        } else {
+            parent.attach(mesh);
+            if (parent.type !== 'Scene') {
+                mesh.position.set(0.4, 0.4, 0);
+            } else {
+                const ship = store.state.ships.find(s => s.name === shipName);
+                if (ship) mesh.position.set(Math.cos(ship.sysAngle) * ship.sysRadius, Math.sin(ship.sysAngle) * ship.sysRadius, 0);
+            }
+            if (mesh.userData.hasToken) {
+                mesh.quaternion.set(0, 0, 0, 1);
+            }
+        }
+    }
+    requestAnimationFrame(tweenShip);
+}
+
 export function recenterMap() {
     const duration = 800;
     const startPos = camera.position.clone();
